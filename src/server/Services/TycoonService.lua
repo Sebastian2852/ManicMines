@@ -27,10 +27,12 @@ Returns the player's tycoon model if the player has one, otherwise returning not
 ]]--
 function TycoonService:GetPlayerTycoon(Player :Player) :Model?
     local UserId = Player.UserId
+    LogService:Log("Getting "..Player.Name.."'s tycoon")
 
     local FoundTycoon = Tycoons:FindFirstChild(tostring(UserId))
     if FoundTycoon then return FoundTycoon end
 
+    LogService:Warn("Couldnt find "..Player.Name.."'s tycoon")
     return nil
 end
 
@@ -40,11 +42,8 @@ spawns they get teleported to their tycoon spawn instead of the SpawnLocation.
 ]]--
 function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
     assert(not self:DoesPlayerHaveTycoon(Player), "Player already has tycoon?")
-    
-    LogService:Info("Creating tycoon for player: "..Player.Name) -- TEST LOGS
-    LogService:Log("Creating tycoon for player: "..Player.Name) -- TEST LOGS
-    LogService:Warn("Creating tycoon for player: "..Player.Name) -- TEST LOGS
 
+    LogService:Log("Creating tycoon for player: "..Player.Name)
     local NewTycoon = TycoonAssets.TycoonModel:Clone()
     NewTycoon.Name = Player.UserId
     NewTycoon.Parent = Tycoons
@@ -59,6 +58,7 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
         Player.Character:PivotTo(CFrame.new(TycoonSpawn.Position + Vector3.new(0, 5, 0)))
     end
 
+    LogService:Log("Created "..Player.Name.."'s tycoon")
     return NewTycoon
 end
 
@@ -71,6 +71,7 @@ Allow the client to get player tycoon, not really needed but here if for some re
 This function may later be removed but its here for now.
 ]]--
 function TycoonService.Client:GetPlayerTycoon(Player :Player) :Model?
+    LogService:Log(Player.Name.."asked for their tycoon model")
     return self:GetPlayerTycoon(Player)
 end
 
