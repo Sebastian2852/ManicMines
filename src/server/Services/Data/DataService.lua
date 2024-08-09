@@ -3,7 +3,7 @@ local Knit = require(game.ReplicatedStorage.Packages.Knit)
 local RootDataFolder :Folder = game.ReplicatedStorage.PlayerData
 local TemplateDataFolder :Folder = RootDataFolder:FindFirstChild("Template")
 
-local OresFolder :Folder = game.ReplicatedStorage.Ores
+local OresFolder :Folder = game.ReplicatedStorage.Assets.Ores
 
 local DataService = Knit.CreateService {
     Name = "DataService",
