@@ -8,6 +8,8 @@ local TycoonService = Knit.CreateService{
     Client = {};
 }
 
+local LogService = nil
+
 --[[
 Returns true/false if the player has a tycoon.
 ]]--
@@ -38,6 +40,11 @@ spawns they get teleported to their tycoon spawn instead of the SpawnLocation.
 ]]--
 function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
     assert(not self:DoesPlayerHaveTycoon(Player), "Player already has tycoon?")
+    
+    LogService:Info("Creating tycoon for player: "..Player.Name) -- TEST LOGS
+    LogService:Log("Creating tycoon for player: "..Player.Name) -- TEST LOGS
+    LogService:Warn("Creating tycoon for player: "..Player.Name) -- TEST LOGS
+
     local NewTycoon = TycoonAssets.TycoonModel:Clone()
     NewTycoon.Name = Player.UserId
     NewTycoon.Parent = Tycoons
@@ -76,6 +83,8 @@ Setup the module, for now it creates the tycoon for the player. Later when data 
 This will be removed and the data service will handle creating the player's tycoon.
 ]]--
 function TycoonService:KnitStart()
+    LogService = Knit.GetService("LogService")
+
     game.Players.PlayerAdded:Connect(function(Player)
         self:CreateTycoonForPlayer(Player)
     end)
