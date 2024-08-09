@@ -5,6 +5,8 @@ local TemplateDataFolder :Folder = RootDataFolder:FindFirstChild("Template")
 
 local OresFolder :Folder = game.ReplicatedStorage.Assets.Ores
 
+local PickaxeService
+
 local DataService = Knit.CreateService {
     Name = "DataService",
     Client = {},
@@ -18,6 +20,12 @@ function DataService:CreateDataFolderForPlayer(Player :Player) :Folder
     local DataFolder = TemplateDataFolder:Clone()
     DataFolder.Name = Player.UserId
     DataFolder.Parent = RootDataFolder
+
+    -- Move this into the load data function when that is made
+    PickaxeService:GivePickaxeToPlayer(Player) 
+    Player.CharacterAdded:Connect(function()
+        PickaxeService:GivePickaxeToPlayer(Player) 
+    end)
     return DataFolder
 end
 
@@ -73,6 +81,10 @@ function DataService:KnitInit()
     game.Players.PlayerAdded:Connect(function(Player)
         self:CreateDataFolderForPlayer(Player)
     end)
+end
+
+function DataService:KnitStart()
+    PickaxeService = Knit.GetService("PickaxeService")
 end
 
 return DataService
