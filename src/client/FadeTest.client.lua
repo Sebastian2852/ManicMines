@@ -1,18 +1,18 @@
-local Knit = require(game.ReplicatedStorage.Packages.Knit)
-local UserInputService = game:GetService("UserInputService")
+--local Knit = require(game.ReplicatedStorage.Packages.Knit)
+--local UserInputService = game:GetService("UserInputService")
+--
+--local FadeController = Knit.GetController("FadeController")
+--local LogService = Knit.GetService("LogService")
 
-local FadeController = Knit.GetController("FadeController")
-local LogService = Knit.GetService("LogService")
-
-UserInputService.InputBegan:Connect(function(Input)
-    LogService:Log("Awesome!")
-    if Input.KeyCode == Enum.KeyCode.Z then
-        FadeController:FadeGameplayOut(false);
-        return
-    end
-
-    if Input.KeyCode == Enum.KeyCode.X then
-        FadeController:FadeGameplayIn(false);
-        return
-    end
-end)
+--UserInputService.InputBegan:Connect(function(Input)
+--    LogService:Log("Awesome!")
+--    if Input.KeyCode == Enum.KeyCode.Z then
+--        FadeController:FadeGameplayOut(false);
+--        return
+--    end
+--
+--    if Input.KeyCode == Enum.KeyCode.X then
+--        FadeController:FadeGameplayIn(false);
+--        return
+--    end
+--end)
