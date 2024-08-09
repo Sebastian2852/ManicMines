@@ -29,6 +29,10 @@ function LogService:GetNameOfFunctionCaller(UpLevel :number) :string
     return Name:upper();
 end
 
+function LogService.Client:GetNameOfFunctionCaller(Player, UpLevel :number) :string
+    return self:GetNameOfFunctionCaller(UpLevel)
+end
+
 --[[
 Print out the message passed as well as anything else passed with a space between them in orange
 ]]--
@@ -39,6 +43,10 @@ function LogService:Warn(Message :string, ... :string)
     warn(ScriptName, "[WARNING]", Message, table.unpack(Extras))
 end
 
+function LogService.Client:Warn(Player :Player, Message :string, ... :string)
+    self:Warn("[CLIENT] "..Message, ...)
+end
+
 --[[
 Print out the message passed as well as anything else passed with a space between them
 ]]--
@@ -47,6 +55,10 @@ function LogService:Log(Message :string, ... :string)
     local Extras = {...}
     local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
     print(ScriptName, Message, table.unpack(Extras))
+end
+
+function LogService.Client:Log(Player :Player, Message :string, ... :string)
+    LogService.Log(LogService, "[CLIENT]", Message, ...)
 end
 
 --[[
@@ -70,6 +82,10 @@ function LogService:Info(Message :string, ... :string)
     TestService:Message(FinalMessage)
 end
 
+function LogService.Client:Info(Player :Player, Message :string, ... :string)
+    self:Info("[CLIENT] "..Message, ...)
+end
+
 --[[
 If the given value is nil or false it errors with a given error message.
 ]]--
@@ -77,6 +93,16 @@ function LogService:Assert(Value :any, ErrorMessage:string)
     if not self.AssertsEnabled then return end
     if Value == nil or Value == false then
         error("ASSERTION FAILED: "..ErrorMessage)
+    end
+end
+
+--[[
+The client side version which does the same except puts a client tag before the error.
+]]--
+function LogService.Client:Assert(Player :Player, Value :string, ErrorMessage :string)
+    if not self.AssertsEnabled then return end
+    if Value == nil or Value == false then
+        error("[CLIENT] ASSERTION FAILED: "..ErrorMessage)
     end
 end
 

@@ -8,8 +8,10 @@ repeat
 until Knit.ControllersReady
 
 local FadeController = Knit.GetController("FadeController")
+local LogService = Knit.GetService("LogService")
 
 UserInputService.InputBegan:Connect(function(Input)
+    LogService:Log("Awesome!")
     if Input.KeyCode == Enum.KeyCode.Z then
         FadeController:FadeGameplayOut(false);
         return
