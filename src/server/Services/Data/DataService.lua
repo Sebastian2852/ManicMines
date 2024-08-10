@@ -4,6 +4,7 @@ local RootDataFolder :Folder = game.ReplicatedStorage.PlayerData
 local TemplateDataFolder :Folder = RootDataFolder:FindFirstChild("Template")
 
 local OresFolder :Folder = game.ReplicatedStorage.Assets.Ores
+local PickaxesFolder :Folder = game.ReplicatedStorage.Assets.Pickaxe.Pickaxes
 
 local PickaxeService
 
@@ -74,6 +75,13 @@ function DataService:KnitInit()
         local EmblemOwned = Instance.new("BoolValue")
         EmblemOwned.Name = Ore.Name
         EmblemOwned.Parent = TemplateDataFolder.Emblems
+    end
+
+    for _, Pickaxe in pairs(PickaxesFolder:GetChildren()) do
+        local PickaxeValue = Instance.new("BoolValue")
+        PickaxeValue.Name = Pickaxe:GetAttribute("Name")
+        PickaxeValue.Parent = TemplateDataFolder.Pickaxes
+        PickaxeValue.Value = Pickaxe:GetAttribute("OwnedByDefault")
     end
 
     -- TEMP CODE:
