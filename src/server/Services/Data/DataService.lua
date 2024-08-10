@@ -79,9 +79,13 @@ function DataService:KnitInit()
 
     for _, Pickaxe in pairs(PickaxesFolder:GetChildren()) do
         local PickaxeValue = Instance.new("BoolValue")
-        PickaxeValue.Name = Pickaxe:GetAttribute("Name")
-        PickaxeValue.Parent = TemplateDataFolder.Pickaxes
+        PickaxeValue.Name = Pickaxe.Name
         PickaxeValue.Value = Pickaxe:GetAttribute("OwnedByDefault")
+        PickaxeValue.Parent = TemplateDataFolder.Pickaxes.Owned
+
+        local PickaxeUpgradeFolder = Instance.new("Folder")
+        PickaxeUpgradeFolder.Name = Pickaxe.Name
+        PickaxeUpgradeFolder.Parent = TemplateDataFolder.Pickaxes.Upgrades
     end
 
     -- TEMP CODE:

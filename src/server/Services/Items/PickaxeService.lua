@@ -71,7 +71,7 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
     assert(DataFolder, "No data folder")
 
-    local CurrentPickaxeID = DataFolder.Equipped.Pickaxe.Value
+    local CurrentPickaxeID = DataFolder.Pickaxes.Equipped.Value
     local CurrentPickaxeConfig = Pickaxes:FindFirstChild(CurrentPickaxeID)
     assert(CurrentPickaxeConfig, "No pickaxe config")
 
