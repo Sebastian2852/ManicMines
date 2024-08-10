@@ -62,11 +62,11 @@ function DataService:KnitInit()
     for _, Ore :BasePart in pairs(OresFolder:GetChildren()) do
         local InventoryValue = Instance.new("IntValue")
         InventoryValue.Name = Ore.Name
-        InventoryValue.Parent = TemplateDataFolder.Inventory
+        InventoryValue.Parent = TemplateDataFolder.Inventory.Ores
         
         local StorageValue = Instance.new("IntValue")
         StorageValue.Name = Ore.Name
-        StorageValue.Parent = TemplateDataFolder.Storage
+        StorageValue.Parent = TemplateDataFolder.Storage.Ores
 
         local TimesMinedValue = Instance.new("IntValue")
         TimesMinedValue.Name = Ore.Name
