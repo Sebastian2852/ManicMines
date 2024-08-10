@@ -11,7 +11,36 @@ local PickaxeService = Knit.CreateService {
     Client = {},
 }
 
-function PickaxeService:RemovePlayerPickaxe(Player :Player)
+
+
+--[[
+Returns true/false depending on if the player has a pickaxe tool
+]]--
+function PickaxeService:DoesPlayerHavePickaxe(Player :Player) :boolean
+    for _, Tool in pairs(Player.Backpack:GetChildren()) do
+        if Tool:HasTag("Pickaxe") and Tool:IsA("Tool") then
+            return true
+        end
+    end
+
+    if Player.Character then
+        for _, Tool in pairs(Player.Character:GetChildren()) do
+            if Tool:HasTag("Pickaxe") and Tool:IsA("Tool") then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+--[[
+Remove the current pickaxe the player has in their inventory or from their
+character if they have it equipped
+]]--
+function PickaxeService:RemovePickaxeFromPlayer(Player :Player)
+    if not self:DoesPlayerHavePickaxe(Player) then return end
+
     for _, Tool in pairs(Player.Backpack:GetChildren()) do
         if Tool:HasTag("Pickaxe") and Tool:IsA("Tool") then
             Tool:Destroy()
@@ -27,10 +56,17 @@ function PickaxeService:RemovePlayerPickaxe(Player :Player)
     end
 end
 
+--[[
+Give the player thier currently equipped pickaxe
+]]--
 function PickaxeService:GivePickaxeToPlayer(Player :Player)
     repeat
         task.wait(1)
     until Player.Character
+
+    if self:DoesPlayerHavePickaxe(Player) then
+        self:RemovePickaxeFromPlayer(Player)
+    end
 
     local DataFolder = DataService:GetPlayerDataFolder(Player)
     assert(DataFolder, "No data folder")
