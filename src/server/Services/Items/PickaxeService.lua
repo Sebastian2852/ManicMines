@@ -1,7 +1,9 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+
 local DataService
+local MineService
 
 local PickaxeAssetFolder = game.ReplicatedStorage.Assets.Pickaxe
 local Pickaxes = PickaxeAssetFolder.Pickaxes
@@ -38,7 +40,7 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
     if not ObjectToMine then return end
     if not DataFolder then return end
 
-    --if DataFolder.InventoryItemCount.Value + ObjectToMine:GetAttribute("AmountDroppedWhenMined") > DataFolder.InventoryCap.Value then return end
+    if DataFolder.Inventory.InventoryItemCount.Value + ObjectToMine:GetAttribute("AmountDroppedWhenMined") > DataFolder.Inventory.InventoryCap.Value then return end
 
     local Character = Player.Character
     local Pickaxe = self:GetPlayerPickaxe(Player)
@@ -54,36 +56,62 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
     ObjectToMine:SetAttribute("BeingMined", true)
 
     while self.Mining[Player.UserId].Mining and self:VerifyIfCanMine(Player, Character, ObjectToMine) do
-		local Health :number = ObjectToMine:GetAttribute("Health")
-		
-		if Health <= 0 then
-			--StopMining(Player)
-			--Mine:BlockMined(Player, ObjectToMine)
-			--DataModule:MinedOre(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"), Player)
-			--DataModule:RecalculateInventoryItems(Player)
-			--Events.Client.UpdateInventory:FireClient(Player)
-			break
-		end
-		
-		Health -= Pickaxe:GetAttribute("HitDamage")
-		ObjectToMine:SetAttribute("Health", Health)
-		--Events.Client.UpdateMiningSelection:FireClient(Player, ObjectToMine.Name, DataModule:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
-		
-		if Health <= 0 then
-			--Mine:BlockMined(Player, ObjectToMine)
-			--task.wait(PickaxeStats.MiningHitDelay / 2)
-			--DataModule:MinedOre(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"), Player)
-			--DataModule:RecalculateInventoryItems(Player)
-			--StopMining(Player)
-			--Events.Client.UpdateInventory:FireClient(Player)
-			break
-		end
-		
-		task.wait(Pickaxe:GetAttribute("MiningHitDelay"))
-	end
+        local Health :number = ObjectToMine:GetAttribute("Health")
+
+        if Health <= 0 then
+            self:StopMining(Player)
+            MineService:BlockMined(Player, ObjectToMine)
+            --DataModule:MinedOre(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"), Player)
+            --DataModule:RecalculateInventoryItems(Player)
+            --Events.Client.UpdateInventory:FireClient(Player)
+            break
+        end
+
+        Health -= Pickaxe:GetAttribute("HitDamage")
+        ObjectToMine:SetAttribute("Health", Health)
+        --Events.Client.UpdateMiningSelection:FireClient(Player, ObjectToMine.Name, DataModule:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
+
+        if Health <= 0 then
+            self:StopMining(Player)
+            MineService:BlockMined(Player, ObjectToMine)
+            task.wait(Pickaxe:GetAttribute("MiningHitDelay") / 2)
+            --DataModule:MinedOre(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"), Player)
+            --DataModule:RecalculateInventoryItems(Player)
+            --Events.Client.UpdateInventory:FireClient(Player)
+            break
+        end
+
+        task.wait(Pickaxe:GetAttribute("MiningHitDelay"))
+    end
 end
 
+function PickaxeService.Client:StopMining(Player :Player)
+    if not self.Mining[Player.UserId] then
+        self.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}
+    end
 
+    if not self.Mining[Player.UserId].Mining then return end
+
+    local DataFolder = DataService:GetPlayerDataFolder(Player)
+    if not DataFolder then return end
+
+    if self.Mining[Player.UserId].Object ~= nil then
+        self.Mining[Player.UserId].Object:SetAttribute("MinedBy", 0)
+        self.Mining[Player.UserId].Object:SetAttribute("BeingMined", false)
+    end
+
+    local Pickaxe = self:GetPlayerPickaxe(Player)
+
+    DataFolder.ServerMining.Value = false
+    self.Mining[Player.UserId].Mining = false
+    self.Mining[Player.UserId].Object = nil
+
+    self.Mining[Player.UserId].Cooldown = true
+    task.spawn(function()
+        task.wait(Pickaxe:GetAttribute("MiningCooldown"))
+        self.Mining[Player.UserId].Cooldown = false
+    end)
+end
 
 --[[
 Returns true/false depending on if the player has a pickaxe tool
@@ -179,6 +207,7 @@ end
 
 function PickaxeService:KnitStart()
     DataService = Knit.GetService("DataService")
+    MineService = Knit.GetService("MineService")
 
     game.Players.PlayerAdded:Connect(function(Player)
         self.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}

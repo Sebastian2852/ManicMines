@@ -32,7 +32,6 @@ layer is used.
 ]]--
 function MineService:YLevelToLayer(YLevel :number) :Configuration
     -- This only returns the default layer for now
-
     return game.ReplicatedStorage.Assets.Layers.Default
 end
 
@@ -141,16 +140,32 @@ function MineService:GenerateTopLayer()
     MineSpawn.CanCollide = false
 end
 
+function MineService:BlockMined(Player :Player, Block :BasePart)
+    local PositionOffsets = {
+        Vector3.new(5, 0, 0);
+        Vector3.new(-5, 0, 0);
+
+        Vector3.new(0, 5, 0);
+        Vector3.new(0, -5, 0);
+
+        Vector3.new(0, 0, 5);
+        Vector3.new(0, 0, -5);
+    }
+
+    local OriginalPosition = Block.Position
+    Block:Destroy()
+
+    for _, Offset in pairs(PositionOffsets) do
+        MineService:GenerateBlockAtPosition(OriginalPosition + Offset)
+    end
+end
+
 
 --[[ KNIT ]]--
 function MineService:KnitStart()
     self:GenerateTopLayer()
 end
 
-
-function MineService:KnitInit()
-    
-end
 
 
 return MineService
