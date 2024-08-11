@@ -182,6 +182,10 @@ function PickaxeService:KnitStart()
 
     game.Players.PlayerAdded:Connect(function(Player)
         self.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}
+
+        Player.CharacterAdded:Connect(function(Character :Model)
+            Character.Parent = workspace.Game.Players
+        end)
     end)
 
     game.Players.PlayerRemoving:Connect(function(Player)
