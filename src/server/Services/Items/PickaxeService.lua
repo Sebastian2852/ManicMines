@@ -18,6 +18,9 @@ local PickaxeService = Knit.CreateService {
 
 PickaxeService.Mining = {}
 
+--[=[
+Check if the player can actually mine the block they want to
+]=]
 function PickaxeService:VerifyIfCanMine(Player :Player, Character :Model, ObjectToMine :BasePart) :boolean
     local Pickaxe :Instance = PickaxeService:GetPlayerPickaxe(Player)
     if not Pickaxe then return false end
@@ -30,6 +33,9 @@ function PickaxeService:VerifyIfCanMine(Player :Player, Character :Model, Object
     return true
 end
 
+--[=[
+Makes the player start mining a given block
+]=]
 function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePart)
     if not PickaxeService.Mining[Player.UserId] then
         LogService:Warn("Player should have an entry in mining table?")
@@ -67,7 +73,7 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
 
         if Health <= 0 then
             PickaxeService:StopMining(Player)
-            MineService:BlockMined(Player, ObjectToMine)
+            MineService:BlockMined(ObjectToMine)
             PlayerStatsService:MinedOre(Player, OreListItem)
             --DataModule:RecalculateInventoryItems(Player)
             --Events.Client.UpdateInventory:FireClient(Player)
@@ -80,7 +86,7 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
 
         if Health <= 0 then
             PickaxeService.Client:StopMining(Player)
-            MineService:BlockMined(Player, ObjectToMine)
+            MineService:BlockMined(ObjectToMine)
             task.wait(Pickaxe:GetAttribute("MiningHitDelay") / 2)
             PlayerStatsService:MinedOre(Player, OreListItem)
             --DataModule:RecalculateInventoryItems(Player)
@@ -92,6 +98,9 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
     end
 end
 
+--[=[
+Stops the player from mining aswell as starting their cooldown
+]=]
 function PickaxeService.Client:StopMining(Player :Player)
     if not PickaxeService.Mining[Player.UserId] then
         PickaxeService.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}
@@ -121,9 +130,9 @@ function PickaxeService.Client:StopMining(Player :Player)
     end)
 end
 
---[[
+--[=[
 Returns true/false depending on if the player has a pickaxe tool
-]]--
+]=]
 function PickaxeService:DoesPlayerHavePickaxe(Player :Player) :boolean
     for _, Tool in pairs(Player.Backpack:GetChildren()) do
         if Tool:HasTag("Pickaxe") and Tool:IsA("Tool") then
@@ -142,9 +151,9 @@ function PickaxeService:DoesPlayerHavePickaxe(Player :Player) :boolean
     return false
 end
 
---[[
+--[=[
 Returns the player's pickaxe tool
-]]--
+]=]
 function PickaxeService:GetPlayerPickaxe(Player :Player) :Tool?
     for _, Tool in pairs(Player.Backpack:GetChildren()) do
         if Tool:HasTag("Pickaxe") and Tool:IsA("Tool") then
@@ -163,10 +172,10 @@ function PickaxeService:GetPlayerPickaxe(Player :Player) :Tool?
     return nil
 end
 
---[[
+--[=[
 Remove the current pickaxe the player has in their inventory or from their
 character if they have it equipped
-]]--
+]=]
 function PickaxeService:RemovePickaxeFromPlayer(Player :Player)
     if not PickaxeService:DoesPlayerHavePickaxe(Player) then return end
 
@@ -187,9 +196,9 @@ function PickaxeService:RemovePickaxeFromPlayer(Player :Player)
     end
 end
 
---[[
+--[=[
 Give the player thier currently equipped pickaxe
-]]--
+]=]
 function PickaxeService:GivePickaxeToPlayer(Player :Player)
     LogService:Log("Giving "..Player.Name.." a pickaxe")
     repeat

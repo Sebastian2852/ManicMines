@@ -4,18 +4,18 @@ local Types = require(game.ReplicatedStorage.Shared.Modules.Types)
 local DataService
 local LogService
 
---[[
+--[=[
 A service that has all the functions to do with stats, stuff like giving ores
 paying for stuff, etc. All those functions are in this service
-]]--
+]=]
 local PlayerStatsService = Knit.CreateService {
     Name = "PlayerStatsService",
     Client = {},
 }
 
---[[
+--[=[
 Internal function to convert and ore into its inventory value
-]]--
+]=]
 local function ConvertOreListItemToInventoryValue(DataFolder :Folder, Ore :Types.OreListItem) :IntValue
     local OreName = Ore.Name
     
@@ -37,10 +37,10 @@ local function ConvertOreListItemToTimesMinedValue(DataFolder :Folder, Ore :Type
     return FoundValue
 end
 
---[[
+--[=[
 Converts an ore part or ore name into an `OreListItem` which can be used with most functions that take in ores
 as a paramater
-]]--
+]=]
 function PlayerStatsService:ConvertOreNameToOreListItem(Ore :string|BasePart, Amount :number) :Types.OreListItem
     local OreName = ""
 
@@ -58,9 +58,9 @@ function PlayerStatsService:ConvertOreNameToOreListItem(Ore :string|BasePart, Am
     }
 end
 
---[[
+--[=[
 Gives an ore to the players inventory, doesnt matter if they dont have enough space to carry it
-]]--
+]=]
 function PlayerStatsService:GiveOre(Player :Player, Ore :Types.OreListItem)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
     local ValueToChange :IntValue = ConvertOreListItemToInventoryValue(DataFolder, Ore)
@@ -69,9 +69,9 @@ function PlayerStatsService:GiveOre(Player :Player, Ore :Types.OreListItem)
     LogService:Log("Gave "..Player.Name.." "..Ore.Amount.." "..Ore.Name)
 end
 
---[[
+--[=[
 Gives the player an ore and adds it to its times mined value
-]]--
+]=]
 function PlayerStatsService:MinedOre(Player :Player, Ore :Types.OreListItem)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
     local ValueToChange = ConvertOreListItemToTimesMinedValue(DataFolder, Ore)

@@ -16,9 +16,9 @@ end
 
 --[[ KNIT ]]--
 
---[[
+--[=[
 Setup events for values changing to update their UI as well as getting the player's data folder
-]]--
+]=]
 function HUDController:KnitInit()
     PlayerDataFolder = game.ReplicatedStorage:WaitForChild("PlayerData"):WaitForChild(Knit.Player.UserId)
 
@@ -27,9 +27,9 @@ function HUDController:KnitInit()
     end)
 end
 
---[[
+--[=[
 Update all UIs on start
-]]--
+]=]
 function HUDController:KnitStart()
    self:UpdateGold() 
 end

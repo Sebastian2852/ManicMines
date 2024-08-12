@@ -28,18 +28,18 @@ MineService.Settings = {
     ChanceToGenerateOre = 25
 }
 
---[[
+--[=[
 Convert any Y level number into a layer config. If no valid layer config is found then the default
 layer is used.
-]]--
+]=]
 function MineService:YLevelToLayer(YLevel :number) :Configuration
     -- This only returns the default layer for now
     return game.ReplicatedStorage.Assets.Layers.Default
 end
 
---[[
+--[=[
 Gets a table of the possible ores that can spawn at a given Y level
-]]--
+]=]
 function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
     local SpawnableOres = {}
 
@@ -56,9 +56,9 @@ function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
     return SpawnableOres
 end
 
---[[
+--[=[
 Generates a position at a given position, has a random chance to be an ore
-]]--
+]=]
 function MineService:GenerateBlockAtPosition(Position :Vector3)
     if table.find(self.UsedPositions, Position) then return end
 
@@ -107,9 +107,9 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     end
 end
 
---[[
+--[=[
 Generates the top layer of the mine based of the mine spawn
-]]--
+]=]
 function MineService:GenerateTopLayer()
     if not TopLayerCanGenerate then return end
 
@@ -143,7 +143,10 @@ function MineService:GenerateTopLayer()
     MineSpawn.CanCollide = false
 end
 
-function MineService:BlockMined(Player :Player, Block :BasePart)
+--[=[
+Generates blocks around a block that was mined aswell as destroying the block
+]=]
+function MineService:BlockMined(Block :BasePart)
     local PositionOffsets = {
         Vector3.new(5, 0, 0);
         Vector3.new(-5, 0, 0);

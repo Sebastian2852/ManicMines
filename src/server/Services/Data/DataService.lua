@@ -16,6 +16,10 @@ local DataService = Knit.CreateService {
 
 --[[ INTERNAL ]]--
 
+--[=[
+Create all values in the template data folder so that it can be cloned for each player
+and it be fully ready for data loading straight away
+]=]
 local function SetupTemplateDataFolder()
     local StoneInventoryValue = Instance.new("IntValue")
     StoneInventoryValue.Name = "Stone"
@@ -69,9 +73,9 @@ end
 
 --[[ PUBLIC ]]--
 
---[[
+--[=[
 Create a data folder for a given player
-]]--
+]=]
 function DataService:CreateDataFolderForPlayer(Player :Player) :Folder
     if self:PlayerHasDataFolder(Player) then return nil end
     local DataFolder = TemplateDataFolder:Clone()
@@ -88,17 +92,17 @@ function DataService:CreateDataFolderForPlayer(Player :Player) :Folder
     return DataFolder
 end
 
---[[
+--[=[
 Returns the player's data folder if they have one
-]]--
+]=]
 function DataService:GetPlayerDataFolder(Player :Player) :Folder?
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     return FoundDataFolder
 end
 
---[[
+--[=[
 Returns true/false if the the player has a data folder
-]]--
+]=]
 function DataService:PlayerHasDataFolder(Player :Player) :boolean
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     if FoundDataFolder then
@@ -112,11 +116,11 @@ end
 
 --[[ KNIT ]]--
 
---[[
+--[=[
 Setup the template data folder to have every single value so that when it is
 cloned for a player it already has every value the player needs ready. This should
 make it so data loading is much faster than before.
-]]--
+]=]
 function DataService:KnitInit()
     LogService = Knit.GetService("LogService")
 

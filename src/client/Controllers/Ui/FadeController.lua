@@ -42,33 +42,33 @@ end
 
 --[[ FUNCTIONS ]]--
 
---[[
+--[=[
 Fades in a black GUI to cover the whole screen and any UI
 if await for finish is true then the script will not return
 until the fade has finished
-]]--
+]=]
 function FadeController:FadeGameplayOut(AwaitFinish :boolean)
     FadeGuiIn(true, AwaitFinish)
 end
 
---[[
+--[=[
 Fades out the GUI if await for finish is true then the script
 will not return until the fade has finished
-]]--
+]=]
 function FadeController:FadeGameplayIn(AwaitFinish :boolean)
     FadeGuiOut(true, AwaitFinish)
 end
 
---[[
+--[=[
 Puts the black gui on the screen with no fade/animation
-]]--
+]=]
 function FadeController:HideGameplay()
     FadeGuiIn(false, false)
 end
 
---[[
+--[=[
 gets rid of the black gui on the screen with no fade/animation
-]]--
+]=]
 function FadeController:ShowGameplay()
     FadeGuiOut(false, false)
 end
