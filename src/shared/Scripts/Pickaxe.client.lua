@@ -38,7 +38,6 @@ local function Activate()
     if PlayerFolder.PickaxeSelection.Value:GetAttribute("BeingMined") then return end
 
     if not Active then
-        print("Activating")
         PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
         Active = true
         while Active do
@@ -53,7 +52,6 @@ end
 
 local function Deactivate()
     if Automining then return end
-    print("Deactivating")
     PickaxeService:StopMining()
     Active = false
 end

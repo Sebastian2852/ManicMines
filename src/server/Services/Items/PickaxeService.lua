@@ -6,6 +6,7 @@ local Types = require(ReplicatedStorage.Shared.Modules.Types)
 local PlayerStatsService
 local DataService
 local MineService
+local LogService
 
 local PickaxeAssetFolder = game.ReplicatedStorage.Assets.Pickaxe
 local Pickaxes = PickaxeAssetFolder.Pickaxes
@@ -31,6 +32,7 @@ end
 
 function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePart)
     if not PickaxeService.Mining[Player.UserId] then
+        LogService:Warn("Player should have an entry in mining table?")
         PickaxeService.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}
     end
 
@@ -56,6 +58,8 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
 
     ObjectToMine:SetAttribute("MinedBy", Player.UserId)
     ObjectToMine:SetAttribute("BeingMined", true)
+
+    LogService:Log(Player.Name.." started mining")
 
     while PickaxeService.Mining[Player.UserId].Mining and PickaxeService:VerifyIfCanMine(Player, Character, ObjectToMine) do
         local Health :number = ObjectToMine:GetAttribute("Health")
@@ -104,6 +108,7 @@ function PickaxeService.Client:StopMining(Player :Player)
     end
 
     local Pickaxe = PickaxeService:GetPlayerPickaxe(Player)
+    LogService:Log(Player.Name.." stopped mining")
 
     DataFolder.ServerMining.Value = false
     PickaxeService.Mining[Player.UserId].Mining = false
@@ -165,6 +170,8 @@ character if they have it equipped
 function PickaxeService:RemovePickaxeFromPlayer(Player :Player)
     if not PickaxeService:DoesPlayerHavePickaxe(Player) then return end
 
+    LogService:Log("Removing "..Player.Name.."'s pickaxe")
+
     for _, Tool in pairs(Player.Backpack:GetChildren()) do
         if Tool:HasTag("Pickaxe") and Tool:IsA("Tool") then
             Tool:Destroy()
@@ -184,6 +191,7 @@ end
 Give the player thier currently equipped pickaxe
 ]]--
 function PickaxeService:GivePickaxeToPlayer(Player :Player)
+    LogService:Log("Giving "..Player.Name.." a pickaxe")
     repeat
         task.wait(1)
     until Player.Character
@@ -193,11 +201,11 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
     end
 
     local DataFolder = DataService:GetPlayerDataFolder(Player)
-    assert(DataFolder, "No data folder")
+    LogService:Assert(DataFolder, "No data folder")
 
     local CurrentPickaxeID = DataFolder.Pickaxes.Equipped.Value
     local CurrentPickaxeConfig = Pickaxes:FindFirstChild(CurrentPickaxeID)
-    assert(CurrentPickaxeConfig, "No pickaxe config")
+    LogService:Assert(CurrentPickaxeConfig, "No pickaxe config")
 
     local Pickaxe = CurrentPickaxeConfig:FindFirstChildWhichIsA("Tool")
     local NewPickaxe = Pickaxe:Clone()
@@ -206,12 +214,15 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
     NewScript.Parent = NewPickaxe
 end
 
+
+
 --[[ KNIT ]]--
 
 function PickaxeService:KnitStart()
     DataService = Knit.GetService("DataService")
     MineService = Knit.GetService("MineService")
     PlayerStatsService = Knit.GetService("PlayerStatsService")
+    LogService = Knit.GetService("LogService")
 
     game.Players.PlayerAdded:Connect(function(Player)
         PickaxeService.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}

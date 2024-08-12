@@ -2,6 +2,8 @@ local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
+local LogService
+
 local MineService = Knit.CreateService {
     Name = "MineService",
     Client = {},
@@ -121,6 +123,7 @@ function MineService:GenerateTopLayer()
     local BlocksToGenerateX = math.round(MineSpawn.Size.X / BlockSize.X)
     local BlocksToGenerateY = math.round(MineSpawn.Size.Z / BlockSize.Z)
 
+    LogService:Log("Generating top layer ("..(BlocksToGenerateX * BlocksToGenerateY).." blocks)")
     local TopLeftPosition = Vector3.new(MineSpawn.Position.X - ((MineSpawn.Size.X / 2) - (BlockSize.X / 2)), MineSpawn.Position.Y, MineSpawn.Position.Z - ((MineSpawn.Size.Z / 2) - (BlockSize.X / 2)))
 
     for Y = 1, BlocksToGenerateY, 1 do
@@ -162,7 +165,9 @@ end
 
 
 --[[ KNIT ]]--
+
 function MineService:KnitStart()
+    LogService = Knit.GetService("LogService")
     self:GenerateTopLayer()
 end
 

@@ -2,6 +2,7 @@ local Knit = require(game.ReplicatedStorage.Packages.Knit)
 
 local Types = require(game.ReplicatedStorage.Shared.Modules.Types)
 local DataService
+local LogService
 
 --[[
 A service that has all the functions to do with stats, stuff like giving ores
@@ -65,6 +66,7 @@ function PlayerStatsService:GiveOre(Player :Player, Ore :Types.OreListItem)
     local ValueToChange :IntValue = ConvertOreListItemToInventoryValue(DataFolder, Ore)
 
     ValueToChange.Value += Ore.Amount
+    LogService:Log("Gave "..Player.Name.." "..Ore.Amount.." "..Ore.Name)
 end
 
 --[[
@@ -74,15 +76,18 @@ function PlayerStatsService:MinedOre(Player :Player, Ore :Types.OreListItem)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
     local ValueToChange = ConvertOreListItemToTimesMinedValue(DataFolder, Ore)
 
+    LogService:Log("Increased "..Player.Name.."'s "..Ore.Name.." times mined value")
     ValueToChange.Value += 1
     self:GiveOre(Player, Ore)
 end
+
 
 
 --[[ KNIT ]]
 
 function PlayerStatsService:KnitStart()
     DataService = Knit.GetService("DataService")
+    LogService = Knit.GetService("LogService")
 end
 
 return PlayerStatsService

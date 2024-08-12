@@ -27,7 +27,6 @@ Returns the player's tycoon model if the player has one, otherwise returning not
 ]]--
 function TycoonService:GetPlayerTycoon(Player :Player) :Model?
     local UserId = Player.UserId
-    LogService:Log("Getting "..Player.Name.."'s tycoon")
 
     local FoundTycoon = Tycoons:FindFirstChild(tostring(UserId))
     if FoundTycoon then return FoundTycoon end
@@ -41,9 +40,8 @@ Create a tycoon for the player and put it in workspace. Then setup an event so w
 spawns they get teleported to their tycoon spawn instead of the SpawnLocation.
 ]]--
 function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
-    assert(not self:DoesPlayerHaveTycoon(Player), "Player already has tycoon?")
+    LogService:Assert(not self:DoesPlayerHaveTycoon(Player), "Player already has tycoon?")
 
-    LogService:Log("Creating tycoon for player: "..Player.Name)
     local NewTycoon = TycoonAssets.TycoonModel:Clone()
     NewTycoon.Name = Player.UserId
     NewTycoon.Parent = Tycoons

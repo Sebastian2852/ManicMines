@@ -7,6 +7,7 @@ local OresFolder :Folder = game.ReplicatedStorage.Assets.Ores
 local PickaxesFolder :Folder = game.ReplicatedStorage.Assets.Pickaxe.Pickaxes
 
 local PickaxeService
+local LogService
 
 local DataService = Knit.CreateService {
     Name = "DataService",
@@ -60,6 +61,8 @@ local function SetupTemplateDataFolder()
         PickaxeUpgradeFolder.Name = Pickaxe.Name
         PickaxeUpgradeFolder.Parent = TemplateDataFolder.Pickaxes.Upgrades
     end
+
+    LogService:Log("Setup template data folder")
 end
 
 
@@ -80,6 +83,8 @@ function DataService:CreateDataFolderForPlayer(Player :Player) :Folder
     Player.CharacterAdded:Connect(function()
         PickaxeService:GivePickaxeToPlayer(Player) 
     end)
+
+    LogService:Log("Created "..Player.Name.."'s data folder")
     return DataFolder
 end
 
@@ -113,6 +118,8 @@ cloned for a player it already has every value the player needs ready. This shou
 make it so data loading is much faster than before.
 ]]--
 function DataService:KnitInit()
+    LogService = Knit.GetService("LogService")
+
     SetupTemplateDataFolder()
 
     -- TEMP CODE:
