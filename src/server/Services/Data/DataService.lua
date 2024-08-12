@@ -54,7 +54,7 @@ local function SetupTemplateDataFolder()
         local InventoryValue = Instance.new("IntValue")
         InventoryValue.Name = Ore.Name
         InventoryValue.Parent = TemplateDataFolder.Inventory.Ores
-        
+
         local StorageValue = Instance.new("IntValue")
         StorageValue.Name = Ore.Name
         StorageValue.Parent = TemplateDataFolder.Storage.Ores
@@ -86,7 +86,11 @@ end
 Returns true/false if the given data store is a valid slot data store
 ]=]
 local function IsSlotValid(Slot :DataStore) :boolean
-    return true
+    for _, v :DataStore in pairs(DataService.SaveSlots) do
+        if Slot == v then return true end
+    end
+
+    return false
 end
 
 
