@@ -13,6 +13,59 @@ local DataService = Knit.CreateService {
     Client = {},
 }
 
+--[[ INTERNAL ]]--
+
+local function SetupTemplateDataFolder()
+    local StoneInventoryValue = Instance.new("IntValue")
+    StoneInventoryValue.Name = "Stone"
+    StoneInventoryValue.Parent = TemplateDataFolder.Inventory.Ores
+
+    local StoneStorageValue = Instance.new("IntValue")
+    StoneStorageValue.Name = "Stone"
+    StoneStorageValue.Parent = TemplateDataFolder.Storage.Ores
+
+    local TimesMinedValue = Instance.new("IntValue")
+    TimesMinedValue.Name = "Stone"
+    TimesMinedValue.Parent = TemplateDataFolder.TimesMined
+
+    local EmblemOwned = Instance.new("BoolValue")
+    EmblemOwned.Name = "Stone"
+    EmblemOwned.Parent = TemplateDataFolder.Emblems
+
+    for _, Ore :BasePart in pairs(OresFolder:GetChildren()) do
+        local InventoryValue = Instance.new("IntValue")
+        InventoryValue.Name = Ore.Name
+        InventoryValue.Parent = TemplateDataFolder.Inventory.Ores
+        
+        local StorageValue = Instance.new("IntValue")
+        StorageValue.Name = Ore.Name
+        StorageValue.Parent = TemplateDataFolder.Storage.Ores
+
+        local TimesMinedValue = Instance.new("IntValue")
+        TimesMinedValue.Name = Ore.Name
+        TimesMinedValue.Parent = TemplateDataFolder.TimesMined
+
+        local EmblemOwned = Instance.new("BoolValue")
+        EmblemOwned.Name = Ore.Name
+        EmblemOwned.Parent = TemplateDataFolder.Emblems
+    end
+
+    for _, Pickaxe in pairs(PickaxesFolder:GetChildren()) do
+        local PickaxeValue = Instance.new("BoolValue")
+        PickaxeValue.Name = Pickaxe.Name
+        PickaxeValue.Value = Pickaxe:GetAttribute("OwnedByDefault")
+        PickaxeValue.Parent = TemplateDataFolder.Pickaxes.Owned
+
+        local PickaxeUpgradeFolder = Instance.new("Folder")
+        PickaxeUpgradeFolder.Name = Pickaxe.Name
+        PickaxeUpgradeFolder.Parent = TemplateDataFolder.Pickaxes.Upgrades
+    end
+end
+
+
+
+--[[ PUBLIC ]]--
+
 --[[
 Create a data folder for a given player
 ]]--
@@ -51,6 +104,7 @@ function DataService:PlayerHasDataFolder(Player :Player) :boolean
 end
 
 
+
 --[[ KNIT ]]--
 
 --[[
@@ -59,34 +113,7 @@ cloned for a player it already has every value the player needs ready. This shou
 make it so data loading is much faster than before.
 ]]--
 function DataService:KnitInit()
-    for _, Ore :BasePart in pairs(OresFolder:GetChildren()) do
-        local InventoryValue = Instance.new("IntValue")
-        InventoryValue.Name = Ore.Name
-        InventoryValue.Parent = TemplateDataFolder.Inventory.Ores
-        
-        local StorageValue = Instance.new("IntValue")
-        StorageValue.Name = Ore.Name
-        StorageValue.Parent = TemplateDataFolder.Storage.Ores
-
-        local TimesMinedValue = Instance.new("IntValue")
-        TimesMinedValue.Name = Ore.Name
-        TimesMinedValue.Parent = TemplateDataFolder.TimesMined
-
-        local EmblemOwned = Instance.new("BoolValue")
-        EmblemOwned.Name = Ore.Name
-        EmblemOwned.Parent = TemplateDataFolder.Emblems
-    end
-
-    for _, Pickaxe in pairs(PickaxesFolder:GetChildren()) do
-        local PickaxeValue = Instance.new("BoolValue")
-        PickaxeValue.Name = Pickaxe.Name
-        PickaxeValue.Value = Pickaxe:GetAttribute("OwnedByDefault")
-        PickaxeValue.Parent = TemplateDataFolder.Pickaxes.Owned
-
-        local PickaxeUpgradeFolder = Instance.new("Folder")
-        PickaxeUpgradeFolder.Name = Pickaxe.Name
-        PickaxeUpgradeFolder.Parent = TemplateDataFolder.Pickaxes.Upgrades
-    end
+    SetupTemplateDataFolder()
 
     -- TEMP CODE:
     -- This will be removed when the main menu is added and save slots are added
