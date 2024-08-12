@@ -1,3 +1,5 @@
+local DataStoreService = game:GetService("DataStoreService")
+local HttpService = game:GetService("HttpService")
 local Knit = require(game.ReplicatedStorage.Packages.Knit)
 
 local RootDataFolder :Folder = game.ReplicatedStorage.PlayerData
@@ -14,7 +16,18 @@ local DataService = Knit.CreateService {
     Client = {},
 }
 
+
+
 --[[ INTERNAL ]]--
+
+--[=[
+A list of all the data stores but as save slots so its easier to refrence in the code
+]=]
+DataService.SaveSlots = {
+    Slot1 = DataStoreService:GetDataStore("SLOT1");
+    Slot2 = DataStoreService:GetDataStore("SLOT2");
+    Slot3 = DataStoreService:GetDataStore("SLOT3");
+}
 
 --[=[
 Create all values in the template data folder so that it can be cloned for each player
@@ -69,9 +82,75 @@ local function SetupTemplateDataFolder()
     LogService:Log("Setup template data folder")
 end
 
+--[=[
+Returns true/false if the given data store is a valid slot data store
+]=]
+local function IsSlotValid(Slot :DataStore) :boolean
+    return true
+end
+
 
 
 --[[ PUBLIC ]]--
+
+--[=[
+Loads a player's data from a given slot (must be a slot in the data slots
+table)
+]=]
+function DataService:SavePlayerData(Player :Player, Slot :DataStore)
+    local DataFolder = self:GetPlayerDataFolder(Player)
+
+    LogService:Assert(DataFolder, "Tried loading data with No data folder")
+    LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
+
+    local PlayerDataKey = Player.UserId.."-PlayerData"
+    local TycoonDataKey = Player.UserId.."-TycoonData"
+    local OreDataKey = Player.UserId.."-OreData"
+
+    LogService:Log("["..Player.Name.."]", "Packaging ore data")
+    local RawOreData = {}
+
+    for _, Ore :IntValue in pairs(DataFolder.Inventory.Ores:GetChildren()) do
+        RawOreData[Ore.Name] = {}
+        RawOreData[Ore.Name].InventoryAmount = Ore.Value
+        RawOreData[Ore.Name].StorageAmount = 0
+        RawOreData[Ore.Name].TimesMined = 0
+    end
+
+    for _, Ore :IntValue in pairs(DataFolder.Storage.Ores:GetChildren()) do
+        RawOreData[Ore.Name].StorageAmount = Ore.Value
+    end
+
+    for _, Ore :IntValue in pairs(DataFolder.TimesMined:GetChildren()) do
+        RawOreData[Ore.Name].TimesMined = Ore.Value
+    end
+
+    LogService:Log("["..Player.Name.."]", "Packaging player data")
+    local RawPlayerData = {}
+
+    RawPlayerData.XP = DataFolder.XP.Value
+    RawPlayerData.Level = DataFolder.Level.Value
+    RawPlayerData.Gold = DataFolder.Gold.Value
+
+    LogService:Log("["..Player.Name.."]", "Packaging tycoon data")
+    local RawTycoonData = {}
+
+    RawTycoonData.Name = DataFolder.Tycoon.TycoonName.Value
+    RawTycoonData.Upgrades = {}
+
+    local EncodedOreData :string = HttpService:JSONEncode(RawOreData)
+    local EncodedPlayerData :string = HttpService:JSONEncode(RawPlayerData)
+    local EncodedTycoonData :string = HttpService:JSONEncode(RawTycoonData)
+
+    local Success, ErrorMessage = pcall(function()
+        Slot:SetAsync(PlayerDataKey, EncodedPlayerData)
+        Slot:SetAsync(TycoonDataKey, EncodedTycoonData)
+        Slot:SetAsync(OreDataKey, EncodedOreData)
+    end)
+
+    assert(Success, ErrorMessage)
+    LogService:Log("["..Player.Name.."]", "Saved player data!")
+end
 
 --[=[
 Create a data folder for a given player
@@ -130,6 +209,8 @@ function DataService:KnitInit()
     -- This will be removed when the main menu is added and save slots are added
     game.Players.PlayerAdded:Connect(function(Player)
         self:CreateDataFolderForPlayer(Player)
+        task.wait(5)
+        self:SavePlayerData(Player, self.SaveSlots.Slot1)
     end)
 end
 
