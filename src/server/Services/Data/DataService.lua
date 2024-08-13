@@ -98,7 +98,7 @@ end
 --[[ PUBLIC ]]--
 
 --[=[
-Loads a player's data from a given slot (must be a slot in the data slots
+Saves a player's data from a given slot (must be a slot in the data slots
 table)
 ]=]
 function DataService:SavePlayerData(Player :Player, Slot :DataStore)
@@ -152,8 +152,51 @@ function DataService:SavePlayerData(Player :Player, Slot :DataStore)
         Slot:SetAsync(OreDataKey, EncodedOreData)
     end)
 
-    assert(Success, ErrorMessage)
+    LogService:Assert(Success, ErrorMessage)
     LogService:Log("["..Player.Name.."]", "Saved player data!")
+end
+
+--[=[
+Loads a player's data from a given slot (must be a slot in the data slots
+table)
+]=]
+function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
+    local DataFolder = self:GetPlayerDataFolder(Player)
+
+    LogService:Assert(DataFolder, "Tried loading data with No data folder")
+    LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
+
+    local PlayerDataKey = Player.UserId.."-PlayerData"
+    local TycoonDataKey = Player.UserId.."-TycoonData"
+    local OreDataKey = Player.UserId.."-OreData"
+
+    local RawPlayerData
+    local RawTycoonData
+    local RawOreData
+
+    local Success, ErrorMessage = pcall(function()
+        RawPlayerData = Slot:GetAsync(PlayerDataKey)
+        RawTycoonData = Slot:GetAsync(TycoonDataKey)
+        RawOreData = Slot:GetAsync(OreDataKey)
+
+        if RawPlayerData ~= nil then
+            RawPlayerData = HttpService:JSONDecode(RawPlayerData)
+        end
+
+        if RawTycoonData ~= nil then
+            RawTycoonData = HttpService:JSONDecode(RawTycoonData)
+        end
+
+        if RawOreData ~= nil then
+            RawOreData = HttpService:JSONDecode(RawOreData)
+        end
+    end)
+
+    LogService:Assert(Success, ErrorMessage)
+
+    DataFolder.XP.Value = RawPlayerData.XP
+    DataFolder.Level.Value = RawPlayerData.Level
+    DataFolder.Gold.Value = RawPlayerData.Gold
 end
 
 --[=[
@@ -213,7 +256,10 @@ function DataService:KnitInit()
     -- This will be removed when the main menu is added and save slots are added
     game.Players.PlayerAdded:Connect(function(Player)
         self:CreateDataFolderForPlayer(Player)
-        task.wait(5)
+        self:LoadPlayerData(Player, self.SaveSlots.Slot1)
+    end)
+
+    game.Players.PlayerRemoving:Connect(function(Player)
         self:SavePlayerData(Player, self.SaveSlots.Slot1)
     end)
 end
