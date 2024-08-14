@@ -53,13 +53,13 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         end
 
         New.Info.LastPlayed.TextLabel.Text = TimeText
-        New:AddTag("UsedSlot")
+        New:AddTag("_UsedSlot")
     else
         New.TycoonName.Text = "Empty Slot"
         New.Info.Visible = false
         New.Actions.DeleteButton.Visible = false
         New.Actions.PlayButton.Text = "Create Slot"
-        New:AddTag("NewSlot")
+        New:AddTag("_NewSlot")
     end
 
     New.Parent = SlotSelectionFrame.Slots
@@ -78,6 +78,8 @@ function MainMenuController:CreateSlotFrames()
         end
     end)
 end
+
+
 
 --[[ KNIT ]]--
 
@@ -99,6 +101,20 @@ function MainMenuController:KnitStart()
             Button.Text = OriginalText
         end)
     end
+
+    TitleScreen.LeftSide.Buttons.PlayButton.MouseButton1Click:Connect(function()
+        MainFrame.Credits.Visible = false
+        SlotSelectionFrame.Visible = not SlotSelectionFrame.Visible
+    end)
+
+    TitleScreen.LeftSide.Buttons.CreditsButton.MouseButton1Click:Connect(function()
+        MainFrame.Credits.Visible = not MainFrame.Credits.Visible
+        SlotSelectionFrame.Visible = false
+    end)
+
+    TitleScreen.LeftSide.Buttons.QuitButton.MouseButton1Click:Connect(function()
+        Knit.Player:Kick("Left the game!")
+    end)
 
     self:CreateSlotFrames()
 end
