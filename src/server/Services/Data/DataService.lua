@@ -135,6 +135,7 @@ function DataService:SavePlayerData(Player :Player, Slot :DataStore)
     RawPlayerData.XP = DataFolder.XP.Value
     RawPlayerData.Level = DataFolder.Level.Value
     RawPlayerData.Gold = DataFolder.Gold.Value
+    RawPlayerData.LastPlayed = os.time()
 
     LogService:Log("["..Player.Name.."]", "Packaging tycoon data")
     local RawTycoonData = {}
@@ -236,6 +237,90 @@ function DataService:PlayerHasDataFolder(Player :Player) :boolean
     end
 
     return false
+end
+
+function DataService:GetSlotInfo(Player :Player, Slot :DataStore) :{any}
+    local Info = {
+        SlotID = self:SlotDataStoreToNumber(Slot);
+        Used = false;
+    }
+
+    local PlayerDataKey = Player.UserId.."-PlayerData"
+    local TycoonDataKey = Player.UserId.."-TycoonData"
+
+    local RawPlayerData
+    local RawTycoonData
+
+    local Success, ErrorMessage = pcall(function()
+        RawPlayerData = Slot:GetAsync(PlayerDataKey)
+        RawTycoonData = Slot:GetAsync(TycoonDataKey)
+
+        if RawPlayerData ~= nil then
+            RawPlayerData = HttpService:JSONDecode(RawPlayerData)
+        end
+
+        if RawTycoonData ~= nil then
+            RawTycoonData = HttpService:JSONDecode(RawTycoonData)
+        end
+    end)
+
+    LogService:Assert(Success, ErrorMessage)
+
+    if RawPlayerData == nil or RawTycoonData == nil then
+        return Info
+    end
+
+    Info.Used = true
+    Info.TycoonName = RawTycoonData.Name
+    Info.Gold = RawPlayerData.Gold
+    Info.LastPlayed = RawPlayerData.LastPlayed
+
+    return Info
+end
+
+--[=[
+Turns a number into a data store from the save slots table, returns slot 1 data
+store if an invalid number is given
+]=]
+function DataService:SlotNumberToDataStore(SlotNumber :number) :DataStore
+    if SlotNumber == 1 then
+        return DataService.SaveSlots.Slot1
+    elseif SlotNumber == 2 then
+        return DataService.SaveSlots.Slot2
+    elseif SlotNumber == 3 then
+        return DataService.SaveSlots.Slot3
+    end
+
+    return DataService.SaveSlots.Slot1
+end
+
+--[=[
+Turns a save slot data store into a number, returns `1` if an invalid data store is given
+]=]
+function DataService:SlotDataStoreToNumber(Slot :DataStore) :DataStore
+    if Slot == self.SaveSlots.Slot1 then
+        return 1
+    elseif Slot == self.SaveSlots.Slot2 then
+        return 2
+    elseif Slot == self.SaveSlots.Slot3 then
+        return 3
+    end
+
+    return 1
+end
+
+
+
+--[[ CLIENT ]]--
+
+function DataService.Client:GetSlotsInfo(Player :Player)
+    local Info = {}
+
+    table.insert(Info, DataService:GetSlotInfo(Player, DataService.SaveSlots.Slot1))
+    table.insert(Info, DataService:GetSlotInfo(Player, DataService.SaveSlots.Slot2))
+    table.insert(Info, DataService:GetSlotInfo(Player, DataService.SaveSlots.Slot3))
+
+    return Info
 end
 
 
