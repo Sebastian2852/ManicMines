@@ -13,14 +13,14 @@
     },
 
     "ServerScriptService": {
-      "Server": {
+      "Game": {
         "$path": "src/server"
       }
     },
 
     "StarterPlayer": {
       "StarterPlayerScripts": {
-        "Client": {
+        "Game": {
           "$path": "src/client"
         }
       }
