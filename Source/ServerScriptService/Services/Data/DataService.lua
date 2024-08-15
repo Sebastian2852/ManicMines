@@ -27,6 +27,8 @@ DataService.SaveSlots = {
     Slot3 = DataStoreService:GetDataStore("SLOT3");
 }
 
+DataService.Players = {}
+
 --[=[
 Create all values in the template data folder so that it can be cloned for each player
 and it be fully ready for data loading straight away
@@ -99,7 +101,10 @@ end
 Saves a player's data from a given slot (must be a slot in the data slots
 table)
 ]=]
-function DataService:SavePlayerData(Player :Player, Slot :DataStore)
+function DataService:SavePlayerData(Player :Player)
+    local Slot = self.Players[Player.UserId]
+    if not Slot then return end
+
     local DataFolder = self:GetPlayerDataFolder(Player)
 
     LogService:Assert(DataFolder, "Tried loading data with No data folder")
@@ -160,6 +165,7 @@ Loads a player's data from a given slot (must be a slot in the data slots
 table)
 ]=]
 function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
+    self.Players[Player.UserId] = Slot
     local DataFolder = self:GetPlayerDataFolder(Player)
 
     LogService:Assert(DataFolder, "Tried loading data with No data folder")
@@ -237,6 +243,14 @@ function DataService:PlayerHasDataFolder(Player :Player) :boolean
     return false
 end
 
+--[=[
+Returns the information for a given slot for a player:
+- SlotID
+- Used
+- Gold
+- Tycoon Name
+- Last Played
+]=]
 function DataService:GetSlotInfo(Player :Player, Slot :DataStore) :{any}
     local Info = {
         SlotID = self:SlotDataStoreToNumber(Slot);
@@ -321,6 +335,11 @@ function DataService.Client:GetSlotsInfo(Player :Player)
     return Info
 end
 
+function DataService.Client:LoadData(Player :Player, SlotID :number)
+    local SlotToLoad = DataService:SlotNumberToDataStore(SlotID)
+    DataService:LoadPlayerData(Player, SlotToLoad)
+end
+
 
 
 --[[ KNIT ]]--
@@ -332,23 +351,21 @@ make it so data loading is much faster than before.
 ]=]
 function DataService:KnitInit()
     LogService = Knit.GetService("LogService")
-
     SetupTemplateDataFolder()
-
-    -- TEMP CODE:
-    -- This will be removed when the main menu is added and save slots are added
-    game.Players.PlayerAdded:Connect(function(Player)
-        self:CreateDataFolderForPlayer(Player)
-        self:LoadPlayerData(Player, self.SaveSlots.Slot1)
-    end)
-
-    game.Players.PlayerRemoving:Connect(function(Player)
-        self:SavePlayerData(Player, self.SaveSlots.Slot1)
-    end)
 end
 
 function DataService:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
+
+    game.Players.PlayerAdded:Connect(function(Player)
+        self.Players[Player.UserId] = nil
+        self:CreateDataFolderForPlayer(Player)
+    end)
+
+    game.Players.PlayerRemoving:Connect(function(Player)
+        self:SavePlayerData(Player)
+        self.Players[Player.UserId] = nil
+    end)
 end
 
 return DataService

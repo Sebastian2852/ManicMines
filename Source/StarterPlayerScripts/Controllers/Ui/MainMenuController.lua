@@ -6,13 +6,14 @@ local GameConfig = require(ReplicatedStorage.Game.Modules.GameConfig)
 local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
 local PlayerGUI = Knit.Player.PlayerGui
 
-local DataService
 
 local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
 
 --[[ VARIABLES ]]--
 
+local DataService
 local TextFilteringService
+local FadeController
 
 local Blur :BlurEffect
 local MainScreenGui :ScreenGui
@@ -29,9 +30,10 @@ local SlotSelectionFrame :Frame
 --[[ INTERNAL ]]--
 
 local SlotCreation_CurrentName = ""
+local SlotCreation_CurrentSlotID = 0
 
 local function PickRandomTycoonName() :string
-    local TycoonNames = GameConfig.RandomTycoonNames
+    local TycoonNames = GameConfig.Tycoon.RandomNames
     local RandomName = TycoonNames[math.random(1, #TycoonNames)]
     return RandomName
 end
@@ -45,8 +47,9 @@ local function SetTycoonName(Name :string)
     end)
 end
 
-local function BeginSlotCreation()
+local function BeginSlotCreation(SlotID :number)
     SetTycoonName(PickRandomTycoonName())
+    SlotCreation_CurrentSlotID = SlotID
     TitleScreen.Visible = false
     SlotSelectionFrame.Visible = false
     NewSlotFrame.Visible = true
@@ -77,6 +80,10 @@ end
 function MainMenuController:CreateSlotFrame(SlotInfo)
     local New = SlotFrameTemplate:Clone()
 
+    New.Parent = SlotSelectionFrame.Slots
+    New.Name = SlotInfo.SlotID
+    New.LayoutOrder = SlotInfo.SlotID
+
     if SlotInfo.Used then
         New.TycoonName.Text = SlotInfo.TycoonName
         New.Info.GoldAmount.TextLabel.Text = Util:ConvertNumberToString(SlotInfo.Gold or 0)
@@ -97,6 +104,14 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
 
         New.Info.LastPlayed.TextLabel.Text = TimeText
         New:AddTag("_UsedSlot")
+
+        New.Actions.PlayButton.MouseButton1Click:Connect(function()
+            FadeController:FadeGameplayOut(true)
+            DataService:LoadData(New.Name)
+            self:EnableAllUI()
+            SlotSelectionFrame.Visible = false
+            FadeController:FadeGameplayIn(false)
+        end)
     else
         New.TycoonName.Text = "Empty Slot"
         New.Info.Visible = false
@@ -105,13 +120,9 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         New:AddTag("_NewSlot")
 
         New.Actions.PlayButton.MouseButton1Click:Connect(function()
-            BeginSlotCreation()
+            BeginSlotCreation(New.Name)
         end)
     end
-
-    New.Parent = SlotSelectionFrame.Slots
-    New.Name = SlotInfo.SlotID
-    New.LayoutOrder = SlotInfo.SlotID
 end
 
 function MainMenuController:CreateSlotFrames()
@@ -133,6 +144,7 @@ end
 function MainMenuController:KnitStart()
     DataService = Knit.GetService("DataService")
     TextFilteringService = Knit.GetService("TextFilteringService")
+    FadeController = Knit.GetController("FadeController")
 
     self:DisableAllUI()
 
