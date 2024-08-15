@@ -1,7 +1,7 @@
 local ReplicatedStorage = game.ReplicatedStorage
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Util = require(ReplicatedStorage.Shared.Modules.Util)
-local GameConfig = require(ReplicatedStorage.Shared.Modules.GameConfig)
+local Util = require(ReplicatedStorage.Game.Modules.Util)
+local GameConfig = require(ReplicatedStorage.Game.Modules.GameConfig)
 
 local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
 local PlayerGUI = Knit.Player.PlayerGui

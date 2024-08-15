@@ -1,7 +1,7 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Types = require(ReplicatedStorage.Shared.Modules.Types)
+local Types = require(ReplicatedStorage.Game.Modules.Types)
 
 local PlayerStatsService
 local DataService
@@ -218,7 +218,7 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
 
     local Pickaxe = CurrentPickaxeConfig:FindFirstChildWhichIsA("Tool")
     local NewPickaxe = Pickaxe:Clone()
-    local NewScript = ReplicatedStorage.Shared.Scripts.Pickaxe:Clone()
+    local NewScript = ReplicatedStorage.Game.Scripts.Pickaxe:Clone()
     NewPickaxe.Parent = Player.Backpack
     NewScript.Parent = NewPickaxe
 end

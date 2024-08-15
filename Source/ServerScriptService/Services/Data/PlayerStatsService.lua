@@ -1,6 +1,6 @@
 local Knit = require(game.ReplicatedStorage.Packages.Knit)
 
-local Types = require(game.ReplicatedStorage.Shared.Modules.Types)
+local Types = require(game.ReplicatedStorage.Game.Modules.Types)
 local DataService
 local LogService
 
