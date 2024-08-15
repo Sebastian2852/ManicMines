@@ -12,6 +12,8 @@ local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
 
 --[[ VARIABLES ]]--
 
+local TextFilteringService
+
 local Blur :BlurEffect
 local MainScreenGui :ScreenGui
 local MainFrame :Frame
@@ -35,10 +37,12 @@ local function PickRandomTycoonName() :string
 end
 
 local function SetTycoonName(Name :string)
-    SlotCreation_CurrentName = Name
-    NewSlotFrame.NameInput.Input.Text = Name
-    NewSlotFrame.NameInput.Input.PlaceholderText = Name
-    NewSlotFrame.Title.Text = "New Slot - "..Name
+    TextFilteringService:FilterTextFromUserToEveryone(Name):andThen(function(Text)
+        SlotCreation_CurrentName = Text
+        NewSlotFrame.NameInput.Input.Text = Text
+        NewSlotFrame.NameInput.Input.PlaceholderText = Text
+        NewSlotFrame.Title.Text = "New Slot - "..Text
+    end)
 end
 
 local function BeginSlotCreation()
@@ -128,6 +132,8 @@ end
 
 function MainMenuController:KnitStart()
     DataService = Knit.GetService("DataService")
+    TextFilteringService = Knit.GetService("TextFilteringService")
+
     self:DisableAllUI()
 
     for _, Button :TextButton in pairs(TitleScreen.LeftSide.Buttons:GetChildren()) do
