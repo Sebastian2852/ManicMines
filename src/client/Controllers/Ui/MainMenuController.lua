@@ -1,6 +1,7 @@
 local ReplicatedStorage = game.ReplicatedStorage
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Util = require(ReplicatedStorage.Shared.Modules.Util)
+local GameConfig = require(ReplicatedStorage.Shared.Modules.GameConfig)
 
 local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
 local PlayerGUI = Knit.Player.PlayerGui
@@ -8,6 +9,8 @@ local PlayerGUI = Knit.Player.PlayerGui
 local DataService
 
 local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
+
+--[[ VARIABLES ]]--
 
 local Blur :BlurEffect
 local MainScreenGui :ScreenGui
@@ -18,6 +21,42 @@ local TitleScreen :Frame
 local NewSlotFrame :Frame
 local CreditsFrame :Frame
 local SlotSelectionFrame :Frame
+
+
+
+--[[ INTERNAL ]]--
+
+local SlotCreation_CurrentName = ""
+
+local function PickRandomTycoonName() :string
+    local TycoonNames = GameConfig.RandomTycoonNames
+    local RandomName = TycoonNames[math.random(1, #TycoonNames)]
+    return RandomName
+end
+
+local function SetTycoonName(Name :string)
+    SlotCreation_CurrentName = Name
+    NewSlotFrame.NameInput.Input.Text = Name
+    NewSlotFrame.NameInput.Input.PlaceholderText = Name
+    NewSlotFrame.Title.Text = "New Slot - "..Name
+end
+
+local function BeginSlotCreation()
+    SetTycoonName(PickRandomTycoonName())
+    TitleScreen.Visible = false
+    SlotSelectionFrame.Visible = false
+    NewSlotFrame.Visible = true
+end
+
+local function SetupNewSlotFrame()
+    NewSlotFrame.NameInput.SubmitButton.MouseButton1Click:Connect(function()
+        SetTycoonName(NewSlotFrame.NameInput.Input.Text)
+    end)
+end
+
+
+
+--[[ FUNCTIONS ]]--
 
 function MainMenuController:DisableAllUI()
     PlayerGUI.HUD.Enabled = false
@@ -60,6 +99,10 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         New.Actions.DeleteButton.Visible = false
         New.Actions.PlayButton.Text = "Create Slot"
         New:AddTag("_NewSlot")
+
+        New.Actions.PlayButton.MouseButton1Click:Connect(function()
+            BeginSlotCreation()
+        end)
     end
 
     New.Parent = SlotSelectionFrame.Slots
@@ -135,6 +178,8 @@ function MainMenuController:KnitInit()
     Blur.Size = 10
     Blur.Parent = game.Lighting
     Blur.Name = "_MainMenuBlur"
+
+    SetupNewSlotFrame()
 end
 
 

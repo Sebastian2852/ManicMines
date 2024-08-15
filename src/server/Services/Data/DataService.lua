@@ -16,8 +16,6 @@ local DataService = Knit.CreateService {
     Client = {},
 }
 
-
-
 --[[ INTERNAL ]]--
 
 --[=[
