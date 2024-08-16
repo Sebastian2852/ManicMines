@@ -108,8 +108,19 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         New.Actions.PlayButton.MouseButton1Click:Connect(function()
             FadeController:FadeGameplayOut(true)
             DataService:LoadData(New.Name)
+            local InTycoon = false
             self:EnableAllUI()
             SlotSelectionFrame.Visible = false
+            local DataFolder = DataService:GetPlayerDataFolder():andThen(function(DataFolder)
+                repeat
+                    task.wait(1)
+                until DataFolder.InTycoon.Value
+                InTycoon = true
+            end)
+
+            repeat
+                task.wait(1)
+            until InTycoon
             FadeController:FadeGameplayIn(false)
         end)
     else

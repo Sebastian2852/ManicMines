@@ -10,6 +10,7 @@ local PickaxesFolder :Folder = game.ReplicatedStorage.Assets.Pickaxe.Pickaxes
 
 local PickaxeService
 local LogService
+local TycoonService
 
 local DataService = Knit.CreateService {
     Name = "DataService",
@@ -202,6 +203,8 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     DataFolder.XP.Value = RawPlayerData.XP
     DataFolder.Level.Value = RawPlayerData.Level
     DataFolder.Gold.Value = RawPlayerData.Gold
+
+    TycoonService:CreateTycoonForPlayer(Player)
 end
 
 --[=[
@@ -227,6 +230,11 @@ end
 Returns the player's data folder if they have one
 ]=]
 function DataService:GetPlayerDataFolder(Player :Player) :Folder?
+    local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
+    return FoundDataFolder
+end
+
+function DataService.Client:GetPlayerDataFolder(Player :Player) :Folder?
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     return FoundDataFolder
 end
@@ -356,6 +364,7 @@ end
 
 function DataService:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
+    TycoonService = Knit.GetService("TycoonService")
 
     game.Players.PlayerAdded:Connect(function(Player)
         self.Players[Player.UserId] = nil

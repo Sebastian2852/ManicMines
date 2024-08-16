@@ -8,7 +8,10 @@ local TycoonService = Knit.CreateService{
     Client = {};
 }
 
-local LogService = nil
+local LogService
+local DataService
+
+local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
 
 --[=[
 Returns true/false if the player has a tycoon.
@@ -45,6 +48,7 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
     local NewTycoon = TycoonAssets.TycoonModel:Clone()
     NewTycoon.Name = Player.UserId
     NewTycoon.Parent = Tycoons
+    NewTycoon:PivotTo(CFrame.new(TycoonsSpawn.Position + Vector3.new(500 * (#Tycoons:GetChildren() - 1), 0, 0)))
 
     local TycoonSpawn :BasePart = NewTycoon.Main.Spawn
 
@@ -55,6 +59,9 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
     if Player.Character then
         Player.Character:PivotTo(CFrame.new(TycoonSpawn.Position + Vector3.new(0, 5, 0)))
     end
+
+    local DataFolder = DataService:GetPlayerDataFolder(Player)
+    DataFolder.InTycoon.Value = true
 
     LogService:Log("Created "..Player.Name.."'s tycoon")
     return NewTycoon
@@ -78,15 +85,24 @@ end
 --[[ KNIT ]]--
 
 --[=[
-Setup the module, for now it creates the tycoon for the player. Later when data stuff is up and running
-This will be removed and the data service will handle creating the player's tycoon.
+Some checks to make sure the game is ready for tycoons
 ]=]
-function TycoonService:KnitStart()
+function TycoonService:KnitInit()
     LogService = Knit.GetService("LogService")
 
-    game.Players.PlayerAdded:Connect(function(Player)
-        self:CreateTycoonForPlayer(Player)
-    end)
+    if not TycoonsSpawn then
+        LogService:Warn("No tycoon spawn found, defaulting to 0,0,0")
+        local New = Instance.new("Part")
+        New.Name = "TycoonsSpawn"
+        New.Position = Vector3.new(0, 0, 0)
+        New.Anchored = true
+        New.Parent = workspace.Game
+        TycoonsSpawn = New
+    end
+end
+
+function TycoonService:KnitStart()
+    DataService = Knit.GetService("DataService")
 end
 
 return TycoonService
