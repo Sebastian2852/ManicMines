@@ -8,10 +8,17 @@ local TycoonService = Knit.CreateService{
     Client = {};
 }
 
+--[[ VARIABLES ]]--
+
 local LogService
 local DataService
+local TeleportService
 
 local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
+
+
+
+--[[ PUBLIC ]]--
 
 --[=[
 Returns true/false if the player has a tycoon.
@@ -51,13 +58,14 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
     NewTycoon:PivotTo(CFrame.new(TycoonsSpawn.Position + Vector3.new(500 * (#Tycoons:GetChildren() - 1), 0, 0)))
 
     local TycoonSpawn :BasePart = NewTycoon.Main.Spawn
+    local TeleportLocation = TycoonSpawn.Position + Vector3.new(0, 5, 0)
 
     Player.CharacterAdded:Connect(function(Character)
-        Character:PivotTo(CFrame.new(TycoonSpawn.Position + Vector3.new(0, 5, 0)))
+        TeleportService:TeleportPlayerToPosition(Player, TeleportLocation)
     end)
 
     if Player.Character then
-        Player.Character:PivotTo(CFrame.new(TycoonSpawn.Position + Vector3.new(0, 5, 0)))
+        TeleportService:TeleportPlayerToPosition(Player, TeleportLocation)
     end
 
     local DataFolder = DataService:GetPlayerDataFolder(Player)
@@ -103,6 +111,7 @@ end
 
 function TycoonService:KnitStart()
     DataService = Knit.GetService("DataService")
+    TeleportService = Knit.GetService("TeleportService")
 end
 
 return TycoonService

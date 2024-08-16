@@ -6,7 +6,9 @@ local FadeController = Knit.CreateController {
     Name = "FadeController"
 }
 
-local Player = game.Players.LocalPlayer
+local TeleportService
+
+local Player = Knit.Player
 local FadeFrame :Frame = nil
 local FadeTweenInfo :TweenInfo = nil
 
@@ -31,7 +33,7 @@ local function FadeGuiOut(Animated :boolean, AwaitFinish :boolean)
         Fade:Play()
 
         if AwaitFinish then 
-            Fade.Completed:Wait() 
+            Fade.Completed:Wait()
         end
     else
         FadeFrame.BackgroundTransparency = 1
@@ -40,7 +42,7 @@ end
 
 
 
---[[ FUNCTIONS ]]--
+--[[ PUBLIC ]]--
 
 --[=[
 Fades in a black GUI to cover the whole screen and any UI
@@ -95,6 +97,18 @@ function FadeController:KnitInit()
 
     FadeFrame = NewFrame
     FadeTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false, 0)
+end
+
+function FadeController:KnitStart()
+    TeleportService = Knit.GetService("TeleportService")
+
+    TeleportService.TeleportStarted:Connect(function()
+        FadeController:FadeGameplayOut(false)
+    end)
+
+    TeleportService.TeleportFinished:Connect(function()
+        FadeController:FadeGameplayIn(false)
+    end)
 end
 
 return FadeController
