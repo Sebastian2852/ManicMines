@@ -29,10 +29,6 @@ function LogService:GetNameOfFunctionCaller(UpLevel :number) :string
     return Name:upper();
 end
 
-function LogService.Client:GetNameOfFunctionCaller(Player, UpLevel :number) :string
-    return self:GetNameOfFunctionCaller(UpLevel)
-end
-
 --[=[
 Print out the message passed as well as anything else passed with a space between them in orange
 ]=]
@@ -44,7 +40,9 @@ function LogService:Warn(Message :string, ... :string)
 end
 
 function LogService.Client:Warn(Player :Player, Message :string, ... :string)
-    self:Warn("[CLIENT] "..Message, ...)
+    if not LogService.WarningsEnabled then return end
+    local Extras = {...}
+    warn("["..Player.Name.."]", "[CLIENT] [WARNING]", Message, table.unpack(Extras))
 end
 
 --[=[
@@ -58,7 +56,9 @@ function LogService:Log(Message :string, ... :string)
 end
 
 function LogService.Client:Log(Player :Player, Message :string, ... :string)
-    LogService.Log(LogService, "[CLIENT]", Message, ...)
+    if not LogService.WarningsEnabled then return end
+    local Extras = {...}
+    print("["..Player.Name.."]", "[CLIENT]", Message, table.unpack(Extras))
 end
 
 --[=[
