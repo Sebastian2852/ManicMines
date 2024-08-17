@@ -141,6 +141,7 @@ function MineService:GenerateTopLayer()
     MineSpawn.Position = MineSpawn.Position + Vector3.new(0, 50, 0)
     MineSpawn.Transparency = 1
     MineSpawn.CanCollide = false
+    LogService:Log("Finished generating top layer")
 end
 
 --[=[

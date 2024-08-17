@@ -12,6 +12,7 @@ local TeleportService = Knit.CreateService {
 
 --[[ VARIABLES ]]--
 local TweenService = game:GetService("TweenService")
+local LogService
 
 --[=[
 A list of all the names to avoid while fading a character in or out
@@ -75,8 +76,10 @@ Teleports a player's character to the given position. If the player doesnt have 
 the function waits until a character is present
 ]=]
 function TeleportService:TeleportPlayerToPosition(Player :Player, Position :Vector3)
+    LogService:Log("Teleporting", Player.Name, "to", tostring(Position))
     local Character = Player.Character
     if not Character then
+        LogService:Log("Waiting for player's character")
         repeat
             Character = Player.Character
             task.wait(0.1)
@@ -98,5 +101,12 @@ function TeleportService:TeleportPlayertoPart(Player :Player, Part :BasePart)
     self:TeleportPlayerToPosition(Player, Part.CFrame.Position)
 end
 
+
+
+--[[ KNIT ]]--
+
+function TeleportService:KnitStart()
+    LogService = Knit.GetService("LogService")
+end
 
 return TeleportService
