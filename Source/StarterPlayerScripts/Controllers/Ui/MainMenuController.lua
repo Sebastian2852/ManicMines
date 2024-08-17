@@ -14,6 +14,7 @@ local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
 local DataService
 local TextFilteringService
 local FadeController
+local LogService
 
 local Blur :BlurEffect
 local MainScreenGui :ScreenGui
@@ -44,10 +45,12 @@ local function SetTycoonName(Name :string)
         NewSlotFrame.NameInput.Input.Text = Text
         NewSlotFrame.NameInput.Input.PlaceholderText = Text
         NewSlotFrame.Title.Text = "New Slot - "..Text
+        LogService:Log("Set tycoon name:", Text)
     end)
 end
 
 local function BeginSlotCreation(SlotID :number)
+    LogService:Log("Starting slot creation")
     SetTycoonName(PickRandomTycoonName())
     SlotCreation_CurrentSlotID = SlotID
     TitleScreen.Visible = false
@@ -59,6 +62,7 @@ local function SetupNewSlotFrame()
     NewSlotFrame.NameInput.SubmitButton.MouseButton1Click:Connect(function()
         SetTycoonName(NewSlotFrame.NameInput.Input.Text)
     end)
+    LogService:Log("Setup slot creation")
 end
 
 
@@ -66,23 +70,32 @@ end
 --[[ FUNCTIONS ]]--
 
 function MainMenuController:DisableAllUI()
+    LogService:Log("Disabling all UI")
+    MainScreenGui.Enabled = true
     PlayerGUI.HUD.Enabled = false
     PlayerGUI.Inventory.Enabled = false
     --PlayerGUI.Selection.Enabled = false
 end
 
 function MainMenuController:EnableAllUI()
+    LogService:Log("Enabling all UI")
+    MainScreenGui:Destroy()
+    Blur:Destroy()
+    LogService:Log("Destroyed main menu and blur")
     PlayerGUI.HUD.Enabled = true
     PlayerGUI.Inventory.Enabled = true
     --PlayerGUI.Selection.Enabled = true
 end
 
 function MainMenuController:CreateSlotFrame(SlotInfo)
+    LogService:Log("Creating slot frame")
     local New = SlotFrameTemplate:Clone()
 
     New.Parent = SlotSelectionFrame.Slots
     New.Name = SlotInfo.SlotID
     New.LayoutOrder = SlotInfo.SlotID
+    LogService:Log("    - ID:", SlotInfo.SlotID)
+    LogService:Log("    - Used:", SlotInfo.Used)
 
     if SlotInfo.Used then
         New.TycoonName.Text = SlotInfo.TycoonName
@@ -123,6 +136,8 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
             until InTycoon
             FadeController:FadeGameplayIn(false)
         end)
+
+        LogService:Log("    - Setup play button")
     else
         New.TycoonName.Text = "Empty Slot"
         New.Info.Visible = false
@@ -133,6 +148,7 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         New.Actions.PlayButton.MouseButton1Click:Connect(function()
             BeginSlotCreation(New.Name)
         end)
+        LogService:Log("    - Setup setup slot button")
     end
 end
 
@@ -192,6 +208,8 @@ function MainMenuController:KnitStart()
 end
 
 function MainMenuController:KnitInit()
+    LogService = Knit.GetService("LogService")
+
     SlotFrameTemplate = AssetsFolder.SaveSlot
 
     MainScreenGui = AssetsFolder.MainMenu:Clone()
@@ -207,6 +225,7 @@ function MainMenuController:KnitInit()
     Blur.Size = 10
     Blur.Parent = game.Lighting
     Blur.Name = "_MainMenuBlur"
+    LogService:Log("Created blur")
 
     SetupNewSlotFrame()
 end
