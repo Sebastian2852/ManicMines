@@ -42,8 +42,6 @@ local function FadeCharacterOut(Duration :number, Character :Model)
     for _, Tween in pairs(Tweens) do
         Tween:Play()
     end
-
-    task.wait(Duration)
 end
 
 --[=[
@@ -63,8 +61,6 @@ local function FadeCharacterIn(Duration :number, Character :Model)
     for _, Tween in pairs(Tweens) do
         Tween:Play()
     end
-
-    task.wait(Duration)
 end
 
 
@@ -87,9 +83,9 @@ function TeleportService:TeleportPlayerToPosition(Player :Player, Position :Vect
     end
 
     self.Client.TeleportStarted:Fire(Player)
-    FadeCharacterOut(5, Character)
+    FadeCharacterOut(1, Character)
     Character:PivotTo(CFrame.new(Position))
-    FadeCharacterIn(5, Character)
+    FadeCharacterIn(1, Character)
     self.Client.TeleportFinished:Fire(Player)
 end
 
