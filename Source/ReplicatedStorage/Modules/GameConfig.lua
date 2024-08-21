@@ -10,4 +10,8 @@ Config.Tycoon = {
     MaxNameCharacters = 16;
 }
 
+Config.DefaultSettings = {
+    
+}
+
 return Config
