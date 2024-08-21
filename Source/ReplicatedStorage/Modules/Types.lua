@@ -9,4 +9,8 @@ export type OreListItem = {
 }
 export type OreList = {OreListItem}
 
+export type Settings = {
+    GlobalShadows :boolean;
+}
+
 return Types
