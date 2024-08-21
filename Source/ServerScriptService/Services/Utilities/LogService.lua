@@ -42,7 +42,7 @@ end
 function LogService.Client:Warn(Player :Player, Message :string, ... :string)
     if not LogService.WarningsEnabled then return end
     local Extras = {...}
-    warn("["..Player.Name.."]", "[CLIENT] [WARNING]", Message, table.unpack(Extras))
+    warn("[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
 end
 
 --[=[
@@ -58,7 +58,7 @@ end
 function LogService.Client:Log(Player :Player, Message :string, ... :string)
     if not LogService.WarningsEnabled then return end
     local Extras = {...}
-    print("["..Player.Name.."]", "[CLIENT]", Message, table.unpack(Extras))
+    print("[CLIENT]", "["..Player.Name.."]", Message, table.unpack(Extras))
 end
 
 --[=[
@@ -102,7 +102,7 @@ The client side version which does the same except puts a client tag before the 
 function LogService.Client:Assert(Player :Player, Value :string, ErrorMessage :string)
     if not self.AssertsEnabled then return end
     if Value == nil or Value == false then
-        error("[CLIENT] ASSERTION FAILED: "..ErrorMessage)
+        error("[CLIENT]", "["..Player.Name.."]", "ASSERTION FAILED: "..ErrorMessage)
     end
 end
 
