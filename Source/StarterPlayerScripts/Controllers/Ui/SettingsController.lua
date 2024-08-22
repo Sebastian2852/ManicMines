@@ -53,13 +53,6 @@ UserInputService.InputBegan:Connect(function(Input, Processed)
     end
 end)
 
-
-
---[[ PUBLIC ]]--
-
-
-
-
 --[[ KNIT ]]--
 
 function SettingsController:KnitStart()
