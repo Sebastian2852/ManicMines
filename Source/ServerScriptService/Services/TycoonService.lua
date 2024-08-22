@@ -61,11 +61,11 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
     local TeleportLocation = TycoonSpawn.Position + Vector3.new(0, 5, 0)
 
     Player.CharacterAdded:Connect(function(Character)
-        TeleportService:TeleportPlayerToPosition(Player, TeleportLocation)
+        TeleportService:TeleportPlayerToTycoon(Player, NewTycoon)
     end)
 
     if Player.Character then
-        TeleportService:TeleportPlayerToPosition(Player, TeleportLocation)
+        TeleportService:TeleportPlayerToTycoon(Player, NewTycoon)
     end
 
     local DataFolder = DataService:GetPlayerDataFolder(Player)
