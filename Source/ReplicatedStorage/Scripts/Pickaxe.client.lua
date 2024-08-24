@@ -71,10 +71,10 @@ local function AddOutline(Object :BasePart)
     New.Color3 = Object:GetAttribute("SelectionColor")
 
     if PlayerDataFolder.Inventory["InventoryItemCount"].Value + Object:GetAttribute("AmountDroppedWhenMined") > PlayerDataFolder.Inventory["InventoryCap"].Value then 
-        New.Color3 = Color3.new(1, 0, 0) 
+        New.Color3 = Color3.new(1, 0, 0)
     end
 
-    if Object:GetAttribute("BeingMined") then 
+    if Object:GetAttribute("BeingMined") then
         New.Color3 = Color3.new(1, 0, 0)
      end
     Outline = New
@@ -109,10 +109,10 @@ end
 
 local function SelectOre(Ore :BasePart)
     if not Ore or not Ore.Parent then return end
-    if not Ore:GetAttribute("CanMine") then 
-        Deactivate() 
-        DeselectOre() 
-        return 
+    if not Ore:GetAttribute("CanMine") then
+        Deactivate()
+        DeselectOre()
+        return
     end
 
     if Ore.Parent == workspace.Game.Mine and CanReach(Ore) then
@@ -131,8 +131,7 @@ local function SelectOre(Ore :BasePart)
 end
 
 local function GetOreFromRayCast(X, Y)
-    print("Raycast")
-    if not X or not Y then print("No X or Y") return end
+    if not X or not Y then warn("No X or Y") return end
 
     local Camera = workspace.CurrentCamera
     local CameraRay = Camera:ScreenPointToRay(X, Y)

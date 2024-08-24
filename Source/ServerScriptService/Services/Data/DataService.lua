@@ -207,6 +207,10 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     DataFolder.Tycoon.TycoonName.Value = RawTycoonData.Name
 
     TycoonService:CreateTycoonForPlayer(Player)
+    PickaxeService:GivePickaxeToPlayer(Player)
+    Player.CharacterAdded:Connect(function()
+        PickaxeService:GivePickaxeToPlayer(Player)
+    end)
 end
 
 --[=[
@@ -217,12 +221,6 @@ function DataService:CreateDataFolderForPlayer(Player :Player) :Folder
     local DataFolder = TemplateDataFolder:Clone()
     DataFolder.Name = Player.UserId
     DataFolder.Parent = RootDataFolder
-
-    -- Move this into the load data function when that is made
-    PickaxeService:GivePickaxeToPlayer(Player) 
-    Player.CharacterAdded:Connect(function()
-        PickaxeService:GivePickaxeToPlayer(Player) 
-    end)
 
     LogService:Log("Created "..Player.Name.."'s data folder")
     return DataFolder
