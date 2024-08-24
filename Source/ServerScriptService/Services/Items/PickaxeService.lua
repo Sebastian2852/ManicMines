@@ -1,7 +1,7 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Types = require(ReplicatedStorage.Game.Modules.Types)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local PlayerStatsService
 local DataService
@@ -13,10 +13,26 @@ local Pickaxes = PickaxeAssetFolder.Pickaxes
 
 local PickaxeService = Knit.CreateService {
     Name = "PickaxeService",
-    Client = {},
+    Client = {
+        UpdateMiningSelection = Knit.CreateSignal();
+    },
 }
 
 PickaxeService.Mining = {}
+
+--[[ PUBLIC ]]--
+
+--[=[
+Calculates the time to mine based on the health passed
+]=]
+function PickaxeService:CalculateTimeToMine(Player :Player, Health :number) :number
+    local Pickaxe :Instance = PickaxeService:GetPlayerPickaxe(Player)
+
+    local HitsNeeded = math.ceil(Health / Pickaxe:GetAttribute("HitDamage"))
+    local TimePerHit = Pickaxe:GetAttribute("MiningHitDelay")
+    local TotalTime = HitsNeeded * TimePerHit
+    return Core.Util:RoundToxDP(TotalTime, 1)
+end
 
 --[=[
 Check if the player can actually mine the block they want to
@@ -69,7 +85,7 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
 
     while PickaxeService.Mining[Player.UserId].Mining and PickaxeService:VerifyIfCanMine(Player, Character, ObjectToMine) do
         local Health :number = ObjectToMine:GetAttribute("Health")
-        local OreListItem :Types.OreListItem = PlayerStatsService:ConvertOreNameToOreListItem(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
+        local OreListItem :Core.OreListItem = PlayerStatsService:ConvertOreNameToOreListItem(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
 
         if Health <= 0 then
             PickaxeService:StopMining(Player)
@@ -83,6 +99,7 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
         Health -= Pickaxe:GetAttribute("HitDamage")
         ObjectToMine:SetAttribute("Health", Health)
         --Events.Client.UpdateMiningSelection:FireClient(Player, ObjectToMine.Name, DataModule:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
+        self.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
 
         if Health <= 0 then
             PickaxeService.Client:StopMining(Player)
@@ -221,6 +238,17 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
     local NewScript = ReplicatedStorage.Game.Scripts.Pickaxe:Clone()
     NewPickaxe.Parent = Player.Backpack
     NewScript.Parent = NewPickaxe
+end
+
+
+
+--[[ CLIENT ]]--
+
+--[=[
+Get the players pickaxe
+]=]
+function PickaxeService.Client:GetPickaxe(Player :Player)
+    return PickaxeService:GetPlayerPickaxe(Player)
 end
 
 

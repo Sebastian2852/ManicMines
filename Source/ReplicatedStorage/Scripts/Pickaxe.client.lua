@@ -131,7 +131,8 @@ local function SelectOre(Ore :BasePart)
 end
 
 local function GetOreFromRayCast(X, Y)
-    if not X or not Y then return end
+    print("Raycast")
+    if not X or not Y then print("No X or Y") return end
 
     local Camera = workspace.CurrentCamera
     local CameraRay = Camera:ScreenPointToRay(X, Y)
@@ -149,6 +150,7 @@ local function GetOreFromRayCast(X, Y)
 
     if Ore == nil then return nil end
     if not CanReach(Ore) then return nil end
+    if Ore.Parent ~= game.Workspace.Game.Mine then return nil end
 
     return Ore
 end
@@ -165,6 +167,7 @@ UserInputService.TouchTap:Connect(function(TouchPos, Proccessed)
 end)
 
 RunService.Heartbeat:Connect(function()
+    print("Tick")
     if not Equipped then return end
     local Ore = GetOreFromRayCast(LatestPosition.X, LatestPosition.Y)
 

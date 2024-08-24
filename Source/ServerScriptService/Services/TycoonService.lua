@@ -84,7 +84,6 @@ Allow the client to get player tycoon, not really needed but here if for some re
 This function may later be removed but its here for now.
 ]=]
 function TycoonService.Client:GetPlayerTycoon(Player :Player) :Model?
-    LogService:Log(Player.Name.."asked for their tycoon model")
     return self:GetPlayerTycoon(Player)
 end
 

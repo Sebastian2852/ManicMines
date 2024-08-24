@@ -24,4 +24,10 @@ function Util:ConvertNumberToString(Number :number) :string
     end
 end
 
+function Util:RoundToxDP(Number :number, X :number) :number
+    assert(type(Number) == "number", "NAN passed for 'Number'")
+    assert(type(X) == "number", "NAN passed for 'x'")
+    return tonumber(string.format("%."..(X).."f", Number))
+end
+
 return Util

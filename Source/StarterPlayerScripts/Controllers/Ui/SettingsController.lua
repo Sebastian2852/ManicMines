@@ -14,7 +14,7 @@ local LogService
 local SettingsService
 
 local HudGUI = PlayerGUI:WaitForChild("HUD")
-local SettingsButton = HudGUI:WaitForChild("Settings")
+--local SettingsButton = HudGUI:WaitForChild("Settings")
 
 local Settings = {
     GlobalShadows = true

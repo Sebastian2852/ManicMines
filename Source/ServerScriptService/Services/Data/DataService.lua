@@ -204,6 +204,8 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     DataFolder.Level.Value = RawPlayerData.Level
     DataFolder.Gold.Value = RawPlayerData.Gold
 
+    DataFolder.Tycoon.TycoonName.Value = RawTycoonData.Name
+
     TycoonService:CreateTycoonForPlayer(Player)
 end
 
