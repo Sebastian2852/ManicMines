@@ -1,7 +1,7 @@
 local ReplicatedStorage = game.ReplicatedStorage
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Util = require(ReplicatedStorage.Game.Modules.Util)
-local GameConfig = require(ReplicatedStorage.Game.Modules.GameConfig)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
 local PlayerGUI = Knit.Player.PlayerGui
@@ -33,10 +33,32 @@ local SlotSelectionFrame :Frame
 local SlotCreation_CurrentName = ""
 local SlotCreation_CurrentSlotID = 0
 
+local function IsNameValidLength(Name :string) :boolean
+    local MaxCharacters = Core.GameConfig.Tycoon.MaxNameCharacters
+
+    if #Name > MaxCharacters then return false end
+    return true
+end
+
 local function PickRandomTycoonName() :string
-    local TycoonNames = GameConfig.Tycoon.RandomNames
-    local RandomName = TycoonNames[math.random(1, #TycoonNames)]
-    return RandomName
+    local RandomNames = Core.GameConfig.Tycoon.RandomName
+
+    local RandomAdjective = RandomNames.Adjectives[math.random(1, #RandomNames.Adjectives)]
+    local RandomNoun = RandomNames.Nouns[math.random(1, #RandomNames.Nouns)]
+    local Prefix = RandomNames.Prefix
+    local Name = Prefix.." "..RandomAdjective.." "..RandomNoun
+
+    if IsNameValidLength(Name) then return Name end
+
+    -- Probs not the best but it works
+    repeat
+        RandomAdjective = RandomNames.Adjectives[math.random(1, #RandomNames.Adjectives)]
+        RandomNoun = RandomNames.Nouns[math.random(1, #RandomNames.Nouns)]
+        Prefix = RandomNames.Prefix
+        Name = Prefix.." "..RandomAdjective.." "..RandomNoun
+    until IsNameValidLength(Name)
+
+    return Name
 end
 
 local function SetTycoonName(Name :string)
