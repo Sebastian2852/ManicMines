@@ -10,7 +10,6 @@ local TweenService = game:GetService("TweenService")
 local PickaxeService
 
 local MiningSelection = Player.PlayerGui.HUD.MiningSelection
-local MiningSelection_Animating
 
 function PickaxeSelectionController:UpdateInfo(OreName :string, TimeToMine :number, Percentage :number, MiningProgress :number)
     PickaxeService:GetPickaxe():andThen(function(Pickaxe)
@@ -25,17 +24,12 @@ function PickaxeSelectionController:UpdateInfo(OreName :string, TimeToMine :numb
             return
         end
 
-        local TweeningInformation = TweenInfo.new(Pickaxe:GetAttribute("MiningHitDelay") / 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false, 0)
-        local Tween = TweenService:Create(MiningSelection.MiningProgressBar.Bar, TweeningInformation, {Size = UDim2.new(MiningProgress, 0, 1, 0)})
-
-        repeat task.wait(0.01) until MiningSelection_Animating == false
-        if not PlayerFolder.PickaxeSelection.Value then MiningSelection.Visible = false return end
-
+        MiningSelection.Visible = true
         MiningSelection.OreName.Text = RealOre:GetAttribute("DisplayName")
         MiningSelection.OreName.TextColor3 = PlayerFolder.PickaxeSelection.Value:FindFirstChildWhichIsA("SelectionBox").Color3
 
         MiningSelection.MiningProgressBar.UIGradient.Color = RealOre:GetAttribute("MiningBarGradient")
-        Tween:Play()
+        MiningSelection.MiningProgressBar.Size = UDim2.new(MiningProgress, 0, 1, 0)
 
         MiningSelection.TimeToMine.Text = TimeToMine.."s - "..Percentage.."%"
         MiningSelection.TimeToMine.TextColor3 = RealOre:GetAttribute("SelectionColor")
@@ -47,6 +41,11 @@ function PickaxeSelectionController:UpdateInfo(OreName :string, TimeToMine :numb
     end)
 end
 
+PlayerFolder.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
+    local ObjectToMine = PlayerFolder.PickaxeSelection
+    local Health = ObjectToMine
+    PickaxeSelectionController:UpdateInfo(ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
+end)
 
 --[[ KNIT ]]--
 
