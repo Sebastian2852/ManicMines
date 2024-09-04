@@ -33,19 +33,19 @@ LatestPosition.Y = 0
 local function Activate()
     if not PlayerFolder.PickaxeSelection.Value then return end
 
-    if PlayerDataFolder.Inventory["InventoryItemCount"].Value + PlayerFolder.PickaxeSelection.Value:GetAttribute("AmountDroppedWhenMined") >= PlayerDataFolder.Inventory["InventoryCap"].Value then return end
+    if PlayerDataFolder.Inventory["InventoryItemCount"].Value + PlayerFolder.PickaxeSelection.Value:GetAttribute("AmountDroppedWhenMined") >= PlayerDataFolder.Inventory["InventoryCap"].Value then print("Not enough space") return end
     if not PlayerFolder.PickaxeSelection.Value:GetAttribute("CanMine") then return end
     if PlayerFolder.PickaxeSelection.Value:GetAttribute("BeingMined") then return end
 
     if not Active then
-        PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
         Active = true
+        PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
         while Active do
             PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
             if PlayerFolder.PickaxeSelection.Value == nil then
                 break
             end
-            wait(0.1)
+            task.wait(0.1)
         end
     end
 end
@@ -166,7 +166,6 @@ UserInputService.TouchTap:Connect(function(TouchPos, Proccessed)
 end)
 
 RunService.Heartbeat:Connect(function()
-    print("Tick")
     if not Equipped then return end
     local Ore = GetOreFromRayCast(LatestPosition.X, LatestPosition.Y)
 

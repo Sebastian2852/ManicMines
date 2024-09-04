@@ -45,6 +45,7 @@ function PickaxeService:VerifyIfCanMine(Player :Player, Character :Model, Object
     local Distance :number = (Character.PrimaryPart.Position - ObjectToMine.Position).Magnitude
 
     if Distance > Pickaxe:GetAttribute("MiningRange") then return false end
+    if not ObjectToMine:GetAttribute("CanMine") then return false end
 
     return true
 end
@@ -131,15 +132,16 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
     LogService:Assert(DataFolder, "No data folder")
 
-    local CurrentPickaxeID = DataFolder.Pickaxes.Equipped.Value
-    local CurrentPickaxeConfig = Pickaxes:FindFirstChild(CurrentPickaxeID)
+    local CurrentPickaxeID :number = DataFolder.Pickaxes.Equipped.Value
+    local CurrentPickaxeConfig :Configuration = Pickaxes:FindFirstChild(CurrentPickaxeID)
     LogService:Assert(CurrentPickaxeConfig, "No pickaxe config")
 
-    local Pickaxe = CurrentPickaxeConfig:FindFirstChildWhichIsA("Tool")
-    local NewPickaxe = Pickaxe:Clone()
-    local NewScript = ReplicatedStorage.Game.Scripts.Pickaxe:Clone()
+    local Pickaxe :Tool = CurrentPickaxeConfig:FindFirstChildWhichIsA("Tool")
+    local NewPickaxe :Tool = Pickaxe:Clone()
+    local NewScript :LocalScript = ReplicatedStorage.Game.Scripts.Pickaxe:Clone()
     NewPickaxe.Parent = Player.Backpack
     NewScript.Parent = NewPickaxe
+    NewPickaxe:AddTag("Pickaxe")
 end
 
 
@@ -164,10 +166,8 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
 
     if PickaxeService.Mining[Player.UserId].Cooldown then return end
     if PickaxeService.Mining[Player.UserId].Mining then return end
-    if not ObjectToMine:GetAttribute("CanMine") then return end
 
     local DataFolder = DataService:GetPlayerDataFolder(Player)
-    if not ObjectToMine then return end
     if not DataFolder then return end
 
     if DataFolder.Inventory.InventoryItemCount.Value + ObjectToMine:GetAttribute("AmountDroppedWhenMined") > DataFolder.Inventory.InventoryCap.Value then return end
@@ -176,7 +176,7 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
     local Pickaxe = PickaxeService:GetPlayerPickaxe(Player)
 
     if not Character then return end
-    if not PickaxeService:VerifyIfCanMine(Player, Character, ObjectToMine) then return end
+    if not PickaxeService:VerifyIfCanMine(Player, Character, ObjectToMine) then print("Cant mine") return end
 
     DataFolder.ServerMining.Value = true
     PickaxeService.Mining[Player.UserId].Mining = true
@@ -192,7 +192,7 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
         local OreListItem :Core.OreListItem = PlayerStatsService:ConvertOreNameToOreListItem(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
 
         if Health <= 0 then
-            PickaxeService:StopMining(Player)
+            PickaxeService.Client:StopMining(Player)
             MineService:BlockMined(ObjectToMine)
             PlayerStatsService:MinedOre(Player, OreListItem)
             --DataModule:RecalculateInventoryItems(Player)
@@ -203,7 +203,7 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
         Health -= Pickaxe:GetAttribute("HitDamage")
         ObjectToMine:SetAttribute("Health", Health)
         --Events.Client.UpdateMiningSelection:FireClient(Player, ObjectToMine.Name, DataModule:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
-        self.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
+        self.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
 
         if Health <= 0 then
             PickaxeService.Client:StopMining(Player)
@@ -251,9 +251,11 @@ function PickaxeService.Client:StopMining(Player :Player)
     end)
 end
 
--- function PickaxeService.Client:CalculateTimeToMine(Block :BasePart)
-    -- return self:CalculateTimeToMine(Block)
--- end
+function PickaxeService.Client:CalculateTimeToMine(Player :Player, Health :number)
+    return PickaxeService:CalculateTimeToMine(Player, Health)
+end
+
+
 
 --[[ KNIT ]]--
 
