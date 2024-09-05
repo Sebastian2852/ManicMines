@@ -1,6 +1,5 @@
 local ReplicatedStorage = game.ReplicatedStorage
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Util = require(ReplicatedStorage.Game.Modules.Util)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
@@ -72,7 +71,7 @@ local function SetTycoonName(Name :string)
 end
 
 local function BeginSlotCreation(SlotID :number)
-    LogService:Log("Starting slot creation")
+    LogService:Log("Starting slot creation for slot "..tostring(SlotID))
     SetTycoonName(PickRandomTycoonName())
     SlotCreation_CurrentSlotID = SlotID
     TitleScreen.Visible = false
@@ -83,6 +82,33 @@ end
 local function SetupNewSlotFrame()
     NewSlotFrame.NameInput.SubmitButton.MouseButton1Click:Connect(function()
         SetTycoonName(NewSlotFrame.NameInput.Input.Text)
+    end)
+
+    NewSlotFrame.Actions.CancelButton.MouseButton1Click:Connect(function()
+        NewSlotFrame.Visible = false
+    end)
+
+    NewSlotFrame.Actions.CreateButton.MouseButton1Click:Connect(function()
+        local SlotInfo :Core.SaveSlotSettings = {
+            Name = SlotCreation_CurrentName;
+            Tutorial = false;
+        }
+
+        DataService:NewSlot(SlotCreation_CurrentSlotID, SlotInfo)
+        local InTycoon = false
+        MainMenuController:EnableAllUI()
+        SlotSelectionFrame.Visible = false
+        local DataFolder = DataService:GetPlayerDataFolder():andThen(function(DataFolder)
+            repeat
+                task.wait(1)
+            until DataFolder.InTycoon.Value
+            InTycoon = true
+        end)
+
+        repeat
+            task.wait(1)
+        until InTycoon
+        FadeController:FadeGameplayIn(false)
     end)
     LogService:Log("Setup slot creation")
 end
@@ -96,7 +122,6 @@ function MainMenuController:DisableAllUI()
     MainScreenGui.Enabled = true
     PlayerGUI.HUD.Enabled = false
     PlayerGUI.Inventory.Enabled = false
-    --PlayerGUI.Selection.Enabled = false
 end
 
 function MainMenuController:EnableAllUI()
@@ -106,7 +131,6 @@ function MainMenuController:EnableAllUI()
     LogService:Log("Destroyed main menu and blur")
     PlayerGUI.HUD.Enabled = true
     PlayerGUI.Inventory.Enabled = true
-    --PlayerGUI.Selection.Enabled = true
 end
 
 function MainMenuController:CreateSlotFrame(SlotInfo)
@@ -121,21 +145,11 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
 
     if SlotInfo.Used then
         New.TycoonName.Text = SlotInfo.TycoonName
-        New.Info.GoldAmount.TextLabel.Text = Util:ConvertNumberToString(SlotInfo.Gold or 0)
+        New.Info.GoldAmount.TextLabel.Text = Core.Util:ConvertNumberToString(SlotInfo.Gold or 0)
 
         local TimeNow = os.time()
         local TimeDifference = TimeNow - SlotInfo.LastPlayed
-        local TimeText = "N/A"
-
-        if TimeDifference < 60 then
-            TimeText = TimeDifference .. " seconds ago"
-        elseif TimeDifference < 3600 then
-            TimeText = math.floor(TimeDifference / 60) .. " minutes ago"
-        elseif TimeDifference < 86400 then
-            TimeText = math.floor(TimeDifference / 3600) .. " hours ago"
-        else
-            TimeText = math.floor(TimeDifference / 86400) .. " days ago"
-        end
+        local TimeText = Core.Util:TimeAgo(TimeDifference)
 
         New.Info.LastPlayed.TextLabel.Text = TimeText
         New:AddTag("_UsedSlot")
@@ -168,7 +182,7 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         New:AddTag("_NewSlot")
 
         New.Actions.PlayButton.MouseButton1Click:Connect(function()
-            BeginSlotCreation(New.Name)
+            BeginSlotCreation(tonumber(New.Name))
         end)
         LogService:Log("    - Setup setup slot button")
     end

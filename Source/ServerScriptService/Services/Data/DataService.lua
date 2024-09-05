@@ -1,6 +1,9 @@
 local DataStoreService = game:GetService("DataStoreService")
 local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(game.ReplicatedStorage.Packages.Knit)
+
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local RootDataFolder :Folder = game.ReplicatedStorage.PlayerData
 local TemplateDataFolder :Folder = RootDataFolder:FindFirstChild("Template")
@@ -159,6 +162,10 @@ function DataService:SavePlayerData(Player :Player)
 
     LogService:Assert(Success, ErrorMessage)
     LogService:Log("["..Player.Name.."]", "Saved player data!")
+
+    print(EncodedPlayerData)
+    print(EncodedTycoonData)
+    print(EncodedOreData)
 end
 
 --[=[
@@ -200,11 +207,15 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
 
     LogService:Assert(Success, ErrorMessage)
 
-    DataFolder.XP.Value = RawPlayerData.XP
-    DataFolder.Level.Value = RawPlayerData.Level
-    DataFolder.Gold.Value = RawPlayerData.Gold
+    if RawPlayerData ~= nil then
+        DataFolder.XP.Value = RawPlayerData.XP
+        DataFolder.Level.Value = RawPlayerData.Level
+        DataFolder.Gold.Value = RawPlayerData.Gold
+    end
 
-    DataFolder.Tycoon.TycoonName.Value = RawTycoonData.Name
+    if RawTycoonData ~= nil then
+        DataFolder.Tycoon.TycoonName.Value = RawTycoonData.Name
+    end
 
     TycoonService:CreateTycoonForPlayer(Player)
     PickaxeService:GivePickaxeToPlayer(Player)
@@ -229,12 +240,12 @@ end
 --[=[
 Returns the player's data folder if they have one
 ]=]
-function DataService:GetPlayerDataFolder(Player :Player) :Folder?
+function DataService:GetPlayerDataFolder(Player :Player) :Core.DataFolder?
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     return FoundDataFolder
 end
 
-function DataService.Client:GetPlayerDataFolder(Player :Player) :Folder?
+function DataService.Client:GetPlayerDataFolder(Player :Player) :Core.DataFolder?
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     return FoundDataFolder
 end
@@ -303,6 +314,7 @@ Turns a number into a data store from the save slots table, returns slot 1 data
 store if an invalid number is given
 ]=]
 function DataService:SlotNumberToDataStore(SlotNumber :number) :DataStore
+    LogService:Assert(type(SlotNumber) == "number", "'"..type(SlotNumber).."' passed for 'SlotNumber', expected 'number'")
     if SlotNumber == 1 then
         return DataService.SaveSlots.Slot1
     elseif SlotNumber == 2 then
@@ -311,6 +323,7 @@ function DataService:SlotNumberToDataStore(SlotNumber :number) :DataStore
         return DataService.SaveSlots.Slot3
     end
 
+    LogService:Warn("Invalid slot number", SlotNumber)
     return DataService.SaveSlots.Slot1
 end
 
@@ -326,6 +339,7 @@ function DataService:SlotDataStoreToNumber(Slot :DataStore) :DataStore
         return 3
     end
 
+    LogService:Warn("Invalid slot data store", Slot)
     return 1
 end
 
@@ -348,15 +362,20 @@ function DataService.Client:LoadData(Player :Player, SlotID :number)
     DataService:LoadPlayerData(Player, SlotToLoad)
 end
 
+function DataService.Client:NewSlot(Player :Player, SlotNumber :number, SlotSettings :Core.SaveSlotSettings)
+    local AsDataStore = DataService:SlotNumberToDataStore(SlotNumber)
+    if not IsSlotValid(AsDataStore) then return end
+
+    DataService:LoadPlayerData(Player, AsDataStore)
+    local PlayerData = DataService:GetPlayerDataFolder(Player)
+    PlayerData.Tycoon.TycoonName.Value = SlotSettings.Name
+
+    DataService:SavePlayerData(Player)
+end
 
 
 --[[ KNIT ]]--
 
---[=[
-Setup the template data folder to have every single value so that when it is
-cloned for a player it already has every value the player needs ready. This should
-make it so data loading is much faster than before.
-]=]
 function DataService:KnitInit()
     LogService = Knit.GetService("LogService")
     SetupTemplateDataFolder()
@@ -367,7 +386,6 @@ function DataService:KnitStart()
     TycoonService = Knit.GetService("TycoonService")
 
     game.Players.PlayerAdded:Connect(function(Player)
-        self.Players[Player.UserId] = nil
         self:CreateDataFolderForPlayer(Player)
     end)
 
