@@ -86,6 +86,8 @@ local function SetupNewSlotFrame()
 
     NewSlotFrame.Actions.CancelButton.MouseButton1Click:Connect(function()
         NewSlotFrame.Visible = false
+        TitleScreen.Visible = true
+        SlotSelectionFrame.Visible = true
     end)
 
     NewSlotFrame.Actions.CreateButton.MouseButton1Click:Connect(function()
@@ -156,7 +158,7 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
 
         New.Actions.PlayButton.MouseButton1Click:Connect(function()
             FadeController:FadeGameplayOut(true)
-            DataService:LoadData(New.Name)
+            DataService:LoadData(tonumber(New.Name))
             local InTycoon = false
             self:EnableAllUI()
             SlotSelectionFrame.Visible = false
