@@ -1,17 +1,18 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local RainbowService = Knit.CreateService {
-    Name = "RainbowService",
-    Client = {},
+local RainbowController = Knit.CreateController {
+    Name = "RainbowController",
 }
 
 local CollectionService = game:GetService("CollectionService")
 local TweenService = game:GetService("TweenService")
 
+local LogService
+
 local RainbowTag = "_RainbowGlow"
 
-RainbowService.Colors = {
+RainbowController.Colors = {
     Color3.fromRGB(255, 0, 0);
     Color3.fromRGB(255, 127, 0);
     Color3.fromRGB(255, 255, 0);
@@ -19,6 +20,11 @@ RainbowService.Colors = {
     Color3.fromRGB(0, 0, 255);
     Color3.fromRGB(75, 0, 130);
     Color3.fromRGB(148, 0, 211);
+}
+
+RainbowController.ValidTypes = {
+    "Decal";
+    "Light";
 }
 
 local function CreateInfoPropertyTable(Object :Decal|Light, NewColor :Color3) :{[string]: any}
@@ -29,11 +35,30 @@ local function CreateInfoPropertyTable(Object :Decal|Light, NewColor :Color3) :{
     end
 end
 
-function RainbowService:KnitStart()
+function isCertainType(obj)
+    
+end
+
+local function IsValidObject(Object :any) :boolean
+    for _, Type in ipairs(RainbowController.ValidTypes) do
+        if Object:IsA(Type) then
+            return true
+        end
+    end
+    
+    LogService:Warn("Invalid object: ("..Object.Name..") is a "..Object.ClassName.." expected: Decal, Light")
+    return false
+end
+
+function RainbowController:KnitStart()
+    LogService = Knit.GetService("LogService")
+
     local Tagged = CollectionService:GetTagged(RainbowTag)
     local TweeningInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
 
     for _, Object in pairs(Tagged) do
+        if not IsValidObject(Object) then continue end
+
         task.spawn(function()
             while true do
                 for _, Color :Color3 in ipairs(self.Colors) do
@@ -46,4 +71,4 @@ function RainbowService:KnitStart()
     end
 end
 
-return RainbowService
+return RainbowController
