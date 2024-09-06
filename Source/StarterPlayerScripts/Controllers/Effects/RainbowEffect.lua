@@ -27,6 +27,9 @@ RainbowController.ValidTypes = {
     "Light";
 }
 
+--[=[
+Creates a TweenService:Create() info table for the object given.
+]=]
 local function CreateInfoPropertyTable(Object :Decal|Light, NewColor :Color3) :{[string]: any}
     if Object:IsA("Decal") then
         return {Color3 = NewColor}
@@ -35,17 +38,16 @@ local function CreateInfoPropertyTable(Object :Decal|Light, NewColor :Color3) :{
     end
 end
 
-function isCertainType(obj)
-    
-end
-
+--[=[
+Checks if an object is a valid object that can be made rainbow
+]=]
 local function IsValidObject(Object :any) :boolean
     for _, Type in ipairs(RainbowController.ValidTypes) do
         if Object:IsA(Type) then
             return true
         end
     end
-    
+
     LogService:Warn("Invalid object: ("..Object.Name..") is a "..Object.ClassName.." expected: Decal, Light")
     return false
 end
