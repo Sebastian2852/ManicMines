@@ -19,6 +19,7 @@ or when the reset their settings to default.
 ]=]
 Config.DefaultSettings = {
     GlobalShadows = true;
+    RainbowEffect = true;
 };
 
 Config.MainMenu = {
@@ -29,7 +30,7 @@ Config.MainMenu = {
     Credits = {};
 
     --[=[
-   The changelog for the current version split up into different categories. Show on startup shows the changelog when the players plays the game for the first time in this version. DO NOT EDIT YET!!
+    The changelog for the current version split up into different categories. Show on startup shows the changelog when the players plays the game for the first time in this version. DO NOT EDIT YET!!
     ]=]
     ChangeLog = {
         BugFixes = {};

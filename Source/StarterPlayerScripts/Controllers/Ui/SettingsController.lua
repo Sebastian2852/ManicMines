@@ -17,7 +17,8 @@ local HudGUI = PlayerGUI:WaitForChild("HUD")
 --local SettingsButton = HudGUI:WaitForChild("Settings")
 
 local Settings = {
-    GlobalShadows = true
+    GlobalShadows = true;
+    RainbowEffect = true;
 }
 
 
@@ -49,6 +50,7 @@ UserInputService.InputBegan:Connect(function(Input, Processed)
     if Processed then return end
     if Input.KeyCode == Enum.KeyCode.Z then 
         Settings.GlobalShadows = not Settings.GlobalShadows
+        Settings.RainbowEffect = not Settings.RainbowEffect
         Update()
     end
 end)

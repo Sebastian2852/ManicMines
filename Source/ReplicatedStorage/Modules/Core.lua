@@ -45,6 +45,7 @@ export type DataFolder = {
     InMine :BoolValue;
     InTycoon :BoolValue;
     ServerMining :BoolValue;
+    DataLoaded :BoolValue;
 }
 
 --[=[
@@ -52,6 +53,7 @@ Used for setting tables, contains every setting.
 ]=]
 export type Settings = {
     GlobalShadows :boolean;
+    RainbowEffect :boolean;
 }
 
 local GameConfig = require(script.Parent.GameConfig)

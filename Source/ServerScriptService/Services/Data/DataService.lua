@@ -222,6 +222,8 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     Player.CharacterAdded:Connect(function()
         PickaxeService:GivePickaxeToPlayer(Player)
     end)
+
+    DataFolder.DataLoaded.Value = true
 end
 
 --[=[
@@ -241,11 +243,6 @@ end
 Returns the player's data folder if they have one
 ]=]
 function DataService:GetPlayerDataFolder(Player :Player) :Core.DataFolder?
-    local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
-    return FoundDataFolder
-end
-
-function DataService.Client:GetPlayerDataFolder(Player :Player) :Core.DataFolder?
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     return FoundDataFolder
 end
@@ -373,6 +370,25 @@ function DataService.Client:NewSlot(Player :Player, SlotNumber :number, SlotSett
     DataService:SavePlayerData(Player)
 end
 
+function DataService.Client:GetPlayerDataFolder(Player :Player) :Core.DataFolder?
+    local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
+    if not FoundDataFolder then
+        repeat
+            FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
+            task.wait(0.1)
+        until FoundDataFolder
+    end
+    return FoundDataFolder
+end
+
+function DataService.Client:PlayerHasDataFolder(Player :Player) :boolean
+    local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
+    if FoundDataFolder then
+        return true
+    end
+
+    return false
+end
 
 --[[ KNIT ]]--
 

@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
+
 local RainbowController = Knit.CreateController {
     Name = "RainbowController",
 }
@@ -8,6 +10,7 @@ local RainbowController = Knit.CreateController {
 local CollectionService = game:GetService("CollectionService")
 local TweenService = game:GetService("TweenService")
 
+local DataService
 local LogService
 
 local RainbowTag = "_RainbowGlow"
@@ -26,6 +29,8 @@ RainbowController.ValidTypes = {
     "Decal";
     "Light";
 }
+
+local ActiveEffects = {}
 
 --[=[
 Creates a TweenService:Create() info table for the object given.
@@ -52,25 +57,63 @@ local function IsValidObject(Object :any) :boolean
     return false
 end
 
-function RainbowController:KnitStart()
-    LogService = Knit.GetService("LogService")
-
+local function StartEffects()
     local Tagged = CollectionService:GetTagged(RainbowTag)
     local TweeningInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
 
     for _, Object in pairs(Tagged) do
         if not IsValidObject(Object) then continue end
 
-        task.spawn(function()
+        local Thread = task.spawn(function()
             while true do
-                for _, Color :Color3 in ipairs(self.Colors) do
+                for _, Color :Color3 in ipairs(RainbowController.Colors) do
                     local Tween = TweenService:Create(Object, TweeningInfo, CreateInfoPropertyTable(Object, Color))
                     Tween:Play()
                     Tween.Completed:Wait()
                 end
             end
         end)
+
+        table.insert(ActiveEffects, Thread)
     end
+end
+
+local function StopEffects()
+    for _, Thread in pairs(ActiveEffects) do
+        task.cancel(Thread)
+    end
+
+    local Tagged = CollectionService:GetTagged(RainbowTag)
+    local TweeningInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
+    for _, Object in pairs(Tagged) do
+        if not IsValidObject(Object) then continue end
+        local Tween = TweenService:Create(Object, TweeningInfo, CreateInfoPropertyTable(Object, Color3.fromRGB(500, 500, 500)))
+        Tween:Play()
+    end
+end
+
+function RainbowController:KnitStart()
+    DataService = Knit.GetService("DataService")
+    LogService = Knit.GetService("LogService")
+
+    DataService:GetPlayerDataFolder():andThen(function(PlayerDataFolder :Core.DataFolder)
+        repeat task.wait(1) until PlayerDataFolder:FindFirstChild("DataLoaded")
+        repeat task.wait(1) until PlayerDataFolder:FindFirstChild("DataLoaded").Value
+        print(PlayerDataFolder:GetDescendants())
+        PlayerDataFolder.Settings.RainbowEffect:GetPropertyChangedSignal("Value"):Connect(function()
+            if PlayerDataFolder.Settings.RainbowEffect.Value then
+                StartEffects()
+            else
+                StopEffects()
+            end
+        end)
+
+        if PlayerDataFolder.Settings.RainbowEffect then
+            StartEffects()
+        else
+            StopEffects()
+        end
+    end)
 end
 
 return RainbowController

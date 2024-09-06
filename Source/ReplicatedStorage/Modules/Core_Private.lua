@@ -27,6 +27,7 @@ export type DataFolder_PickaxesFolder = {
 
 export type DataFolder_SettingsFolder = {
     GlobalShadows :BoolValue;
+    RainbowEffect :BoolValue;
 }
 
 export type DataFolder_StatsFolder = {
