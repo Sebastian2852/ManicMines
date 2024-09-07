@@ -59,6 +59,16 @@ export type SlotInfo = {
 }
 
 --[=[
+A chat message to be sent from the server to the client
+]=]
+export type ChatMessage = {
+    Message :string;
+    Prefix :string;
+    HasPrefix :boolean;
+    MessageColor :Color3;
+}
+
+--[=[
 Used for setting tables, contains every setting.
 ]=]
 export type Settings = {
