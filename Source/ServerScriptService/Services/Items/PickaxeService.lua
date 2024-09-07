@@ -29,7 +29,7 @@ function PickaxeService:CalculateTimeToMine(Player :Player, Health :number) :num
     local Pickaxe :Instance = PickaxeService:GetPlayerPickaxe(Player)
 
     local HitsNeeded = math.ceil(Health / Pickaxe:GetAttribute("HitDamage"))
-    local TimePerHit = Pickaxe:GetAttribute("MiningHitDelay")
+    local TimePerHit = Pickaxe:GetAttribute("MiningCooldown")
     local TotalTime = HitsNeeded * TimePerHit
     return Core.Util:RoundToxDP(TotalTime, 1)
 end
@@ -144,21 +144,7 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
     NewPickaxe:AddTag("Pickaxe")
 end
 
-
-
---[[ CLIENT ]]--
-
---[=[
-Get the players pickaxe
-]=]
-function PickaxeService.Client:GetPickaxe(Player :Player)
-    return PickaxeService:GetPlayerPickaxe(Player)
-end
-
---[=[
-Makes the player start mining a given block
-]=]
-function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePart)
+function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
     if not PickaxeService.Mining[Player.UserId] then
         LogService:Warn("Player should have an entry in mining table?")
         PickaxeService.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}
@@ -192,7 +178,7 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
         local OreListItem :Core.OreListItem = PlayerStatsService:ConvertOreNameToOreListItem(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
 
         if Health <= 0 then
-            PickaxeService.Client:StopMining(Player)
+            PickaxeService:StopMining(Player)
             MineService:BlockMined(ObjectToMine)
             PlayerStatsService:MinedOre(Player, OreListItem)
             --DataModule:RecalculateInventoryItems(Player)
@@ -203,26 +189,23 @@ function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePar
         Health -= Pickaxe:GetAttribute("HitDamage")
         ObjectToMine:SetAttribute("Health", Health)
         --Events.Client.UpdateMiningSelection:FireClient(Player, ObjectToMine.Name, DataModule:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
-        self.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
+        PickaxeService.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
 
         if Health <= 0 then
-            PickaxeService.Client:StopMining(Player)
+            PickaxeService:StopMining(Player)
             MineService:BlockMined(ObjectToMine)
-            task.wait(Pickaxe:GetAttribute("MiningHitDelay") / 2)
+            task.wait(Pickaxe:GetAttribute("MiningCooldown") / 2)
             PlayerStatsService:MinedOre(Player, OreListItem)
             --DataModule:RecalculateInventoryItems(Player)
             --Events.Client.UpdateInventory:FireClient(Player)
             break
         end
 
-        task.wait(Pickaxe:GetAttribute("MiningHitDelay"))
+        task.wait(Pickaxe:GetAttribute("MiningCooldown"))
     end
 end
 
---[=[
-Stops the player from mining aswell as starting their cooldown
-]=]
-function PickaxeService.Client:StopMining(Player :Player)
+function PickaxeService:StopMining(Player :Player)
     if not PickaxeService.Mining[Player.UserId] then
         PickaxeService.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}
     end
@@ -249,6 +232,30 @@ function PickaxeService.Client:StopMining(Player :Player)
         task.wait(Pickaxe:GetAttribute("MiningCooldown"))
         PickaxeService.Mining[Player.UserId].Cooldown = false
     end)
+end
+
+
+--[[ CLIENT ]]--
+
+--[=[
+Get the players pickaxe
+]=]
+function PickaxeService.Client:GetPickaxe(Player :Player)
+    return PickaxeService:GetPlayerPickaxe(Player)
+end
+
+--[=[
+Makes the player start mining a given block
+]=]
+function PickaxeService.Client:StartMining(Player :Player, ObjectToMine :BasePart)
+    PickaxeService:StartMining(Player, ObjectToMine)
+end
+
+--[=[
+Stops the player from mining aswell as starting their cooldown
+]=]
+function PickaxeService.Client:StopMining(Player :Player)
+    PickaxeService:StopMining(Player)
 end
 
 function PickaxeService.Client:CalculateTimeToMine(Player :Player, Health :number)

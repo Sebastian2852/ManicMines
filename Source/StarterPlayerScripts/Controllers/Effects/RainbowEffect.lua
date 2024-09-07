@@ -99,7 +99,6 @@ function RainbowController:KnitStart()
     DataService:GetPlayerDataFolder():andThen(function(PlayerDataFolder :Core.DataFolder)
         repeat task.wait(1) until PlayerDataFolder:FindFirstChild("DataLoaded")
         repeat task.wait(1) until PlayerDataFolder:FindFirstChild("DataLoaded").Value
-        print(PlayerDataFolder:GetDescendants())
         PlayerDataFolder.Settings.RainbowEffect:GetPropertyChangedSignal("Value"):Connect(function()
             if PlayerDataFolder.Settings.RainbowEffect.Value then
                 StartEffects()
