@@ -26,7 +26,9 @@ export type SaveSlotSettings = {
     Tutorial :boolean;
 }
 
-
+--[=[
+A data folder described in code
+]=]
 export type DataFolder = {
     Emblems :Folder;
     TimesMined :Folder;
@@ -46,6 +48,14 @@ export type DataFolder = {
     InTycoon :BoolValue;
     ServerMining :BoolValue;
     DataLoaded :BoolValue;
+}
+
+export type SlotInfo = {
+    SlotID :number;
+    Used :boolean;
+    TycoonName :string;
+    Gold :number;
+    LastPlayed :number;
 }
 
 --[=[

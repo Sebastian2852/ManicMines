@@ -229,7 +229,7 @@ end
 --[=[
 Create a data folder for a given player
 ]=]
-function DataService:CreateDataFolderForPlayer(Player :Player) :Folder
+function DataService:CreateDataFolderForPlayer(Player :Player) :Core.DataFolder
     if self:PlayerHasDataFolder(Player) then return nil end
     local DataFolder = TemplateDataFolder:Clone()
     DataFolder.Name = Player.UserId
@@ -268,8 +268,8 @@ Returns the information for a given slot for a player:
 - Tycoon Name
 - Last Played
 ]=]
-function DataService:GetSlotInfo(Player :Player, Slot :DataStore) :{any}
-    local Info = {
+function DataService:GetSlotInfo(Player :Player, Slot :DataStore) :Core.SlotInfo
+    local Info :Core.SlotInfo = {
         SlotID = self:SlotDataStoreToNumber(Slot);
         Used = false;
     }
@@ -328,7 +328,7 @@ end
 --[=[
 Turns a save slot data store into a number, returns `1` if an invalid data store is given
 ]=]
-function DataService:SlotDataStoreToNumber(Slot :DataStore) :DataStore
+function DataService:SlotDataStoreToNumber(Slot :DataStore) :number
     if Slot == self.SaveSlots.Slot1 then
         return 1
     elseif Slot == self.SaveSlots.Slot2 then
@@ -360,6 +360,9 @@ function DataService.Client:LoadData(Player :Player, SlotID :number)
     DataService:LoadPlayerData(Player, SlotToLoad)
 end
 
+--[=[
+Setup a new slot for a given slot number with settings
+]=]
 function DataService.Client:NewSlot(Player :Player, SlotNumber :number, SlotSettings :Core.SaveSlotSettings)
     local AsDataStore = DataService:SlotNumberToDataStore(SlotNumber)
     if not IsSlotValid(AsDataStore) then return end
@@ -371,7 +374,10 @@ function DataService.Client:NewSlot(Player :Player, SlotNumber :number, SlotSett
     DataService:SavePlayerData(Player)
 end
 
-function DataService.Client:GetPlayerDataFolder(Player :Player) :Core.DataFolder?
+--[=[
+Gets the player's data folder, if no data folder is found it waits until the player has a data folder
+]=]
+function DataService.Client:GetPlayerDataFolder(Player :Player) :Core.DataFolder
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     if not FoundDataFolder then
         repeat
@@ -382,6 +388,9 @@ function DataService.Client:GetPlayerDataFolder(Player :Player) :Core.DataFolder
     return FoundDataFolder
 end
 
+--[=[
+returns a true if the player has a data folder, otherwise returns false
+]=]
 function DataService.Client:PlayerHasDataFolder(Player :Player) :boolean
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     if FoundDataFolder then
