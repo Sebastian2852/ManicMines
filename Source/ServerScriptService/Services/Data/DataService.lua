@@ -235,6 +235,7 @@ function DataService:CreateDataFolderForPlayer(Player :Player) :Folder
     DataFolder.Name = Player.UserId
     DataFolder.Parent = RootDataFolder
 
+    Core.Events.NewDataFolder.Event:Fire(DataFolder)
     LogService:Log("Created "..Player.Name.."'s data folder")
     return DataFolder
 end
