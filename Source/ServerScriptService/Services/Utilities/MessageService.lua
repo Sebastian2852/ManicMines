@@ -19,7 +19,7 @@ Sends a chat message to a player
 ]=]
 function MessageService:SendMessageToPlayer(Message :Core.ChatMessage, Player :Player)
     self.Client.SendMessage:Fire(Player, Message)
-    LogService:Log("Send message to player:", Player.Name)
+    LogService:Log("Sent message to player:", Player.Name)
 end
 
 --[=[
@@ -29,7 +29,7 @@ function MessageService:SendMessage(Message :Core.ChatMessage)
     for _, Player :Player in pairs(game.Players:GetPlayers()) do
         self.Client.SendMessage:Fire(Player, Message)
     end
-    LogService:Log("Send message to all players")
+    LogService:Log("Sent message to all players")
 end
 
 

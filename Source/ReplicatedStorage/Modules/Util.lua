@@ -69,4 +69,12 @@ function Util:TimeAgo(Time :number) :string
     return Final
 end
 
+--[=[
+Takes in an objects and outputs a string to use for logging. E.g if you pass a part called "John"
+you will get "John (Part)" back
+]=]
+function Util:LogObjectString(Object :any) :string
+    return Object.Name.." ("..Object.ClassName..")"
+end
+
 return Util
