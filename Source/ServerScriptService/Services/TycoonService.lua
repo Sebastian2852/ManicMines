@@ -21,6 +21,22 @@ local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
 
 --[[ PRIVATE ]]--
 
+local function CreateUpgradeModelUI(UpgradeModelConfig :Configuration) :BillboardGui
+    local UpgradeName = UpgradeModelConfig.Parent:GetAttribute("UpgradeName")
+    local UpgradeNameColor = UpgradeModelConfig.Parent:GetAttribute("UpgradeNameColor")
+
+    local Level = UpgradeModelConfig.Name
+    local LevelColor = UpgradeModelConfig:GetAttribute("LevelColor")
+
+    local NewUI = ReplicatedStorage.Assets.UI.Tycoon.Upgrade:Clone()
+    NewUI.Main.UpgradeLevel.UIGradient.Color = LevelColor
+    NewUI.Main.UpgradeName.UIGradient.Color = UpgradeNameColor
+
+    NewUI.Main.UpgradeName.Text = UpgradeName
+    NewUI.Main.UpgradeLevel.Text = Level
+    return NewUI
+end
+
 local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
     local RawUpgradesFolder = TycoonAssets.Upgrades
     local TycoonUpgradesFolder = Tycoon.Main.Upgrades
@@ -43,6 +59,12 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
         local Model :Model = UpgradeModel:Clone()
         Model.Parent = UpgradeHitbox
         Model:PivotTo(UpgradeHitbox.CFrame)
+
+        local UI = CreateUpgradeModelUI(UpgradeModel.Parent)
+        UI.Parent = Model
+        UI.Adornee = Model
+        UI.StudsOffset = Vector3.new(0, (UpgradeHitbox.Size.Y / 2) + 2, 0)
+
         LogService:Log("Added upgrade model "..UpgradeHitbox.Name.." level "..DataValue.Value)
     end
 end
