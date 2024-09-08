@@ -49,13 +49,16 @@ end
 function HideService:KnitStart()
     LogService = Knit.GetService("LogService")
 
+    Core.Timer.new()
+    Core.Timer:Start()
     local Tagged = CollectionService:GetTagged(HideTag)
 
     for _, Object in pairs(Tagged) do
         self:Hide(Object)
     end
 
-    LogService:Log("Hidden "..#self.HiddenObjects.." objects")
+    local TimeTaken = Core.Timer:End()
+    LogService:Log("Hidden "..#self.HiddenObjects.." objects in "..tostring(TimeTaken).." seconds")
 end
 
 return HideService
