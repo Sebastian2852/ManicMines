@@ -301,7 +301,11 @@ function DataService:GetSlotInfo(Player :Player, Slot :DataStore) :Core.SlotInfo
 
     LogService:Assert(Success, ErrorMessage)
 
-    if RawPlayerData == nil or RawTycoonData == nil then
+    if RawPlayerData == nil or RawPlayerData == {} or RawTycoonData == nil or RawTycoonData == {} then
+        return Info
+    end
+
+    if RawTycoonData.Name == nil then
         return Info
     end
 
@@ -347,6 +351,41 @@ function DataService:SlotDataStoreToNumber(Slot :DataStore) :number
     return 1
 end
 
+--[=[
+Creates a new slot in the given slot number for a player
+]=]
+function DataService:NewSlot(Player :Player, SlotNumber :number, SlotSettings :Core.SaveSlotSettings)
+    local AsDataStore = DataService:SlotNumberToDataStore(SlotNumber)
+    if not IsSlotValid(AsDataStore) then return end
+
+    DataService:LoadPlayerData(Player, AsDataStore)
+    local PlayerData = DataService:GetPlayerDataFolder(Player)
+    PlayerData.Tycoon.TycoonName.Value = SlotSettings.Name
+
+    DataService:SavePlayerData(Player)
+end
+
+function DataService:DeleteSlot(Player :Player, SlotNumber :number)
+    local AsDataStore = DataService:SlotNumberToDataStore(SlotNumber)
+    if not IsSlotValid(AsDataStore) then return end
+
+    LogService:Log("Deleting slot "..tostring(SlotNumber).." for "..Player.Name)
+    local PlayerDataKey = Player.UserId.."-PlayerData"
+    local TycoonDataKey = Player.UserId.."-TycoonData"
+    local OreDataKey = Player.UserId.."-OreData"
+
+    local Data = "{}"
+
+    local Success, ErrorMessage = pcall(function()
+        AsDataStore:SetAsync(PlayerDataKey, Data)
+        AsDataStore:SetAsync(TycoonDataKey, Data)
+        AsDataStore:SetAsync(OreDataKey, Data)
+    end)
+
+    LogService:Assert(Success, ErrorMessage)
+
+    LogService:Log("Deleted slot "..tostring(SlotNumber).." for "..Player.Name)
+end
 
 
 --[[ CLIENT ]]--
@@ -366,23 +405,14 @@ function DataService.Client:LoadData(Player :Player, SlotID :number)
     DataService:LoadPlayerData(Player, SlotToLoad)
 end
 
---[=[
-Setup a new slot for a given slot number with settings
-]=]
 function DataService.Client:NewSlot(Player :Player, SlotNumber :number, SlotSettings :Core.SaveSlotSettings)
-    local AsDataStore = DataService:SlotNumberToDataStore(SlotNumber)
-    if not IsSlotValid(AsDataStore) then return end
-
-    DataService:LoadPlayerData(Player, AsDataStore)
-    local PlayerData = DataService:GetPlayerDataFolder(Player)
-    PlayerData.Tycoon.TycoonName.Value = SlotSettings.Name
-
-    DataService:SavePlayerData(Player)
+    DataService:NewSlot(Player, SlotNumber, SlotSettings)
 end
 
---[=[
-Gets the player's data folder, if no data folder is found it waits until the player has a data folder
-]=]
+function DataService.Client:DeleteSlot(Player :Player, SlotNumber :number)
+    DataService:DeleteSlot(Player, SlotNumber)
+end
+
 function DataService.Client:GetPlayerDataFolder(Player :Player) :Core.DataFolder
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     if not FoundDataFolder then
@@ -394,9 +424,6 @@ function DataService.Client:GetPlayerDataFolder(Player :Player) :Core.DataFolder
     return FoundDataFolder
 end
 
---[=[
-returns a true if the player has a data folder, otherwise returns false
-]=]
 function DataService.Client:PlayerHasDataFolder(Player :Player) :boolean
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     if FoundDataFolder then
@@ -405,6 +432,8 @@ function DataService.Client:PlayerHasDataFolder(Player :Player) :boolean
 
     return false
 end
+
+
 
 --[[ KNIT ]]--
 

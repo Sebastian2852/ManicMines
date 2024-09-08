@@ -176,6 +176,22 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         end)
 
         LogService:Log("    - Setup play button")
+
+        New.Actions.DeleteButton.MouseButton1Click:Connect(function()
+            New.SlotDelete.Visible = not New.SlotDelete.Visible
+        end)
+
+        New.SlotDelete.Delete.MouseButton1Click:Connect(function()
+            DataService:DeleteSlot(tonumber(New.Name))
+            New.Visible = false
+            self:CreateSlotFrames()
+        end)
+
+        New.SlotDelete.Cancel.MouseButton1Click:Connect(function()
+            New.SlotDelete.Visible = false
+        end)
+
+        LogService:Log("    - Setup delete button")
     else
         New.TycoonName.Text = "Empty Slot"
         New.Info.Visible = false
