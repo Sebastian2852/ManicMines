@@ -1,15 +1,18 @@
 local DataStoreService = game:GetService("DataStoreService")
 local HttpService = game:GetService("HttpService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Knit = require(game.ReplicatedStorage.Packages.Knit)
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
+
+local Knit = require(game.ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local RootDataFolder :Folder = game.ReplicatedStorage.PlayerData
-local TemplateDataFolder :Folder = RootDataFolder:FindFirstChild("Template")
+local TemplateDataFolder :Core.DataFolder = RootDataFolder:FindFirstChild("Template")
 
-local OresFolder :Folder = game.ReplicatedStorage.Assets.Ores
-local PickaxesFolder :Folder = game.ReplicatedStorage.Assets.Pickaxe.Pickaxes
+local OresFolder :Folder = ReplicatedStorage.Assets.Ores
+local PickaxesFolder :Folder = ReplicatedStorage.Assets.Pickaxe.Pickaxes
+local TycoonUpgradesFolder :Folder = ServerStorage.Assets.Tycoon.Upgrades
 
 local PickaxeService
 local LogService
@@ -81,6 +84,13 @@ local function SetupTemplateDataFolder()
         local PickaxeUpgradeFolder = Instance.new("Folder")
         PickaxeUpgradeFolder.Name = Pickaxe.Name
         PickaxeUpgradeFolder.Parent = TemplateDataFolder.Pickaxes.Upgrades
+    end
+
+    for _, TycoonUpgrade in pairs(TycoonUpgradesFolder:GetChildren()) do
+        local UpgradeValue = Instance.new("IntValue")
+        UpgradeValue.Name = TycoonUpgrade.Name
+        UpgradeValue.Value = 0
+        UpgradeValue.Parent = TemplateDataFolder.Tycoon.Upgrades
     end
 
     LogService:Log("Setup template data folder")

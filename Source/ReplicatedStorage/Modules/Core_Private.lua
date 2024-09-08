@@ -39,7 +39,7 @@ export type DataFolder_StatsFolder = {
 }
 
 export type DataFolder_TycoonFolder = {
-    TycoonUpgrades :Folder;
+    Upgrades :Folder;
     TycoonName :StringValue;
 }
 ---------------------------------------------------

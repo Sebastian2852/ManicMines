@@ -146,7 +146,7 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
     LogService:Log("    - Used:", SlotInfo.Used)
 
     if SlotInfo.Used then
-        New.TycoonName.Text = SlotInfo.TycoonName
+        New.TycoonName.Text = tostring(SlotInfo.TycoonName)
         New.Info.GoldAmount.TextLabel.Text = Core.Util:ConvertNumberToString(SlotInfo.Gold or 0)
 
         local TimeNow = os.time()
