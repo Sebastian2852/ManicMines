@@ -43,9 +43,13 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
     local DataFolderUpgradesFolder = DataFolder.Tycoon.Upgrades
 
     for _, UpgradeHitbox :BasePart in pairs(TycoonUpgradesFolder:GetChildren()) do
-        -- In case the hitbox isnt setup properly
+        -- Setup upgrade hitbox
         UpgradeHitbox.CanCollide = false
         UpgradeHitbox.Anchored = true
+
+        local NewClickDetector = Instance.new("ClickDetector")
+        NewClickDetector.Name = "_SelectionClickDetector"
+        NewClickDetector.Parent = UpgradeHitbox
 
         local DataValue = DataFolderUpgradesFolder:FindFirstChild(UpgradeHitbox.Name)
         local UpgradeConfig :Configuration = RawUpgradesFolder:FindFirstChild(UpgradeHitbox.Name)
