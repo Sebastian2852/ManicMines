@@ -172,10 +172,6 @@ function DataService:SavePlayerData(Player :Player)
 
     LogService:Assert(Success, ErrorMessage)
     LogService:Log("["..Player.Name.."]", "Saved player data!")
-
-    print(EncodedPlayerData)
-    print(EncodedTycoonData)
-    print(EncodedOreData)
 end
 
 --[=[

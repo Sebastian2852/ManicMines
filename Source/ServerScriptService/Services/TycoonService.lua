@@ -1,4 +1,7 @@
-local Knit = require(game.ReplicatedStorage.Packages.Knit)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Knit = require(ReplicatedStorage.Packages.Knit)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local TycoonAssets = game.ServerStorage.Assets.Tycoon
 local Tycoons = workspace.Game.Tycoons
@@ -15,6 +18,34 @@ local DataService
 local TeleportService
 
 local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
+
+--[[ PRIVATE ]]--
+
+local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
+    local RawUpgradesFolder = TycoonAssets.Upgrades
+    local TycoonUpgradesFolder = Tycoon.Main.Upgrades
+    local DataFolderUpgradesFolder = DataFolder.Tycoon.Upgrades
+
+    for _, UpgradeHitbox :BasePart in pairs(TycoonUpgradesFolder:GetChildren()) do
+        -- In case the hitbox isnt setup properly
+        UpgradeHitbox.CanCollide = false
+        UpgradeHitbox.Anchored = true
+
+        local DataValue = DataFolderUpgradesFolder:FindFirstChild(UpgradeHitbox.Name)
+        local UpgradeConfig :Configuration = RawUpgradesFolder:FindFirstChild(UpgradeHitbox.Name)
+
+        if not DataValue then LogService:Warn("No data value for upgrade: "..UpgradeHitbox.Name) continue end
+        if not DataValue then LogService:Warn("No upgrade config for upgrade: "..UpgradeHitbox.Name) continue end
+
+        local UpgradeModel = UpgradeConfig:FindFirstChild(DataValue.Value):FindFirstChildWhichIsA("Model")
+        if not UpgradeModel then LogService:Warn("No upgrade model for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value) continue end
+
+        local Model :Model = UpgradeModel:Clone()
+        Model.Parent = UpgradeHitbox
+        Model:PivotTo(UpgradeHitbox.CFrame)
+        LogService:Log("Added upgrade model "..UpgradeHitbox.Name.." level "..DataValue.Value)
+    end
+end
 
 
 
@@ -59,17 +90,17 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
 
     local TycoonSpawn :BasePart = NewTycoon.Main.Spawn
     local TeleportLocation = TycoonSpawn.Position + Vector3.new(0, 5, 0)
+    local DataFolder = DataService:GetPlayerDataFolder(Player)
 
     Player.CharacterAdded:Connect(function(Character)
         TeleportService:TeleportPlayerToTycoon(Player, NewTycoon)
     end)
 
+    AddUpgradeModels(DataFolder, NewTycoon)
     if Player.Character then
         TeleportService:TeleportPlayerToTycoon(Player, NewTycoon)
     end
 
-    local DataFolder = DataService:GetPlayerDataFolder(Player)
-    DataFolder.InTycoon.Value = true
 
     LogService:Log("Created "..Player.Name.."'s tycoon")
     return NewTycoon

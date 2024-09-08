@@ -14,6 +14,7 @@ local TeleportService = Knit.CreateService {
 local TweenService = game:GetService("TweenService")
 local LogService
 local TycoonService
+local DataService
 
 --[=[
 A list of all the names to avoid while fading a character in or out
@@ -104,15 +105,18 @@ tycoon.
 ]=]
 function TeleportService:TeleportPlayerToTycoon(Player :Player, Tycoon :Model?)
     LogService:Log("Teleporting", Player.Name, "to their player")
+    local DataFolder = DataService:GetPlayerDataFolder(Player)
     local TeleportLocation
 
     if Tycoon then
         local TycoonSpawn :BasePart = Tycoon.Main.Spawn
         TeleportLocation = TycoonSpawn.Position + Vector3.new(0, 5, 0)
+        DataFolder.InTycoon.Value = true
     else
         local PlayerTycoon = TycoonService:GetPlayerTycoon(Player)
         local TycoonSpawn :BasePart = PlayerTycoon.Main.Spawn
         TeleportLocation = TycoonSpawn.Position + Vector3.new(0, 5, 0)
+        DataFolder.InTycoon.Value = true
     end
 
     self:TeleportPlayerToPosition(Player, TeleportLocation)
@@ -123,6 +127,7 @@ end
 function TeleportService:KnitStart()
     LogService = Knit.GetService("LogService")
     TycoonService = Knit.GetService("TycoonService")
+    DataService = Knit.GetService("DataService")
 end
 
 return TeleportService
