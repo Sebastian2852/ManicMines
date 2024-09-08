@@ -18,11 +18,11 @@ local HideTag = "_Hide"
 
 HideService.HiddenObjects = {}
 
-function HideService:Hide(Object :BasePart|Decal)
+function HideService:Hide(Object :BasePart|Decal|Light)
     local Objects = Object:GetDescendants()
     table.insert(Objects, Object)
 
-    for i, Thing :BasePart|Decal in pairs(Objects) do
+    for i, Thing :BasePart|Decal|Light in pairs(Objects) do
         if Thing:IsA("BasePart") then
             Thing.Transparency = 1
             Thing.CanCollide = false
@@ -30,6 +30,8 @@ function HideService:Hide(Object :BasePart|Decal)
             Thing.CanQuery = false
         elseif Thing:IsA("Decal") then
             Thing.Transparency = 1
+        elseif Thing:IsA("Light") then
+            Thing.Enabled = false
         else
             LogService:Warn("Cannot hide "..Core.Util:LogObjectString(Thing).." unsupported type")
             continue
