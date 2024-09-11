@@ -78,13 +78,11 @@ export type Settings = {
 
 local GameConfig = require(script.Parent.GameConfig)
 local Util = require(script.Parent.Util)
-local Events = require(script.Parent.Events)
 
 local Timer = require(script.Parent.Objects.Timer)
 
 return {
     GameConfig = GameConfig;
     Util = Util;
-    Events = Events;
     Timer = Timer;
 }
