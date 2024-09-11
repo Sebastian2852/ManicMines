@@ -44,7 +44,11 @@ function MessageService:KnitStart()
             Message = Player.DisplayName.." (@"..Player.Name..") joined the game!";
             HasPrefix = false;
         }
-        MessageService:SendMessage(Message)
+
+        for _, v in pairs(game.Players:GetPlayers()) do
+            if Player.UserId == v.UserId then continue end
+            MessageService:SendMessageToPlayer(Message, v)
+        end
     end)
 end
 
