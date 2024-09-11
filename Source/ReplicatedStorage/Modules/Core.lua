@@ -6,7 +6,7 @@ different requires for all the module.
 Since most of the scripts require all of the modules anyway this is easier.
 ]]
 
-local Private = require(script.Parent.Core_Private)
+local Private = require(script.Parent.ModulesInCore.Core_Private)
 
 --[=[
 An ore list is used in places like awarding the player with a set of ores
@@ -76,10 +76,10 @@ export type Settings = {
     RainbowEffect :boolean;
 }
 
-local GameConfig = require(script.Parent.GameConfig)
-local Util = require(script.Parent.Util)
+local GameConfig = require(script.Parent.ModulesInCore.GameConfig)
+local Util = require(script.Parent.ModulesInCore.Util)
 
-local Timer = require(script.Parent.Objects.Timer)
+local Timer = require(script.Parent.Classes.Timer)
 
 return {
     GameConfig = GameConfig;
