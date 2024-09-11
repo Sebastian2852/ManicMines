@@ -14,3 +14,11 @@ Knit.Start():andThen(function()
     print("Knit started")
     print("It took "..TimeTaken.."s to start knit")
 end):catch(warn)
+
+Core.Events.NewDataFolder.OnBindableEvent:Connect(function(DataFolder)
+    print("New data folder: "..DataFolder.Name)
+end)
+
+Core.Events.DataLoaded.OnBindableEvent:Connect(function()
+    print("data loaded")
+end)

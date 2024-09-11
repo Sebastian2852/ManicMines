@@ -241,7 +241,8 @@ function DataService:CreateDataFolderForPlayer(Player :Player) :Core.DataFolder
     DataFolder.Name = Player.UserId
     DataFolder.Parent = RootDataFolder
 
-    Core.Events.NewDataFolder.Event:Fire(DataFolder)
+    Core.Events.NewDataFolder:FireEventForAllClients(DataFolder)
+    Core.Events.NewDataFolder:FireEventForServer(DataFolder)
     LogService:Log("Created "..Player.Name.."'s data folder")
     return DataFolder
 end
@@ -403,6 +404,9 @@ end
 function DataService.Client:LoadData(Player :Player, SlotID :number)
     local SlotToLoad = DataService:SlotNumberToDataStore(SlotID)
     DataService:LoadPlayerData(Player, SlotToLoad)
+
+    Core.Events.DataLoaded:FireEventForServer()
+    Core.Events.DataLoaded:FireEventForAllClients()
 end
 
 function DataService.Client:NewSlot(Player :Player, SlotNumber :number, SlotSettings :Core.SaveSlotSettings)
