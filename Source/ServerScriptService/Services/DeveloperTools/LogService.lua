@@ -14,8 +14,8 @@ local LogService = Knit.CreateService{
 
 local TestService = game:GetService("TestService")
 
-LogService.WarningsEnabled = true
 LogService.LoggingEnabled = true
+LogService.WarningsEnabled = true
 LogService.AssertsEnabled = true
 
 --[=[
