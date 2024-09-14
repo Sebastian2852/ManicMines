@@ -50,6 +50,15 @@ function MessageService:KnitStart()
             MessageService:SendMessageToPlayer(Message, v)
         end
     end)
+
+    game.Players.PlayerRemoving:Connect(function(Player)
+        local Message :Core.ChatMessage = {
+            Message = Player.DisplayName.." (@"..Player.Name..") left the game!";
+            HasPrefix = false;
+        }
+
+        MessageService:SendMessage(Message)
+    end)
 end
 
 return MessageService

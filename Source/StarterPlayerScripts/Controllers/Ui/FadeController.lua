@@ -7,6 +7,7 @@ local FadeController = Knit.CreateController {
 }
 
 local TeleportService
+local LogService
 
 local Player = Knit.Player
 local FadeFrame :Frame = nil
@@ -50,6 +51,7 @@ if await for finish is true then the script will not return
 until the fade has finished
 ]=]
 function FadeController:FadeGameplayOut(AwaitFinish :boolean)
+    LogService:Log("Fading gameplay out")
     FadeGuiIn(true, AwaitFinish)
 end
 
@@ -58,6 +60,7 @@ Fades out the GUI if await for finish is true then the script
 will not return until the fade has finished
 ]=]
 function FadeController:FadeGameplayIn(AwaitFinish :boolean)
+    LogService:Log("Fading gameplay in")
     FadeGuiOut(true, AwaitFinish)
 end
 
@@ -65,6 +68,7 @@ end
 Puts the black gui on the screen with no fade/animation
 ]=]
 function FadeController:HideGameplay()
+    LogService:Log("Hiding gameplay")
     FadeGuiIn(false, false)
 end
 
@@ -72,6 +76,7 @@ end
 gets rid of the black gui on the screen with no fade/animation
 ]=]
 function FadeController:ShowGameplay()
+    LogService:Log("Showing gameplay")
     FadeGuiOut(false, false)
 end
 
@@ -101,6 +106,7 @@ end
 
 function FadeController:KnitStart()
     TeleportService = Knit.GetService("TeleportService")
+    LogService = Knit.GetService("LogService")
 
     TeleportService.TeleportStarted:Connect(function()
         FadeController:FadeGameplayOut(false)

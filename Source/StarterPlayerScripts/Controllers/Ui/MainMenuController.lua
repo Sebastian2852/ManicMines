@@ -97,6 +97,7 @@ local function SetupNewSlotFrame()
         }
 
         DataService:NewSlot(SlotCreation_CurrentSlotID, SlotInfo)
+        FadeController:FadeGameplayOut(true)
         local InTycoon = false
         MainMenuController:EnableAllUI()
         SlotSelectionFrame.Visible = false
@@ -112,6 +113,11 @@ local function SetupNewSlotFrame()
         until InTycoon
         FadeController:FadeGameplayIn(false)
     end)
+
+    NewSlotFrame.NameInput.RandomiseName.MouseButton1Click:Connect(function()
+        SetTycoonName(PickRandomTycoonName())
+    end)
+
     LogService:Log("Setup slot creation")
 end
 
@@ -182,8 +188,20 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         end)
 
         New.SlotDelete.Delete.MouseButton1Click:Connect(function()
+            for _, SlotFrame :Frame in pairs(SlotSelectionFrame.Slots:GetChildren()) do
+                if SlotFrame:IsA("Frame") then SlotFrame:Destroy() end
+            end
+
+            SlotSelectionFrame.Slots.LoadingText.Visible = true
             DataService:DeleteSlot(tonumber(New.Name))
-            New.Visible = false
+            SlotSelectionFrame.Slots.LoadingText.Text = "Loading ."
+            task.wait(0.25)
+            SlotSelectionFrame.Slots.LoadingText.Text = "Loading .."
+            task.wait(0.25)
+            SlotSelectionFrame.Slots.LoadingText.Text = "Loading ..."
+            task.wait(0.25)
+            SlotSelectionFrame.Slots.LoadingText.Visible = false
+
             self:CreateSlotFrames()
         end)
 

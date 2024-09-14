@@ -107,6 +107,25 @@ local function IsSlotValid(Slot :DataStore) :boolean
     return false
 end
 
+--[=[
+Checks wether a data table is valid
+]=]
+local function IsRawDataValid(Data :{any}) :boolean
+    if Data == nil then return false end
+    if Data == {} then return false end
+
+    return true
+end
+
+--[=[
+Checks if a JSON encoded save data table is valid
+]=]
+local function IsSavedDataValid(Data :string) :boolean
+    if Data == nil then return false end
+    if Data == "{}" then return false end
+
+    return true
+end
 
 
 --[[ PUBLIC ]]--
@@ -213,15 +232,15 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
 
     LogService:Assert(Success, ErrorMessage)
 
-    if RawPlayerData ~= nil then
+    if IsRawDataValid(RawPlayerData) then
         DataFolder.XP.Value = RawPlayerData.XP
         DataFolder.Level.Value = RawPlayerData.Level
         DataFolder.Gold.Value = RawPlayerData.Gold
-    end
+    else return end
 
-    if RawTycoonData ~= nil then
+    if IsRawDataValid(RawTycoonData) then
         DataFolder.Tycoon.TycoonName.Value = RawTycoonData.Name
-    end
+    else return end
 
     TycoonService:CreateTycoonForPlayer(Player)
     PickaxeService:GivePickaxeToPlayer(Player)
@@ -240,7 +259,7 @@ function DataService:CreateDataFolderForPlayer(Player :Player) :Core.DataFolder
     local DataFolder = TemplateDataFolder:Clone()
     DataFolder.Name = Player.UserId
     DataFolder.Parent = RootDataFolder
-    
+
     LogService:Log("Created "..Player.Name.."'s data folder")
     return DataFolder
 end
@@ -357,11 +376,12 @@ function DataService:NewSlot(Player :Player, SlotNumber :number, SlotSettings :C
     local AsDataStore = DataService:SlotNumberToDataStore(SlotNumber)
     if not IsSlotValid(AsDataStore) then return end
 
-    DataService:LoadPlayerData(Player, AsDataStore)
     local PlayerData = DataService:GetPlayerDataFolder(Player)
     PlayerData.Tycoon.TycoonName.Value = SlotSettings.Name
 
+    self.Players[Player.UserId] = AsDataStore
     DataService:SavePlayerData(Player)
+    DataService:LoadPlayerData(Player, AsDataStore)
 end
 
 function DataService:DeleteSlot(Player :Player, SlotNumber :number)
