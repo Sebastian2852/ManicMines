@@ -90,6 +90,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     local NewBlock :BasePart = BlockToGenerate:Clone()
     NewBlock.Parent = workspace.Game.Mine
     NewBlock.Position = Position
+    NewBlock.Size = Vector3.new(6, 6, 6)
 
     table.insert(self.UsedPositions, Position)
     self.MineStats.BlocksGenerated += 1
@@ -119,7 +120,7 @@ function MineService:GenerateTopLayer()
     MineSpawn.CanCollide = true
     TopLayerY = MineSpawn.Position.Y
 
-    local BlockSize = Vector3.new(5, 5, 5)
+    local BlockSize = Vector3.new(6, 6, 6)
     local BlocksToGenerateX = math.round(MineSpawn.Size.X / BlockSize.X)
     local BlocksToGenerateY = math.round(MineSpawn.Size.Z / BlockSize.Z)
 
@@ -149,14 +150,14 @@ Generates blocks around a block that was mined aswell as destroying the block
 ]=]
 function MineService:BlockMined(Block :BasePart)
     local PositionOffsets = {
-        Vector3.new(5, 0, 0);
-        Vector3.new(-5, 0, 0);
+        Vector3.new(6, 0, 0);
+        Vector3.new(-6, 0, 0);
 
-        Vector3.new(0, 5, 0);
-        Vector3.new(0, -5, 0);
+        Vector3.new(0, 6, 0);
+        Vector3.new(0, -6, 0);
 
-        Vector3.new(0, 0, 5);
-        Vector3.new(0, 0, -5);
+        Vector3.new(0, 0, 6);
+        Vector3.new(0, 0, -6);
     }
 
     local OriginalPosition = Block.Position
