@@ -242,6 +242,36 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
         DataFolder.Tycoon.TycoonName.Value = RawTycoonData.Name
     else return end
 
+    if IsRawDataValid(RawOreData) then
+        for OreName, OreData in pairs(RawOreData) do
+            local InventoryAmount = OreData["InventoryAmount"]
+            local StorageAmount = OreData["StorageAmount"]
+            local TimesMined = OreData["TimesMined"]
+
+            local InventoryOre = DataFolder.Inventory.Ores:FindFirstChild(OreName)
+            local StorageOre = DataFolder.Storage.Ores:FindFirstChild(OreName)
+            local TimesMinedOre = DataFolder.TimesMined:FindFirstChild(OreName)
+
+            if InventoryOre then
+                InventoryOre.Value = InventoryAmount
+            else
+                LogService:Warn("Discarding data for ore", OreName, "; No longer exists")
+            end
+
+            if StorageOre then
+                StorageOre.Value = StorageAmount
+            else
+                LogService:Warn("Discarding data for ore", OreName, "; No longer exists")
+            end
+
+            if TimesMinedOre then
+                TimesMinedOre.Value = TimesMined
+            else
+                LogService:Warn("Discarding data for ore", OreName, "; No longer exists")
+            end
+        end
+    else return end
+
     TycoonService:CreateTycoonForPlayer(Player)
     PickaxeService:GivePickaxeToPlayer(Player)
     Player.CharacterAdded:Connect(function()
