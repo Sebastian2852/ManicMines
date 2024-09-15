@@ -1,7 +1,9 @@
+local TeleportService = game:GetService("TeleportService")
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
+local TeleportService
 local LogService
 
 local MineService = Knit.CreateService {
@@ -25,8 +27,34 @@ MineService.MineStats = {
 }
 
 MineService.Settings = {
-    ChanceToGenerateOre = 25
+    ChanceToGenerateOre = 25;
+    BlocksMinedForCollapse = 10;
 }
+
+local function CollapseMine()
+    LogService:Log("Mine collapsing")
+    for _, Player in pairs(game.Players:GetPlayers()) do
+        TeleportService:TeleportPlayerToSurface(Player)
+    end
+
+    MineSpawn.Position = OriginalMineSpawnPosition
+    MineSpawn.Transparency = 0
+
+    LogService:Log("Deleting all blocks in mine")
+    for _, Part in ipairs(workspace.Game.Mine:GetChildren()) do
+        Part:Destroy()
+    end
+
+    task.wait(1)
+
+    MineService.TopLayerPositions = {}
+    MineService.TopLayerPositions = {}
+
+    LogService:Log("Generating top layer")
+    TopLayerCanGenerate = true
+    MineService:GenerateTopLayer()
+    MineSpawn.Transparency = 1
+end
 
 --[=[
 Convert any Y level number into a layer config. If no valid layer config is found then the default
@@ -61,6 +89,8 @@ Generates a position at a given position, has a random chance to be an ore
 ]=]
 function MineService:GenerateBlockAtPosition(Position :Vector3)
     if table.find(self.UsedPositions, Position) then return end
+
+    LogService:Log("Generating block:", Position)
 
     local RandomNumber = math.random(1, self.Settings.ChanceToGenerateOre)
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
@@ -119,6 +149,7 @@ function MineService:GenerateTopLayer()
     MineSpawn.Transparency = 0
     MineSpawn.CanCollide = true
     TopLayerY = MineSpawn.Position.Y
+    LogService:Log(TopLayerY)
 
     local BlockSize = Vector3.new(6, 6, 6)
     local BlocksToGenerateX = math.round(MineSpawn.Size.X / BlockSize.X)
@@ -126,6 +157,9 @@ function MineService:GenerateTopLayer()
 
     LogService:Log("Generating top layer ("..(BlocksToGenerateX * BlocksToGenerateY).." blocks)")
     local TopLeftPosition = Vector3.new(MineSpawn.Position.X - ((MineSpawn.Size.X / 2) - (BlockSize.X / 2)), MineSpawn.Position.Y, MineSpawn.Position.Z - ((MineSpawn.Size.Z / 2) - (BlockSize.X / 2)))
+
+    self.UsedPositions = {}
+    self.TopLayerPositions = {}
 
     for Y = 1, BlocksToGenerateY, 1 do
         for X = 1, BlocksToGenerateX, 1 do
@@ -149,6 +183,11 @@ end
 Generates blocks around a block that was mined aswell as destroying the block
 ]=]
 function MineService:BlockMined(Block :BasePart)
+    if MineService.MineStats.BlocksGenerated >= MineService.Settings.BlocksMinedForCollapse then
+        CollapseMine()
+        return
+    end
+
     local PositionOffsets = {
         Vector3.new(6, 0, 0);
         Vector3.new(-6, 0, 0);
@@ -173,6 +212,7 @@ end
 
 function MineService:KnitStart()
     LogService = Knit.GetService("LogService")
+    TeleportService = Knit.GetService("TeleportService")
     self:GenerateTopLayer()
 end
 

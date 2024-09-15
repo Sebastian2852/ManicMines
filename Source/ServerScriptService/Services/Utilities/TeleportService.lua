@@ -12,6 +12,7 @@ local TeleportService = Knit.CreateService {
 
 --[[ VARIABLES ]]--
 local TweenService = game:GetService("TweenService")
+local Workspace = game:GetService("Workspace")
 local LogService
 local TycoonService
 local DataService
@@ -86,7 +87,9 @@ function TeleportService:TeleportPlayerToPosition(Player :Player, Position :Vect
 
     self.Client.TeleportStarted:Fire(Player)
     FadeCharacterOut(1, Character)
+    task.wait(1)
     Character:PivotTo(CFrame.new(Position))
+    task.wait(1)
     FadeCharacterIn(1, Character)
     self.Client.TeleportFinished:Fire(Player)
 end
@@ -120,6 +123,10 @@ function TeleportService:TeleportPlayerToTycoon(Player :Player, Tycoon :Model?)
     end
 
     self:TeleportPlayerToPosition(Player, TeleportLocation)
+end
+
+function TeleportService:TeleportPlayerToSurface(Player :Player)
+    self:TeleportPlayerToPosition(Player, workspace.Game.Teleports.Surface.Position)
 end
 
 --[[ KNIT ]]--
