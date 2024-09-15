@@ -90,8 +90,6 @@ Generates a position at a given position, has a random chance to be an ore
 function MineService:GenerateBlockAtPosition(Position :Vector3)
     if table.find(self.UsedPositions, Position) then return end
 
-    LogService:Log("Generating block:", Position)
-
     local RandomNumber = math.random(1, self.Settings.ChanceToGenerateOre)
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
     local BlockToGenerate = StoneBlock

@@ -1,3 +1,4 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Util = {}
 
 --[=[
@@ -75,6 +76,37 @@ you will get "John (Part)" back
 ]=]
 function Util:LogObjectString(Object :any) :string
     return Object.Name.." ("..Object.ClassName..")"
+end
+
+function Util:ConvertOreToType(Ore :BasePart, Amount :number) :{Name :string, DisaplyName :string, Amount :number, Emblem :string, ActualOre :BasePart}
+    local OreType = {
+        Name = Ore.Name;
+        DisaplyName = Ore:GetAttribute("DisplayName");
+        Amount = Amount;
+        Emblem = Ore:GetAttribute("EmblemImageID") or ReplicatedStorage.Assets.UI.NoTexture.Texture;
+        ActualOre = Ore;
+    }
+
+    return OreType
+end
+
+function Util:GetOreByName(OreName :string) :BasePart
+    if OreName == "Gold" then return end
+    if OreName == "Stone" then
+        return ReplicatedStorage.Assets.Stone
+    end
+
+    return ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
+end
+
+function Util:MakeOreUIFromType(Ore :{Name :string, DisaplyName :string, Amount :number, Emblem :string, ActualOre :BasePart})
+    local UI = ReplicatedStorage.Assets.UI.OreFrame:Clone()
+    UI.OreImage.Image = Ore.Emblem
+    UI.OreAmount.Text = Ore.Amount
+    UI.OreName.Text = Ore.DisaplyName
+    local Color = Ore.ActualOre:GetAttribute("InventoryBackgroundColor")
+    UI.UIGradient.Color = Color
+    return UI
 end
 
 return Util

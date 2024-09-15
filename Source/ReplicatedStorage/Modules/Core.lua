@@ -8,14 +8,15 @@ Since most of the scripts require all of the modules anyway this is easier.
 
 local Private = require(script.Parent.ModulesInCore.Core_Private)
 
---[=[
-An ore list is used in places like awarding the player with a set of ores
-]=]
-export type OreListItem = {
+export type Ore = {
     Name :string;
+    DisaplyName :string;
     Amount :number;
+    Emblem :string;
+
+    ActualOre :BasePart;
 }
-export type OreList = {OreListItem}
+export type OreList = {Ore}
 
 --[=[
 Settings used for when creating a new save slot
