@@ -28,7 +28,7 @@ MineService.MineStats = {
 
 MineService.Settings = {
     ChanceToGenerateOre = 25;
-    BlocksMinedForCollapse = 10;
+    BlocksMinedForCollapse = 110;
 }
 
 local function CollapseMine()
@@ -46,9 +46,6 @@ local function CollapseMine()
     end
 
     task.wait(1)
-
-    MineService.TopLayerPositions = {}
-    MineService.TopLayerPositions = {}
 
     LogService:Log("Generating top layer")
     TopLayerCanGenerate = true
@@ -93,6 +90,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     local RandomNumber = math.random(1, self.Settings.ChanceToGenerateOre)
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
     local BlockToGenerate = StoneBlock
+    local Tag = "_Stone"
 
     if RandomNumber == 1 then
         local SpawnableOres = self:GetSpawnableOres(Position.Y, false)
@@ -106,12 +104,14 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
 
             if GeneratedNumber == 1 then
                 BlockToGenerate = Ore
+                Tag = "_Ore"
                 self.MineStats.OresGenerated += 1
             end
         end
 
         if BlockToGenerate == nil then
             BlockToGenerate = StoneBlock
+            Tag = "_Stone"
         end
     end
 
@@ -119,6 +119,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     NewBlock.Parent = workspace.Game.Mine
     NewBlock.Position = Position
     NewBlock.Size = Vector3.new(6, 6, 6)
+    NewBlock:AddTag(Tag)
 
     table.insert(self.UsedPositions, Position)
     self.MineStats.BlocksGenerated += 1
@@ -147,7 +148,6 @@ function MineService:GenerateTopLayer()
     MineSpawn.Transparency = 0
     MineSpawn.CanCollide = true
     TopLayerY = MineSpawn.Position.Y
-    LogService:Log(TopLayerY)
 
     local BlockSize = Vector3.new(6, 6, 6)
     local BlocksToGenerateX = math.round(MineSpawn.Size.X / BlockSize.X)
@@ -158,6 +158,8 @@ function MineService:GenerateTopLayer()
 
     self.UsedPositions = {}
     self.TopLayerPositions = {}
+    self.MineStats.BlocksGenerated = 0
+    self.MineStats.OresGenerated = 0
 
     for Y = 1, BlocksToGenerateY, 1 do
         for X = 1, BlocksToGenerateX, 1 do
@@ -181,7 +183,7 @@ end
 Generates blocks around a block that was mined aswell as destroying the block
 ]=]
 function MineService:BlockMined(Block :BasePart)
-    if MineService.MineStats.BlocksGenerated >= MineService.Settings.BlocksMinedForCollapse then
+    if self.MineStats.BlocksGenerated >= self.Settings.BlocksMinedForCollapse then
         CollapseMine()
         return
     end
@@ -201,10 +203,17 @@ function MineService:BlockMined(Block :BasePart)
     Block:Destroy()
 
     for _, Offset in pairs(PositionOffsets) do
-        MineService:GenerateBlockAtPosition(OriginalPosition + Offset)
+        self:GenerateBlockAtPosition(OriginalPosition + Offset)
     end
 end
 
+
+
+-- [[ CLIENT ]] --
+
+function MineService.Client:GetBlocksToCollapse()
+    return self.Server.Settings.BlocksMinedForCollapse
+end
 
 --[[ KNIT ]]--
 
