@@ -7,3 +7,4 @@ realm = "shared"
 [dependencies]
 Knit = "sleitnick/knit@^1.7"
 Component = "sleitnick/component@2.4.8"
+Iris = "michael-48/iris@2.3.1"

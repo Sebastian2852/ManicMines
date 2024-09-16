@@ -8,9 +8,14 @@ version = "4.0.0"
 dependencies = []
 
 [[package]]
+name = "michael-48/iris"
+version = "2.3.1"
+dependencies = []
+
+[[package]]
 name = "sebas/manic-mines"
 version = "0.1.0"
-dependencies = [["Component", "sleitnick/component@2.4.8"], ["Knit", "sleitnick/knit@1.7.0"]]
+dependencies = [["Component", "sleitnick/component@2.4.8"], ["Iris", "michael-48/iris@2.3.1"], ["Knit", "sleitnick/knit@1.7.0"]]
 
 [[package]]
 name = "sleitnick/comm"
