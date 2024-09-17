@@ -13,6 +13,8 @@ local MineService
 local LogBuffer = {}
 local LogSearch = ""
 
+local Admin_CurrentPlayer = 0
+
 local GeneralStats = {Ores = {}, Layers = {}, Pickaxes = {}}
 local ScriptingStats = {Services = 0, Controllers = 0, GeneralModules = 0}
 local MineStats = {TotalBlocks = 0, TotalStone = 0, TotalOres = 0, BlocksToCollapse = 0}
@@ -94,6 +96,7 @@ function IrisController:Console()
     Iris.Window({
         [Iris.Args.Window.Title] = "Console",
         [Iris.Args.Window.NoClose] = true,
+        [Iris.Args.Window.NoBackground] = true,
     })
         Iris.SameLine()
             if Iris.Button({"Clear console"}).clicked() then
@@ -196,8 +199,7 @@ function IrisController:AdminPanel()
 
     Iris.MenuBar()
         Iris.Menu({"Tools"})
-            -- Dev Mode as a MenuToggle
-            Iris.MenuToggle({"Toggle Dev Mode"}, {isChecked = DevMode})
+            Iris.MenuToggle({"Dev Mode"}, {isChecked = DevMode})
             self.EnableDevMode = DevMode.value
 
 
@@ -213,12 +215,47 @@ function IrisController:AdminPanel()
         Iris.End()
     Iris.End()
 
-    Iris.CollapsingHeader({ "A header" })
-        Iris.Text({"Wow awesome :D"})
-    Iris.End()
+    if Admin_CurrentPlayer ~= 0 then
+        Iris.SameLine()
+            local Player = game.Players:GetPlayerByUserId(Admin_CurrentPlayer)
+            if Iris.Button({"<- Back"}).clicked() then
+                Admin_CurrentPlayer = 0
+            end
+            Iris.Text({"Current player: "..Player.DisplayName.." (@"..Player.Name..") "..Admin_CurrentPlayer})
+        Iris.End()
+    else
+        Iris.Table({ 4 })
+            do
+                Iris.Text({"Username"})
+                Iris.NextColumn()
+                Iris.Text({"Display Name"})
+                Iris.NextColumn()
+                Iris.Text({"UserID"})
+                Iris.NextColumn()
+                Iris.Text({"Actions"})
+                Iris.NextRow()
+                Iris.NextColumn()
 
-    Iris.SeparatorText({"Wow epic sep 1"})
-    Iris.SeparatorText({"Wow epic sep 2"})
+                for _, Player in ipairs(game.Players:GetPlayers()) do
+                    Iris.Text({Player.Name})
+                    Iris.NextColumn()
+
+                    Iris.Text({Player.DisplayName})
+                    Iris.NextColumn()
+
+                    Iris.Text({tostring(Player.UserId)})
+                    Iris.NextColumn()
+
+                    if Iris.Button({"Select"}).clicked() then
+                        Admin_CurrentPlayer = Player.UserId
+                    end
+                    Iris.NextRow()
+                    Iris.NextColumn()
+                end
+            end
+        Iris.End()
+    end
+
 
     Iris.End()
 end
