@@ -6,6 +6,7 @@ local Iris = require(ReplicatedStorage.Packages.Iris)
 local IrisController = Knit.CreateController { Name = "IrisController" }
 
 IrisController.EnableDevMode = false
+IrisController.DemoWindow = false
 local LogService
 local MineService
 
@@ -115,7 +116,7 @@ function IrisController:StatsWindow()
         [Iris.Args.Window.NoClose] = true,
     })
 
-        Iris.Tree({"General"})
+        Iris.CollapsingHeader({"General"})
         if #GeneralStats.Ores >= 1 then
             Iris.Tree({"Ores - "..#GeneralStats.Ores})
             for i, Ore in ipairs(GeneralStats.Ores) do
@@ -143,13 +144,13 @@ function IrisController:StatsWindow()
             end
         Iris.End()
 
-        Iris.Tree({"Scripting"})
+        Iris.CollapsingHeader({"Scripting"})
             Iris.Text({"Services: "..ScriptingStats.Services})
             Iris.Text({"Controllers: "..ScriptingStats.Controllers})
             Iris.Text({"General Modules: "..ScriptingStats.GeneralModules})
         Iris.End()
 
-        Iris.Tree({"Mine stats"})
+        Iris.CollapsingHeader({"Mine stats"})
             local ColorToSet = Color3.fromRGB(255, 255, 255)
 
             if MineStats.BlocksUntilCollapse <= 10 then
@@ -169,12 +170,71 @@ function IrisController:StatsWindow()
     Iris.End()
 end
 
+function IrisController:AdminPanel()
+    local NoBackground = Iris.State(false)
+    local NoMove = Iris.State(false)
+
+    local DevMode = Iris.State(self.EnableDevMode)
+    local DemoWindow = Iris.State(self.DemoWindow)
+
+    Iris.Window({
+        [Iris.Args.Window.Title] = "Admin panel V0.0.1",
+
+        -- Customisable stuff
+        [Iris.Args.Window.NoBackground] = NoBackground.value,
+        [Iris.Args.Window.NoMove] = NoMove.value,
+
+        -- Forced stuff that cant be changed
+        [Iris.Args.Window.NoTitleBar] = false,
+        [Iris.Args.Window.NoCollapse] = true,
+        [Iris.Args.Window.NoClose] = true,
+        [Iris.Args.Window.NoScrollbar] = false,
+        [Iris.Args.Window.NoResize] = false,
+        [Iris.Args.Window.NoNav] = false,
+        [Iris.Args.Window.NoMenu] = false,
+    }, {size = Iris.State(Vector2.new(438, 550)), position = Iris.State(Vector2.new(10, 10))})
+
+    Iris.MenuBar()
+        Iris.Menu({"Tools"})
+            -- Dev Mode as a MenuToggle
+            Iris.MenuToggle({"Toggle Dev Mode"}, {isChecked = DevMode})
+            self.EnableDevMode = DevMode.value
+
+
+            Iris.Menu({"IRIS"})
+                Iris.MenuToggle({"IRIS demo window"}, {isChecked = DemoWindow})
+                self.DemoWindow = DemoWindow.value
+            Iris.End()
+
+            Iris.Menu({"Options"})
+                Iris.MenuToggle({"No background"}, {isChecked = NoBackground})
+                Iris.MenuToggle({"No move"}, {isChecked = NoMove})
+            Iris.End()
+        Iris.End()
+    Iris.End()
+
+    Iris.CollapsingHeader({ "A header" })
+        Iris.Text({"Wow awesome :D"})
+    Iris.End()
+
+    Iris.SeparatorText({"Wow epic sep 1"})
+    Iris.SeparatorText({"Wow epic sep 2"})
+
+    Iris.End()
+end
+
 function IrisController:Update()
+    if self.DemoWindow then
+        Iris.ShowDemoWindow()
+    end
+
     if self.EnableDevMode then
         UpdateStats()
         self:Console()
         self:StatsWindow()
     end
+
+    self:AdminPanel()
 end
 
 function IrisController:KnitInit()
@@ -190,13 +250,6 @@ function IrisController:KnitInit()
     Iris.Init()
     Iris:Connect(function()
         self:Update()
-    end)
-
-    UserInputService.InputBegan:Connect(function(Input, Processed)
-        if Processed then return end
-        if Input.KeyCode ~= Enum.KeyCode.P then return end
-
-        self.EnableDevMode = not self.EnableDevMode
     end)
 end
 
