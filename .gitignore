@@ -1,10 +1,10 @@
-# Project place file
-/Manic Mines.rbxlx
-
-# Roblox Studio lock files
-/*.rbxlx.lock
-/*.rbxl.lock
-
 #Folders
 Packages/
 .vscode/
+
+#Files
+/Manic Mines.rbxlx
+/*.rbxlx.lock
+/*.rbxl.lock
+
+*.lock
