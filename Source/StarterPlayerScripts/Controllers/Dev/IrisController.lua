@@ -9,11 +9,13 @@ IrisController.EnableDevMode = false
 IrisController.DemoWindow = false
 local LogService
 local MineService
+local AdminService
 
 local LogBuffer = {}
 local LogSearch = ""
 
 local Admin_CurrentPlayer = 0
+local Admin_IsAdmin = false
 
 local GeneralStats = {Ores = {}, Layers = {}, Pickaxes = {}}
 local ScriptingStats = {Services = 0, Controllers = 0, GeneralModules = 0}
@@ -224,35 +226,36 @@ function IrisController:AdminPanel()
             Iris.Text({"Current player: "..Player.DisplayName.." (@"..Player.Name..") "..Admin_CurrentPlayer})
         Iris.End()
     else
+        Iris.SeparatorText({"Quick Actions"})
+
+        Iris.SeparatorText({"Players"})
         Iris.Table({ 4 })
-            do
-                Iris.Text({"Username"})
+            Iris.Text({"Username"})
+            Iris.NextColumn()
+            Iris.Text({"Display Name"})
+            Iris.NextColumn()
+            Iris.Text({"UserID"})
+            Iris.NextColumn()
+            Iris.Text({"Actions"})
+            Iris.NextRow()
+            Iris.NextColumn()
+
+            for _, Player in ipairs(game.Players:GetPlayers()) do
+                Iris.Text({Player.Name})
                 Iris.NextColumn()
-                Iris.Text({"Display Name"})
+
+                Iris.Text({Player.DisplayName})
                 Iris.NextColumn()
-                Iris.Text({"UserID"})
+
+                Iris.Text({tostring(Player.UserId)})
                 Iris.NextColumn()
-                Iris.Text({"Actions"})
+
+                if Iris.Button({"Select"}).clicked() then
+                    Admin_CurrentPlayer = Player.UserId
+                end
                 Iris.NextRow()
                 Iris.NextColumn()
-
-                for _, Player in ipairs(game.Players:GetPlayers()) do
-                    Iris.Text({Player.Name})
-                    Iris.NextColumn()
-
-                    Iris.Text({Player.DisplayName})
-                    Iris.NextColumn()
-
-                    Iris.Text({tostring(Player.UserId)})
-                    Iris.NextColumn()
-
-                    if Iris.Button({"Select"}).clicked() then
-                        Admin_CurrentPlayer = Player.UserId
-                    end
-                    Iris.NextRow()
-                    Iris.NextColumn()
                 end
-            end
         Iris.End()
     end
 
@@ -271,17 +274,24 @@ function IrisController:Update()
         self:StatsWindow()
     end
 
-    self:AdminPanel()
+    if Admin_IsAdmin then
+        self:AdminPanel()
+    end
 end
 
 function IrisController:KnitInit()
     LogService = Knit.GetService("LogService")
     MineService = Knit.GetService("MineService")
+    AdminService = Knit.GetService("AdminService")
     local UserInputService = game:GetService("UserInputService")
 
     LogService.ActionLog:Connect(function(Color :Color3, ...)
         local Args = {...}
         NewLog(Args)
+    end)
+
+    AdminService:IsPlayerAdmin():andThen(function(Admin :boolean)
+        Admin_IsAdmin = Admin
     end)
 
     Iris.Init()

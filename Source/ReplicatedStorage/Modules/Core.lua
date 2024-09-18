@@ -77,6 +77,13 @@ export type Settings = {
     RainbowEffect :boolean;
 }
 
+--[=[
+Used for well admin permissions
+]=]
+export type AdminPermissions = {
+    CanDoOtherPlayer :boolean
+}
+
 local GameConfig = require(script.Parent.ModulesInCore.GameConfig)
 local Util = require(script.Parent.ModulesInCore.Util)
 
