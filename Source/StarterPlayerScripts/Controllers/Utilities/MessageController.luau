@@ -1,15 +1,17 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local MessageController = Knit.CreateController { Name = "MessageController" }
 
---[[ PRIVATE ]]--
-
 local LogService
 local MessageService
 local TextChannel
+
+
+--[[ PRIVATE ]]--
 
 local function SendChatMessage(MessageInfo :Core.ChatMessage)
     local Message = MessageInfo.Message
@@ -21,6 +23,8 @@ local function SendChatMessage(MessageInfo :Core.ChatMessage)
     TextChannel:SendAsync(Message)
     LogService:Log("Sent chat message")
 end
+
+
 
 --[[ KNIT ]]--
 

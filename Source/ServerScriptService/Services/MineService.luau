@@ -31,6 +31,8 @@ MineService.Settings = {
     BlocksMinedForCollapse = 110;
 }
 
+-- [[ PRIVATE ]] --
+
 local function CollapseMine()
     LogService:Log("Mine collapsing")
     for _, Player in pairs(game.Players:GetPlayers()) do
@@ -52,6 +54,8 @@ local function CollapseMine()
     MineService:GenerateTopLayer()
     MineSpawn.Transparency = 1
 end
+
+-- [[ PUBLIC ]] --
 
 --[=[
 Convert any Y level number into a layer config. If no valid layer config is found then the default
@@ -214,6 +218,8 @@ end
 function MineService.Client:GetBlocksToCollapse()
     return self.Server.Settings.BlocksMinedForCollapse
 end
+
+
 
 --[[ KNIT ]]--
 

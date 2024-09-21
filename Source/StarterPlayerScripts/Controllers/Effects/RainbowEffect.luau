@@ -32,6 +32,8 @@ RainbowController.ValidTypes = {
 
 local ActiveEffects = {}
 
+-- [[ PRIVATE ]] --
+
 --[=[
 Creates a TweenService:Create() info table for the object given.
 ]=]
@@ -91,6 +93,10 @@ local function StopEffects()
         Tween:Play()
     end
 end
+
+
+
+-- [[ KNIT ]] --
 
 function RainbowController:KnitStart()
     DataService = Knit.GetService("DataService")

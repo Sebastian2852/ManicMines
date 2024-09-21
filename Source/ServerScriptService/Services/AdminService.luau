@@ -8,7 +8,6 @@ local AdminService = Knit.CreateService {
     Client = {},
 }
 
-
 -- [[ PUBLIC ]] --
 
 --[=[
@@ -26,6 +25,7 @@ function AdminService:IsPlayerAdmin(Player :Player) :boolean
 
     return false
 end
+
 
 
 -- [[ CLIENT ]] --

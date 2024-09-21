@@ -1,6 +1,7 @@
-local Knit = require(game.ReplicatedStorage.Packages.Knit)
-
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+
+local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local FadeController = Knit.CreateController {
     Name = "FadeController"
@@ -13,7 +14,7 @@ local Player = Knit.Player
 local FadeFrame :Frame = nil
 local FadeTweenInfo :TweenInfo = nil
 
---[[ INTERNAL ]]--
+--[[ PRIVATE ]]--
 
 local function FadeGuiIn(Animated :boolean, AwaitFinish :boolean)
     if Animated then

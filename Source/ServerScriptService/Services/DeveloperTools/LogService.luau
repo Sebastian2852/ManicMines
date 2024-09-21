@@ -1,20 +1,12 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TestService = game:GetService("TestService")
+
 local Knit = require(game.ReplicatedStorage.Packages.Knit)
 
---[=[
-Log service is like a custom logger, I have done it like this so that we can disable
-logging. Also it allows to only have logging for certain scripts and stuff.
-
-There are no errors since there is no reason they shold be disabled/enabled at runtime
-they should always just be enabled.
-]=]
 local LogService = Knit.CreateService{
     Name = "LogService";
-    Client = {
-        ActionLog = Knit.CreateSignal()
-    };
+    Client = {};
 }
-
-local TestService = game:GetService("TestService")
 
 LogService.LoggingEnabled = true
 LogService.WarningsEnabled = true
@@ -31,6 +23,7 @@ local function SendLogToPlayers(Color :Color3, ...)
 end
 
 
+
 --[[ PUBLIC ]]--
 
 --[=[
@@ -45,24 +38,6 @@ function LogService:GetNameOfFunctionCaller(UpLevel :number) :string
 end
 
 --[=[
-Print out the message passed as well as anything else passed with a space between them in orange
-]=]
-function LogService:Warn(Message :string, ... :string)
-    if not self.WarningsEnabled then return end
-    local Extras = {...}
-    local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
-    warn(ScriptName, "[WARNING]", Message, table.unpack(Extras))
-    SendLogToPlayers(Color3.fromRGB(255, 103, 0), ScriptName, "[WARNING]", Message, table.unpack(Extras))
-end
-
-function LogService.Client:Warn(Player :Player, Message :string, ... :string)
-    if not LogService.WarningsEnabled then return end
-    local Extras = {...}
-    warn("[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
-    SendLogToPlayers(Color3.fromRGB(255, 103, 0), "[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
-end
-
---[=[
 Print out the message passed as well as anything else passed with a space between them
 ]=]
 function LogService:Log(Message :string, ... :string)
@@ -73,11 +48,15 @@ function LogService:Log(Message :string, ... :string)
     SendLogToPlayers(Color3.fromRGB(255, 255, 255), ScriptName, Message, table.unpack(Extras))
 end
 
-function LogService.Client:Log(Player :Player, Message :string, ... :string)
-    if not LogService.WarningsEnabled then return end
+--[=[
+Print out the message passed as well as anything else passed with a space between them in orange
+]=]
+function LogService:Warn(Message :string, ... :string)
+    if not self.WarningsEnabled then return end
     local Extras = {...}
-    print("[CLIENT]", "["..Player.Name.."]", Message, table.unpack(Extras))
-    SendLogToPlayers(Color3.fromRGB(255, 255, 255), "[CLIENT]", "["..Player.Name.."]", Message, table.unpack(Extras))
+    local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
+    warn(ScriptName, "[WARNING]", Message, table.unpack(Extras))
+    SendLogToPlayers(Color3.fromRGB(255, 103, 0), ScriptName, "[WARNING]", Message, table.unpack(Extras))
 end
 
 --[=[
@@ -101,9 +80,6 @@ function LogService:Info(Message :string, ... :string)
     TestService:Message(FinalMessage)
 end
 
-function LogService.Client:Info(Player :Player, Message :string, ... :string)
-    self:Info("[CLIENT] "..Message, ...)
-end
 
 --[=[
 If the given value is nil or false it errors with a given error message.
@@ -115,13 +91,32 @@ function LogService:Assert(Value :any, ErrorMessage:string)
     end
 end
 
---[=[
-The client side version which does the same except puts a client tag before the error.
-]=]
+
+
+-- [[ CLIENT ]]--
+
+function LogService.Client:Log(Player :Player, Message :string, ... :string)
+    if not LogService.WarningsEnabled then return end
+    local Extras = {...}
+    print("[CLIENT]", "["..Player.Name.."]", Message, table.unpack(Extras))
+    SendLogToPlayers(Color3.fromRGB(255, 255, 255), "[CLIENT]", "["..Player.Name.."]", Message, table.unpack(Extras))
+end
+
+function LogService.Client:Warn(Player :Player, Message :string, ... :string)
+    if not LogService.WarningsEnabled then return end
+    local Extras = {...}
+    warn("[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
+    SendLogToPlayers(Color3.fromRGB(255, 103, 0), "[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
+end
+
+function LogService.Client:Info(Player :Player, Message :string, ... :string)
+    self:Info("[CLIENT] "..Message, ...)
+end
+
 function LogService.Client:Assert(Player :Player, Value :string, ErrorMessage :string)
     if not self.AssertsEnabled then return end
     if Value == nil or Value == false then
-        error("[CLIENT]", "["..Player.Name.."]", "ASSERTION FAILED: "..ErrorMessage)
+        error("[CLIENT]", "["..Player.Name.."]".." ASSERTION FAILED: "..ErrorMessage)
     end
 end
 

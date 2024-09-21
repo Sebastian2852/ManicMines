@@ -5,8 +5,6 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local SettingsController = Knit.CreateController { Name = "PlayerSettingsController" }
 
---[[ VARIABLES ]]--
-
 local Player = Knit.Player
 local PlayerGUI = Player.PlayerGui
 
@@ -14,16 +12,13 @@ local LogService
 local SettingsService
 
 local HudGUI = PlayerGUI:WaitForChild("HUD")
---local SettingsButton = HudGUI:WaitForChild("Settings")
 
 local Settings = {
     GlobalShadows = true;
     RainbowEffect = true;
 }
 
-
-
---[[ INTERNAL ]]--
+--[[ PRIVATE ]]--
 
 --[=[
 Pushes the current settings to the server
@@ -54,6 +49,8 @@ UserInputService.InputBegan:Connect(function(Input, Processed)
         Update()
     end
 end)
+
+
 
 --[[ KNIT ]]--
 

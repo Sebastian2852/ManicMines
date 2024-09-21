@@ -11,8 +11,6 @@ local TycoonService = Knit.CreateService{
     Client = {};
 }
 
---[[ VARIABLES ]]--
-
 local LogService
 local DataService
 local TeleportService

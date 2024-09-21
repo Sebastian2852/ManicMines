@@ -13,6 +13,8 @@ local PickaxeService
 
 local MiningSelection = Player.PlayerGui.HUD.MiningSelection
 
+-- [[ PUBLIC ]] --
+
 function PickaxeSelectionController:UpdateInfo(OreName :string, TimeToMine :number, Percentage :number, MiningProgress :number)
     PickaxeService:GetPickaxe():andThen(function(Pickaxe)
         if not PlayerFolder.PickaxeSelection.Value then MiningSelection.Visible = false return end
@@ -51,6 +53,8 @@ PlayerFolder.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function
         PickaxeSelectionController:UpdateInfo(ObjectToMine.Name, TimeToMine, math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
     end)
 end)
+
+
 
 --[[ KNIT ]]--
 

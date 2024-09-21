@@ -1,5 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Knit = require(game.ReplicatedStorage.Packages.Knit)
+
+local Knit = require(ReplicatedStorage.Packages.Knit)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local HUDGUI = Knit.Player.PlayerGui:WaitForChild("HUD")
 local InventoryGUI = Knit.Player.PlayerGui:WaitForChild("Inventory")
@@ -7,8 +9,6 @@ local InventoryGUI = Knit.Player.PlayerGui:WaitForChild("Inventory")
 local HUDController = Knit.CreateController {
     Name = "HUDController"
 }
-
-local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local DataService
 
@@ -33,6 +33,7 @@ function HUDController:UpdateInventoryOre(OreName :string, OreAmount :number)
         Frame.OreAmount.Text = OreAmount
     end
 end
+
 
 
 --[[ KNIT ]]--

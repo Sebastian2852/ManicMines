@@ -23,7 +23,7 @@ local DataService = Knit.CreateService {
     Client = {},
 }
 
---[[ INTERNAL ]]--
+--[[ PRIVATE ]]--
 
 --[=[
 A list of all the data stores but as save slots so its easier to refrence in the code
@@ -414,6 +414,9 @@ function DataService:NewSlot(Player :Player, SlotNumber :number, SlotSettings :C
     DataService:LoadPlayerData(Player, AsDataStore)
 end
 
+--[=[
+Deletes all data in a the given slot for the given player
+]=]
 function DataService:DeleteSlot(Player :Player, SlotNumber :number)
     local AsDataStore = DataService:SlotNumberToDataStore(SlotNumber)
     if not IsSlotValid(AsDataStore) then return end
@@ -435,6 +438,7 @@ function DataService:DeleteSlot(Player :Player, SlotNumber :number)
 
     LogService:Log("Deleted slot "..tostring(SlotNumber).." for "..Player.Name)
 end
+
 
 
 --[[ CLIENT ]]--

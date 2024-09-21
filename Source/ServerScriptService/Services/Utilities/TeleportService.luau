@@ -1,4 +1,6 @@
-local ReplicatedStorage = game.ReplicatedStorage
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local Workspace = game:GetService("Workspace")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
@@ -10,23 +12,16 @@ local TeleportService = Knit.CreateService {
     },
 }
 
---[[ VARIABLES ]]--
-local TweenService = game:GetService("TweenService")
-local Workspace = game:GetService("Workspace")
 local LogService
 local TycoonService
 local DataService
 
---[=[
-A list of all the names to avoid while fading a character in or out
-]=]
 local NamesToAvoid = {
     "HumanoidRootPart";
 }
 
 
-
---[[ INTERNAL ]]--
+--[[ PRIVATE ]]--
 
 --[=[
 Takes in a duration and a model to fade out
@@ -125,9 +120,14 @@ function TeleportService:TeleportPlayerToTycoon(Player :Player, Tycoon :Model?)
     self:TeleportPlayerToPosition(Player, TeleportLocation)
 end
 
+--[=[
+Teleport the given player to the surface of the mine
+]=]
 function TeleportService:TeleportPlayerToSurface(Player :Player)
     self:TeleportPlayerToPosition(Player, workspace.Game.Teleports.Surface.Position)
 end
+
+
 
 --[[ KNIT ]]--
 

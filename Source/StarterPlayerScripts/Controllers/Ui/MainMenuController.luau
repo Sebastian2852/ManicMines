@@ -1,14 +1,15 @@
-local ReplicatedStorage = game.ReplicatedStorage
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
-local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
-local PlayerGUI = Knit.Player.PlayerGui
 
 
 local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
 
---[[ VARIABLES ]]--
+
+local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
+local PlayerGUI = Knit.Player.PlayerGui
 
 local DataService
 local TextFilteringService
@@ -27,7 +28,7 @@ local SlotSelectionFrame :Frame
 
 
 
---[[ INTERNAL ]]--
+--[[ PRIVATE ]]--
 
 local SlotCreation_CurrentName = ""
 local SlotCreation_CurrentSlotID = 0
@@ -123,7 +124,7 @@ end
 
 
 
---[[ FUNCTIONS ]]--
+--[[ PUBLIC ]]--
 
 function MainMenuController:DisableAllUI()
     LogService:Log("Disabling all UI")
@@ -240,6 +241,29 @@ end
 
 --[[ KNIT ]]--
 
+function MainMenuController:KnitInit()
+    LogService = Knit.GetService("LogService")
+
+    SlotFrameTemplate = AssetsFolder.SaveSlot
+
+    MainScreenGui = AssetsFolder.MainMenu:Clone()
+    MainScreenGui.Parent = Knit.Player.PlayerGui
+
+    MainFrame = MainScreenGui.Main
+    TitleScreen = MainFrame.TitleScreen
+    NewSlotFrame = MainFrame.CreateNewSlot
+    CreditsFrame = MainFrame.Credits
+    SlotSelectionFrame = MainFrame.SlotSelector
+
+    Blur = Instance.new("BlurEffect")
+    Blur.Size = 10
+    Blur.Parent = game.Lighting
+    Blur.Name = "_MainMenuBlur"
+    LogService:Log("Created blur")
+
+    SetupNewSlotFrame()
+end
+
 function MainMenuController:KnitStart()
     DataService = Knit.GetService("DataService")
     TextFilteringService = Knit.GetService("TextFilteringService")
@@ -278,29 +302,5 @@ function MainMenuController:KnitStart()
 
     self:CreateSlotFrames()
 end
-
-function MainMenuController:KnitInit()
-    LogService = Knit.GetService("LogService")
-
-    SlotFrameTemplate = AssetsFolder.SaveSlot
-
-    MainScreenGui = AssetsFolder.MainMenu:Clone()
-    MainScreenGui.Parent = Knit.Player.PlayerGui
-
-    MainFrame = MainScreenGui.Main
-    TitleScreen = MainFrame.TitleScreen
-    NewSlotFrame = MainFrame.CreateNewSlot
-    CreditsFrame = MainFrame.Credits
-    SlotSelectionFrame = MainFrame.SlotSelector
-
-    Blur = Instance.new("BlurEffect")
-    Blur.Size = 10
-    Blur.Parent = game.Lighting
-    Blur.Name = "_MainMenuBlur"
-    LogService:Log("Created blur")
-
-    SetupNewSlotFrame()
-end
-
 
 return MainMenuController

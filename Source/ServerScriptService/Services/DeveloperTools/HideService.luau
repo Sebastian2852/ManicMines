@@ -1,9 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Knit = require(ReplicatedStorage.Packages.Knit)
-
-local Core = require(ReplicatedStorage.Game.Modules.Core)
-
 local CollectionService = game:GetService("CollectionService")
+
+local Knit = require(ReplicatedStorage.Packages.Knit)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local HideService = Knit.CreateService {
     Name = "HideService",
@@ -11,13 +10,15 @@ local HideService = Knit.CreateService {
 }
 
 local LogService
-
 local HideTag = "_Hide"
 
 --[[ PUBLIC ]]--
 
 HideService.HiddenObjects = {}
 
+--[=[
+Hide a given object, makes it invisible and disables all events for it
+]=]
 function HideService:Hide(Object :BasePart|Decal|Light)
     local Objects = Object:GetDescendants()
     table.insert(Objects, Object)

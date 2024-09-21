@@ -1,20 +1,19 @@
-local Knit = require(game.ReplicatedStorage.Packages.Knit)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Knit = require(ReplicatedStorage.Packages.Knit)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 
-local Core = require(game.ReplicatedStorage.Game.Modules.Core)
-local DataService
-local LogService
-
---[=[
-A service that has all the functions to do with stats, stuff like giving ores
-paying for stuff, etc. All those functions are in this service
-]=]
 local PlayerStatsService = Knit.CreateService {
     Name = "PlayerStatsService",
     Client = {},
 }
 
+local DataService
+local LogService
+
+-- [[ PRIVATE ]] --
+
 --[=[
-Internal function to convert and ore into its inventory value
+Convert an ore type into its inventory value
 ]=]
 local function ConvertOreListItemToInventoryValue(DataFolder :Folder, Ore :Core.Ore) :IntValue
     local OreName = Ore.Name
@@ -28,7 +27,7 @@ local function ConvertOreListItemToInventoryValue(DataFolder :Folder, Ore :Core.
 end
 
 --[=[
-Internal function to convert and ore into a times mined value
+Convert an ore type into its TimesMined value
 ]=]
 local function ConvertOreListItemToTimesMinedValue(DataFolder :Folder, Ore :Core.Ore) :IntValue
     local OreName = Ore.Name
@@ -36,6 +35,10 @@ local function ConvertOreListItemToTimesMinedValue(DataFolder :Folder, Ore :Core
     local FoundValue = DataFolder.TimesMined:FindFirstChild(OreName)
     return FoundValue
 end
+
+
+
+-- [[ PUBLIC ]]--
 
 --[=[
 Gives an ore to the players inventory, doesnt matter if they dont have enough space to carry it
