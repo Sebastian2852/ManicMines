@@ -1,0 +1,40 @@
+name: Check Wally Installation
+
+on:
+  push:
+    branches:
+      - 1.3.x
+  pull_request:
+    branches:
+      - 1.3.x
+
+jobs:
+  wally-install:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install Homebrew
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential curl file git
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.profile
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+    - name: Install Wally with Homebrew
+      run: |
+        brew install wally
+
+    - name: Install dependencies with Wally
+      run: |
+        wally --version  # Check Wally version to ensure it's installed
+        wally install     # Run Wally install to install dependencies
+
+    - name: Verify Wally install success
+      run: |
+        if [ ! -d Packages ]; then
+          echo "Wally installation failed! Packages folder not found."
+          exit 1
