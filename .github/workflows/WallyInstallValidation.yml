@@ -20,12 +20,12 @@ jobs:
       run: |
         sudo apt update
         sudo apt-get install build-essential procps curl file git
-        test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)"
-        test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bashrc
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"  # Install Homebrew
+        echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> $GITHUB_ENV
 
     - name: Install Wally with Homebrew
       run: |
+        source $GITHUB_ENV  # Load Homebrew path
         brew install wally
 
     - name: Install dependencies with Wally
