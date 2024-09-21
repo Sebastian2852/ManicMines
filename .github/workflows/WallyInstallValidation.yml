@@ -17,6 +17,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install Homebrew
+      shell: bash
       run: |
         sudo apt update
         sudo apt-get install build-essential procps curl file git
