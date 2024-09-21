@@ -47,4 +47,9 @@ Config.Admins = {
         }
     };
 }
+
+Config.Mine = {
+    BlockSize = Vector3.new(6, 6, 6)
+}
+
 return Config

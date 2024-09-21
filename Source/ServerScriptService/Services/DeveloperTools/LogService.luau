@@ -5,7 +5,9 @@ local Knit = require(game.ReplicatedStorage.Packages.Knit)
 
 local LogService = Knit.CreateService{
     Name = "LogService";
-    Client = {};
+    Client = {
+        ActionLog = Knit.CreateSignal()
+    };
 }
 
 LogService.LoggingEnabled = true
