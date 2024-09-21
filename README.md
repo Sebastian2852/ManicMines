@@ -13,7 +13,7 @@ Then install all the packages by running
 `wally install`  
 in the project's **root directory**.  
 
-**Note:** this project is will error when first running since all assets are not present. I do not plan to proivde any assets or the folder structure of the game for now. Maybe sometime in the future I will add it.
+**Note:** this project is will error when first running since all assets are not present. I do not plan to provide any assets or the folder structure of the game for now. Maybe sometime in the future I will add it.
 
 ## Bugs / Issues
 Please report in-game bugs on the [Discord server](https://discord.gg/xtSNQAnSDt) in the `bug-reports` channel. This Issues section is reserved for code-related problems not yet present in the public game (i.e., not in the `Game` branch).
