@@ -2,6 +2,7 @@ local TeleportService = game:GetService("TeleportService")
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local TeleportService
 local LogService
@@ -122,7 +123,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     local NewBlock :BasePart = BlockToGenerate:Clone()
     NewBlock.Parent = workspace.Game.Mine
     NewBlock.Position = Position
-    NewBlock.Size = Vector3.new(6, 6, 6)
+    NewBlock.Size = Core.GameConfig.Mine.BlockSize
     NewBlock:AddTag(Tag)
 
     table.insert(self.UsedPositions, Position)
@@ -153,7 +154,7 @@ function MineService:GenerateTopLayer()
     MineSpawn.CanCollide = true
     TopLayerY = MineSpawn.Position.Y
 
-    local BlockSize = Vector3.new(6, 6, 6)
+    local BlockSize = Core.GameConfig.Mine.BlockSize
     local BlocksToGenerateX = math.round(MineSpawn.Size.X / BlockSize.X)
     local BlocksToGenerateY = math.round(MineSpawn.Size.Z / BlockSize.Z)
 
@@ -192,15 +193,19 @@ function MineService:BlockMined(Block :BasePart)
         return
     end
 
+    local XOffset = Core.GameConfig.Mine.BlockSize.X
+    local YOffset = Core.GameConfig.Mine.BlockSize.Y
+    local ZOffset = Core.GameConfig.Mine.BlockSize.Z
+
     local PositionOffsets = {
-        Vector3.new(6, 0, 0);
-        Vector3.new(-6, 0, 0);
+        Vector3.new(XOffset, 0, 0);
+        Vector3.new(-XOffset, 0, 0);
 
-        Vector3.new(0, 6, 0);
-        Vector3.new(0, -6, 0);
+        Vector3.new(0, YOffset, 0);
+        Vector3.new(0, -YOffset, 0);
 
-        Vector3.new(0, 0, 6);
-        Vector3.new(0, 0, -6);
+        Vector3.new(0, 0, ZOffset);
+        Vector3.new(0, 0, -ZOffset);
     }
 
     local OriginalPosition = Block.Position
