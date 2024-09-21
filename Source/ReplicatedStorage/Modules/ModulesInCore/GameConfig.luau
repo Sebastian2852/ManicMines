@@ -11,7 +11,7 @@ Config.Tycoon = {
     };
 
     MaxNameCharacters = 30;
-};
+}
 
 --[=[
 The default settings for anyone. This is used when the player creates a new slot
@@ -20,7 +20,7 @@ or when the reset their settings to default.
 Config.DefaultSettings = {
     GlobalShadows = true;
     RainbowEffect = true;
-};
+}
 
 Config.MainMenu = {
     Version = "1.3";

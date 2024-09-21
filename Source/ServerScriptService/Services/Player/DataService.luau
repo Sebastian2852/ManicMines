@@ -17,6 +17,7 @@ local TycoonUpgradesFolder :Folder = ServerStorage.Assets.Tycoon.Upgrades
 local PickaxeService
 local LogService
 local TycoonService
+local PlayerDisplayService
 
 local DataService = Knit.CreateService {
     Name = "DataService",
@@ -272,9 +273,11 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
         end
     else return end
 
-    TycoonService:CreateTycoonForPlayer(Player)
+    PlayerDisplayService:GivePlayerOverheadGUI(Player)
     PickaxeService:GivePickaxeToPlayer(Player)
+    TycoonService:CreateTycoonForPlayer(Player)
     Player.CharacterAdded:Connect(function()
+        PlayerDisplayService:GivePlayerOverheadGUI(Player)
         PickaxeService:GivePickaxeToPlayer(Player)
     end)
 
@@ -498,6 +501,7 @@ end
 function DataService:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
     TycoonService = Knit.GetService("TycoonService")
+    PlayerDisplayService = Knit.GetService("PlayerDisplayService")
 
     game.Players.PlayerAdded:Connect(function(Player)
         self:CreateDataFolderForPlayer(Player)
