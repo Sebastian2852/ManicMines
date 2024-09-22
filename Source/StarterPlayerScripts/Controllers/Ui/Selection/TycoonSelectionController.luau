@@ -20,7 +20,7 @@ local Selection = nil
 
 local Player = Knit.Player
 local Mouse = Player:GetMouse()
-local MiningSelection = Player.PlayerGui.HUD.MiningSelection
+local TycoonSelection :Frame = Player.PlayerGui.HUD.TycoonSelection
 
 
 
@@ -64,7 +64,13 @@ function TycoonSelectionController:Deselect()
     LogService:Log("Deselecting upgrade hitbox")
     if CurrentOutline then CurrentOutline:Destroy() end
     if Selection ~= nil then Selection = nil end
+    TycoonSelection.Visible = false
     CurrentlySelecting = false
+end
+
+function TycoonSelectionController:UpdateUiInfo(UpgradeName :string, UpgradeDescription :string, UpgradeCosts :Core.OreList)
+    TycoonSelection.Title.Text = UpgradeName
+    TycoonSelection.Description.Text = UpgradeDescription
 end
 
 --[=[
@@ -76,6 +82,7 @@ function TycoonSelectionController:SelectHitbox(Hitbox)
     if CurrentlySelecting then self:Deselect() end
     if Selection ~= nil then self:Deselect() end
 
+    TycoonSelection.Visible = true
     local New = SelectionOutline:Clone()
     New.Parent = Hitbox
     New.Adornee = Hitbox
@@ -95,7 +102,8 @@ function TycoonSelectionController:KnitStart()
     TycoonService = Knit.GetService("TycoonService")
     LogService = Knit.GetService("LogService")
 
-    TycoonService.SelectUpgrade:Connect(function(UpgradeName :string, UpgradeConfig :Configuration, Hitbox :BasePart, Model :Model)
+    TycoonService.SelectUpgrade:Connect(function(UpgradeName :string, UpgradeConfig :Configuration, ModelConfig :Configuration, Hitbox :BasePart, Model :Model)
+        self:UpdateUiInfo(UpgradeName, UpgradeConfig:GetAttribute("Description"), {})
         self:SelectHitbox(Hitbox)
     end)
 

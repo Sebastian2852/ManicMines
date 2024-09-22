@@ -12,7 +12,7 @@ local TemplateDataFolder :Core.DataFolder = RootDataFolder:FindFirstChild("Templ
 
 local OresFolder :Folder = ReplicatedStorage.Assets.Ores
 local PickaxesFolder :Folder = ReplicatedStorage.Assets.Pickaxe.Pickaxes
-local TycoonUpgradesFolder :Folder = ServerStorage.Assets.Tycoon.Upgrades
+local TycoonUpgradesFolder :Folder = ReplicatedStorage.Assets.Tycoon.Upgrades
 
 local PickaxeService
 local LogService
