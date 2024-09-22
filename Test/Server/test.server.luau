@@ -9,6 +9,16 @@ LogService:ClearOutput()
 print("Test env ready")
 local PackageTest = require(script.Parent.Packages)
 
-local Results = {}
+local Results :{{string}} = {}
+
+print("!!! Starting package testing... !!!")
+print("-----------------------------------")
 local PackagesResult = PackageTest()
 table.insert(Results, PackagesResult)
+print("-----------------------------------")
+
+for _, Strings :{string} in pairs(Results) do
+    for _, String :string in pairs(Strings) do
+        warn(String)
+    end
+end

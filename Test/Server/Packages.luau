@@ -4,13 +4,10 @@ local PackagesToFind = {
 }
 
 return function ()
-    print("!!! Starting package testing... !!!")
-    print("-----------------------------------")
-
     print("Checking for packages folder")
 
     local PackagesFolder = game.ReplicatedStorage:FindFirstChild("Packages")
-    if not PackagesFolder then warn("No packages folder found! run `wally install` to fix") return end
+    if not PackagesFolder then warn("No packages folder found! run `wally install` to fix") return {"No packages folder found! run `wally install` to fix"} end
     print("Packages folder valid")
 
     for _, PackageModule :ModuleScript in pairs(PackagesFolder:GetChildren()) do
@@ -34,9 +31,10 @@ return function ()
     end
 
     local FoundAllPackages = true
+    local PackagesNotFound = "Couldn't find packages:"
     for PackageName, Found in pairs(PackagesToFind) do
         if not Found then
-            warn("Couldnt find package: "..PackageName)
+            PackagesNotFound = PackagesNotFound.." "..PackageName..";"
             FoundAllPackages = false
         else
             print("Found package: "..PackageName)
@@ -45,7 +43,7 @@ return function ()
 
     if not FoundAllPackages then
         warn("Couldn't find all packages!")
-        return
+        return {PackagesNotFound}
     end
 
     print("Packages valid")
