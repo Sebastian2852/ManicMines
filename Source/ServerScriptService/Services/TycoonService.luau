@@ -3,8 +3,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
-local TycoonAssets = game.ServerStorage.Assets.Tycoon
+local TycoonAssets = ReplicatedStorage.Assets.Tycoon
 local Tycoons = workspace.Game.Tycoons
+
 
 local TycoonService = Knit.CreateService{
     Name = "TycoonService";
@@ -75,7 +76,7 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
         NewClickDetector.MaxActivationDistance = Core.GameConfig.Tycoon.UpgradeSelectionDistance
 
         NewClickDetector.MouseClick:Connect(function(Player)
-            TycoonService.Client.SelectUpgrade:Fire(Player, UpgradeHitbox.Name, ModelConfig, UpgradeHitbox, Model)
+            TycoonService.Client.SelectUpgrade:Fire(Player, UpgradeHitbox.Name, UpgradeConfig, ModelConfig, UpgradeHitbox, Model)
         end)
     end
 end
