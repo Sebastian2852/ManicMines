@@ -6,8 +6,8 @@ Welcome to the source code repository for **Manic Mines** (Roblox game), version
 ## Build Instructions
 To use start using this repo you need to have [Git](https://git-scm.com/), [Aftman](https://github.com/LPGhatguy/aftman) and [Wally](https://wally.run/) installed.
 
-To setup the coding enviroment start by cloning the repo using the command:  
-``` git clone https://github.com/Sebastian2852/ManicMines```  
+To setup the coding environment start by cloning the repo using the command:  
+```git clone https://github.com/Sebastian2852/ManicMines```  
 This will automatically download the latest version of the game *(Note that this downloads the latest DEV version meaning it may contain code not actually in prod).*  
 Then install all the packages by running  
 `wally install`  
