@@ -8,7 +8,9 @@ local Tycoons = workspace.Game.Tycoons
 
 local TycoonService = Knit.CreateService{
     Name = "TycoonService";
-    Client = {};
+    Client = {
+        SelectUpgrade = Knit.CreateSignal()
+    };
 }
 
 local LogService
@@ -44,10 +46,7 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
         -- Setup upgrade hitbox
         UpgradeHitbox.CanCollide = false
         UpgradeHitbox.Anchored = true
-
-        local NewClickDetector = Instance.new("ClickDetector")
-        NewClickDetector.Name = "_SelectionClickDetector"
-        NewClickDetector.Parent = UpgradeHitbox
+        UpgradeHitbox:AddTag("_UpgradeHitbox")
 
         local DataValue = DataFolderUpgradesFolder:FindFirstChild(UpgradeHitbox.Name)
         local UpgradeConfig :Configuration = RawUpgradesFolder:FindFirstChild(UpgradeHitbox.Name)
@@ -55,7 +54,8 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
         if not DataValue then LogService:Warn("No data value for upgrade: "..UpgradeHitbox.Name) continue end
         if not DataValue then LogService:Warn("No upgrade config for upgrade: "..UpgradeHitbox.Name) continue end
 
-        local UpgradeModel = UpgradeConfig:FindFirstChild(DataValue.Value):FindFirstChildWhichIsA("Model")
+        local ModelConfig = UpgradeConfig:FindFirstChild(DataValue.Value)
+        local UpgradeModel = ModelConfig:FindFirstChildWhichIsA("Model")
         if not UpgradeModel then LogService:Warn("No upgrade model for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value) continue end
 
         local Model :Model = UpgradeModel:Clone()
@@ -68,6 +68,15 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
         UI.StudsOffset = Vector3.new(0, (UpgradeHitbox.Size.Y / 2) + 2, 0)
 
         LogService:Log("Added upgrade model "..UpgradeHitbox.Name.." level "..DataValue.Value)
+
+        local NewClickDetector = Instance.new("ClickDetector")
+        NewClickDetector.Name = "_SelectionClickDetector"
+        NewClickDetector.Parent = UpgradeHitbox
+        NewClickDetector.MaxActivationDistance = Core.GameConfig.Tycoon.UpgradeSelectionDistance
+
+        NewClickDetector.MouseClick:Connect(function(Player)
+            TycoonService.Client.SelectUpgrade:Fire(Player, UpgradeHitbox.Name, ModelConfig, UpgradeHitbox, Model)
+        end)
     end
 end
 

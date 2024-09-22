@@ -11,6 +11,7 @@ Config.Tycoon = {
     };
 
     MaxNameCharacters = 30;
+    UpgradeSelectionDistance = 32;
 }
 
 --[=[
