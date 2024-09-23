@@ -203,33 +203,19 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     LogService:Assert(DataFolder, "Tried loading data with No data folder")
     LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
-    local PlayerDataKey = Player.UserId.."-PlayerData"
-    local TycoonDataKey = Player.UserId.."-TycoonData"
-    local OreDataKey = Player.UserId.."-OreData"
+    local OreData = Core.Data.Data.New("Ore", {})
+    local PlayerData = Core.Data.Data.New("PlayerData", {})
+    local TycoonData = Core.Data.Data.New("Tycoon", {})
 
-    local RawPlayerData
-    local RawTycoonData
-    local RawOreData
+    local SaveData = Core.Data.SaveData.New(Player.UserId)
+    SaveData:AddData(OreData)
+    SaveData:AddData(PlayerData)
+    SaveData:AddData(TycoonData)
+    SaveData:Load(Slot)
 
-    local Success, ErrorMessage = pcall(function()
-        RawPlayerData = Slot:GetAsync(PlayerDataKey)
-        RawTycoonData = Slot:GetAsync(TycoonDataKey)
-        RawOreData = Slot:GetAsync(OreDataKey)
-
-        if RawPlayerData ~= nil then
-            RawPlayerData = HttpService:JSONDecode(RawPlayerData)
-        end
-
-        if RawTycoonData ~= nil then
-            RawTycoonData = HttpService:JSONDecode(RawTycoonData)
-        end
-
-        if RawOreData ~= nil then
-            RawOreData = HttpService:JSONDecode(RawOreData)
-        end
-    end)
-
-    LogService:Assert(Success, ErrorMessage)
+    local RawOreData      = SaveData:GetDataByName("Ore")
+    local RawPlayerData   = SaveData:GetDataByName("PlayerData")
+    local RawTycoonData   = SaveData:GetDataByName("Tycoon")
 
     if IsRawDataValid(RawPlayerData) then
         DataFolder.XP.Value = RawPlayerData.XP

@@ -13,6 +13,28 @@ SaveData._UserID = 0
 SaveData._Data = {}
 
 --[=[
+Override the `tostring` function to print out all data within the object in a format:
+`SaveKey == SaveData;`
+]=]
+function SaveData.__tostring(SaveDataObject)
+    local ReturnString = ""
+
+    for Name :string, Data :{any} in pairs(SaveDataObject._Data) do
+        local DataStoreKey = tostring(SaveDataObject._UserID).."-"..Name
+        local DataStoreSaveData :string
+
+        local Success, ErrorMessage = pcall(function()
+            DataStoreSaveData = HttpService:JSONEncode(Data)
+        end)
+
+        if not Success then warn("Failed to JSONEncode: "..ErrorMessage) ReturnString = ReturnString.."; (FAILED)" return end
+        ReturnString = ReturnString.."; "..DataStoreKey.." == "..DataStoreSaveData
+    end
+
+    return ReturnString
+end
+
+--[=[
 Create a new blank save data object, optinal data can be passed in a table to automatically be added
 ]=]
 function SaveData.New(UserID :number, Data :{DataCopy}?)
@@ -52,12 +74,42 @@ function SaveData:Save(DataStore :DataStore)
         if not Success then warn("Failed to JSONEncode: "..ErrorMessage) return end
 
         local Success, ErrorMessage = pcall(function()
-            --DataStore:SetAsync(DataStoreKey, DataStoreSaveData)
-            print(DataStoreKey, DataStoreSaveData)
+            DataStore:SetAsync(DataStoreKey, DataStoreSaveData)
         end)
 
         if not Success then warn("Failed to set to datastore: "..ErrorMessage) return end
     end
+end
+
+--[=[
+Loads data stored in the given DataStore based on the names of the
+data in the object
+]=]
+function SaveData:Load(DataStore :DataStore)
+    for Name :string, Data :{any} in pairs(self._Data) do
+        local DataStoreKey = tostring(self._UserID).."-"..Name
+        local DataStoreSaveData :string
+
+        local Success, ErrorMessage = pcall(function()
+            DataStoreSaveData = DataStore:GetAsync(DataStoreKey)
+        end)
+
+        if not Success then warn("Failed to set to datastore: "..ErrorMessage) return end
+
+        local Success, ErrorMessage = pcall(function()
+            DataStoreSaveData = HttpService:JSONDecode(DataStoreSaveData)
+        end)
+
+        if not Success then warn("Failed to JSONDecode: "..ErrorMessage) return end
+        self._Data[Name] = DataStoreSaveData
+    end
+end
+
+--[=[
+Get the stored data by name
+]=]
+function SaveData:GetDataByName(Name :string) :{any}?
+    return self._Data[Name]
 end
 
 --[=[

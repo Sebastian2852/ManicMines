@@ -3,9 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
-local SaveData = require(ReplicatedStorage.Game.Modules.Classes.SaveData.SaveData)
-local Data = require(ReplicatedStorage.Game.Modules.Classes.SaveData.Data)
-
 Knit.AddServicesDeep(script.Parent.Services)
 
 local Timer = Core.Timer.new()
