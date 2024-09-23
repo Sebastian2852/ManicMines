@@ -20,15 +20,18 @@ end):catch(warn)
 
 -- TEST CODE
 -- Only here to test the new data saving system stuff
-
 game.Players.PlayerAdded:Connect(function(Player)
-    local NewSaveData = SaveData.New(Player.UserId)
     local OreData = {}
     OreData["Stone"] = {}
     OreData["Stone"].InventoryAmount = 0
     OreData["Stone"].StorageAmount = 0
     OreData["Stone"].TimesMined = 0
+
+    local NewSaveData = SaveData.New(Player.UserId)
     local MockData = Data.New("Ores", OreData)
     NewSaveData:AddData(MockData)
     NewSaveData:Save(nil)
+
+    MockData:Discard()
+    NewSaveData:Discard()
 end)

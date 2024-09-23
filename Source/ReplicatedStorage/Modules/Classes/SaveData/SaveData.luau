@@ -37,6 +37,9 @@ function SaveData:AddData(Data :DataCopy)
     self._Data[Data.Name] = Data.Data
 end
 
+--[=[
+Save the stored data to the given DataStore
+]=]
 function SaveData:Save(DataStore :DataStore)
     for Name :string, Data :{any} in pairs(self._Data) do
         local DataStoreKey = tostring(self._UserID).."-"..Name
