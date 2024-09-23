@@ -141,12 +141,10 @@ function DataService:SavePlayerData(Player :Player)
 
     local DataFolder = self:GetPlayerDataFolder(Player)
 
-    LogService:Assert(DataFolder, "Tried loading data with No data folder")
+    LogService:Assert(DataFolder, "Tried saving data with No data folder")
     LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
-    local PlayerDataKey = Player.UserId.."-PlayerData"
-    local TycoonDataKey = Player.UserId.."-TycoonData"
-    local OreDataKey = Player.UserId.."-OreData"
+    local SaveData = Core.Data.SaveData.New(Player.UserId)
 
     LogService:Log("["..Player.Name.."]", "Packaging ore data")
     local RawOreData = {}
@@ -165,32 +163,32 @@ function DataService:SavePlayerData(Player :Player)
     for _, Ore :IntValue in pairs(DataFolder.TimesMined:GetChildren()) do
         RawOreData[Ore.Name].TimesMined = Ore.Value
     end
+    local OreData = Core.Data.Data.New("Ore", RawOreData)
+
+
 
     LogService:Log("["..Player.Name.."]", "Packaging player data")
     local RawPlayerData = {}
-
     RawPlayerData.XP = DataFolder.XP.Value
     RawPlayerData.Level = DataFolder.Level.Value
     RawPlayerData.Gold = DataFolder.Gold.Value
     RawPlayerData.LastPlayed = os.time()
+    local PlayerData = Core.Data.Data.New("PlayerData", RawPlayerData)
+
+
 
     LogService:Log("["..Player.Name.."]", "Packaging tycoon data")
     local RawTycoonData = {}
-
     RawTycoonData.Name = DataFolder.Tycoon.TycoonName.Value
     RawTycoonData.Upgrades = {}
+    local TycoonData = Core.Data.Data.New("Tycoon", RawTycoonData)
 
-    local EncodedOreData :string = HttpService:JSONEncode(RawOreData)
-    local EncodedPlayerData :string = HttpService:JSONEncode(RawPlayerData)
-    local EncodedTycoonData :string = HttpService:JSONEncode(RawTycoonData)
+    SaveData:AddData(OreData)
+    SaveData:AddData(PlayerData)
+    SaveData:AddData(TycoonData)
 
-    local Success, ErrorMessage = pcall(function()
-        Slot:SetAsync(PlayerDataKey, EncodedPlayerData)
-        Slot:SetAsync(TycoonDataKey, EncodedTycoonData)
-        Slot:SetAsync(OreDataKey, EncodedOreData)
-    end)
+    SaveData:Save(Slot)
 
-    LogService:Assert(Success, ErrorMessage)
     LogService:Log("["..Player.Name.."]", "Saved player data!")
 end
 

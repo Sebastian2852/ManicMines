@@ -89,8 +89,15 @@ local Util = require(script.Parent.ModulesInCore.Util)
 
 local Timer = require(script.Parent.Classes.Timer)
 
+local SaveData = require(script.Parent.Classes.SaveData.SaveData)
+local Data = require(script.Parent.Classes.SaveData.Data)
+
 return {
     GameConfig = GameConfig;
     Util = Util;
     Timer = Timer;
+    Data = {
+        SaveData = SaveData;
+        Data = Data;
+    }
 }
