@@ -16,6 +16,7 @@ local LogSearch = ""
 
 local Admin_CurrentPlayer = 0
 local Admin_IsAdmin = false
+local Admin_Open = false
 
 local GeneralStats = {Ores = {}, Layers = {}, Pickaxes = {}}
 local ScriptingStats = {Services = 0, Controllers = 0, GeneralModules = 0}
@@ -274,7 +275,7 @@ function IrisController:Update()
         self:StatsWindow()
     end
 
-    if Admin_IsAdmin then
+    if Admin_IsAdmin and Admin_Open then
         self:AdminPanel()
     end
 end
@@ -292,6 +293,12 @@ function IrisController:KnitInit()
 
     AdminService:IsPlayerAdmin():andThen(function(Admin :boolean)
         Admin_IsAdmin = Admin
+    end)
+
+    UserInputService.InputBegan:Connect(function(Input, Processed)
+        if Processed then return end
+        if Input.KeyCode ~= Enum.KeyCode.P then return end
+        Admin_Open = not Admin_Open
     end)
 
     Iris.Init()
