@@ -1,8 +1,12 @@
 local OreList = {}
 OreList.__index = OreList
-
 OreList._Ores = {}
 
+--[=[
+Override the tostring() function to return the object as a nice string in the format:  
+`Amount DisplayName (Name);`  
+`15 Test Ore (TestOre); 25 Stone (Stone)`
+]=]
 function OreList.__tostring(OreListObject)
     local Text = ""
     for _, OreData in pairs(OreListObject._Ores) do
@@ -11,7 +15,6 @@ function OreList.__tostring(OreListObject)
     return Text
 end
 
-
 local function GetOreByName(Name :string) :BasePart
     local FoundOre = nil
     FoundOre = game.ReplicatedStorage.Assets.Ores:FindFirstChild(Name)
@@ -19,12 +22,23 @@ local function GetOreByName(Name :string) :BasePart
     return FoundOre
 end
 
+
+--[=[
+Create a new blank ore list
+]=]
 function OreList.New()
     local self = setmetatable({}, OreList)
     return self
 end
 
+--[=[
+Add an ore to the list with a given amount. Everything else will be filled out for you.
+If a non-existent ore name is passed it will use stone instead!
+]=]
 function OreList:AddOre(OreName :string, Amount :number)
+    -- TODO: Check that the ore isnt already in the list
+    -- If it is then just add the amount to it and not add as a new ore
+
     local RealOre = GetOreByName(OreName)
     local OreData = {}
     OreData.Name = RealOre.Name
@@ -55,6 +69,9 @@ function OreList:RemoveOre(OreName :string, Amount :number)
     self._Ores[OreName].Amount = NewAmount
 end
 
+--[=[
+Delete the ore list
+]=]
 function OreList:Destroy()
     self._Ores = nil
 end
