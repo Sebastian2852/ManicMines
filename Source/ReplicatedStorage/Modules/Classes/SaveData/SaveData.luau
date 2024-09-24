@@ -46,7 +46,6 @@ function SaveData.New(UserID :number, Data :{DataCopy}?)
     if Data then
         for _, DataToAdd in pairs(Data) do
             self._Data[DataToAdd.Name] = DataToAdd.Data
-            DataToAdd:Discard()
         end
     end
 
@@ -59,7 +58,6 @@ Also automatically discards the data after its added
 ]=]
 function SaveData:AddData(Data :DataCopy)
     self._Data[Data.Name] = Data.Data
-    Data:Discard()
 end
 
 --[=[

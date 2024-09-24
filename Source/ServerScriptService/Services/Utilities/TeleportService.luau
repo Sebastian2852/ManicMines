@@ -6,15 +6,13 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local TeleportService = Knit.CreateService {
     Name = "TeleportService",
-    Client = {
-        TeleportStarted = Knit.CreateSignal(); -- Starts a fade out
-        TeleportFinished = Knit.CreateSignal(); -- Starts fading in
-    },
+    Client = {},
 }
 
 local LogService
 local TycoonService
 local DataService
+local LoadingService
 
 local NamesToAvoid = {
     "HumanoidRootPart";
@@ -80,13 +78,13 @@ function TeleportService:TeleportPlayerToPosition(Player :Player, Position :Vect
         until Character
     end
 
-    self.Client.TeleportStarted:Fire(Player)
+    LoadingService:StartLoading(Player)
     FadeCharacterOut(1, Character)
     task.wait(1)
     Character:PivotTo(CFrame.new(Position))
     task.wait(1)
     FadeCharacterIn(1, Character)
-    self.Client.TeleportFinished:Fire(Player)
+    LoadingService:EndLoading(Player)
 end
 
 --[=[
@@ -135,6 +133,7 @@ function TeleportService:KnitStart()
     LogService = Knit.GetService("LogService")
     TycoonService = Knit.GetService("TycoonService")
     DataService = Knit.GetService("DataService")
+    LoadingService = Knit.GetService("LoadingService")
 end
 
 return TeleportService

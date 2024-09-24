@@ -13,7 +13,7 @@ local PlayerGUI = Knit.Player.PlayerGui
 
 local DataService
 local TextFilteringService
-local FadeController
+local LoadingService
 local LogService
 
 local Blur :BlurEffect
@@ -98,7 +98,7 @@ local function SetupNewSlotFrame()
         }
 
         DataService:NewSlot(SlotCreation_CurrentSlotID, SlotInfo)
-        FadeController:FadeGameplayOut(true)
+        LoadingService:StartLoading()
         local InTycoon = false
         MainMenuController:EnableAllUI()
         SlotSelectionFrame.Visible = false
@@ -112,7 +112,7 @@ local function SetupNewSlotFrame()
         repeat
             task.wait(1)
         until InTycoon
-        FadeController:FadeGameplayIn(false)
+        LoadingService:EndLoading()
     end)
 
     NewSlotFrame.NameInput.RandomiseName.MouseButton1Click:Connect(function()
@@ -164,7 +164,7 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         New:AddTag("_UsedSlot")
 
         New.Actions.PlayButton.MouseButton1Click:Connect(function()
-            FadeController:FadeGameplayOut(true)
+            LoadingService:StartLoading()
             DataService:LoadData(tonumber(New.Name))
             local InTycoon = false
             self:EnableAllUI()
@@ -179,7 +179,7 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
             repeat
                 task.wait(1)
             until InTycoon
-            FadeController:FadeGameplayIn(false)
+            LoadingService:EndLoading()
         end)
 
         LogService:Log("    - Setup play button")
@@ -267,7 +267,7 @@ end
 function MainMenuController:KnitStart()
     DataService = Knit.GetService("DataService")
     TextFilteringService = Knit.GetService("TextFilteringService")
-    FadeController = Knit.GetController("FadeController")
+    LoadingService = Knit.GetService("LoadingService")
 
     self:DisableAllUI()
 

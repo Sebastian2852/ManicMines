@@ -3,11 +3,11 @@ local TweenService = game:GetService("TweenService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local FadeController = Knit.CreateController {
-    Name = "FadeController"
+local LoadingController = Knit.CreateController {
+    Name = "LoadingController"
 }
 
-local TeleportService
+local LoadingService
 local LogService
 
 local Player = Knit.Player
@@ -51,7 +51,7 @@ Fades in a black GUI to cover the whole screen and any UI
 if await for finish is true then the script will not return
 until the fade has finished
 ]=]
-function FadeController:FadeGameplayOut(AwaitFinish :boolean)
+function LoadingController:FadeGameplayOut(AwaitFinish :boolean)
     LogService:Log("Fading gameplay out")
     FadeGuiIn(true, AwaitFinish)
 end
@@ -60,7 +60,7 @@ end
 Fades out the GUI if await for finish is true then the script
 will not return until the fade has finished
 ]=]
-function FadeController:FadeGameplayIn(AwaitFinish :boolean)
+function LoadingController:FadeGameplayIn(AwaitFinish :boolean)
     LogService:Log("Fading gameplay in")
     FadeGuiOut(true, AwaitFinish)
 end
@@ -68,7 +68,7 @@ end
 --[=[
 Puts the black gui on the screen with no fade/animation
 ]=]
-function FadeController:HideGameplay()
+function LoadingController:HideGameplay()
     LogService:Log("Hiding gameplay")
     FadeGuiIn(false, false)
 end
@@ -76,7 +76,7 @@ end
 --[=[
 gets rid of the black gui on the screen with no fade/animation
 ]=]
-function FadeController:ShowGameplay()
+function LoadingController:ShowGameplay()
     LogService:Log("Showing gameplay")
     FadeGuiOut(false, false)
 end
@@ -85,7 +85,7 @@ end
 
 --[[ KNIT ]]--
 
-function FadeController:KnitInit()
+function LoadingController:KnitInit()
     local NewScreenGui = Instance.new("ScreenGui")
     NewScreenGui.Parent = Player.PlayerGui
     NewScreenGui.Name = "FadeGui"
@@ -105,17 +105,17 @@ function FadeController:KnitInit()
     FadeTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false, 0)
 end
 
-function FadeController:KnitStart()
-    TeleportService = Knit.GetService("TeleportService")
+function LoadingController:KnitStart()
+    LoadingService = Knit.GetService("LoadingService")
     LogService = Knit.GetService("LogService")
 
-    TeleportService.TeleportStarted:Connect(function()
-        FadeController:FadeGameplayOut(false)
+    LoadingService.LoadingStarted:Connect(function()
+        LoadingController:FadeGameplayOut(false)
     end)
 
-    TeleportService.TeleportFinished:Connect(function()
-        FadeController:FadeGameplayIn(false)
+    LoadingService.LoadingEnded:Connect(function()
+        LoadingController:FadeGameplayIn(false)
     end)
 end
 
-return FadeController
+return LoadingController
