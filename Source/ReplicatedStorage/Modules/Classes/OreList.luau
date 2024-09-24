@@ -36,8 +36,10 @@ Add an ore to the list with a given amount. Everything else will be filled out f
 If a non-existent ore name is passed it will use stone instead!
 ]=]
 function OreList:AddOre(OreName :string, Amount :number)
-    -- TODO: Check that the ore isnt already in the list
-    -- If it is then just add the amount to it and not add as a new ore
+    if self._Ores[OreName] then
+        self._Ores[OreName].Amount += Amount
+        return
+    end
 
     local RealOre = GetOreByName(OreName)
     local OreData = {}
