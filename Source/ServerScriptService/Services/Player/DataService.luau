@@ -188,6 +188,7 @@ function DataService:SavePlayerData(Player :Player)
     SaveData:AddData(TycoonData)
 
     SaveData:Save(Slot)
+    SaveData:Discard()
 
     LogService:Log("["..Player.Name.."]", "Saved player data!")
 end
@@ -266,6 +267,7 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     end)
 
     DataFolder.DataLoaded.Value = true
+    SaveData:Discard()
 end
 
 --[=[
