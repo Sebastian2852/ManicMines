@@ -9,6 +9,134 @@
       },
       "Packages": {
         "$path": "Packages"
+      },
+
+      "Assets":{
+        "$className":"Folder",
+        "Layers":{
+          "$className":"Folder",
+          "Default":{"$className":"Configuration"}
+        },
+        "Levels":{
+          "$className":"Folder",
+          "0":{"$className":"Configuration"}
+        },
+        "Ores":{
+          "$className":"Folder",
+          "Ore":{"$className":"Part"}
+        },
+        "Pickaxe":{
+          "$className":"Folder",
+          "PickaxeSelection":{"$className":"SelectionBox"},
+          "Pickaxes":{
+            "$className":"Folder",
+            "0":{"$className":"Configuration"}
+          }
+        },
+        "Tycoon":{
+          "$className":"Folder",
+          "UpgradeSelection":{"$className":"SelectionBox"},
+          "TycoonModel":{
+            "$className":"Model",
+            "Main":{
+              "$className":"Folder",
+              "Spawn":{"$className":"Part"}
+            }
+          },
+          "Upgrades":{"$className":"Folder"}
+        },
+        "UI":{
+          "$className":"Folder",
+          "Billboards":{"$className":"Folder"},
+          "MainMenu":{"$className":"Folder"},
+          "Tycoon":{"$className":"Folder"},
+          "OreFrame":{"$className":"Frame"}
+        },
+
+        "Stone":{"$className":"Part"}
+      },
+
+      "Player":{
+        "$className":"Folder",
+        "ActiveSelectionBox":{"$className":"ObjectValue"},
+        "MainMenuReady":{"$className":"BoolValue"},
+        "PickaxeActive":{"$className":"BoolValue"},
+        "PickaxeEquipped":{"$className":"BoolValue"},
+        "PickaxeSelection":{"$className":"ObjectValue"}
+      },
+      "PlayerData": {
+        "$className": "Folder",
+        "Template": {
+          "$className":"Folder",
+          "Emblems":{"$className":"Folder"},
+          "TimesMined":{"$className":"Folder"},
+
+          "Level":{"$className":"IntValue"},
+          "Gold":{"$className":"IntValue"},
+          "XP":{"$className":"IntValue"},
+
+          "DataLoaded":{"$className":"BoolValue"},
+          "InMine":{"$className":"BoolValue"},
+          "InTycoon":{"$className":"BoolValue"},
+          "ServerMining":{"$className":"BoolValue"},
+
+          "Inventory":{
+            "$className":"Folder",
+            "InventoryCap":{"$className":"IntValue"},
+            "InventoryItemCount":{"$className":"IntValue"},
+            "Ores":{"$className":"Folder"}
+          },
+          "Storage":{
+            "$className":"Folder",
+            "StorageCap":{"$className":"IntValue"},
+            "StorageItemCount":{"$className":"IntValue"},
+            "Ores":{"$className":"Folder"}
+          },
+
+          "Tycoon":{
+            "$className":"Folder",
+            "Upgrades":{"$className":"Folder"},
+            "TycoonName":{"$className":"StringValue"}
+          },
+
+          "Stats":{
+            "$className":"Folder",
+            "BlocksMined":{"$className":"IntValue"},
+            "DeepestMiningLevel":{"$className":"IntValue"},
+            "HoursPlayed":{"$className":"IntValue"},
+            "TotalGoldEarned":{"$className":"IntValue"},
+            "TotalXpEarned":{"$className":"IntValue"}
+          },
+
+          "Settings":{
+            "$className":"Folder",
+            "GlobalShadows":{"$className":"BoolValue"},
+            "RainbowEffect":{"$className":"BoolValue"}
+          },
+
+          "Pickaxes":{
+            "$className":"Folder",
+            "Owned":{"$className":"Folder"},
+            "Upgrades":{"$className":"Folder"},
+            "Equipped":{"$className":"IntValue"}
+          }
+        }
+      }
+    },
+
+    "Workspace":{
+      "Game":{
+        "$className":"Folder",
+        "Mine":{"$className":"Folder"},
+        "Players":{"$className":"Folder"},
+        "Teleports":{
+          "$className":"Folder",
+          "Surface":{"$className":"Part"}
+        },
+        "Tycoons":{"$className":"Folder"},
+
+        "MineSpawn":{"$className":"Part"},
+        "TycoonsSpawn":{"$className":"Part"}
       }
     },
 
