@@ -1,6 +1,6 @@
 ---
 name: Test
-about: Help us imrove automatic testing / unit tests
+about: Help us improve automatic testing / unit tests
 title: Improve testing for ...
 labels: Backend, Testing
 assignees: ''
