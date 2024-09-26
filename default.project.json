@@ -102,7 +102,7 @@
           "Stats":{
             "$className":"Folder",
             "BlocksMined":{"$className":"IntValue"},
-            "DeepestMiningLevel":{"$className":"IntValue"},
+            "DeepestMineLevel":{"$className":"IntValue"},
             "HoursPlayed":{"$className":"IntValue"},
             "TotalGoldEarned":{"$className":"IntValue"},
             "TotalXpEarned":{"$className":"IntValue"}
