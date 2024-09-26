@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Util = {}
 
+local OreList = require(ReplicatedStorage.Game.Modules.Classes.OreList)
+
 --[=[
 Convertes a given number into a string, good for use in UI.
 For example  
@@ -76,6 +78,26 @@ you will get "John (Part)" back
 ]=]
 function Util:LogObjectString(Object :any) :string
     return Object.Name.." ("..Object.ClassName..")"
+end
+
+--[=[
+Create an ore list from a folder
+]=]
+function Util:CreateOreListFromFolder(Folder :Folder)
+    local NewList = OreList.New()
+
+    for _, Object :ValueBase in pairs(Folder:GetChildren()) do
+        if not Object:IsA("ValueBase") then continue end
+
+        if Object.Name == "Gold" then
+            NewList:AddGold(Object.Name)
+            continue
+        end
+
+        NewList:AddOre(Object.Name, Object.Value)
+    end
+
+    return NewList
 end
 
 function Util:ConvertOreToType(Ore :BasePart, Amount :number) :{Name :string, DisaplyName :string, Amount :number, Emblem :string, ActualOre :BasePart}

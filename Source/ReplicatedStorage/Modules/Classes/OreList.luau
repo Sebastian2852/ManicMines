@@ -1,6 +1,7 @@
 local OreList = {}
 OreList.__index = OreList
 OreList._Ores = {}
+OreList._Gold = {}
 
 --[=[
 Override the tostring() function to return the object as a nice string in the format:  
@@ -69,6 +70,23 @@ function OreList:RemoveOre(OreName :string, Amount :number)
     end
 
     self._Ores[OreName].Amount = NewAmount
+end
+
+--[=[
+Adds gold to the ore list
+]=]
+function OreList:AddGold(Amount :number)
+    self._Gold += Amount
+end
+
+--[=[
+Removes gold from the ore list, if is below 0 then it is set to 0
+]=]
+function OreList:RemoveGold(Amount :number)
+    self._Gold -= Amount
+    if self._Gold < 0 then
+        self._Gold = 0
+    end
 end
 
 --[=[
