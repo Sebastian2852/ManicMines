@@ -1,3 +1,4 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 --[[
 This module is basically the core of the game since it is required by most scripts and gives access to some core settings and functions
 that without the whole game would break down. They are all in this one module so that you can have 1 `require(core)` instead of a million
@@ -7,16 +8,6 @@ Since most of the scripts require all of the modules anyway this is easier.
 ]]
 
 local Private = require(script.Parent.ModulesInCore.Core_Private)
-
-export type Ore = {
-    Name :string;
-    DisaplyName :string;
-    Amount :number;
-    Emblem :string;
-
-    ActualOre :BasePart;
-}
-export type OreList = {Ore}
 
 --[=[
 Settings used for when creating a new save slot
@@ -88,6 +79,7 @@ local GameConfig = require(script.Parent.ModulesInCore.GameConfig)
 local Util = require(script.Parent.ModulesInCore.Util)
 
 local Timer = require(script.Parent.Classes.Timer)
+local OreList = require(script.Parent.Classes.OreList)
 
 local SaveData = require(script.Parent.Classes.SaveData.SaveData)
 local Data = require(script.Parent.Classes.SaveData.Data)
@@ -96,8 +88,18 @@ return {
     GameConfig = GameConfig;
     Util = Util;
     Timer = Timer;
+    OreList = OreList;
     Data = {
         SaveData = SaveData;
         Data = Data;
-    }
+    };
+
+    Assets = {
+        Layers = ReplicatedStorage.Assets.Layers;
+        Levels = ReplicatedStorage.Assets.Levels;
+        Ores = ReplicatedStorage.Assets.Ores;
+        Pickaxe = ReplicatedStorage.Assets.Pickaxe;
+        Tycoon = ReplicatedStorage.Assets.Tycoon;
+        UI = ReplicatedStorage.Assets.UI;
+    };
 }

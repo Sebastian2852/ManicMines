@@ -1,7 +1,7 @@
 local OreList = {}
 OreList.__index = OreList
 OreList._Ores = {}
-OreList._Gold = {}
+OreList._Gold = 0
 
 --[=[
 Override the tostring() function to return the object as a nice string in the format:  
@@ -87,6 +87,27 @@ function OreList:RemoveGold(Amount :number)
     if self._Gold < 0 then
         self._Gold = 0
     end
+end
+
+--[=[
+a function to convert the ore list into a valid thing for using in a for
+loop
+
+```
+for OreName, OreData in pairs(OreList:LoopList()) do
+    print(OreName, OreData)
+end
+]=]
+function OreList:LoopList()
+    local List = {}
+
+    for OreName, OreData in pairs(self._Ores) do
+        List[OreName] = OreData
+    end
+
+    List["Gold"] = {Name = "Gold", Amount = self._Gold, DisplayName = "Gold"}
+
+    return List
 end
 
 --[=[

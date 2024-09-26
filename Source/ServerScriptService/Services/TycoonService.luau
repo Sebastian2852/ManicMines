@@ -75,8 +75,9 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
         NewClickDetector.Parent = UpgradeHitbox
         NewClickDetector.MaxActivationDistance = Core.GameConfig.Tycoon.UpgradeSelectionDistance
 
+        local NextConfig = UpgradeConfig:FindFirstChild(DataValue.Value + 1)
         NewClickDetector.MouseClick:Connect(function(Player)
-            TycoonService.Client.SelectUpgrade:Fire(Player, UpgradeHitbox.Name, UpgradeConfig, ModelConfig, UpgradeHitbox, Model)
+            TycoonService.Client.SelectUpgrade:Fire(Player, UpgradeHitbox.Name, UpgradeConfig, ModelConfig, UpgradeHitbox, Model, NextConfig)
         end)
     end
 end

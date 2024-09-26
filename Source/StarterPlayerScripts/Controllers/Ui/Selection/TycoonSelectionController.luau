@@ -52,7 +52,13 @@ local function DidClickedHitbox(MouseX, MouseY) :boolean
     return false
 end
 
-
+local function OreListDataToUI(OreData :{Name :string, DisplayName :string, Amount :number, Emblem :string, RealOre :BasePart}) :Frame
+    local NewFrame = Core.Assets.UI.OreFrame:Clone()
+    NewFrame.OreName.Text = OreData.DisplayName
+    NewFrame.OreAmount.Text = OreData.Amount
+    NewFrame.OreImage.Image = OreData.Emblem or Core.Assets.UI.NoTexture.Texture
+    return NewFrame
+end
 
 -- [[ PUBLIC ]]--
 
@@ -68,9 +74,23 @@ function TycoonSelectionController:Deselect()
     CurrentlySelecting = false
 end
 
-function TycoonSelectionController:UpdateUiInfo(UpgradeName :string, UpgradeDescription :string, UpgradeCosts :Core.OreList)
+--[=[
+Updates the GUI to match the new information passed. Call before showing the UI to avoid incorrect data
+]=]
+function TycoonSelectionController:UpdateUiInfo(UpgradeName :string, UpgradeDescription :string, NextConfig :Configuration)
     TycoonSelection.Title.Text = UpgradeName
     TycoonSelection.Description.Text = UpgradeDescription
+
+    for _, Child :GuiBase in pairs(TycoonSelection.UpgradePanel.CostItems:GetChildren()) do
+        if Child:IsA("UIListLayout") then continue end
+        Child:Destroy()
+    end
+
+    local CostList = self:CreateCostOreList(NextConfig)
+    for OreName, OreData in pairs(CostList:LoopList()) do
+        local NewUI = OreListDataToUI(OreData)
+        NewUI.Parent = TycoonSelection.UpgradePanel.CostItems
+    end
 end
 
 --[=[
@@ -94,6 +114,16 @@ function TycoonSelectionController:SelectHitbox(Hitbox)
     LogService:Log("Selected upgrade hitbox: "..Hitbox.Name)
 end
 
+--[=[
+Takes in an upgrade config and returns the cost for the upgrade as a OreList or nil
+if there is no config passed or no cost folder in the config
+]=]
+function TycoonSelectionController:CreateCostOreList(UpgradeConfig :Configuration)
+    if UpgradeConfig == nil then return nil end
+    if not UpgradeConfig:FindFirstChild("Cost") then return nil end
+    return Core.Util:CreateOreListFromFolder(UpgradeConfig:FindFirstChild("Cost"))
+end
+
 
 
 -- [[ KNIT ]]--
@@ -102,8 +132,8 @@ function TycoonSelectionController:KnitStart()
     TycoonService = Knit.GetService("TycoonService")
     LogService = Knit.GetService("LogService")
 
-    TycoonService.SelectUpgrade:Connect(function(UpgradeName :string, UpgradeConfig :Configuration, ModelConfig :Configuration, Hitbox :BasePart, Model :Model)
-        self:UpdateUiInfo(UpgradeName, UpgradeConfig:GetAttribute("Description"), {})
+    TycoonService.SelectUpgrade:Connect(function(UpgradeName :string, UpgradeConfig :Configuration, ModelConfig :Configuration, Hitbox :BasePart, Model :Model, NextConfig :Configuration)
+        self:UpdateUiInfo(UpgradeName, UpgradeConfig:GetAttribute("Description"), NextConfig)
         self:SelectHitbox(Hitbox)
     end)
 

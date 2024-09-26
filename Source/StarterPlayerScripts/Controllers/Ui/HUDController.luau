@@ -21,7 +21,7 @@ end
 function HUDController:UpdateInventoryOre(OreName :string, OreAmount :number)
     local RealOre = Core.Util:GetOreByName(OreName)
     local OreAsType = Core.Util:ConvertOreToType(RealOre, OreAmount)
-    
+
     local Frame = InventoryGUI.Inventory.Inventory:FindFirstChild(OreName)
     if not Frame and OreAmount > 0 then
         local NewFrame = Core.Util:MakeOreUIFromType(OreAsType)
@@ -48,11 +48,16 @@ function HUDController:KnitStart()
 
     for _, Ore :IntValue in pairs(PlayerDataFolder.Inventory.Ores:GetChildren()) do
         Ore:GetPropertyChangedSignal("Value"):Connect(function()
-            self:UpdateInventoryOre(Ore.Name, Ore.Value)
+            --self:UpdateInventoryOre(Ore.Name, Ore.Value)
         end)
 
-        self:UpdateInventoryOre(Ore.Name, Ore.Value)
+        --self:UpdateInventoryOre(Ore.Name, Ore.Value)
     end
+
+    --[[
+    Had to comment out all the inventory update functions because it used old type based code
+    instead of ore list based code
+    ]]
 
    self:UpdateGold(PlayerDataFolder.Gold.Value)
 end
