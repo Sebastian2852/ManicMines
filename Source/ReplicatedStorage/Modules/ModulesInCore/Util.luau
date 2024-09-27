@@ -100,6 +100,9 @@ function Util:CreateOreListFromFolder(Folder :Folder)
     return NewList
 end
 
+--[=[
+Returns the ore as a base part from the ores folder
+]=]
 function Util:GetOreByName(OreName :string) :BasePart
     if OreName == "Gold" then return end
     if OreName == "Stone" then
@@ -107,6 +110,25 @@ function Util:GetOreByName(OreName :string) :BasePart
     end
 
     return ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
+end
+
+--[=[
+Convert an ore to a type. This is a function just to keep stuff working and **will
+be deleted soon!**
+]=]
+function Util:ConvertOreToType(Ore :BasePart, Amount :number) :{Name :string, DisaplyName :string, Amount :number, Emblem :string, ActualOre :BasePart}
+    local ScriptCallingFunction :string = debug.info(5, "s") or "unkown"
+    warn("USING OUTDATED FUNCTION!!! "..ScriptCallingFunction)
+
+    local OreType = {
+        Name = Ore.Name;
+        DisaplyName = Ore:GetAttribute("DisplayName");
+        Amount = Amount;
+        Emblem = Ore:GetAttribute("EmblemImageID") or ReplicatedStorage.Assets.UI.NoTexture.Texture;
+        ActualOre = Ore;
+    }
+
+    return OreType
 end
 
 return Util

@@ -22,8 +22,7 @@
           "0":{"$className":"Configuration"}
         },
         "Ores":{
-          "$className":"Folder",
-          "Ore":{"$className":"Part"}
+          "$className":"Folder"
         },
         "Pickaxe":{
           "$className":"Folder",

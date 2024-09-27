@@ -15,7 +15,7 @@ local LogService
 --[=[
 Convert an ore type into its inventory value
 ]=]
-local function ConvertOreListItemToInventoryValue(DataFolder :Folder, Ore :Core.Ore) :IntValue
+local function ConvertOreListItemToInventoryValue(DataFolder :Folder, Ore) :IntValue
     local OreName = Ore.Name
     
     if OreName == "Gold" then
@@ -29,7 +29,7 @@ end
 --[=[
 Convert an ore type into its TimesMined value
 ]=]
-local function ConvertOreListItemToTimesMinedValue(DataFolder :Folder, Ore :Core.Ore) :IntValue
+local function ConvertOreListItemToTimesMinedValue(DataFolder :Folder, Ore) :IntValue
     local OreName = Ore.Name
 
     local FoundValue = DataFolder.TimesMined:FindFirstChild(OreName)
@@ -43,7 +43,7 @@ end
 --[=[
 Gives an ore to the players inventory, doesnt matter if they dont have enough space to carry it
 ]=]
-function PlayerStatsService:GiveOre(Player :Player, Ore :Core.Ore)
+function PlayerStatsService:GiveOre(Player :Player, Ore)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
     local ValueToChange :IntValue = ConvertOreListItemToInventoryValue(DataFolder, Ore)
 
@@ -54,7 +54,7 @@ end
 --[=[
 Gives the player an ore and adds it to its times mined value
 ]=]
-function PlayerStatsService:MinedOre(Player :Player, Ore :Core.Ore)
+function PlayerStatsService:MinedOre(Player :Player, Ore)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
     local ValueToChange = ConvertOreListItemToTimesMinedValue(DataFolder, Ore)
 

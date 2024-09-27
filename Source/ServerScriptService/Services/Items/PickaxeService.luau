@@ -175,7 +175,7 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
 
     while PickaxeService.Mining[Player.UserId].Mining and PickaxeService:VerifyIfCanMine(Player, Character, ObjectToMine) do
         local Health :number = ObjectToMine:GetAttribute("Health")
-        local OreListItem :Core.Ore = Core.Util:ConvertOreToType(ObjectToMine, ObjectToMine:GetAttribute("AmountDroppedWhenMined")) --PlayerStatsService:ConvertOreNameToOreListItem(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
+        local OreListItem = Core.Util:ConvertOreToType(ObjectToMine, ObjectToMine:GetAttribute("AmountDroppedWhenMined")) --PlayerStatsService:ConvertOreNameToOreListItem(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
 
         if Health <= 0 then
             PickaxeService:StopMining(Player)
