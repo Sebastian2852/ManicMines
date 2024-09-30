@@ -144,7 +144,9 @@ function DataService:SavePlayerData(Player :Player)
     LogService:Assert(DataFolder, "Tried saving data with No data folder")
     LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
+    local Maid = Core.Maid.new()
     local SaveData = Core.Data.SaveData.New(Player.UserId)
+    Maid:GiveTask(SaveData)
 
     LogService:Log("["..Player.Name.."]", "Packaging ore data")
     local RawOreData = {}
@@ -164,6 +166,7 @@ function DataService:SavePlayerData(Player :Player)
         RawOreData[Ore.Name].TimesMined = Ore.Value
     end
     local OreData = Core.Data.Data.New("Ore", RawOreData)
+    Maid:GiveTask(OreData)
 
 
 
@@ -174,6 +177,7 @@ function DataService:SavePlayerData(Player :Player)
     RawPlayerData.Gold = DataFolder.Gold.Value
     RawPlayerData.LastPlayed = os.time()
     local PlayerData = Core.Data.Data.New("PlayerData", RawPlayerData)
+    Maid:GiveTask(PlayerData)
 
 
 
@@ -182,14 +186,16 @@ function DataService:SavePlayerData(Player :Player)
     RawTycoonData.Name = DataFolder.Tycoon.TycoonName.Value
     RawTycoonData.Upgrades = {}
     local TycoonData = Core.Data.Data.New("Tycoon", RawTycoonData)
+    Maid:GiveTask(TycoonData)
+
+
 
     SaveData:AddData(OreData)
     SaveData:AddData(PlayerData)
     SaveData:AddData(TycoonData)
-
     SaveData:Save(Slot)
-    SaveData:Discard()
 
+    Maid:DoCleaning()
     LogService:Log("["..Player.Name.."]", "Saved player data!")
 end
 
@@ -204,11 +210,17 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     LogService:Assert(DataFolder, "Tried loading data with No data folder")
     LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
+    local Maid = Core.Maid.new()
     local OreData = Core.Data.Data.New("Ore", {})
     local PlayerData = Core.Data.Data.New("PlayerData", {})
     local TycoonData = Core.Data.Data.New("Tycoon", {})
 
+    Maid:GiveTask(OreData)
+    Maid:GiveTask(PlayerData)
+    Maid:GiveTask(TycoonData)
+
     local SaveData = Core.Data.SaveData.New(Player.UserId)
+    Maid:GiveTask(SaveData)
     SaveData:AddData(OreData)
     SaveData:AddData(PlayerData)
     SaveData:AddData(TycoonData)
@@ -267,7 +279,7 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     end)
 
     DataFolder.DataLoaded.Value = true
-    SaveData:Discard()
+    Maid:DoCleaning()
 end
 
 --[=[
@@ -280,6 +292,18 @@ function DataService:CreateDataFolderForPlayer(Player :Player) :Core.DataFolder
     DataFolder.Parent = RootDataFolder
 
     LogService:Log("Created "..Player.Name.."'s data folder")
+    return DataFolder
+end
+
+--[=[
+Deletes the given player's data folder
+]=]
+function DataService:DeleteDataFolder(Player :Player) :Core.DataFolder
+    if not self:PlayerHasDataFolder(Player) then return nil end
+    local DataFolder = self:GetPlayerDataFolder(Player)
+    DataFolder:Destroy()
+
+    LogService:Log("Deleted "..Player.Name.."'s data folder")
     return DataFolder
 end
 
@@ -424,7 +448,6 @@ function DataService:DeleteSlot(Player :Player, SlotNumber :number)
     end)
 
     LogService:Assert(Success, ErrorMessage)
-
     LogService:Log("Deleted slot "..tostring(SlotNumber).." for "..Player.Name)
 end
 
@@ -495,6 +518,7 @@ function DataService:KnitStart()
 
     game.Players.PlayerRemoving:Connect(function(Player)
         self:SavePlayerData(Player)
+        self:DeleteDataFolder(Player)
         self.Players[Player.UserId] = nil
     end)
 end

@@ -83,12 +83,16 @@ local OreList = require(script.Parent.Classes.OreList)
 
 local SaveData = require(script.Parent.Classes.SaveData.SaveData)
 local Data = require(script.Parent.Classes.SaveData.Data)
+local Maid = require(ReplicatedStorage.Packages.maid)
 
 return {
     GameConfig = GameConfig;
     Util = Util;
     Timer = Timer;
     OreList = OreList;
+
+    Maid = Maid;
+
     Data = {
         SaveData = SaveData;
         Data = Data;

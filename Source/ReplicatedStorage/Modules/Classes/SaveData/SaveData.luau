@@ -116,7 +116,7 @@ end
 --[=[
 Delete any data stored in the save data object itself
 ]=]
-function SaveData:Discard()
+function SaveData:Destroy()
     self._Data = nil
     self._UserID = nil
 end
