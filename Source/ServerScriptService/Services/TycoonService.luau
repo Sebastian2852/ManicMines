@@ -59,6 +59,9 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
         local UpgradeModel = ModelConfig:FindFirstChildWhichIsA("Model")
         if not UpgradeModel then LogService:Warn("No upgrade model for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value) continue end
 
+        local CurrentModel = UpgradeHitbox:FindFirstChildWhichIsA("Model")
+        if CurrentModel then CurrentModel:Destroy() end
+
         local Model :Model = UpgradeModel:Clone()
         Model.Parent = UpgradeHitbox
         Model:PivotTo(UpgradeHitbox.CFrame)
@@ -150,9 +153,22 @@ Allow the client to get player tycoon, not really needed but here if for some re
 This function may later be removed but its here for now.
 ]=]
 function TycoonService.Client:GetPlayerTycoon(Player :Player) :Model?
-    return self:GetPlayerTycoon(Player)
+    return self.Server:GetPlayerTycoon(Player)
 end
 
+--[=[
+Tell the server to upgrade a given upgrade.
+]=]
+function TycoonService.Client:Upgrade(Player :Player, UpgradeName :string)
+    local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    local Tycoon = self.Server:GetPlayerTycoon(Player)
+
+    local DataValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+    if not DataValue then LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName) return end
+
+    DataValue.Value += 1
+    AddUpgradeModels(PlayerData, Tycoon)
+end
 
 
 --[[ KNIT ]]--

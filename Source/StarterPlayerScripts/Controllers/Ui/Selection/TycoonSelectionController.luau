@@ -137,6 +137,15 @@ function TycoonSelectionController:KnitStart()
         self:SelectHitbox(Hitbox)
     end)
 
+    TycoonSelection.CloseButton.MouseButton1Click:Connect(function()
+        self:Deselect()
+    end)
+
+    TycoonSelection.UpgradePanel.UpgradeButton.MouseButton1Click:Connect(function()
+        if not CurrentlySelecting then return end
+        TycoonService:Upgrade(Selection.Name)
+    end)
+
     Mouse.Button1Down:Connect(function()
         local MouseX = Mouse.X
         local MouseY = Mouse.Y
