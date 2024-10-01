@@ -56,6 +56,8 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
         if not DataValue then LogService:Warn("No upgrade config for upgrade: "..UpgradeHitbox.Name) continue end
 
         local ModelConfig = UpgradeConfig:FindFirstChild(DataValue.Value)
+        if not ModelConfig then LogService:Warn("No upgrade level config for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value) continue end
+
         local UpgradeModel = ModelConfig:FindFirstChildWhichIsA("Model")
         if not UpgradeModel then LogService:Warn("No upgrade model for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value) continue end
 
@@ -83,6 +85,19 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
             TycoonService.Client.SelectUpgrade:Fire(Player, UpgradeHitbox.Name, UpgradeConfig, ModelConfig, UpgradeHitbox, Model, NextConfig)
         end)
     end
+end
+
+local function CanBeUpgraded(Player :Player, UpgradeName :string)
+    local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+
+    local DataValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+    if not DataValue then LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName) return end
+
+    local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+    if not UpgradeConfig then LogService:Warn("Invalid upgrade name:", UpgradeName) return end
+
+    if UpgradeConfig:FindFirstChild(tostring(DataValue.Value + 1)) then return true end
+    return false
 end
 
 
@@ -160,6 +175,8 @@ end
 Tell the server to upgrade a given upgrade.
 ]=]
 function TycoonService.Client:Upgrade(Player :Player, UpgradeName :string)
+    if not CanBeUpgraded(Player, UpgradeName) then return end
+
     local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
     local Tycoon = self.Server:GetPlayerTycoon(Player)
 

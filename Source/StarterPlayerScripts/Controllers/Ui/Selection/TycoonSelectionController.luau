@@ -9,6 +9,7 @@ local TycoonSelectionController = Knit.CreateController{
 
 local TycoonService
 local LogService
+local DataService
 
 local Assets = ReplicatedStorage.Assets
 local TycoonAssets = Assets.Tycoon
@@ -26,30 +27,20 @@ local TycoonSelection :Frame = Player.PlayerGui.HUD.TycoonSelection
 
 -- [[ PRIVATE ]]--
 
---[=[
-Shoots a ray from the mouse positions given and checks if it hit a
-tycoon upgrade hitbox part
-]=]
-local function DidClickedHitbox(MouseX, MouseY) :boolean
-    if not MouseX or not MouseY then warn("No X or Y") return end
+local function CanBeUpgraded(UpgradeName :string)
+    local CanUpgrade = false
+    CanUpgrade = DataService:GetPlayerDataFolder(Player):andThen(function(PlayerData :Core.DataFolder)
+        local DataValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+        if not DataValue then LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName) return false end
 
-    local Camera = workspace.CurrentCamera
-    local CameraRay = Camera:ScreenPointToRay(MouseX, MouseY)
+        local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+        if not UpgradeConfig then LogService:Warn("Invalid upgrade name:", UpgradeName) return false end
 
-    local RaycastParamaters = RaycastParams.new()
-    RaycastParamaters.FilterDescendantsInstances = {workspace.Game.Players:GetDescendants()}
-    RaycastParamaters.FilterType = Enum.RaycastFilterType.Exclude
+        if UpgradeConfig:FindFirstChild(tostring(DataValue.Value + 1)) then return true end
+        return false
+    end)
 
-    local RayCastResult = workspace:Raycast(CameraRay.Origin, CameraRay.Direction * Core.GameConfig.Tycoon.UpgradeSelectionDistance, RaycastParamaters)
-
-    if RayCastResult then
-        local HitObject = RayCastResult.Instance
-        if HitObject:HasTag("_UpgradeHitbox") then
-            return true
-        end
-    end
-
-    return false
+    return CanUpgrade
 end
 
 local function OreListDataToUI(OreData :{Name :string, DisplayName :string, Amount :number, Emblem :string, RealOre :BasePart}) :Frame
@@ -91,6 +82,9 @@ function TycoonSelectionController:UpdateUiInfo(UpgradeName :string, UpgradeDesc
         local NewUI = OreListDataToUI(OreData)
         NewUI.Parent = TycoonSelection.UpgradePanel.CostItems
     end
+
+    TycoonSelection.UpgradePanel.UpgradeButton.Visible = CanBeUpgraded(UpgradeName)
+    print(CanBeUpgraded(UpgradeName), TycoonSelection.UpgradePanel.UpgradeButton.Visible)
 end
 
 --[=[
@@ -129,8 +123,9 @@ end
 -- [[ KNIT ]]--
 
 function TycoonSelectionController:KnitStart()
-    TycoonService = Knit.GetService("TycoonService")
-    LogService = Knit.GetService("LogService")
+    TycoonService   = Knit.GetService("TycoonService")
+    LogService      = Knit.GetService("LogService")
+    DataService     = Knit.GetService("DataService")
 
     TycoonService.SelectUpgrade:Connect(function(UpgradeName :string, UpgradeConfig :Configuration, ModelConfig :Configuration, Hitbox :BasePart, Model :Model, NextConfig :Configuration)
         self:UpdateUiInfo(UpgradeName, UpgradeConfig:GetAttribute("Description"), NextConfig)
@@ -144,15 +139,7 @@ function TycoonSelectionController:KnitStart()
     TycoonSelection.UpgradePanel.UpgradeButton.MouseButton1Click:Connect(function()
         if not CurrentlySelecting then return end
         TycoonService:Upgrade(Selection.Name)
-    end)
-
-    Mouse.Button1Down:Connect(function()
-        local MouseX = Mouse.X
-        local MouseY = Mouse.Y
-
-        if not DidClickedHitbox(MouseX, MouseY) then
-            self:Deselect()
-        end
+        self:Deselect()
     end)
 end
 
