@@ -185,6 +185,9 @@ function DataService:SavePlayerData(Player :Player)
     local RawTycoonData = {}
     RawTycoonData.Name = DataFolder.Tycoon.TycoonName.Value
     RawTycoonData.Upgrades = {}
+    for _, Upgrade in pairs(DataFolder.Tycoon.Upgrades:GetChildren()) do
+        RawTycoonData.Upgrades[Upgrade.Name] = Upgrade.Value
+    end
     local TycoonData = Core.Data.Data.New("Tycoon", RawTycoonData)
     Maid:GiveTask(TycoonData)
 
@@ -238,6 +241,11 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
 
     if IsRawDataValid(RawTycoonData) then
         DataFolder.Tycoon.TycoonName.Value = RawTycoonData.Name
+        for UpgradeName, UpgradeValue in pairs(RawTycoonData.Upgrades) do
+            local Value = DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+            if not Value then LogService:Warn("Cannot find data value for "..UpgradeName.."; discarding data") end
+            Value.Value = UpgradeValue
+        end
     else return end
 
     if IsRawDataValid(RawOreData) then
