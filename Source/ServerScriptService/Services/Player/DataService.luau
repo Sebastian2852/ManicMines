@@ -506,6 +506,9 @@ function DataService.Client:PlayerHasDataFolder(Player :Player) :boolean
     return false
 end
 
+function DataService.Client:GetOtherPlayerStats(Getter :Player, Player :Player)
+    return self:GetPlayerDataFolder(Player)
+end
 
 
 --[[ KNIT ]]--

@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Iris = require(ReplicatedStorage.Packages.Iris)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local IrisController = Knit.CreateController { Name = "IrisController" }
 
@@ -10,6 +11,7 @@ IrisController.DemoWindow = false
 local LogService
 local MineService
 local AdminService
+local DataService
 
 local LogBuffer = {}
 local LogSearch = ""
@@ -17,6 +19,10 @@ local LogSearch = ""
 local Admin_CurrentPlayer = 0
 local Admin_IsAdmin = false
 local Admin_Open = false
+local Admin_CurrentTycoon = {
+    TycoonName = "NILL";
+    Upgrades = {}
+}
 
 local GeneralStats = {Ores = {}, Layers = {}, Pickaxes = {}}
 local ScriptingStats = {Services = 0, Controllers = 0, GeneralModules = 0}
@@ -83,6 +89,17 @@ local function UpdateStats()
     UpdateMineStats()
     UpdateScriptingStats()
     UpdateGeneralStats()
+end
+
+local function GetTycoonDetails(Player :Player)
+    DataService:GetOtherPlayerStats(Player):andThen(function(Data :Core.DataFolder)
+        Admin_CurrentTycoon.TycoonName = Data.Tycoon.TycoonName.Value
+        Admin_CurrentTycoon.Upgrades = {}
+
+        for _, Value in pairs(Data.Tycoon.Upgrades:GetChildren()) do
+            Admin_CurrentTycoon.Upgrades[Value.Name] = Value.Value
+        end
+    end)
 end
 
 local function NewLog(Messages)
@@ -176,7 +193,7 @@ function IrisController:StatsWindow()
     Iris.End()
 end
 
-function IrisController:AdminPanel()
+function IrisController:AdminPanel(DataFolder :Core.DataFolder)
     local NoBackground = Iris.State(false)
     local NoMove = Iris.State(false)
 
@@ -226,11 +243,30 @@ function IrisController:AdminPanel()
             end
             Iris.Text({"Current player: "..Player.DisplayName.." (@"..Player.Name..") "..Admin_CurrentPlayer})
         Iris.End()
+
+        Iris.SeparatorText({"Tycoon"})
+        local TycoonNameInput = Iris.InputText({"Tycoon name", Admin_CurrentTycoon.TycoonName})
+        Iris.Text({"Upgrades"})
+        for _, Upgrade in pairs(DataFolder.Tycoon.Upgrades:GetChildren()) do
+            Iris.InputNum({Upgrade.Name}, {Admin_CurrentTycoon.Upgrades[Upgrade.Name]})
+        end
+
+        Iris.SameLine()
+
+        if Iris.Button({"Update"}).clicked() then
+            Iris.Text({"Test"})
+        end
+
+        if Iris.Button({"Reset"}).clicked() then
+            Iris.Text({"Test"})
+        end
+
+        Iris.End()
     else
         Iris.SeparatorText({"Quick Actions"})
 
         Iris.SeparatorText({"Players"})
-        Iris.Table({ 4 })
+        Iris.Table({4})
             Iris.Text({"Username"})
             Iris.NextColumn()
             Iris.Text({"Display Name"})
@@ -253,6 +289,7 @@ function IrisController:AdminPanel()
 
                 if Iris.Button({"Select"}).clicked() then
                     Admin_CurrentPlayer = Player.UserId
+                    GetTycoonDetails(Player)
                 end
                 Iris.NextRow()
                 Iris.NextColumn()
@@ -264,7 +301,7 @@ function IrisController:AdminPanel()
     Iris.End()
 end
 
-function IrisController:Update()
+function IrisController:Update(DataFolder :Core.DataFolder)
     if self.DemoWindow then
         Iris.ShowDemoWindow()
     end
@@ -276,7 +313,7 @@ function IrisController:Update()
     end
 
     if Admin_IsAdmin and Admin_Open then
-        self:AdminPanel()
+        self:AdminPanel(DataFolder)
     end
 end
 
@@ -284,6 +321,8 @@ function IrisController:KnitInit()
     LogService = Knit.GetService("LogService")
     MineService = Knit.GetService("MineService")
     AdminService = Knit.GetService("AdminService")
+    DataService = Knit.GetService("DataService")
+
     local UserInputService = game:GetService("UserInputService")
 
     LogService.ActionLog:Connect(function(Color :Color3, ...)
@@ -301,9 +340,11 @@ function IrisController:KnitInit()
         Admin_Open = not Admin_Open
     end)
 
-    Iris.Init()
-    Iris:Connect(function()
-        self:Update()
+    DataService:GetPlayerDataFolder():andThen(function(DataFolder)
+        Iris.Init()
+        Iris:Connect(function()
+            self:Update(DataFolder)
+        end)
     end)
 end
 

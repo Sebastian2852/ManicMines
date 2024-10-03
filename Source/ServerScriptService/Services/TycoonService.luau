@@ -17,6 +17,7 @@ local TycoonService = Knit.CreateService{
 local LogService
 local DataService
 local TeleportService
+local AdminService
 
 local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
 
@@ -187,6 +188,19 @@ function TycoonService.Client:Upgrade(Player :Player, UpgradeName :string)
     AddUpgradeModels(PlayerData, Tycoon)
 end
 
+function TycoonService.Client:SetUpgradeValue(Player :Player, UpgradeName :string, Value :number)
+    if not AdminService:IsPlayerAdmin(Player) then LogService:Warn("User is not an admin!") return end
+
+    local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    local Tycoon = self:GetPlayerTycoon(Player)
+
+    local UpgradeValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+    if not UpgradeValue then LogService:Warn("Invalid upgrade name passed") return end
+    UpgradeValue.Value = Value
+
+    AddUpgradeModels(PlayerData, Tycoon)
+end
+
 
 --[[ KNIT ]]--
 
@@ -208,8 +222,9 @@ function TycoonService:KnitInit()
 end
 
 function TycoonService:KnitStart()
-    DataService = Knit.GetService("DataService")
-    TeleportService = Knit.GetService("TeleportService")
+    DataService        = Knit.GetService("DataService")
+    TeleportService    = Knit.GetService("TeleportService")
+    AdminService       = Knit.GetService("AdminService")
 end
 
 return TycoonService
