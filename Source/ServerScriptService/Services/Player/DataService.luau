@@ -358,27 +358,22 @@ function DataService:GetSlotInfo(Player :Player, Slot :DataStore) :Core.SlotInfo
         SlotID = self:SlotDataStoreToNumber(Slot);
         Used = false;
     }
+    local Maid = Core.Maid.new()
 
-    local PlayerDataKey = Player.UserId.."-PlayerData"
-    local TycoonDataKey = Player.UserId.."-TycoonData"
+    local PlayerData = Core.Data.Data.New("PlayerData", {})
+    local TycoonData = Core.Data.Data.New("Tycoon", {})
+    local SaveData = Core.Data.SaveData.New(Player.UserId)
+    Maid:GiveTask(PlayerData)
+    Maid:GiveTask(TycoonData)
+    Maid:GiveTask(SaveData)
 
-    local RawPlayerData
-    local RawTycoonData
+    SaveData:AddData(PlayerData)
+    SaveData:AddData(TycoonData)
+    SaveData:Load(Slot)
 
-    local Success, ErrorMessage = pcall(function()
-        RawPlayerData = Slot:GetAsync(PlayerDataKey)
-        RawTycoonData = Slot:GetAsync(TycoonDataKey)
-
-        if RawPlayerData ~= nil then
-            RawPlayerData = HttpService:JSONDecode(RawPlayerData)
-        end
-
-        if RawTycoonData ~= nil then
-            RawTycoonData = HttpService:JSONDecode(RawTycoonData)
-        end
-    end)
-
-    LogService:Assert(Success, ErrorMessage)
+    local RawPlayerData = SaveData:GetDataByName("PlayerData")
+    local RawTycoonData = SaveData:GetDataByName("Tycoon")
+    Maid:DoCleaning()
 
     if RawPlayerData == nil or RawPlayerData == {} or RawTycoonData == nil or RawTycoonData == {} then
         return Info
