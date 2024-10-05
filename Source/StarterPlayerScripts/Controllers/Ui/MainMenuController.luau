@@ -157,7 +157,7 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         New.Info.GoldAmount.TextLabel.Text = Core.Util:ConvertNumberToString(SlotInfo.Gold or 0)
 
         local TimeNow = os.time()
-        local TimeDifference = TimeNow - SlotInfo.LastPlayed
+        local TimeDifference = TimeNow - (SlotInfo.LastPlayed or 0)
         local TimeText = Core.Util:TimeAgo(TimeDifference)
 
         New.Info.LastPlayed.TextLabel.Text = TimeText

@@ -448,19 +448,23 @@ function DataService:DeleteSlot(Player :Player, SlotNumber :number)
     if not IsSlotValid(AsDataStore) then return end
 
     LogService:Log("Deleting slot "..tostring(SlotNumber).." for "..Player.Name)
-    local PlayerDataKey = Player.UserId.."-PlayerData"
-    local TycoonDataKey = Player.UserId.."-TycoonData"
-    local OreDataKey = Player.UserId.."-OreData"
+    local SaveData = Core.Data.SaveData.New(Player.UserId)
+    local Maid = Core.Maid.new()
 
-    local Data = "{}"
+    local OreData = Core.Data.Data.New("Ore", {})
+    local PlayerData = Core.Data.Data.New("PlayerData", {})
+    local TycoonData = Core.Data.Data.New("Tycoon", {})
+    SaveData:AddData(OreData)
+    SaveData:AddData(PlayerData)
+    SaveData:AddData(TycoonData)
 
-    local Success, ErrorMessage = pcall(function()
-        AsDataStore:SetAsync(PlayerDataKey, Data)
-        AsDataStore:SetAsync(TycoonDataKey, Data)
-        AsDataStore:SetAsync(OreDataKey, Data)
-    end)
+    Maid:GiveTask(SaveData)
+    Maid:GiveTask(OreData)
+    Maid:GiveTask(PlayerData)
+    Maid:GiveTask(TycoonData)
+    SaveData:Save(AsDataStore)
 
-    LogService:Assert(Success, ErrorMessage)
+    Maid:DoCleaning()
     LogService:Log("Deleted slot "..tostring(SlotNumber).." for "..Player.Name)
 end
 
