@@ -1,9 +1,6 @@
 local Data = {}
 Data.__index = Data
 
-Data.Name = ""
-Data.Data = nil
-
 --[=[
 Create a new data object with a name and some data
 ]=]

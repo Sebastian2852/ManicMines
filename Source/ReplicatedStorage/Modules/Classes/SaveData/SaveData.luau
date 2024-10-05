@@ -9,9 +9,6 @@ local HttpService = game:GetService("HttpService")
 local SaveData = {}
 SaveData.__index = SaveData
 
-SaveData._UserID = 0
-SaveData._Data = {}
-
 --[=[
 Override the `tostring` function to print out all data within the object in a format:
 `SaveKey == SaveData;`
@@ -42,6 +39,7 @@ function SaveData.New(UserID :number, Data :{DataCopy}?)
     local self = setmetatable({}, SaveData)
 
     self._UserID = UserID
+    self._Data = {}
 
     if Data then
         for _, DataToAdd in pairs(Data) do

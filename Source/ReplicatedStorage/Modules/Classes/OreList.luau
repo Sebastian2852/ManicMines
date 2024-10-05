@@ -29,6 +29,8 @@ Create a new blank ore list
 ]=]
 function OreList.New()
     local self = setmetatable({}, OreList)
+    self._Gold = 0
+    self._Ores = {}
     return self
 end
 
