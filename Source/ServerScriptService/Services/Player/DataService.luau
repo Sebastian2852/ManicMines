@@ -228,26 +228,34 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     SaveData:AddData(PlayerData)
     SaveData:AddData(TycoonData)
     SaveData:Load(Slot)
+    LogService:Log("["..Player.Name.."]", "Loaded data from data store")
 
     local RawOreData      = SaveData:GetDataByName("Ore")
     local RawPlayerData   = SaveData:GetDataByName("PlayerData")
     local RawTycoonData   = SaveData:GetDataByName("Tycoon")
 
+    LogService:Log("["..Player.Name.."]", "Loading player data")
     if IsRawDataValid(RawPlayerData) then
         DataFolder.XP.Value = RawPlayerData.XP
         DataFolder.Level.Value = RawPlayerData.Level
         DataFolder.Gold.Value = RawPlayerData.Gold
+        LogService:Log("["..Player.Name.."]", "Loaded player data")
     else return end
 
+    LogService:Log("["..Player.Name.."]", "Loading tycoon data")
     if IsRawDataValid(RawTycoonData) then
         DataFolder.Tycoon.TycoonName.Value = RawTycoonData.Name
+
+        LogService:Log("["..Player.Name.."]", "Loading tycoon data (upgrades)")
         for UpgradeName, UpgradeValue in pairs(RawTycoonData.Upgrades) do
             local Value = DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-            if not Value then LogService:Warn("Cannot find data value for "..UpgradeName.."; discarding data") end
+            if not Value then LogService:Warn("["..Player.Name.."]", "Cannot find data value for "..UpgradeName.."; discarding data") end
             Value.Value = UpgradeValue
         end
+        LogService:Log("["..Player.Name.."]", "Loaded tycoon data")
     else return end
 
+    LogService:Log("["..Player.Name.."]", "Loading ore data")
     if IsRawDataValid(RawOreData) then
         for OreName, OreData in pairs(RawOreData) do
             local InventoryAmount = OreData["InventoryAmount"]
@@ -261,23 +269,25 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
             if InventoryOre then
                 InventoryOre.Value = InventoryAmount
             else
-                LogService:Warn("Discarding data for ore", OreName, "; No longer exists")
+                LogService:Warn("["..Player.Name.."]", "Discarding data for ore", OreName, "; No longer exists")
             end
 
             if StorageOre then
                 StorageOre.Value = StorageAmount
             else
-                LogService:Warn("Discarding data for ore", OreName, "; No longer exists")
+                LogService:Warn("["..Player.Name.."]", "Discarding data for ore", OreName, "; No longer exists")
             end
 
             if TimesMinedOre then
                 TimesMinedOre.Value = TimesMined
             else
-                LogService:Warn("Discarding data for ore", OreName, "; No longer exists")
+                LogService:Warn("["..Player.Name.."]", "Discarding data for ore", OreName, "; No longer exists")
             end
         end
+        LogService:Log("["..Player.Name.."]", "Loaded ore data")
     else return end
 
+    LogService:Log("["..Player.Name.."]", "Player data loaded")
     PlayerDisplayService:GivePlayerOverheadGUI(Player)
     PickaxeService:GivePickaxeToPlayer(Player)
     TycoonService:CreateTycoonForPlayer(Player)
@@ -318,7 +328,7 @@ end
 --[=[
 Returns the player's data folder if they have one
 ]=]
-function DataService:GetPlayerDataFolder(Player :Player) :Core.DataFolder?
+function DataService:GetPlayerDataFolder(Player :Player) :Core.DataFolder
     local FoundDataFolder = RootDataFolder:FindFirstChild(tostring(Player.UserId))
     return FoundDataFolder
 end

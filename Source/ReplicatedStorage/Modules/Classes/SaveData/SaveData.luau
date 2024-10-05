@@ -95,7 +95,7 @@ function SaveData:Load(DataStore :DataStore)
             DataStoreSaveData = DataStore:GetAsync(DataStoreKey)
         end)
 
-        if not Success then warn("Failed to set to datastore: "..ErrorMessage) return end
+        if not Success then warn("Failed to get from datastore: "..ErrorMessage) return end
 
         local Success, ErrorMessage = pcall(function()
             DataStoreSaveData = HttpService:JSONDecode(DataStoreSaveData)
