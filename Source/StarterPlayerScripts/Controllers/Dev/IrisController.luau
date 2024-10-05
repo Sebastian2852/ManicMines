@@ -17,6 +17,7 @@ local TycoonService
 local LogBuffer = {}
 local LogSearch = ""
 
+local Admin_Permissions :Core.AdminPermissions
 local Admin_CurrentPlayer = 0
 local Admin_IsAdmin = false
 local Admin_Open = false
@@ -248,31 +249,36 @@ function IrisController:AdminPanel(DataFolder :Core.DataFolder)
             Iris.Text({"Current player: "..Player.DisplayName.." (@"..Player.Name..") "..Admin_CurrentPlayer})
         Iris.End()
 
-        Iris.SeparatorText({"Tycoon"})
-        local TycoonNameInput = Iris.InputText({"Tycoon name", Admin_CurrentTycoon.TycoonName}, {Admin_CurrentTycoon.TycoonName})
-        NameInput = TycoonNameInput.text.value
-        Iris.Text({"Upgrades"})
-        for _, Upgrade in pairs(DataFolder.Tycoon.Upgrades:GetChildren()) do
-            local Max = (#Core.Assets.Tycoon.Upgrades:FindFirstChild(Upgrade.Name):GetChildren()) - 1
-            local Input = Iris.SliderNum({Upgrade.Name, 1, 0, Max}, {Admin_CurrentTycoon.Upgrades[Upgrade.Name]})
-            UpgradeInputs[Upgrade.Name] = Input.state.number.value
-        end
-
-        Iris.SameLine()
-
-        if Iris.Button({"Update"}).clicked() then
-            for Name, Value in pairs(UpgradeInputs) do
-                TycoonService:SetUpgradeValue(game.Players:GetPlayerByUserId(Admin_CurrentPlayer), Name, Value)
+        if Admin_Permissions.EditTycoonName or Admin_Permissions.EditTycoonUpgrades then
+            Iris.SeparatorText({"Tycoon"})
+            if Admin_Permissions.EditTycoonName then
+                local TycoonNameInput = Iris.InputText({"Tycoon name", Admin_CurrentTycoon.TycoonName}, {Admin_CurrentTycoon.TycoonName})
+                NameInput = TycoonNameInput.text.value
             end
 
-            TycoonService:SetTycoonName(game.Players:GetPlayerByUserId(Admin_CurrentPlayer), NameInput)
-        end
+            if Admin_Permissions.EditTycoonUpgrades then
+                Iris.Text({"Upgrades"})
+                for _, Upgrade in pairs(DataFolder.Tycoon.Upgrades:GetChildren()) do
+                    local Max = (#Core.Assets.Tycoon.Upgrades:FindFirstChild(Upgrade.Name):GetChildren()) - 1
+                    local Input = Iris.SliderNum({Upgrade.Name, 1, 0, Max}, {Admin_CurrentTycoon.Upgrades[Upgrade.Name]})
+                    UpgradeInputs[Upgrade.Name] = Input.state.number.value
+                end
+            end
 
-        if Iris.Button({"Reset"}).clicked() then
-            Iris.Text({"Test"})
-        end
+            Iris.SameLine()
 
-        Iris.End()
+            if Iris.Button({"Update"}).clicked() then
+                for Name, Value in pairs(UpgradeInputs) do
+                    TycoonService:SetUpgradeValue(game.Players:GetPlayerByUserId(Admin_CurrentPlayer), Name, Value)
+                end
+                TycoonService:SetTycoonName(game.Players:GetPlayerByUserId(Admin_CurrentPlayer), NameInput)
+            end
+
+            if Iris.Button({"Reset"}).clicked() then
+                Iris.Text({"Test"})
+            end 
+            Iris.End()
+        end
     else
         Iris.SeparatorText({"Quick Actions"})
 
@@ -334,6 +340,10 @@ function IrisController:KnitInit()
     AdminService = Knit.GetService("AdminService")
     DataService = Knit.GetService("DataService")
     TycoonService = Knit.GetService("TycoonService")
+
+    AdminService:GetPermissions():andThen(function(Permissions)
+        Admin_Permissions = Permissions
+    end)
 
     local UserInputService = game:GetService("UserInputService")
 

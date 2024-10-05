@@ -44,7 +44,7 @@ Config.MainMenu = {
 Config.Admins = {
     Admins = {
         [3092257097] = {
-            EditTycoonName = false;
+            EditTycoonName = true;
             EditTycoonUpgrades = true;
         }
     };
