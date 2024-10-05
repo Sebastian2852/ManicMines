@@ -13,6 +13,7 @@ local DataService
 
 local Assets = ReplicatedStorage.Assets
 local TycoonAssets = Assets.Tycoon
+local DataFolder :Core.DataFolder
 
 local SelectionOutline :SelectionBox = TycoonAssets.UpgradeSelection
 local CurrentlySelecting = false
@@ -29,18 +30,15 @@ local TycoonSelection :Frame = Player.PlayerGui.HUD.TycoonSelection
 
 local function CanBeUpgraded(UpgradeName :string)
     local CanUpgrade = false
-    CanUpgrade = DataService:GetPlayerDataFolder(Player):andThen(function(PlayerData :Core.DataFolder)
-        local DataValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-        if not DataValue then LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName) return false end
 
-        local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-        if not UpgradeConfig then LogService:Warn("Invalid upgrade name:", UpgradeName) return false end
+    local DataValue = DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+    if not DataValue then LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName) return false end
 
-        if UpgradeConfig:FindFirstChild(tostring(DataValue.Value + 1)) then return true end
-        return false
-    end)
+    local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+    if not UpgradeConfig then LogService:Warn("Invalid upgrade name:", UpgradeName) return false end
 
-    return CanUpgrade
+    if UpgradeConfig:FindFirstChild(tostring(DataValue.Value + 1)) then return true end
+    return false
 end
 
 local function OreListDataToUI(OreData :{Name :string, DisplayName :string, Amount :number, Emblem :string, RealOre :BasePart}) :Frame
@@ -78,13 +76,19 @@ function TycoonSelectionController:UpdateUiInfo(UpgradeName :string, UpgradeDesc
     end
 
     local CostList = self:CreateCostOreList(NextConfig)
-    for OreName, OreData in pairs(CostList:LoopList()) do
-        local NewUI = OreListDataToUI(OreData)
-        NewUI.Parent = TycoonSelection.UpgradePanel.CostItems
+    if CostList ~= nil then
+        LogService:Warn("Creating cost UIs", CostList)
+        for OreName, OreData in pairs(CostList:LoopList()) do
+            if OreData.Amount <= 0 then continue end
+            local NewUI = OreListDataToUI(OreData)
+            NewUI.Parent = TycoonSelection.UpgradePanel.CostItems
+        end
+        CostList:Destroy()
+    else
+        LogService:Warn("Got empty cost list")
     end
 
     TycoonSelection.UpgradePanel.UpgradeButton.Visible = CanBeUpgraded(UpgradeName)
-    print(CanBeUpgraded(UpgradeName), TycoonSelection.UpgradePanel.UpgradeButton.Visible)
 end
 
 --[=[
@@ -126,6 +130,10 @@ function TycoonSelectionController:KnitStart()
     TycoonService   = Knit.GetService("TycoonService")
     LogService      = Knit.GetService("LogService")
     DataService     = Knit.GetService("DataService")
+
+    DataService:GetPlayerDataFolder():andThen(function(Data)
+        DataFolder = Data
+    end)
 
     TycoonService.SelectUpgrade:Connect(function(UpgradeName :string, UpgradeConfig :Configuration, ModelConfig :Configuration, Hitbox :BasePart, Model :Model, NextConfig :Configuration)
         self:UpdateUiInfo(UpgradeName, UpgradeConfig:GetAttribute("Description"), NextConfig)
