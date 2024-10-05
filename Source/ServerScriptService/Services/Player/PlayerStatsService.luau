@@ -12,55 +12,42 @@ local LogService
 
 -- [[ PRIVATE ]] --
 
---[=[
-Convert an ore type into its inventory value
-]=]
-local function ConvertOreListItemToInventoryValue(DataFolder :Folder, Ore) :IntValue
-    local OreName = Ore.Name
-    
-    if OreName == "Gold" then
-        return DataFolder.Gold
-    end
-
-    local FoundOreValue = DataFolder.Inventory.Ores:FindFirstChild(OreName)
-    return FoundOreValue
+local function FindInventoryValueByName(Name :string, DataFolder :Core.DataFolder)
+    return DataFolder.Inventory.Ores:FindFirstChild(Name) or DataFolder.Inventory.Ores:FindFirstChild("Stone")
 end
 
---[=[
-Convert an ore type into its TimesMined value
-]=]
-local function ConvertOreListItemToTimesMinedValue(DataFolder :Folder, Ore) :IntValue
-    local OreName = Ore.Name
-
-    local FoundValue = DataFolder.TimesMined:FindFirstChild(OreName)
-    return FoundValue
+local function FindTimesMinedValueByName(Name :string, DataFolder :Core.DataFolder)
+    return DataFolder.TimesMined:FindFirstChild(Name) or DataFolder.TimesMined:FindFirstChild("Stone")
 end
-
-
 
 -- [[ PUBLIC ]]--
 
 --[=[
-Gives an ore to the players inventory, doesnt matter if they dont have enough space to carry it
+Gives ores to the players inventory, doesnt matter if they dont have enough space to carry it
 ]=]
-function PlayerStatsService:GiveOre(Player :Player, Ore)
+function PlayerStatsService:GiveOres(Player :Player, OreList)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
-    local ValueToChange :IntValue = ConvertOreListItemToInventoryValue(DataFolder, Ore)
 
-    ValueToChange.Value += Ore.Amount
-    LogService:Log("Gave "..Player.Name.." "..Ore.Amount.." "..Ore.Name)
+    for OreName, Data in pairs(OreList:LoopList()) do
+        local DataValue = FindInventoryValueByName(OreName, DataFolder)
+        DataValue.Value += Data.Amount
+        LogService:Log("Gave "..Player.Name.." "..Data.Amount.." "..Data.DisplayName)
+    end
 end
 
 --[=[
-Gives the player an ore and adds it to its times mined value
+Gives the player ores and adds 1 to its times mined value
 ]=]
-function PlayerStatsService:MinedOre(Player :Player, Ore)
+function PlayerStatsService:MinedOre(Player :Player, OreList)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
-    local ValueToChange = ConvertOreListItemToTimesMinedValue(DataFolder, Ore)
 
-    LogService:Log("Increased "..Player.Name.."'s "..Ore.Name.." times mined value")
-    ValueToChange.Value += 1
-    self:GiveOre(Player, Ore)
+    for OreName, Data in pairs(OreList:LoopList()) do
+        local DataValue = FindTimesMinedValueByName(OreName, DataFolder)
+        DataValue.Value += 1
+        LogService:Log("Increased "..Player.Name.."'s "..OreName.." times mined value")
+    end
+
+    self:GiveOres(Player, OreList)
 end
 
 

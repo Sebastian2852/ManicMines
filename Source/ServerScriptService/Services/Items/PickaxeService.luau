@@ -173,36 +173,34 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
 
     LogService:Log(Player.Name.." started mining")
 
+    local OreList = Core.OreList.New()
+    OreList:AddOre(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
     while PickaxeService.Mining[Player.UserId].Mining and PickaxeService:VerifyIfCanMine(Player, Character, ObjectToMine) do
         local Health :number = ObjectToMine:GetAttribute("Health")
-        local OreListItem = Core.Util:ConvertOreToType(ObjectToMine, ObjectToMine:GetAttribute("AmountDroppedWhenMined")) --PlayerStatsService:ConvertOreNameToOreListItem(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
 
         if Health <= 0 then
             PickaxeService:StopMining(Player)
             MineService:BlockMined(ObjectToMine)
-            PlayerStatsService:MinedOre(Player, OreListItem)
-            --DataModule:RecalculateInventoryItems(Player)
-            --Events.Client.UpdateInventory:FireClient(Player)
+            PlayerStatsService:MinedOre(Player, OreList)
             break
         end
 
         Health -= Pickaxe:GetAttribute("HitDamage")
         ObjectToMine:SetAttribute("Health", Health)
-        --Events.Client.UpdateMiningSelection:FireClient(Player, ObjectToMine.Name, DataModule:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
         PickaxeService.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
 
         if Health <= 0 then
             PickaxeService:StopMining(Player)
             MineService:BlockMined(ObjectToMine)
             task.wait(Pickaxe:GetAttribute("MiningCooldown") / 2)
-            PlayerStatsService:MinedOre(Player, OreListItem)
-            --DataModule:RecalculateInventoryItems(Player)
-            --Events.Client.UpdateInventory:FireClient(Player)
+            PlayerStatsService:MinedOre(Player, OreList)
             break
         end
 
         task.wait(Pickaxe:GetAttribute("MiningCooldown"))
     end
+
+    OreList:Destroy()
 end
 
 function PickaxeService:StopMining(Player :Player)
