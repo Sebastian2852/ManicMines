@@ -44,7 +44,8 @@ Config.MainMenu = {
 Config.Admins = {
     Admins = {
         [3092257097] = {
-            CanDoOtherPlayer = true; -- Can they mess with other players
+            EditTycoonName = false;
+            EditTycoonUpgrades = true;
         }
     };
 }

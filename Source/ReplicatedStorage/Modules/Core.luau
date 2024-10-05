@@ -72,7 +72,8 @@ export type Settings = {
 Used for well admin permissions
 ]=]
 export type AdminPermissions = {
-    CanDoOtherPlayer :boolean
+    EditTycoonName :boolean;
+    EditTycoonUpgrades :boolean;
 }
 
 local GameConfig = require(script.Parent.ModulesInCore.GameConfig)

@@ -12,6 +12,7 @@ local LogService
 local MineService
 local AdminService
 local DataService
+local TycoonService
 
 local LogBuffer = {}
 local LogSearch = ""
@@ -236,6 +237,9 @@ function IrisController:AdminPanel(DataFolder :Core.DataFolder)
     Iris.End()
 
     if Admin_CurrentPlayer ~= 0 then
+        local UpgradeInputs = {}
+        local NameInput = Admin_CurrentTycoon.TycoonName
+
         Iris.SameLine()
             local Player = game.Players:GetPlayerByUserId(Admin_CurrentPlayer)
             if Iris.Button({"<- Back"}).clicked() then
@@ -245,16 +249,23 @@ function IrisController:AdminPanel(DataFolder :Core.DataFolder)
         Iris.End()
 
         Iris.SeparatorText({"Tycoon"})
-        local TycoonNameInput = Iris.InputText({"Tycoon name", Admin_CurrentTycoon.TycoonName})
+        local TycoonNameInput = Iris.InputText({"Tycoon name", Admin_CurrentTycoon.TycoonName}, {Admin_CurrentTycoon.TycoonName})
+        NameInput = TycoonNameInput.text.value
         Iris.Text({"Upgrades"})
         for _, Upgrade in pairs(DataFolder.Tycoon.Upgrades:GetChildren()) do
-            Iris.InputNum({Upgrade.Name}, {Admin_CurrentTycoon.Upgrades[Upgrade.Name]})
+            local Max = (#Core.Assets.Tycoon.Upgrades:FindFirstChild(Upgrade.Name):GetChildren()) - 1
+            local Input = Iris.SliderNum({Upgrade.Name, 1, 0, Max}, {Admin_CurrentTycoon.Upgrades[Upgrade.Name]})
+            UpgradeInputs[Upgrade.Name] = Input.state.number.value
         end
 
         Iris.SameLine()
 
         if Iris.Button({"Update"}).clicked() then
-            Iris.Text({"Test"})
+            for Name, Value in pairs(UpgradeInputs) do
+                TycoonService:SetUpgradeValue(game.Players:GetPlayerByUserId(Admin_CurrentPlayer), Name, Value)
+            end
+
+            TycoonService:SetTycoonName(game.Players:GetPlayerByUserId(Admin_CurrentPlayer), NameInput)
         end
 
         if Iris.Button({"Reset"}).clicked() then
@@ -293,7 +304,7 @@ function IrisController:AdminPanel(DataFolder :Core.DataFolder)
                 end
                 Iris.NextRow()
                 Iris.NextColumn()
-                end
+            end
         Iris.End()
     end
 
@@ -322,6 +333,7 @@ function IrisController:KnitInit()
     MineService = Knit.GetService("MineService")
     AdminService = Knit.GetService("AdminService")
     DataService = Knit.GetService("DataService")
+    TycoonService = Knit.GetService("TycoonService")
 
     local UserInputService = game:GetService("UserInputService")
 

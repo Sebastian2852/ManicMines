@@ -188,8 +188,9 @@ function TycoonService.Client:Upgrade(Player :Player, UpgradeName :string)
     AddUpgradeModels(PlayerData, Tycoon)
 end
 
-function TycoonService.Client:SetUpgradeValue(Player :Player, UpgradeName :string, Value :number)
-    if not AdminService:IsPlayerAdmin(Player) then LogService:Warn("User is not an admin!") return end
+function TycoonService.Client:SetUpgradeValue(Setter :Player, Player :Player, UpgradeName :string, Value :number)
+    if not AdminService:IsPlayerAdmin(Setter) then LogService:Warn("User is not an admin!") return end
+    if not AdminService:GetAdminPermissions(Setter).EditTycoonUpgrades then return end
 
     local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
     local Tycoon = self:GetPlayerTycoon(Player)
@@ -199,6 +200,14 @@ function TycoonService.Client:SetUpgradeValue(Player :Player, UpgradeName :strin
     UpgradeValue.Value = Value
 
     AddUpgradeModels(PlayerData, Tycoon)
+end
+
+function TycoonService.Client:SetTycoonName(Setter :Player, Player :Player, Name :string)
+    if not AdminService:IsPlayerAdmin(Setter) then LogService:Warn("User is not an admin!") return end
+    if not AdminService:GetAdminPermissions(Setter).EditTycoonName then return end
+
+    local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    PlayerData.Tycoon.TycoonName.Value = Name
 end
 
 
