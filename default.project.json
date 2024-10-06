@@ -69,6 +69,7 @@
           "$className":"Folder",
           "Emblems":{"$className":"Folder"},
           "TimesMined":{"$className":"Folder"},
+          "Settings":{"$className":"Folder"},
 
           "Level":{"$className":"IntValue"},
           "Gold":{"$className":"IntValue"},
@@ -105,12 +106,6 @@
             "HoursPlayed":{"$className":"IntValue"},
             "TotalGoldEarned":{"$className":"IntValue"},
             "TotalXpEarned":{"$className":"IntValue"}
-          },
-
-          "Settings":{
-            "$className":"Folder",
-            "GlobalShadows":{"$className":"BoolValue"},
-            "RainbowEffect":{"$className":"BoolValue"}
           },
 
           "Pickaxes":{

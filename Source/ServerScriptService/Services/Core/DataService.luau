@@ -94,6 +94,19 @@ local function SetupTemplateDataFolder()
         UpgradeValue.Parent = TemplateDataFolder.Tycoon.Upgrades
     end
 
+    for SettingName, DefaultValue in pairs(Core.GameConfig.DefaultSettings) do
+        local TypeToMake = ""
+
+        if type(DefaultValue) == "number" then TypeToMake = "NumberValue" end
+        if type(DefaultValue) == "string" then TypeToMake = "StringValue" end
+        if type(DefaultValue) == "boolean" then TypeToMake = "BoolValue" end
+
+        local NewValue = Instance.new(TypeToMake)
+        NewValue.Name = SettingName
+        NewValue.Value = DefaultValue
+        NewValue.Parent = TemplateDataFolder.Settings
+    end
+
     LogService:Log("Setup template data folder")
 end
 
@@ -176,6 +189,11 @@ function DataService:SavePlayerData(Player :Player)
     RawPlayerData.Level = DataFolder.Level.Value
     RawPlayerData.Gold = DataFolder.Gold.Value
     RawPlayerData.LastPlayed = os.time()
+
+    RawPlayerData.Settings = {}
+    for _, Setting :ValueBase in pairs(DataFolder.Settings:GetChildren()) do
+        RawPlayerData.Settings[Setting.Name] = Setting.Value
+    end
     local PlayerData = Core.Data.Data.New("PlayerData", RawPlayerData)
     Maid:GiveTask(PlayerData)
 
@@ -239,6 +257,21 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
         DataFolder.XP.Value = RawPlayerData.XP
         DataFolder.Level.Value = RawPlayerData.Level
         DataFolder.Gold.Value = RawPlayerData.Gold
+
+        if not RawPlayerData.Settings then
+            LogService:Warn("Appling default settings; cannot find saved settings!")
+            for SettingName, SettingValue in pairs(Core.GameConfig.DefaultSettings) do
+                local SettingDataValue = DataFolder.Settings:FindFirstChild(SettingName)
+                if not SettingDataValue then LogService:Warn("Cannot find setting `"..tostring(SettingName).."`; Ignoring") continue end
+                SettingDataValue.Value = SettingValue
+            end
+        else
+            for SettingName, SettingValue in pairs(RawPlayerData.Settings) do
+                local SettingDataValue = DataFolder.Settings:FindFirstChild(SettingName)
+                if not SettingDataValue then LogService:Warn("Cannot find setting `"..tostring(SettingName).."`; discarding data") continue end
+                SettingDataValue.Value = SettingValue
+            end
+        end
         LogService:Log("["..Player.Name.."]", "Loaded player data")
     else return end
 

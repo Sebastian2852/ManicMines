@@ -37,16 +37,19 @@ function SettingsService:ResetPlayerSettings(Player :Player)
 end
 
 
+-- [[ CLIENT ]] --
+
+function SettingsService.Client:PushSettings(Player :Player, NewSettings :Core.Settings)
+    UpdateSettings(Player, NewSettings)
+end
+
+
 
 --[[ KNIT ]]--
 
 function SettingsService:KnitStart()
     DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
-
-    self.Client.UpdateSettings:Connect(function(Player :Player, NewSettings :Core.Settings)
-        UpdateSettings(Player, NewSettings)
-    end)
 end
 
 return SettingsService
