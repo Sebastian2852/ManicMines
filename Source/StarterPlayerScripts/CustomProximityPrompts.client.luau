@@ -67,7 +67,7 @@ local KeyCodeToTextMapping = {
     [Enum.KeyCode.F12] = "F12",
 }
 
-local function GetScreenGUI()
+local function getScreenGui()
     local screenGui = PlayerGui:FindFirstChild("ProximityPrompts")
     if screenGui == nil then
         screenGui = Instance.new("ScreenGui")
@@ -78,7 +78,7 @@ local function GetScreenGUI()
     return screenGui
 end
 
-local function SetUpCircleProgressBar(bar)
+local function setUpCircularProgressBar(bar)
     local leftGradient = bar.LeftGradient.ProgressBarImage.UIGradient
     local rightGradient = bar.RightGradient.ProgressBarImage.UIGradient
 
@@ -90,7 +90,7 @@ local function SetUpCircleProgressBar(bar)
     end)
 end
 
-local function CreateCustomPrompt(prompt, inputType, gui)
+local function createPrompt(prompt, inputType, gui)
     local tweensForButtonHoldBegin = {}
     local tweensForButtonHoldEnd = {}
     local tweensForFadeOut = {}
@@ -101,20 +101,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
     local tweenInfoQuick = TweenInfo.new(0.06, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
     local tweenInfoInstant = TweenInfo.new(0, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
 
-    local promptUI = nil
-    local promptTheme = prompt:GetAttribute("Theme")
-    if promptTheme then
-        local themedPromptUI = script:FindFirstChild(promptTheme)
-        if themedPromptUI then
-            promptUI = themedPromptUI:Clone()
-        end
-    end
-
-    if promptUI == nil then
-        promptUI = script.Default:Clone()
-    end
-
-    promptUI.Enabled = true
+    local promptUI = game.ReplicatedStorage.Assets.UI.Billboards.ProximityPrompt
 
     local frame = promptUI.PromptFrame
     local inputFrame = frame.InputFrame
@@ -133,7 +120,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
     table.insert(tweensForFadeOut, TweenService:Create(frame, tweenInfoFast, { Size = UDim2.fromScale(0.5, 1), BackgroundTransparency = 1, ImageTransparency = 1 }))
     table.insert(tweensForFadeIn, TweenService:Create(frame, tweenInfoFast, { Size = UDim2.fromScale(1, 1), BackgroundTransparency = backgroundTransparency, ImageTransparency = imageTransparency }))
 
-    local function SetupUIStrokeTweens(uiStroke)
+    local function setupUIStrokeTweens(uiStroke)
         local transparency = uiStroke.Transparency
         uiStroke.Transparency = 1
         table.insert(tweensForButtonHoldBegin, TweenService:Create(uiStroke, tweenInfoFast, { Transparency = 1 }))
@@ -142,7 +129,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
         table.insert(tweensForFadeIn, TweenService:Create(uiStroke, tweenInfoFast, { Transparency = transparency }))
     end
 
-    local function SetupGUIObjectTweens(guiObject)
+    local function setupGUIObjectTweens(guiObject)
         local guiObjectBackgroundTransparency = guiObject.BackgroundTransparency
         guiObject.BackgroundTransparency = 1
         table.insert(tweensForButtonHoldBegin, TweenService:Create(guiObject, tweenInfoFast, { BackgroundTransparency = 1 }))
@@ -151,7 +138,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
         table.insert(tweensForFadeIn, TweenService:Create(guiObject, tweenInfoFast, { BackgroundTransparency = guiObjectBackgroundTransparency }))
     end
 
-    local function SetupTextLabelTweens(textLabel)
+    local function setupTextLabelTweens(textLabel)
         local textTransparency = textLabel.TextTransparency
         local textStrokeTransparency = textLabel.TextStrokeTransparency
         textLabel.TextTransparency = 1
@@ -162,7 +149,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
         table.insert(tweensForFadeIn, TweenService:Create(textLabel, tweenInfoFast, { TextTransparency = textTransparency, TextStrokeTransparency = textStrokeTransparency }))
     end
 
-    local function SetupTextLabelTweens(imageLabel)
+    local function setupImageLabelTweens(imageLabel)
         local imageTransparency = imageLabel.ImageTransparency
         imageLabel.ImageTransparency = 1
         table.insert(tweensForButtonHoldBegin, TweenService:Create(imageLabel, tweenInfoFast, { ImageTransparency = 1 }))
@@ -171,23 +158,23 @@ local function CreateCustomPrompt(prompt, inputType, gui)
         table.insert(tweensForFadeIn, TweenService:Create(imageLabel, tweenInfoFast, { ImageTransparency = imageTransparency }))
     end
 
-    local function SetupTextLabelTweens(child)
+    local function setupUnexpectedChildTweens(child)
         if child:IsA("UIStroke") then
-            SetupUIStrokeTweens(child)
+            setupUIStrokeTweens(child)
         elseif child:IsA("UIGradient") then
             -- The Transparency property of UIGradients is not tweenable
         elseif child:IsA("GuiObject") then
-            SetupGUIObjectTweens(child)
+            setupGUIObjectTweens(child)
 
             if child:IsA("TextLabel") then
-                SetupTextLabelTweens(child)
+                setupTextLabelTweens(child)
             elseif child:IsA("ImageLabel") then
-                SetupTextLabelTweens(child)
+                setupImageLabelTweens(child)
             end
         end
 
         for _, grandChild in pairs(child:GetChildren()) do
-            SetupTextLabelTweens(grandChild)
+            setupUnexpectedChildTweens(grandChild)
         end
     end
 
@@ -196,11 +183,11 @@ local function CreateCustomPrompt(prompt, inputType, gui)
     for _, child in pairs(frame:GetChildren()) do
         if expectedFrameChildren[child] == nil then
             -- Unexpected child of the frame and direct children elements
-            SetupTextLabelTweens(child)
+            setupUnexpectedChildTweens(child)
         elseif expectedFrameChildren[child] == true then
             for _, grandChild in pairs(child:GetChildren()) do
                 -- All children of ActionText or ObjectText
-                SetupTextLabelTweens(grandChild)
+                setupUnexpectedChildTweens(grandChild)
             end
         end
     end
@@ -213,12 +200,12 @@ local function CreateCustomPrompt(prompt, inputType, gui)
     table.insert(tweensForButtonHoldEnd, TweenService:Create(inputFrameScaler, tweenInfoFast, { Scale = 1 }))
 
     -- Tweens for ActionText and ObjectText
-    SetupTextLabelTweens(actionText)
-    SetupTextLabelTweens(objectText)
+    setupTextLabelTweens(actionText)
+    setupTextLabelTweens(objectText)
 
     local buttonFrame = resizeableInputFrame.ButtonFrame
 
-    local function SetupButtonFrameTweens()
+    local function setupButtonFrameTweens()
         local buttonFrameBackgroundTransparency = buttonFrame.BackgroundTransparency
         local buttonFrameImageTransparency = buttonFrame.ImageTransparency
 
@@ -234,13 +221,13 @@ local function CreateCustomPrompt(prompt, inputType, gui)
             -- Currently not supporting any other children other than UIStroke
         end
     end
-    SetupButtonFrameTweens()
+    setupButtonFrameTweens()
 
     local buttonImage = resizeableInputFrame.ButtonImage
     local buttonText = resizeableInputFrame.ButtonText
     local icon = resizeableInputFrame.ButtonTextImage
 
-    local function SetupButtonFrameTweens()
+    local function setupButtonTextTweens()
         local textTransparency = buttonText.TextTransparency
         local textStrokeTransparency = buttonText.TextStrokeTransparency
         local textBackgroundTransparency = buttonText.BackgroundTransparency
@@ -260,7 +247,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
         end
     end
 
-    local function SetupButtonImageTweens()
+    local function setupButtonImageTweens()
         local buttonImageTransparency = buttonImage.ImageTransparency
         local buttonImageBackgroundTransparency = buttonImage.BackgroundTransparency
         buttonImage.BackgroundTransparency = 1
@@ -269,7 +256,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
         table.insert(tweensForFadeIn, TweenService:Create(buttonImage, tweenInfoQuick, { ImageTransparency = buttonImageTransparency, BackgroundTransparency = buttonImageBackgroundTransparency }))
     end
 
-    local function SetupButtonImageTweens()
+    local function setupIconTweens()
         local iconBackgroundTransparency = icon.BackgroundTransparency
         local iconImageTransparency = icon.ImageTransparency
         icon.BackgroundTransparency = 1
@@ -280,7 +267,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
 
     if inputType == Enum.ProximityPromptInputType.Gamepad then
         if GamepadButtonImage[prompt.GamepadKeyCode] then
-            SetupButtonImageTweens()
+            setupIconTweens()
             icon.Image = GamepadButtonImage[prompt.GamepadKeyCode]
 
             -- Hide ButtonText and ButtonImage, show ButtonTextImage
@@ -289,7 +276,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
             icon.Visible = true    
         end
     elseif inputType == Enum.ProximityPromptInputType.Touch then
-        SetupButtonImageTweens()
+        setupButtonImageTweens()
         buttonImage.Image = "rbxasset://textures/ui/Controls/TouchTapIcon.png"
 
         -- Hide ButtonText and ButtonTextImage, show ButtonImage
@@ -297,7 +284,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
         icon.Visible = false
         buttonImage.Visible = true    
     else
-        SetupButtonImageTweens()
+        setupButtonImageTweens()
 
         -- Show ButtonImage
         buttonImage.Visible = true
@@ -317,7 +304,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
         end
 
         if buttonTextImage then
-            SetupButtonImageTweens()
+            setupIconTweens()
             icon.Image = buttonTextImage
 
             --  Hide ButtonText, show ButtonTextImage
@@ -327,7 +314,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
             if string.len(buttonTextString) > 2 then
                 buttonText.TextSize = math.round(buttonText.TextSize * 6/7)
             end
-            SetupButtonFrameTweens()
+            setupButtonTextTweens()
             buttonText.Text = buttonTextString
 
             -- Hide ButtonTextImage, show ButtonText
@@ -364,7 +351,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
 
     if prompt.HoldDuration > 0 then
         local circleBar = resizeableInputFrame.ProgressBar
-        SetUpCircleProgressBar(circleBar)
+        setUpCircularProgressBar(circleBar)
         table.insert(tweensForButtonHoldBegin, TweenService:Create(circleBar.Progress, tweenInfoInFullDuration, { Value = 1 }))
         table.insert(tweensForButtonHoldEnd, TweenService:Create(circleBar.Progress, tweenInfoInstant, { Value = 0 }))
     end
@@ -415,7 +402,7 @@ local function CreateCustomPrompt(prompt, inputType, gui)
         objectTextParams.Size = objectText.TextSize
         objectTextParams.Width = 1000
         local objectTextSize = TextService:GetTextBoundsAsync(objectTextParams)
-
+        
         local maxTextWidth = math.max(actionTextSize.X, objectTextSize.X)
         local promptHeight = 72
         local promptWidth = 72
@@ -486,9 +473,9 @@ local function onLoad()
             return
         end
 
-        local gui = GetScreenGUI()
+        local gui = getScreenGui()
 
-        local cleanupFunction = CreateCustomPrompt(prompt, inputType, gui)
+        local cleanupFunction = createPrompt(prompt, inputType, gui)
 
         prompt.PromptHidden:Wait()
 
