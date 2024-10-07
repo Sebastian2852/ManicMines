@@ -44,10 +44,149 @@ UserInputService.InputBegan:Connect(function(Input, Processed)
     if Input.KeyCode == Enum.KeyCode.Z then 
         Settings.GlobalShadows = not Settings.GlobalShadows
         Settings.RainbowEffect = not Settings.RainbowEffect
-        Update()
         PushToServer()
     end
 end)
+
+
+-- [[ UI ]] --
+
+local SettingsComponent = Core.Roact.Component:extend("SettingsComponent")
+local Objects = 0
+
+local function SettingsHeader(HeadingText :string)
+    Objects += 1;
+    return Core.Roact.createElement("TextLabel", {
+        Size = UDim2.fromScale(0.9, 0.15);
+        Position = UDim2.fromScale(0.5, 0);
+        AnchorPoint = Vector2.new(0.5, 0.5);
+
+        BackgroundTransparency = 1;
+        BorderSizePixel = 0;
+        LayoutOrder = Objects;
+
+        Text = HeadingText;
+        TextScaled = true;
+
+        FontFace = Core.UI.Theme.TextFont;
+        TextColor3 = Core.UI.Theme.TextColor3;
+    }, {})
+end
+
+local function BooleanToggle(SettingName :string, DisplayName :string, Description :string)
+    Objects += 1;
+    return Core.Roact.createElement("Frame", {
+        Size = UDim2.fromScale(0.9, 0.15);
+        Position = UDim2.fromScale(0.5, 0);
+        AnchorPoint = Vector2.new(0.5, 0.5);
+
+        BackgroundTransparency = 1;
+        BorderSizePixel = 0;
+        LayoutOrder = Objects;
+    }, {
+        NameLabel = Core.Roact.createElement("TextLabel", {
+            Size = UDim2.fromScale(0.9, 0.6);
+
+            BackgroundTransparency = 1;
+
+            Text = DisplayName;
+            TextScaled = true;
+            TextXAlignment = Enum.TextXAlignment.Left;
+
+            FontFace = Core.UI.Theme.TextFont;
+            TextColor3 = Core.UI.Theme.TextColor3;
+        }, {}),
+
+        DescriptionLabel = Core.Roact.createElement("TextLabel", {
+            Size = UDim2.fromScale(0.9, 0.4);
+            Position = UDim2.fromScale(0, 0.6);
+
+            BackgroundTransparency = 1;
+
+            Text = Description;
+            TextScaled = true;
+            TextXAlignment = Enum.TextXAlignment.Left;
+
+            FontFace = Core.UI.Theme.TextFont;
+            TextColor3 = Core.UI.Theme.TextColorDisabled;
+        }, {}),
+
+        -- Actual toggle thing
+        Toggle = Core.Roact.createElement("Frame", {}, {})
+    })
+end
+
+function SettingsComponent:init()
+    self:setState({
+        IsSettingsVisible = false
+    })
+end
+
+function SettingsComponent:render()
+    return Core.Roact.createElement("ScreenGui", {}, {
+        ToggleButton = Core.Roact.createElement("ImageButton", {
+            Size = UDim2.fromScale(0.04, 0.08);
+            Position = UDim2.fromScale(0.01, 0.98);
+            AnchorPoint = Vector2.new(0, 1);
+
+            Image = "";
+
+            BackgroundColor3 = Core.UI.Theme.BackgroundColor;
+            BackgroundTransparency = Core.UI.Theme.BackgroundColorTransparency;
+
+            [Core.Roact.Event.Activated] = function()
+                self:setState({
+                    IsSettingsVisible = not self.state.IsSettingsVisible
+                })
+            end
+        }),
+
+        SettingsPanel = self.state.IsSettingsVisible and Core.Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.5, 0.5);
+            Position = UDim2.fromScale(0.5, 0.5);
+            AnchorPoint = Vector2.new(0.5, 0.5);
+
+            BackgroundColor3 = Core.UI.Theme.BackgroundColor;
+            BackgroundTransparency = Core.UI.Theme.BackgroundColorTransparency;
+            BorderSizePixel = 0;
+        }, {
+            Title = Core.Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(1, 0.15);
+
+                BackgroundTransparency = 1;
+                Text = "Settings";
+                TextScaled = true;
+                TextXAlignment = Enum.TextXAlignment.Left;
+
+                TextColor3 = Core.UI.Theme.TextColor3;
+                FontFace = Core.UI.Theme.TextFont;
+            }, {});
+
+            SettingsFrame = Core.Roact.createElement("ScrollingFrame", {
+                Size = UDim2.fromScale(1, 0.85);
+                Position = UDim2.fromScale(0.5, 0.575);
+                AnchorPoint = Vector2.new(0.5, 0.5);
+
+                ScrollBarThickness = 5;
+                AutomaticCanvasSize = Enum.AutomaticSize.Y;
+                ScrollingDirection = Enum.ScrollingDirection.Y;
+
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+            }, {
+                Layout = Core.Roact.createElement("UIListLayout", {
+                    Padding = UDim.new(0.01, 0);
+                    HorizontalAlignment = Enum.HorizontalAlignment.Center;
+                    SortOrder = Enum.SortOrder.LayoutOrder;
+                }, {}),
+
+                GraphicsHeader = SettingsHeader("Graphics");
+                ShadowsToggle = BooleanToggle("GlobalShadows", "Shadows", "Toggle all shadows");
+                RainbowToggle = BooleanToggle("RainbowEffect", "Rainbow effects", "Toggle all rainbow (RGB) effects and set them to white");
+            })
+        })
+    })
+end
 
 
 
@@ -70,6 +209,9 @@ function SettingsController:KnitStart()
 
         Update()
     end)
+
+    local App = Core.Roact.createElement(SettingsComponent)
+    Core.Roact.mount(App, Knit.Player.PlayerGui, "Settings")
 end
 
 return SettingsController

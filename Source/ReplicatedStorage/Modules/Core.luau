@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 --[[
 This module is basically the core of the game since it is required by most scripts and gives access to some core settings and functions
 that without the whole game would break down. They are all in this one module so that you can have 1 `require(core)` instead of a million
@@ -78,7 +79,8 @@ export type AdminPermissions = {
 
 local GameConfig = require(script.Parent.ModulesInCore.GameConfig)
 local Util = require(script.Parent.ModulesInCore.Util)
-local UI = require(script.Parent.ModulesInCore.UI)
+local UI
+local Roact
 
 local Timer = require(script.Parent.Classes.Timer)
 local OreList = require(script.Parent.Classes.OreList)
@@ -87,12 +89,19 @@ local SaveData = require(script.Parent.Classes.SaveData.SaveData)
 local Data = require(script.Parent.Classes.SaveData.Data)
 local Maid = require(ReplicatedStorage.Packages.maid)
 
+if RunService:IsClient() then
+    Roact = require(ReplicatedStorage.Packages.Roact)
+    UI = require(script.Parent.ModulesInCore.UI)
+end
+
 return {
     GameConfig = GameConfig;
     Util = Util;
     Timer = Timer;
     OreList = OreList;
+
     UI = UI;
+    Roact = Roact;
 
     Maid = Maid;
 

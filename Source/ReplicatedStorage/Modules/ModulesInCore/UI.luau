@@ -10,6 +10,8 @@ UI.Theme = {
     TextColor3 = Color3.new(1, 1, 1);
     TextFont = Font.fromEnum(Enum.Font.Highway);
     TextStrokeTransparency = 0;
+
+    TextColorDisabled = Color3.new(0.278431, 0.278431, 0.278431);
 }
 
 return UI
