@@ -78,6 +78,7 @@ export type AdminPermissions = {
 
 local GameConfig = require(script.Parent.ModulesInCore.GameConfig)
 local Util = require(script.Parent.ModulesInCore.Util)
+local UI = require(script.Parent.ModulesInCore.UI)
 
 local Timer = require(script.Parent.Classes.Timer)
 local OreList = require(script.Parent.Classes.OreList)
@@ -91,6 +92,7 @@ return {
     Util = Util;
     Timer = Timer;
     OreList = OreList;
+    UI = UI;
 
     Maid = Maid;
 
