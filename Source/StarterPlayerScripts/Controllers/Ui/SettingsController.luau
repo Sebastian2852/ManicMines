@@ -52,6 +52,7 @@ end)
 -- [[ UI ]] --
 
 local SettingsComponent = Core.Roact.Component:extend("SettingsComponent")
+
 local Objects = 0
 
 local function SettingsHeader(HeadingText :string)
@@ -70,6 +71,30 @@ local function SettingsHeader(HeadingText :string)
 
         FontFace = Core.UI.Theme.TextFont;
         TextColor3 = Core.UI.Theme.TextColor3;
+    }, {})
+end
+
+local function Checkbox(SettingName :string)
+    local Value = Settings[SettingName]
+    if Value == nil then LogService:Warn("Invalid setting name!") return end
+
+    local ImageId = "rbxassetid://4458801905"
+    if Value == true then ImageId = "rbxassetid://4458804262" end
+    return Core.Roact.createElement("ImageButton", {
+        Size = UDim2.fromScale(0.7, 0.7);
+        Position = UDim2.fromScale(0.9, 0.5);
+        AnchorPoint = Vector2.new(0.5, 0.5);
+        SizeConstraint = Enum.SizeConstraint.RelativeYY;
+
+        BackgroundTransparency = 1;
+        BorderSizePixel = 0;
+
+        Image = ImageId;
+
+        [Core.Roact.Event.MouseButton1Click] = function()
+            Settings[SettingName] = not Settings[SettingName]
+            PushToServer()
+        end
     }, {})
 end
 
@@ -111,15 +136,19 @@ local function BooleanToggle(SettingName :string, DisplayName :string, Descripti
             TextColor3 = Core.UI.Theme.TextColorDisabled;
         }, {}),
 
-        -- Actual toggle thing
-        Toggle = Core.Roact.createElement("Frame", {}, {})
+        Toggle = Checkbox(SettingName)
     })
 end
 
 function SettingsComponent:init()
     self:setState({
-        IsSettingsVisible = false
+        IsSettingsVisible = false;
+        Refresh = false;
     })
+end
+
+function SettingsComponent:ReRender()
+    Core.UI:Rerender(self)
 end
 
 function SettingsComponent:render()
