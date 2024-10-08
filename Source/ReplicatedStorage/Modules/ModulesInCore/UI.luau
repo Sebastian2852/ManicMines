@@ -17,13 +17,4 @@ UI.Theme = {
     TextColorDisabled = Color3.new(0.278431, 0.278431, 0.278431);
 }
 
---[=[
-Rerender a given component
-]=]
-function UI:Rerender(Component :Roact.Component)
-    Component:setState(function(Previous)
-        return { Refresh = not Previous.Refresh }
-    end)
-end
-
 return UI

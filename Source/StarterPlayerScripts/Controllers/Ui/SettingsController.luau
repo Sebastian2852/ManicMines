@@ -55,10 +55,10 @@ local SettingsComponent = Core.Roact.Component:extend("SettingsComponent")
 
 local Objects = 0
 
-local function SettingsHeader(HeadingText :string)
+function SettingsComponent:SettingsHeader(HeadingText :string)
     Objects += 1;
     return Core.Roact.createElement("TextLabel", {
-        Size = UDim2.fromScale(0.9, 0.15);
+        Size = UDim2.fromScale(0.9, 0.135);
         Position = UDim2.fromScale(0.5, 0);
         AnchorPoint = Vector2.new(0.5, 0.5);
 
@@ -74,7 +74,26 @@ local function SettingsHeader(HeadingText :string)
     }, {})
 end
 
-local function Checkbox(SettingName :string)
+function SettingsComponent:SettingsSubtitle(SubtitleText :string)
+    Objects += 1;
+    return Core.Roact.createElement("TextLabel", {
+        Size = UDim2.fromScale(0.9, 0.1);
+        Position = UDim2.fromScale(0.5, 0);
+        AnchorPoint = Vector2.new(0.5, 0.5);
+
+        BackgroundTransparency = 1;
+        BorderSizePixel = 0;
+        LayoutOrder = Objects;
+
+        Text = SubtitleText;
+        TextScaled = true;
+
+        FontFace = Core.UI.Theme.TextFont;
+        TextColor3 = Core.UI.Theme.TextColorDisabled;
+    }, {})
+end
+
+function SettingsComponent:Checkbox(SettingName :string)
     local Value = Settings[SettingName]
     if Value == nil then LogService:Warn("Invalid setting name!") return end
 
@@ -93,12 +112,15 @@ local function Checkbox(SettingName :string)
 
         [Core.Roact.Event.MouseButton1Click] = function()
             Settings[SettingName] = not Settings[SettingName]
+            local NewSettings = self.state.Settings
+            NewSettings[SettingName] = Settings[SettingName]
+            self:setState({Settings = NewSettings})
             PushToServer()
         end
     }, {})
 end
 
-local function BooleanToggle(SettingName :string, DisplayName :string, Description :string)
+function SettingsComponent:BooleanToggle(SettingName :string, DisplayName :string, Description :string)
     Objects += 1;
     return Core.Roact.createElement("Frame", {
         Size = UDim2.fromScale(0.9, 0.15);
@@ -136,19 +158,15 @@ local function BooleanToggle(SettingName :string, DisplayName :string, Descripti
             TextColor3 = Core.UI.Theme.TextColorDisabled;
         }, {}),
 
-        Toggle = Checkbox(SettingName)
+        Toggle = self:Checkbox(SettingName)
     })
 end
 
 function SettingsComponent:init()
     self:setState({
         IsSettingsVisible = false;
-        Refresh = false;
+        Settings = Settings;
     })
-end
-
-function SettingsComponent:ReRender()
-    Core.UI:Rerender(self)
 end
 
 function SettingsComponent:render()
@@ -209,9 +227,15 @@ function SettingsComponent:render()
                     SortOrder = Enum.SortOrder.LayoutOrder;
                 }, {}),
 
-                GraphicsHeader = SettingsHeader("Graphics");
-                ShadowsToggle = BooleanToggle("GlobalShadows", "Shadows", "Toggle all shadows");
-                RainbowToggle = BooleanToggle("RainbowEffect", "Rainbow effects", "Toggle all rainbow (RGB) effects and set them to white");
+                GraphicsHeader = self:SettingsHeader("Graphics");
+                ShadowsToggle = self:BooleanToggle("GlobalShadows", "Shadows", "Toggle all shadows");
+                RainbowToggle = self:BooleanToggle("RainbowEffect", "Rainbow effects", "Toggle all rainbow (RGB) effects and set them to white");
+
+                ExperimentalHeader = self:SettingsHeader("Experimental");
+                ExperimentalWarning = self:SettingsSubtitle("⚠️ THESE SETTINGS ARE EXPERIMENTAL AND CAN CAUSE ERRORS OR DATA LOSS; USE AT YOUR OWN RISK ⚠️");
+
+                -- No settings here yet but there will be one for the custom map streamer thingy
+                -- because I already know its going to cause a lot of issues
             })
         })
     })
