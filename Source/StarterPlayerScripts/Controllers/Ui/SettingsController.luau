@@ -272,7 +272,7 @@ function SettingsController:KnitStart()
     TestList:AddOre("Stone", 15)
 
     local Test = Core.Roact.createElement("ScreenGui", {}, {
-        OreFrame = Core.UI:CreateOreFrame(TestList, Core.UI.OreFrameStyle.PcInventory, UDim2.fromScale(0.3, 0.1), UDim2.fromScale(0.5, 0.5))
+        OreFrame = Core.UI:CreateOreFrame(TestList, Core.UI.OreFrameStyle.Normal, UDim2.fromScale(0.3, 0.1), UDim2.fromScale(0.5, 0.5))
     })
     Core.Roact.mount(Test, Knit.Player.PlayerGui, "TEST")
     TestList:Destroy()
