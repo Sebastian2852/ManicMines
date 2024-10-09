@@ -176,7 +176,7 @@ function SettingsComponent:render()
             Position = UDim2.fromScale(0.01, 0.98);
             AnchorPoint = Vector2.new(0, 1);
 
-            Image = "";
+            Image = "rbxassetid://88251609691626";
 
             BackgroundColor3 = Core.UI.Theme.BackgroundColor;
             BackgroundTransparency = Core.UI.Theme.BackgroundColorTransparency;
@@ -228,6 +228,8 @@ function SettingsComponent:render()
                 }, {}),
 
                 GraphicsHeader = self:SettingsHeader("Graphics");
+                GraphicsDescription = self:SettingsSubtitle("Adjust visual quality; Higher settings enhance detail but may impact performance on lower-end devices.");
+
                 ShadowsToggle = self:BooleanToggle("GlobalShadows", "Shadows", "Toggle all shadows");
                 RainbowToggle = self:BooleanToggle("RainbowEffect", "Rainbow effects", "Toggle all rainbow (RGB) effects and set them to white");
 
@@ -265,6 +267,15 @@ function SettingsController:KnitStart()
 
     local App = Core.Roact.createElement(SettingsComponent)
     Core.Roact.mount(App, Knit.Player.PlayerGui, "Settings")
+
+    local TestList = Core.OreList.New()
+    TestList:AddOre("Stone", 15)
+
+    local Test = Core.Roact.createElement("ScreenGui", {}, {
+        OreFrame = Core.UI:CreateOreFrame(TestList, Core.UI.OreFrameStyle.PcInventory, UDim2.fromScale(0.3, 0.1), UDim2.fromScale(0.5, 0.5))
+    })
+    Core.Roact.mount(Test, Knit.Player.PlayerGui, "TEST")
+    TestList:Destroy()
 end
 
 return SettingsController

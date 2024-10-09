@@ -1,7 +1,5 @@
 local OreList = {}
 OreList.__index = OreList
-OreList._Ores = {}
-OreList._Gold = 0
 
 --[=[
 Override the tostring() function to return the object as a nice string in the format:  
