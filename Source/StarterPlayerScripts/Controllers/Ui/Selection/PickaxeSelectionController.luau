@@ -17,10 +17,15 @@ local MiningSelection = Player.PlayerGui.HUD.MiningSelection
 
 function PickaxeSelectionController:UpdateInfo(OreName :string, TimeToMine :number, Percentage :number, MiningProgress :number)
     PickaxeService:GetPickaxe():andThen(function(Pickaxe)
-        if not PlayerFolder.PickaxeSelection.Value then MiningSelection.Visible = false return end
+        if not PlayerFolder.PickaxeSelection.Value then
+            MiningSelection.Visible = false
+            return
+        end
 
         local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
-        if OreName == "Stone" then RealOre = ReplicatedStorage.Assets.Stone end
+        if OreName == "Stone" then
+            RealOre = ReplicatedStorage.Assets.Stone
+        end
         if not RealOre then
             MiningSelection.TimeToMine.Text = ""
             MiningSelection.OreName.Text = OreName
@@ -43,9 +48,16 @@ end
 PlayerFolder.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
     local ObjectToMine :BasePart = PlayerFolder.PickaxeSelection.Value
 
-    if not ObjectToMine then MiningSelection.Visible = false return end
-    if not ObjectToMine:IsA("BasePart") then MiningSelection.Visible = false return end
-    if not ObjectToMine:IsDescendantOf(Workspace.Game.Mine) then MiningSelection.Visible = false return end
+    if not ObjectToMine then
+        MiningSelection.Visible = false
+        return
+    elseif not ObjectToMine:IsA("BasePart") then
+        MiningSelection.Visible = false
+        return
+    elseif not ObjectToMine:IsDescendantOf(Workspace.Game.Mine) then
+        MiningSelection.Visible = false
+        return
+    end
 
     MiningSelection.Visible = true
     local Health = ObjectToMine:GetAttribute("Health")

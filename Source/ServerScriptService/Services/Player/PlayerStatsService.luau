@@ -41,7 +41,7 @@ Gives the player ores and adds 1 to its times mined value
 function PlayerStatsService:MinedOre(Player :Player, OreList)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
 
-    for OreName, Data in pairs(OreList:LoopList()) do
+    for OreName, _ in pairs(OreList:LoopList()) do
         local DataValue = FindTimesMinedValueByName(OreName, DataFolder)
         DataValue.Value += 1
         LogService:Log("Increased "..Player.Name.."'s "..OreName.." times mined value")

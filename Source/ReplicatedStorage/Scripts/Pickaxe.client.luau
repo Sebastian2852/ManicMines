@@ -18,7 +18,6 @@ local PlayerFolder = game.ReplicatedStorage.Player
 local PlayerDataFolder = game.ReplicatedStorage.PlayerData:WaitForChild(Player.UserId)
 
 local Equipped = false
-local Selecting = false
 
 local Outline = nil
 local Active = false
@@ -33,7 +32,10 @@ LatestPosition.Y = 0
 local function Activate()
     if not PlayerFolder.PickaxeSelection.Value then return end
 
-    if PlayerDataFolder.Inventory["InventoryItemCount"].Value + PlayerFolder.PickaxeSelection.Value:GetAttribute("AmountDroppedWhenMined") >= PlayerDataFolder.Inventory["InventoryCap"].Value then print("Not enough space") return end
+    if PlayerDataFolder.Inventory["InventoryItemCount"].Value + PlayerFolder.PickaxeSelection.Value:GetAttribute("AmountDroppedWhenMined") >= PlayerDataFolder.Inventory["InventoryCap"].Value then
+        warn("Not enough space")
+        return
+    end
     if not PlayerFolder.PickaxeSelection.Value:GetAttribute("CanMine") then return end
     if PlayerFolder.PickaxeSelection.Value:GetAttribute("BeingMined") then return end
 
@@ -102,7 +104,6 @@ local function DeselectOre()
     if Outline then 
         Outline:Destroy() 
     end
-    Selecting = false
     PlayerFolder.PickaxeSelection.Value = nil
     Deactivate()
 end
@@ -116,13 +117,11 @@ local function SelectOre(Ore :BasePart)
     end
 
     if Ore.Parent == workspace.Game.Mine and CanReach(Ore) then
-        Selecting = true
         SetTarget(Ore)
         PlayerFolder.PickaxeSelection.Value = Ore
     elseif Ore and Ore.Parent:IsA("Model") then
         SetTarget(Ore.Parent)
         PlayerFolder.PickaxeSelection.Value = Ore.Parent
-        Selecting = true
     elseif not UserInputService.TouchEnabled then
         Deactivate()
         DeselectOre()
@@ -131,7 +130,10 @@ local function SelectOre(Ore :BasePart)
 end
 
 local function GetOreFromRayCast(X, Y)
-    if not X or not Y then warn("No X or Y") return end
+    if not X or not Y then
+        warn("No X or Y")
+        return
+    end
 
     local Camera = workspace.CurrentCamera
     local CameraRay = Camera:ScreenPointToRay(X, Y)
@@ -197,13 +199,13 @@ Tool.Activated:Connect(function()
     Activate()
 end)
 
-UserInputService.TouchStarted:Connect(function(Touch, Processed)
+UserInputService.TouchStarted:Connect(function(_, Processed)
     if Processed then return end
     MouseDown = true
     Activate()
 end)
 
-UserInputService.TouchEnded:Connect(function(Touch, Processed)
+UserInputService.TouchEnded:Connect(function(_, Processed)
     if Processed then return end
     MouseDown = false
     Deactivate()
@@ -228,24 +230,3 @@ Player.Character:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
     DeselectOre()
     Deactivate()
 end)
-
---while true do
---    if PlayerDataFolder.ServerMining.Value then
---        PlayerController.Mouse:SetCursorImage(Tool:GetAttribute("CursorUpImage"))
---        task.wait(Tool:GetAttribute("CursorAnimationFPS"))
---        PlayerController.Mouse:SetCursorImage(Tool:GetAttribute("CursorDownImage"))
---        task.wait(Tool:GetAttribute("CursorAnimationFPS"))
---    else
---        PlayerController.Mouse:ResetCursorImage()
---    end
---    
---    if Selecting and not Outline.Parent:GetAttribute("BeingMined") then
---        PlayerController.Mouse:SetCursorImage(Tool:GetAttribute("CantMineImage"))
---    end
---    
---    if not Selecting then
---        PlayerController.Mouse:ResetCursorImage()
---    end
---    
---    task.wait(0.01)
---end

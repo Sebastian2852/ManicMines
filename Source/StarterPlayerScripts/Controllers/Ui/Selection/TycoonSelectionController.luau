@@ -21,7 +21,6 @@ local CurrentOutline = nil
 local Selection = nil
 
 local Player = Knit.Player
-local Mouse = Player:GetMouse()
 local TycoonSelection :Frame = Player.PlayerGui.HUD.TycoonSelection
 
 
@@ -29,13 +28,17 @@ local TycoonSelection :Frame = Player.PlayerGui.HUD.TycoonSelection
 -- [[ PRIVATE ]]--
 
 local function CanBeUpgraded(UpgradeName :string)
-    local CanUpgrade = false
-
     local DataValue = DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-    if not DataValue then LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName) return false end
+    if not DataValue then
+        LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName)
+        return false
+    end
 
     local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-    if not UpgradeConfig then LogService:Warn("Invalid upgrade name:", UpgradeName) return false end
+    if not UpgradeConfig then
+        LogService:Warn("Invalid upgrade name:", UpgradeName)
+        return false
+    end
 
     if UpgradeConfig:FindFirstChild(tostring(DataValue.Value + 1)) then return true end
     return false
@@ -57,8 +60,12 @@ Deselects the currently selected hitbox by destroying the outline it was given
 function TycoonSelectionController:Deselect()
     if not CurrentlySelecting then return end
     LogService:Log("Deselecting upgrade hitbox")
-    if CurrentOutline then CurrentOutline:Destroy() end
-    if Selection ~= nil then Selection = nil end
+    if CurrentOutline then
+        CurrentOutline:Destroy()
+    end
+    if Selection ~= nil then
+        Selection = nil
+    end
     TycoonSelection.Visible = false
     CurrentlySelecting = false
 end
@@ -78,7 +85,7 @@ function TycoonSelectionController:UpdateUiInfo(UpgradeName :string, UpgradeDesc
     local CostList = self:CreateCostOreList(NextConfig)
     if CostList ~= nil then
         LogService:Warn("Creating cost UIs", CostList)
-        for OreName, OreData in pairs(CostList:LoopList()) do
+        for _, OreData in pairs(CostList:LoopList()) do
             if OreData.Amount <= 0 then continue end
             local NewUI = OreListDataToUI(OreData)
             NewUI.Parent = TycoonSelection.UpgradePanel.CostItems
@@ -135,7 +142,7 @@ function TycoonSelectionController:KnitStart()
         DataFolder = Data
     end)
 
-    TycoonService.SelectUpgrade:Connect(function(UpgradeName :string, UpgradeConfig :Configuration, ModelConfig :Configuration, Hitbox :BasePart, Model :Model, NextConfig :Configuration)
+    TycoonService.SelectUpgrade:Connect(function(UpgradeName :string, UpgradeConfig :Configuration, _, Hitbox :BasePart, _, NextConfig :Configuration)
         self:UpdateUiInfo(UpgradeName, UpgradeConfig:GetAttribute("Description"), NextConfig)
         self:SelectHitbox(Hitbox)
     end)

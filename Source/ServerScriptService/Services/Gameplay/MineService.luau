@@ -1,4 +1,3 @@
-local TeleportService = game:GetService("TeleportService")
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -64,6 +63,7 @@ layer is used.
 ]=]
 function MineService:YLevelToLayer(YLevel :number) :Configuration
     -- This only returns the default layer for now
+    print(YLevel)
     return game.ReplicatedStorage.Assets.Layers.Default
 end
 
@@ -73,12 +73,12 @@ Gets a table of the possible ores that can spawn at a given Y level
 function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
     local SpawnableOres = {}
 
-    for i, v in pairs(OresFolder:GetChildren()) do
-        if not v:FindFirstChildWhichIsA("Decal") or (v:GetAttribute("CaveOnly") and not InCave) then continue end
-        local SpawningRange = v:GetAttribute("SpawningRange")
+    for _, Ore in pairs(OresFolder:GetChildren()) do
+        if not Ore:FindFirstChildWhichIsA("Decal") or (Ore:GetAttribute("CaveOnly") and not InCave) then continue end
+        local SpawningRange = Ore:GetAttribute("SpawningRange")
 
         if (SpawningRange.Min * 6) <= math.abs(YLevel) and (SpawningRange.Max * 6) - 1 >= math.abs(YLevel) then
-            table.insert(SpawnableOres, v)
+            table.insert(SpawnableOres, Ore)
             continue
         end
     end

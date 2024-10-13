@@ -24,7 +24,10 @@ function SaveData.__tostring(SaveDataObject)
             DataStoreSaveData = HttpService:JSONEncode(Data)
         end)
 
-        if not Success then warn("Failed to JSONEncode: "..ErrorMessage) ReturnString = ReturnString.."; (FAILED)" return end
+        if not Success then
+            warn("Failed to JSONEncode: "..ErrorMessage) ReturnString = ReturnString.."; (FAILED)"
+            return
+        end
         ReturnString = ReturnString.."; "..DataStoreKey.." == "..DataStoreSaveData
     end
 
@@ -66,17 +69,23 @@ function SaveData:Save(DataStore :DataStore)
         local DataStoreKey = tostring(self._UserID).."-"..Name
         local DataStoreSaveData :string
 
-        local Success, ErrorMessage = pcall(function()
+        local EncodeSuccess, EncodeError = pcall(function()
             DataStoreSaveData = HttpService:JSONEncode(Data)
         end)
 
-        if not Success then warn("Failed to JSONEncode: "..ErrorMessage) return end
+        if not EncodeSuccess then
+            warn("Failed to JSONEncode: "..EncodeError)
+            return
+        end
 
-        local Success, ErrorMessage = pcall(function()
+        local SaveDataSuccess, SaveDataError = pcall(function()
             DataStore:SetAsync(DataStoreKey, DataStoreSaveData)
         end)
 
-        if not Success then warn("Failed to set to datastore: "..ErrorMessage) return end
+        if not SaveDataSuccess then
+            warn("Failed to set to datastore: "..SaveDataError)
+            return
+        end
     end
 end
 
@@ -89,17 +98,23 @@ function SaveData:Load(DataStore :DataStore)
         local DataStoreKey = tostring(self._UserID).."-"..Name
         local DataStoreSaveData :string
 
-        local Success, ErrorMessage = pcall(function()
+        local GetDataSuccess, GetDataError = pcall(function()
             DataStoreSaveData = DataStore:GetAsync(DataStoreKey)
         end)
 
-        if not Success then warn("Failed to get from datastore: "..ErrorMessage) return end
+        if not GetDataSuccess then
+            warn("Failed to get from datastore: "..GetDataError)
+            return
+        end
 
-        local Success, ErrorMessage = pcall(function()
+        local DecodeSuccess, DecodeError = pcall(function()
             DataStoreSaveData = HttpService:JSONDecode(DataStoreSaveData)
         end)
 
-        if not Success then warn("Failed to JSONDecode: "..ErrorMessage) return end
+        if not DecodeSuccess then
+            warn("Failed to JSONDecode: "..DecodeError)
+            return
+        end
         self._Data[Name] = DataStoreSaveData
     end
 end

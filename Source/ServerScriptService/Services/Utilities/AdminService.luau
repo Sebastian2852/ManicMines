@@ -17,7 +17,7 @@ function AdminService:IsPlayerAdmin(Player :Player) :boolean
     local UserID = Player.UserId
     local Admins = Core.GameConfig.Admins.Admins
 
-    for AdminID :number, Permissions :Core.AdminPermissions in pairs(Admins) do
+    for AdminID :number, _ in pairs(Admins) do
         if AdminID == UserID then
             return true
         end

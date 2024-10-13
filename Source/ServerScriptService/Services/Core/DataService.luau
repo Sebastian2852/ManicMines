@@ -1,8 +1,5 @@
 local DataStoreService = game:GetService("DataStoreService")
-local HttpService = game:GetService("HttpService")
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerStorage = game:GetService("ServerStorage")
 
 local Knit = require(game.ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
@@ -50,13 +47,13 @@ local function SetupTemplateDataFolder()
     StoneStorageValue.Name = "Stone"
     StoneStorageValue.Parent = TemplateDataFolder.Storage.Ores
 
-    local TimesMinedValue = Instance.new("IntValue")
-    TimesMinedValue.Name = "Stone"
-    TimesMinedValue.Parent = TemplateDataFolder.TimesMined
+    local StoneTimesMinedValue = Instance.new("IntValue")
+    StoneTimesMinedValue.Name = "Stone"
+    StoneTimesMinedValue.Parent = TemplateDataFolder.TimesMined
 
-    local EmblemOwned = Instance.new("BoolValue")
-    EmblemOwned.Name = "Stone"
-    EmblemOwned.Parent = TemplateDataFolder.Emblems
+    local StoneEmblemOwned = Instance.new("BoolValue")
+    StoneEmblemOwned.Name = "Stone"
+    StoneEmblemOwned.Parent = TemplateDataFolder.Emblems
 
     for _, Ore :BasePart in pairs(OresFolder:GetChildren()) do
         local InventoryValue = Instance.new("IntValue")
@@ -97,9 +94,13 @@ local function SetupTemplateDataFolder()
     for SettingName, DefaultValue in pairs(Core.GameConfig.DefaultSettings) do
         local TypeToMake = ""
 
-        if type(DefaultValue) == "number" then TypeToMake = "NumberValue" end
-        if type(DefaultValue) == "string" then TypeToMake = "StringValue" end
-        if type(DefaultValue) == "boolean" then TypeToMake = "BoolValue" end
+        if type(DefaultValue) == "number" then
+            TypeToMake = "NumberValue"
+        elseif type(DefaultValue) == "string" then
+            TypeToMake = "StringValue"
+        elseif type(DefaultValue) == "boolean" then
+            TypeToMake = "BoolValue"
+        end
 
         local NewValue = Instance.new(TypeToMake)
         NewValue.Name = SettingName
@@ -125,19 +126,9 @@ end
 Checks wether a data table is valid
 ]=]
 local function IsRawDataValid(Data :{any}) :boolean
-    if Data == nil then return false end
-    if Data == {} then return false end
-
-    return true
-end
-
---[=[
-Checks if a JSON encoded save data table is valid
-]=]
-local function IsSavedDataValid(Data :string) :boolean
-    if Data == nil then return false end
-    if Data == "{}" then return false end
-
+    if Data == nil or Data == {} then
+        return false
+    end
     return true
 end
 
@@ -232,17 +223,17 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
     local Maid = Core.Maid.new()
-    local OreData = Core.Data.Data.New("Ore", {})
+    local OreDataData = Core.Data.Data.New("Ore", {})
     local PlayerData = Core.Data.Data.New("PlayerData", {})
     local TycoonData = Core.Data.Data.New("Tycoon", {})
 
-    Maid:GiveTask(OreData)
+    Maid:GiveTask(OreDataData)
     Maid:GiveTask(PlayerData)
     Maid:GiveTask(TycoonData)
 
     local SaveData = Core.Data.SaveData.New(Player.UserId)
     Maid:GiveTask(SaveData)
-    SaveData:AddData(OreData)
+    SaveData:AddData(OreDataData)
     SaveData:AddData(PlayerData)
     SaveData:AddData(TycoonData)
     SaveData:Load(Slot)
@@ -262,13 +253,19 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
             LogService:Warn("Appling default settings; cannot find saved settings!")
             for SettingName, SettingValue in pairs(Core.GameConfig.DefaultSettings) do
                 local SettingDataValue = DataFolder.Settings:FindFirstChild(SettingName)
-                if not SettingDataValue then LogService:Warn("Cannot find setting `"..tostring(SettingName).."`; Ignoring") continue end
+                if not SettingDataValue then
+                    LogService:Warn("Cannot find setting `"..tostring(SettingName).."`; Ignoring")
+                    continue
+                end
                 SettingDataValue.Value = SettingValue
             end
         else
             for SettingName, SettingValue in pairs(RawPlayerData.Settings) do
                 local SettingDataValue = DataFolder.Settings:FindFirstChild(SettingName)
-                if not SettingDataValue then LogService:Warn("Cannot find setting `"..tostring(SettingName).."`; discarding data") continue end
+                if not SettingDataValue then
+                    LogService:Warn("Cannot find setting `"..tostring(SettingName).."`; discarding data")
+                    continue
+                end
                 SettingDataValue.Value = SettingValue
             end
         end
@@ -282,7 +279,10 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
         LogService:Log("["..Player.Name.."]", "Loading tycoon data (upgrades)")
         for UpgradeName, UpgradeValue in pairs(RawTycoonData.Upgrades) do
             local Value = DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-            if not Value then LogService:Warn("["..Player.Name.."]", "Cannot find data value for "..UpgradeName.."; discarding data") end
+            if not Value then
+                LogService:Warn("["..Player.Name.."]", "Cannot find data value for "..UpgradeName.."; discarding data")
+                continue
+            end
             Value.Value = UpgradeValue
         end
         LogService:Log("["..Player.Name.."]", "Loaded tycoon data")
@@ -408,7 +408,7 @@ function DataService:GetSlotInfo(Player :Player, Slot :DataStore) :Core.SlotInfo
     local RawTycoonData = SaveData:GetDataByName("Tycoon")
     Maid:DoCleaning()
 
-    if RawPlayerData == nil or RawPlayerData == {} or RawTycoonData == nil or RawTycoonData == {} then
+    if RawPlayerData == nil or RawTycoonData == nil then
         return Info
     end
 
@@ -548,7 +548,7 @@ function DataService.Client:PlayerHasDataFolder(Player :Player) :boolean
     return false
 end
 
-function DataService.Client:GetOtherPlayerStats(Getter :Player, Player :Player)
+function DataService.Client:GetOtherPlayerStats(_, Player :Player)
     return self:GetPlayerDataFolder(Player)
 end
 

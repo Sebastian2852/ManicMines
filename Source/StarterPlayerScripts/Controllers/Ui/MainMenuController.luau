@@ -23,7 +23,6 @@ local SlotFrameTemplate :Frame
 
 local TitleScreen :Frame
 local NewSlotFrame :Frame
-local CreditsFrame :Frame
 local SlotSelectionFrame :Frame
 
 
@@ -102,7 +101,7 @@ local function SetupNewSlotFrame()
         local InTycoon = false
         MainMenuController:EnableAllUI()
         SlotSelectionFrame.Visible = false
-        local DataFolder = DataService:GetPlayerDataFolder():andThen(function(DataFolder)
+        DataService:GetPlayerDataFolder():andThen(function(DataFolder)
             repeat
                 task.wait(1)
             until DataFolder.InTycoon.Value
@@ -169,7 +168,7 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
             local InTycoon = false
             self:EnableAllUI()
             SlotSelectionFrame.Visible = false
-            local DataFolder = DataService:GetPlayerDataFolder():andThen(function(DataFolder)
+            DataService:GetPlayerDataFolder():andThen(function(DataFolder)
                 repeat
                     task.wait(1)
                 until DataFolder.InTycoon.Value
@@ -252,7 +251,6 @@ function MainMenuController:KnitInit()
     MainFrame = MainScreenGui.Main
     TitleScreen = MainFrame.TitleScreen
     NewSlotFrame = MainFrame.CreateNewSlot
-    CreditsFrame = MainFrame.Credits
     SlotSelectionFrame = MainFrame.SlotSelector
 
     Blur = Instance.new("BlurEffect")

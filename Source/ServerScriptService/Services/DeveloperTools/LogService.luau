@@ -1,4 +1,3 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TestService = game:GetService("TestService")
 
 local Knit = require(game.ReplicatedStorage.Packages.Knit)
@@ -19,7 +18,7 @@ LogService.AssertsEnabled = true
 local function SendLogToPlayers(Color :Color3, ...)
     local Args = {...}
 
-    for i, Player in pairs(game.Players:GetPlayers()) do
+    for _, Player in pairs(game.Players:GetPlayers()) do
         LogService.Client.ActionLog:Fire(Player, Color, table.unpack(Args))
     end
 end
@@ -112,13 +111,13 @@ function LogService.Client:Warn(Player :Player, Message :string, ... :string)
 end
 
 function LogService.Client:Info(Player :Player, Message :string, ... :string)
-    self:Info("[CLIENT] "..Message, ...)
+    self:Info("[CLIENT]", "["..Player.Name.."]", Message, ...)
 end
 
 function LogService.Client:Assert(Player :Player, Value :string, ErrorMessage :string)
     if not self.AssertsEnabled then return end
     if Value == nil or Value == false then
-        error("[CLIENT]", "["..Player.Name.."]".." ASSERTION FAILED: "..ErrorMessage)
+        error("[CLIENT]".." ["..Player.Name.."] ".."ASSERTION FAILED: "..ErrorMessage)
     end
 end
 

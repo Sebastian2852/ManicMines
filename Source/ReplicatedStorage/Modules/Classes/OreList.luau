@@ -17,7 +17,10 @@ end
 local function GetOreByName(Name :string) :BasePart
     local FoundOre = nil
     FoundOre = game.ReplicatedStorage.Assets.Ores:FindFirstChild(Name)
-    if FoundOre == nil then FoundOre = game.ReplicatedStorage.Assets.Stone end
+
+    if FoundOre == nil then
+        FoundOre = game.ReplicatedStorage.Assets.Stone
+    end
     return FoundOre
 end
 
@@ -62,7 +65,9 @@ function OreList:RemoveOre(OreName :string, Amount :number)
     local AmountInList = OreData.Amount
     local NewAmount = AmountInList - Amount
 
-    if NewAmount < 0 then NewAmount = 0 end
+    if NewAmount < 0 then
+        NewAmount = 0
+    end
 
     if Amount == -1 then
         self._Ores[OreName] = nil
@@ -99,14 +104,8 @@ for OreName, OreData in pairs(OreList:LoopList()) do
 end
 ]=]
 function OreList:LoopList()
-    local List = {}
-
-    for OreName, OreData in pairs(self._Ores) do
-        List[OreName] = OreData
-    end
-
+    local List = self._Ores
     List["Gold"] = {Name = "Gold", Amount = self._Gold, DisplayName = "Gold"}
-
     return List
 end
 

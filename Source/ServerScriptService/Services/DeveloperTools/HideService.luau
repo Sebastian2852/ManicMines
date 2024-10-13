@@ -23,7 +23,7 @@ function HideService:Hide(Object :BasePart|Decal|Light)
     local Objects = Object:GetDescendants()
     table.insert(Objects, Object)
 
-    for i, Thing :BasePart|Decal|Light in pairs(Objects) do
+    for _, Thing :BasePart|Decal|Light in pairs(Objects) do
         if Thing:IsA("BasePart") then
             Thing.Transparency = 1
             Thing.CanCollide = false

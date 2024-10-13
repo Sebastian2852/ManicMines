@@ -7,9 +7,9 @@ local Random = Random.new()
 
 local InventoryController = Knit.CreateController { Name = "InventoryController" }
 
-local DataService
 local LogService
-local DataFolder :Core.DataFolder
+-- local DataService
+--local DataFolder :Core.DataFolder
 
 -- [[ UI ]]--
 
@@ -158,11 +158,11 @@ end
 -- [[ KNIT ]] --
 
 function InventoryController:KnitStart()
-    DataService = Knit.GetService("DataService")
+    -- DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
-    DataService:GetPlayerDataFolder():andThen(function(Return)
-        DataFolder = Return
-    end)
+    -- DataService:GetPlayerDataFolder():andThen(function(Return)
+        -- DataFolder = Return
+    -- end)
 
     local App = Core.Roact.createElement(InventoryComponent)
     Core.Roact.mount(App, Knit.Player.PlayerGui, "Inventory")

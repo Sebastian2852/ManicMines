@@ -20,6 +20,12 @@ local function GiveChracterGUI(Character :Model, DisplayName :string, Username :
     NewGUI.Main.LevelName.TextColor3 = LevelColor
     NewGUI.PlayerToHideFrom = game.Players:GetPlayerFromCharacter(Character)
 
+    if ExtraTag ~= nil and type(ExtraTag) == "string" then
+        -- TEMP
+        -- Later on add a text label for the extra tag
+        NewGUI.Main.Username.Text = Username.."; "..ExtraTag
+    end
+
     NewGUI.Parent = Character:WaitForChild("Head")
 end
 
@@ -43,7 +49,7 @@ function PlayerDisplayService:GivePlayerOverheadGUI(Player :Player, ExtraTag :st
     end
     LevelName = LevelConfig:GetAttribute("LevelName")
 
-    GiveChracterGUI(Player.Character, DisplayName, Username, LevelName, LevelConfig:GetAttribute("LevelColor"))
+    GiveChracterGUI(Player.Character, DisplayName, Username, LevelName, LevelConfig:GetAttribute("LevelColor"), ExtraTag)
 end
 
 function PlayerDisplayService:KnitStart()

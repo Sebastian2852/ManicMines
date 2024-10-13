@@ -13,7 +13,6 @@ local LogService
 local SettingsService
 local DataService
 
-local HudGUI = PlayerGUI:WaitForChild("HUD")
 local Settings :Core.Settings = {}
 
 --[[ PRIVATE ]]--
@@ -95,10 +94,15 @@ end
 
 function SettingsComponent:Checkbox(SettingName :string)
     local Value = Settings[SettingName]
-    if Value == nil then LogService:Warn("Invalid setting name!") return end
+    if Value == nil then
+        LogService:Warn("Invalid setting name!")
+        return
+    end
 
     local ImageId = "rbxassetid://4458801905"
-    if Value == true then ImageId = "rbxassetid://4458804262" end
+    if Value == true then
+        ImageId = "rbxassetid://4458804262"
+    end
     return Core.Roact.createElement("ImageButton", {
         Size = UDim2.fromScale(0.7, 0.7);
         Position = UDim2.fromScale(0.9, 0.5);

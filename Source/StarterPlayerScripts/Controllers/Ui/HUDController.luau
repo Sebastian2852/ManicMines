@@ -10,8 +10,6 @@ local HUDController = Knit.CreateController {
     Name = "HUDController"
 }
 
-local DataService
-
 --[[ PUBLIC ]]--
 
 function HUDController:UpdateGold(GoldAmount :number)
@@ -39,7 +37,6 @@ end
 --[[ KNIT ]]--
 
 function HUDController:KnitStart()
-    DataService = Knit.GetService("DataService")
     local PlayerDataFolder :Core.DataFolder = ReplicatedStorage.PlayerData:WaitForChild(tostring(Knit.Player.UserId))
 
     PlayerDataFolder.Gold:GetPropertyChangedSignal("Value"):Connect(function()

@@ -162,7 +162,10 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
     local Pickaxe = PickaxeService:GetPlayerPickaxe(Player)
 
     if not Character then return end
-    if not PickaxeService:VerifyIfCanMine(Player, Character, ObjectToMine) then print("Cant mine") return end
+    if not PickaxeService:VerifyIfCanMine(Player, Character, ObjectToMine) then
+        print("Cant mine")
+        return
+    end
 
     DataFolder.ServerMining.Value = true
     PickaxeService.Mining[Player.UserId].Mining = true

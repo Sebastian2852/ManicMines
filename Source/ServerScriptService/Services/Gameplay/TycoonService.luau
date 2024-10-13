@@ -53,17 +53,31 @@ local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
         local DataValue = DataFolderUpgradesFolder:FindFirstChild(UpgradeHitbox.Name)
         local UpgradeConfig :Configuration = RawUpgradesFolder:FindFirstChild(UpgradeHitbox.Name)
 
-        if not DataValue then LogService:Warn("No data value for upgrade: "..UpgradeHitbox.Name) continue end
-        if not DataValue then LogService:Warn("No upgrade config for upgrade: "..UpgradeHitbox.Name) continue end
+        if not DataValue then
+            LogService:Warn("No data value for upgrade: "..UpgradeHitbox.Name)
+            continue
+        end
+        if not DataValue then
+            LogService:Warn("No upgrade config for upgrade: "..UpgradeHitbox.Name)
+            continue
+        end
 
         local ModelConfig = UpgradeConfig:FindFirstChild(DataValue.Value)
-        if not ModelConfig then LogService:Warn("No upgrade level config for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value) continue end
+        if not ModelConfig then
+            LogService:Warn("No upgrade level config for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value)
+            continue
+        end
 
         local UpgradeModel = ModelConfig:FindFirstChildWhichIsA("Model")
-        if not UpgradeModel then LogService:Warn("No upgrade model for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value) continue end
+        if not UpgradeModel then
+            LogService:Warn("No upgrade model for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value)
+            continue
+        end
 
         local CurrentModel = UpgradeHitbox:FindFirstChildWhichIsA("Model")
-        if CurrentModel then CurrentModel:Destroy() end
+        if CurrentModel then
+            CurrentModel:Destroy()
+        end
 
         local Model :Model = UpgradeModel:Clone()
         Model.Parent = UpgradeHitbox
@@ -92,10 +106,16 @@ local function CanBeUpgraded(Player :Player, UpgradeName :string)
     local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
 
     local DataValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-    if not DataValue then LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName) return end
+    if not DataValue then
+        LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName)
+        return
+    end
 
     local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-    if not UpgradeConfig then LogService:Warn("Invalid upgrade name:", UpgradeName) return end
+    if not UpgradeConfig then
+        LogService:Warn("Invalid upgrade name:", UpgradeName)
+        return
+    end
 
     if UpgradeConfig:FindFirstChild(tostring(DataValue.Value + 1)) then return true end
     return false
@@ -143,7 +163,6 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
     NewTycoon:PivotTo(CFrame.new(TycoonsSpawn.Position + Vector3.new(500 * (#Tycoons:GetChildren() - 1), 0, 0)))
 
     local TycoonSpawn :BasePart = NewTycoon.Main.Spawn
-    local TeleportLocation = TycoonSpawn.Position + Vector3.new(0, 5, 0)
     local DataFolder = DataService:GetPlayerDataFolder(Player)
 
     Player.CharacterAdded:Connect(function(Character)
@@ -182,28 +201,40 @@ function TycoonService.Client:Upgrade(Player :Player, UpgradeName :string)
     local Tycoon = self.Server:GetPlayerTycoon(Player)
 
     local DataValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-    if not DataValue then LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName) return end
+    if not DataValue then
+        LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName)
+        return
+    end
 
     DataValue.Value += 1
     AddUpgradeModels(PlayerData, Tycoon)
 end
 
 function TycoonService.Client:SetUpgradeValue(Setter :Player, Player :Player, UpgradeName :string, Value :number)
-    if not AdminService:IsPlayerAdmin(Setter) then LogService:Warn("User is not an admin!") return end
+    if not AdminService:IsPlayerAdmin(Setter) then
+        LogService:Warn("User is not an admin!")
+        return
+    end
     if not AdminService:GetAdminPermissions(Setter).EditTycoonUpgrades then return end
 
     local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
     local Tycoon = self:GetPlayerTycoon(Player)
 
     local UpgradeValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-    if not UpgradeValue then LogService:Warn("Invalid upgrade name passed") return end
+    if not UpgradeValue then
+        LogService:Warn("Invalid upgrade name passed")
+        return
+    end
     UpgradeValue.Value = Value
 
     AddUpgradeModels(PlayerData, Tycoon)
 end
 
 function TycoonService.Client:SetTycoonName(Setter :Player, Player :Player, Name :string)
-    if not AdminService:IsPlayerAdmin(Setter) then LogService:Warn("User is not an admin!") return end
+    if not AdminService:IsPlayerAdmin(Setter) then
+        LogService:Warn("User is not an admin!")
+        return
+    end
     if not AdminService:GetAdminPermissions(Setter).EditTycoonName then return end
 
     local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)

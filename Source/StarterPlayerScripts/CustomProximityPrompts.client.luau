@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 --    THIS SCRIPT IS NOT MINE                                              --
---    THIS WAS TAKEN FROM THE TOOLBOX AN EDITED TO FIT THIS GAMES NEEDS    --
+--    THIS WAS TAKEN FROM THE TOOLBOX AND EDITED TO FIT THIS GAMES NEEDS   --
 -----------------------------------------------------------------------------
 
 
@@ -96,7 +96,6 @@ local function createPrompt(prompt, inputType, gui)
     local tweensForFadeOut = {}
     local tweensForFadeIn = {}
     local tweenInfoInFullDuration = TweenInfo.new(prompt.HoldDuration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-    local tweenInfoOutHalfSecond = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
     local tweenInfoFast = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
     local tweenInfoQuick = TweenInfo.new(0.06, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
     local tweenInfoInstant = TweenInfo.new(0, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
@@ -150,19 +149,17 @@ local function createPrompt(prompt, inputType, gui)
     end
 
     local function setupImageLabelTweens(imageLabel)
-        local imageTransparency = imageLabel.ImageTransparency
+        local NewimageTransparency = imageLabel.ImageTransparency
         imageLabel.ImageTransparency = 1
         table.insert(tweensForButtonHoldBegin, TweenService:Create(imageLabel, tweenInfoFast, { ImageTransparency = 1 }))
-        table.insert(tweensForButtonHoldEnd, TweenService:Create(imageLabel, tweenInfoFast, { ImageTransparency = imageTransparency }))
+        table.insert(tweensForButtonHoldEnd, TweenService:Create(imageLabel, tweenInfoFast, { ImageTransparency = NewimageTransparency }))
         table.insert(tweensForFadeOut, TweenService:Create(imageLabel, tweenInfoFast, { ImageTransparency = 1 }))
-        table.insert(tweensForFadeIn, TweenService:Create(imageLabel, tweenInfoFast, { ImageTransparency = imageTransparency }))
+        table.insert(tweensForFadeIn, TweenService:Create(imageLabel, tweenInfoFast, { ImageTransparency = NewimageTransparency }))
     end
 
     local function setupUnexpectedChildTweens(child)
         if child:IsA("UIStroke") then
             setupUIStrokeTweens(child)
-        elseif child:IsA("UIGradient") then
-            -- The Transparency property of UIGradients is not tweenable
         elseif child:IsA("GuiObject") then
             setupGUIObjectTweens(child)
 

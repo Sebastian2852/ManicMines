@@ -176,16 +176,6 @@ function IrisController:StatsWindow()
         Iris.End()
 
         Iris.CollapsingHeader({"Mine stats"})
-            local ColorToSet = Color3.fromRGB(255, 255, 255)
-
-            if MineStats.BlocksUntilCollapse <= 10 then
-                ColorToSet = Color3.fromRGB(255, 255, 0)
-            end
-
-            if MineStats.BlocksUntilCollapse <= 0 then
-                ColorToSet = Color3.fromRGB(255, 0, 0)
-            end
-
             Iris.Text({"Total blocks in mine: "..MineStats.TotalBlocks})
             Iris.Text({"    - Stone in mine: "..MineStats.TotalStone})
             Iris.Text({"    - Ores in mine: "..MineStats.TotalOres})
@@ -347,7 +337,7 @@ function IrisController:KnitInit()
 
     local UserInputService = game:GetService("UserInputService")
 
-    LogService.ActionLog:Connect(function(Color :Color3, ...)
+    LogService.ActionLog:Connect(function(_, ...)
         local Args = {...}
         NewLog(Args)
     end)

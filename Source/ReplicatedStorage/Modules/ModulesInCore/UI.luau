@@ -283,7 +283,10 @@ function UI:CreateOreFrames(OreList, Style :EnumList.EnumItem, Size :UDim2) :{Ro
             continue
         end
         if OreData.Amount == 0 then continue end
-        if OreName == "Gold" then warn("Gold is not supported in ore frames!!!") continue end
+        if OreName == "Gold" then
+            warn("Gold is not supported in ore frames!!!")
+            continue
+        end
 
         local NewList = OreListClass.New()
         if OreName == "Gold" then
