@@ -1,3 +1,5 @@
+[![Linter](https://github.com/Sebastian2852/ManicMines/actions/workflows/Lint.yml/badge.svg)](https://github.com/Sebastian2852/ManicMines/actions/workflows/Lint.yml)
+
 # Manic Mines
 Welcome to the source code repository for **Manic Mines** (Roblox game), versions 1.3 and above.
 

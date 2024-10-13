@@ -1,4 +1,3 @@
-local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
