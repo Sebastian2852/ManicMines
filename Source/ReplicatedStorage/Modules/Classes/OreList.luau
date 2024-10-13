@@ -60,7 +60,11 @@ Delete an ore from the list. If result is below `zero`, zero will be used. If yo
 the ore will be removed from the list!
 ]=]
 function OreList:RemoveOre(OreName :string, Amount :number)
-    if not self._Ores[OreName] then warn("There is no "..OreName.." in the ore list") return end
+    if not self._Ores[OreName] then
+        warn("There is no "..OreName.." in the ore list")
+        return
+    end
+
     local OreData = self._Ores[OreName]
     local AmountInList = OreData.Amount
     local NewAmount = AmountInList - Amount

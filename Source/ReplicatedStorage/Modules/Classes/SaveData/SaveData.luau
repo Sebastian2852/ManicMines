@@ -25,7 +25,8 @@ function SaveData.__tostring(SaveDataObject)
         end)
 
         if not Success then
-            warn("Failed to JSONEncode: "..ErrorMessage) ReturnString = ReturnString.."; (FAILED)"
+            warn("Failed to JSONEncode: "..ErrorMessage)
+            ReturnString = ReturnString.."; (FAILED)"
             return
         end
         ReturnString = ReturnString.."; "..DataStoreKey.." == "..DataStoreSaveData
@@ -94,7 +95,7 @@ Loads data stored in the given DataStore based on the names of the
 data in the object
 ]=]
 function SaveData:Load(DataStore :DataStore)
-    for Name :string, Data :{any} in pairs(self._Data) do
+    for Name :string, _ in pairs(self._Data) do
         local DataStoreKey = tostring(self._UserID).."-"..Name
         local DataStoreSaveData :string
 

@@ -162,10 +162,9 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
     NewTycoon.Parent = Tycoons
     NewTycoon:PivotTo(CFrame.new(TycoonsSpawn.Position + Vector3.new(500 * (#Tycoons:GetChildren() - 1), 0, 0)))
 
-    local TycoonSpawn :BasePart = NewTycoon.Main.Spawn
     local DataFolder = DataService:GetPlayerDataFolder(Player)
 
-    Player.CharacterAdded:Connect(function(Character)
+    Player.CharacterAdded:Connect(function()
         TeleportService:TeleportPlayerToTycoon(Player, NewTycoon)
     end)
 

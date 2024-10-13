@@ -126,7 +126,7 @@ end
 Checks wether a data table is valid
 ]=]
 local function IsRawDataValid(Data :{any}) :boolean
-    if Data == nil or Data == {} then
+    if Data == nil then
         return false
     end
     return true
@@ -270,7 +270,9 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
             end
         end
         LogService:Log("["..Player.Name.."]", "Loaded player data")
-    else return end
+    else
+        return
+    end
 
     LogService:Log("["..Player.Name.."]", "Loading tycoon data")
     if IsRawDataValid(RawTycoonData) then
@@ -286,7 +288,9 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
             Value.Value = UpgradeValue
         end
         LogService:Log("["..Player.Name.."]", "Loaded tycoon data")
-    else return end
+    else
+        return
+    end
 
     LogService:Log("["..Player.Name.."]", "Loading ore data")
     if IsRawDataValid(RawOreData) then
@@ -318,7 +322,9 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
             end
         end
         LogService:Log("["..Player.Name.."]", "Loaded ore data")
-    else return end
+    else
+        return
+    end
 
     LogService:Log("["..Player.Name.."]", "Player data loaded")
     PlayerDisplayService:GivePlayerOverheadGUI(Player)

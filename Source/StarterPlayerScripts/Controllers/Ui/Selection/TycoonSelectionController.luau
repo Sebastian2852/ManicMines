@@ -104,8 +104,12 @@ automatically deslect it
 ]=]
 function TycoonSelectionController:SelectHitbox(Hitbox)
     LogService:Log("Selecting upgrade hitbox")
-    if CurrentlySelecting then self:Deselect() end
-    if Selection ~= nil then self:Deselect() end
+    if CurrentlySelecting then
+        self:Deselect()
+    end
+    if Selection ~= nil then
+        self:Deselect()
+    end
 
     TycoonSelection.Visible = true
     local New = SelectionOutline:Clone()

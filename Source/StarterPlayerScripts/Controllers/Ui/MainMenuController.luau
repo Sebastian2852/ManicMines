@@ -4,9 +4,7 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 
-
 local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
-
 
 local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
 local PlayerGUI = Knit.Player.PlayerGui
@@ -189,7 +187,9 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
 
         New.SlotDelete.Delete.MouseButton1Click:Connect(function()
             for _, SlotFrame :Frame in pairs(SlotSelectionFrame.Slots:GetChildren()) do
-                if SlotFrame:IsA("Frame") then SlotFrame:Destroy() end
+                if SlotFrame:IsA("Frame") then
+                    SlotFrame:Destroy()
+                end
             end
 
             SlotSelectionFrame.Slots.LoadingText.Visible = true
@@ -227,7 +227,9 @@ end
 function MainMenuController:CreateSlotFrames()
     DataService:GetSlotsInfo():andThen(function(SlotsInfo)
         for _, SlotFrame :Frame in pairs(SlotSelectionFrame.Slots:GetChildren()) do
-            if SlotFrame:IsA("Frame") then SlotFrame:Destroy() end
+            if SlotFrame:IsA("Frame") then
+                SlotFrame:Destroy()
+            end
         end
 
         for _, Slot in pairs(SlotsInfo) do
