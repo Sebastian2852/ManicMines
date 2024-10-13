@@ -45,10 +45,7 @@ end
 PlayerFolder.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
     local ObjectToMine :BasePart = PlayerFolder.PickaxeSelection.Value
 
-    if not ObjectToMine then
-        MiningSelection.Visible = false
-        return
-    elseif not ObjectToMine:IsDescendantOf(Workspace.Game.Mine) then
+    if not ObjectToMine or not ObjectToMine:IsDescendantOf(Workspace.Game.Mine) or not ObjectToMine:IsA("BasePart") then
         MiningSelection.Visible = false
         return
     end

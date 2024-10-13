@@ -6,8 +6,6 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local SettingsController = Knit.CreateController { Name = "PlayerSettingsController" }
 
-local Player = Knit.Player
-
 local LogService
 local SettingsService
 local DataService
