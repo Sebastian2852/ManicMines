@@ -87,7 +87,9 @@ local OreList = require(script.Parent.Classes.OreList)
 
 local SaveData = require(script.Parent.Classes.SaveData.SaveData)
 local Data = require(script.Parent.Classes.SaveData.Data)
+
 local Maid = require(ReplicatedStorage.Packages.maid)
+local EnumList = require(ReplicatedStorage.Packages.EnumList)
 
 if RunService:IsClient() then
     Roact = require(ReplicatedStorage.Packages.Roact)
@@ -104,6 +106,7 @@ return {
     Roact = Roact;
 
     Maid = Maid;
+    EnumList = EnumList;
 
     Data = {
         SaveData = SaveData;

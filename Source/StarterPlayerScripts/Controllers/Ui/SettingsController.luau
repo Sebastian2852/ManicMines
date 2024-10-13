@@ -32,17 +32,6 @@ local function Update()
     game.Lighting.GlobalShadows = Settings.GlobalShadows
 end
 
---[[
-!!!This is only here to test the settings!!!
-]]
-UserInputService.InputBegan:Connect(function(Input, Processed)
-    if Processed then return end
-    if Input.KeyCode == Enum.KeyCode.Z then 
-        Settings.GlobalShadows = not Settings.GlobalShadows
-        Settings.RainbowEffect = not Settings.RainbowEffect
-        PushToServer()
-    end
-end)
 
 
 -- [[ UI ]] --

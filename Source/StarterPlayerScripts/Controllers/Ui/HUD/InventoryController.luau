@@ -1,15 +1,32 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local Random = Random.new()
+local LastInputType = "None"
 
 local InventoryController = Knit.CreateController { Name = "InventoryController" }
 
 local LogService
--- local DataService
---local DataFolder :Core.DataFolder
+local DataService
+local DataFolder :Core.DataFolder
+
+-- [[ PRIVATE ]]--
+
+local function CreateInventoryOreList()
+    local NewList = Core.OreList.New()
+
+    for _, OreDataValue :IntValue in pairs(DataFolder.Inventory.Ores:GetChildren()) do
+        if OreDataValue.Value == 0 then continue end
+        NewList:AddOre(OreDataValue.Name, OreDataValue.Value)
+    end
+
+    return NewList
+end
+
+
 
 -- [[ UI ]]--
 
@@ -24,27 +41,44 @@ function InventoryComponent:init()
     end
 
     self:setState({
+        StyleToUse = Core.UI.OreFrameStyle.Normal;
         OreList = {};
         Capacity = 0;
         Amount = 0;
     })
 
-    task.spawn(function()
-        local TestList = Core.OreList.New()
-        TestList:AddOre("Stone", 15)
-        self:UpdateInventory(Random:NextInteger(0, 100), Random:NextInteger(0, 100), TestList)
+    for _, OreDataValue :IntValue in pairs(DataFolder:WaitForChild("Inventory"):WaitForChild("Ores"):GetChildren()) do
+        OreDataValue:GetPropertyChangedSignal("Value"):Connect(function()
+            self:UpdateInventory(0, 0, CreateInventoryOreList())
+        end)
+    end
 
-        while task.wait(5) do
-            local NewList = Core.OreList.New()
-            NewList:AddOre("Stone", Random:NextInteger(0, 50))
-            self:UpdateInventory(Random:NextInteger(0, 100), Random:NextInteger(0, 100), NewList)
+    UserInputService.InputBegan:Connect(function()
+        local InputType = UserInputService:GetLastInputType()
+
+        -- Long ass if statment to check all the possible PC input types
+        -- Thanks roblox for not making any simple way to check device :D
+        if InputType == Enum.UserInputType.Keyboard or InputType == Enum.UserInputType.MouseMovement or InputType == Enum.UserInputType.MouseButton1 or InputType == Enum.UserInputType.MouseButton2 or InputType == Enum.UserInputType.MouseButton3 then
+            if LastInputType == "PC" then return end
+            self:setState(function(PreviousState :{any})
+                PreviousState.StyleToUse = Core.UI.OreFrameStyle.PcInventory
+                return PreviousState
+            end)
+            LastInputType = "PC"
+        else
+            if LastInputType == "Mobile" then return end
+            self:setState(function(PreviousState :{any})
+                PreviousState.StyleToUse = Core.UI.OreFrameStyle.Normal
+                return PreviousState
+            end)
+            LastInputType = "Mobile"
         end
     end)
 end
 
 function InventoryComponent:render()
     LogService:Log("Rendering inventory")
-    local Components = Core.UI:CreateOreFrames(self.state.OreList, Core.UI.OreFrameStyle.PcInventory, UDim2.fromScale(1, 0.1))
+    local Components = Core.UI:CreateOreFrames(self.state.OreList, self.state.StyleToUse, UDim2.fromScale(1, 0.1))
     Components["Layout"] = Core.Roact.createElement("UIListLayout", {}, {})
 
 
@@ -158,15 +192,16 @@ end
 -- [[ KNIT ]] --
 
 function InventoryController:KnitStart()
-    -- DataService = Knit.GetService("DataService")
+    DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
-    -- DataService:GetPlayerDataFolder():andThen(function(Return)
-        -- DataFolder = Return
-    -- end)
+    DataService:GetPlayerDataFolder():andThen(function(Return)
+        DataFolder = Return
 
-    local App = Core.Roact.createElement(InventoryComponent)
-    Core.Roact.mount(App, Knit.Player.PlayerGui, "Inventory")
-    LogService:Log("Mounted Inventory component")
+        local App = Core.Roact.createElement(InventoryComponent)
+        Core.Roact.mount(App, Knit.Player.PlayerGui, "Inventory")
+        LogService:Log("Mounted Inventory component")
+    end)
+
 end
 
 return InventoryController

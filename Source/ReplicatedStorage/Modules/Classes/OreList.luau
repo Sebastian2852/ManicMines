@@ -30,9 +30,21 @@ Create a new blank ore list
 ]=]
 function OreList.New()
     local self = setmetatable({}, OreList)
+    self.ClassName = "OreList"
     self._Gold = 0
     self._Ores = {}
     return self
+end
+
+--[=[
+Check if an object is an OreList object
+]=]
+function OreList.IsOreList(Object :any)
+    if Object.ClassName == "OreList" then
+        return true
+    end
+
+    return false
 end
 
 --[=[

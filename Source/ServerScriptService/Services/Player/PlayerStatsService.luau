@@ -20,15 +20,25 @@ local function FindTimesMinedValueByName(Name :string, DataFolder :Core.DataFold
     return DataFolder.TimesMined:FindFirstChild(Name) or DataFolder.TimesMined:FindFirstChild("Stone")
 end
 
+
+
 -- [[ PUBLIC ]]--
 
 --[=[
 Gives ores to the players inventory, doesnt matter if they dont have enough space to carry it
 ]=]
 function PlayerStatsService:GiveOres(Player :Player, OreList)
-    local DataFolder = DataService:GetPlayerDataFolder(Player)
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
 
     for OreName, Data in pairs(OreList:LoopList()) do
+        if Data.Amount == 0 then continue end
+
+        if OreName == "Gold" then
+            DataFolder.Gold.Value += Data.Amount
+            LogService:Log("Gave "..Player.Name.." "..Data.Amount.." gold")
+            continue
+        end
+
         local DataValue = FindInventoryValueByName(OreName, DataFolder)
         DataValue.Value += Data.Amount
         LogService:Log("Gave "..Player.Name.." "..Data.Amount.." "..Data.DisplayName)

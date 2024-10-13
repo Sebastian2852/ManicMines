@@ -86,6 +86,11 @@ function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Posit
             continue
         end
 
+        if not UI.OreFrameStyle:BelongsTo(Style) then
+            warn("Invalid ore frame style passed: "..tostring(Style))
+            return {}
+        end
+
         if Style.Value == 1 then
             return Roact.createElement("Frame", {
                 Size = Size;
@@ -275,6 +280,11 @@ end
 Returns a table of Ore frames as components in a table.
 ]=]
 function UI:CreateOreFrames(OreList, Style :EnumList.EnumItem, Size :UDim2) :{Roact.Component}
+    if not OreListClass.IsOreList(OreList) then
+        warn("Invalid ore list passed:", OreList)
+        return {}
+    end
+
     local Frames = {}
 
     for OreName, OreData in pairs(OreList:LoopList()) do
