@@ -9,7 +9,7 @@ Override the tostring() function to return the object as a nice string in the fo
 function OreList.__tostring(OreListObject)
     local Text = ""
     for _, OreData in pairs(OreListObject._Ores) do
-        Text = Text.." "..OreData.Amount.." "..OreData.DisplayName.."("..OreData.Name..");"
+        Text = Text.." "..tostring(OreData.Amount).." "..tostring(OreData.DisplayName).." ("..tostring(OreData.Name)..");"
     end
     return Text
 end

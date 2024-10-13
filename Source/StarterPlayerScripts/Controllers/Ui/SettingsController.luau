@@ -170,13 +170,15 @@ function SettingsComponent:init()
 end
 
 function SettingsComponent:render()
+    LogService:Log("Rendering settings GUI")
     return Core.Roact.createElement("ScreenGui", {}, {
         ToggleButton = Core.Roact.createElement("ImageButton", {
             Size = UDim2.fromScale(0.04, 0.08);
             Position = UDim2.fromScale(0.01, 0.98);
-            AnchorPoint = Vector2.new(0, 1);
+            AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
 
             Image = "rbxassetid://88251609691626";
+            BorderSizePixel = 0;
 
             BackgroundColor3 = Core.UI.Theme.BackgroundColor;
             BackgroundTransparency = Core.UI.Theme.BackgroundColorTransparency;
@@ -191,7 +193,7 @@ function SettingsComponent:render()
         SettingsPanel = self.state.IsSettingsVisible and Core.Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.5, 0.5);
             Position = UDim2.fromScale(0.5, 0.5);
-            AnchorPoint = Vector2.new(0.5, 0.5);
+            AnchorPoint = Core.UI.AnchorPoint.Center;
 
             BackgroundColor3 = Core.UI.Theme.BackgroundColor;
             BackgroundTransparency = Core.UI.Theme.BackgroundColorTransparency;
@@ -212,7 +214,7 @@ function SettingsComponent:render()
             SettingsFrame = Core.Roact.createElement("ScrollingFrame", {
                 Size = UDim2.fromScale(1, 0.85);
                 Position = UDim2.fromScale(0.5, 0.575);
-                AnchorPoint = Vector2.new(0.5, 0.5);
+                AnchorPoint = Core.UI.AnchorPoint.Center;
 
                 ScrollBarThickness = 5;
                 AutomaticCanvasSize = Enum.AutomaticSize.Y;
@@ -267,15 +269,7 @@ function SettingsController:KnitStart()
 
     local App = Core.Roact.createElement(SettingsComponent)
     Core.Roact.mount(App, Knit.Player.PlayerGui, "Settings")
-
-    local TestList = Core.OreList.New()
-    TestList:AddOre("Stone", 15)
-
-    local Test = Core.Roact.createElement("ScreenGui", {}, {
-        OreFrame = Core.UI:CreateOreFrame(TestList, Core.UI.OreFrameStyle.Normal, UDim2.fromScale(0.3, 0.1), UDim2.fromScale(0.5, 0.5))
-    })
-    Core.Roact.mount(Test, Knit.Player.PlayerGui, "TEST")
-    TestList:Destroy()
+    LogService:Log("Mounted settings component")
 end
 
 return SettingsController

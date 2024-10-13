@@ -6,6 +6,7 @@ local UI = {}
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local EnumList = require(ReplicatedStorage.Packages.EnumList)
+local OreListClass = require(ReplicatedStorage.Game.Modules.Classes.OreList)
 
 UI.Theme = {
     BackgroundColor = Color3.new(0, 0, 0);
@@ -18,13 +19,72 @@ UI.Theme = {
     TextColorDisabled = Color3.new(0.278431, 0.278431, 0.278431);
 }
 
+--[=[
+A set of preset anchor points
+]=]
+UI.AnchorPoint = {
+    TopLeft         = Vector2.new(0, 0);
+    TopRight        = Vector2.new(1, 0);
+
+    BottomLeft      = Vector2.new(0, 1);
+    BottomRight     = Vector2.new(1, 1);
+
+    Center          = Vector2.new(0.5, 0.5);
+    TopCenter       = Vector2.new(0.5, 0);
+    BottomCenter    = Vector2.new(0.5, 1);
+}
+
+--[=[
+A set of preset positions
+]=]
+UI.Position = {
+    TopLeft         = UDim2.fromScale(0, 0);
+    TopRight        = UDim2.fromScale(1, 0);
+
+    Bottomleft      = UDim2.fromScale(0, 1);
+    BottomRight     = UDim2.fromScale(1, 1);
+
+    Center          = UDim2.fromScale(0.5, 0.5);
+    TopCenter       = UDim2.fromOffset(0.5, 0);
+    BottomCenter    = UDim2.fromScale(0.5, 1);
+}
+
+--[=[
+Color presets
+]=]
+UI.Color = {
+    Blue       = Color3.fromRGB(0, 123, 255);
+    Red        = Color3.fromRGB(220, 53, 69);
+    Green      = Color3.fromRGB(40, 267, 69);
+    Yellow     = Color3.fromRGB(255, 193, 64);
+    Orange     = Color3.fromRGB(255, 159, 64);
+    Purple     = Color3.fromRGB(102, 16, 242);
+    Pink       = Color3.fromRGB(232, 62, 140);
+    Teal       = Color3.fromRGB(32, 201, 151);
+    Cyan       = Color3.fromRGB(23, 162, 184);
+    Gray       = Color3.fromRGB(108, 117, 125);
+    Black      = Color3.fromRGB(0, 0, 0);
+    White      = Color3.fromRGB(255, 255, 255);
+    Brown      = Color3.fromRGB(121, 85, 72);
+    Indigo     = Color3.fromRGB(75, 0, 130);
+    Lime       = Color3.fromRGB(50, 205, 50);
+}
+
 UI.OreFrameStyle = EnumList.new("OreFrameStyle", {
     "PcInventory";
     "Normal";
 })
 
-function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Position :UDim2)
+--[=[
+Create a single ore frame from an ore list. This only creates a frame for the first thing in the ore list
+]=]
+function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Position :UDim2) -- Maybe add an "include gold" param
     for OreName :string, OreData in pairs(OreList:LoopList()) do
+        if OreData.Amount == 0 then continue end
+        if OreName == "Gold" then
+            warn("Gold is not supported in ore frames!!!")
+            continue
+        end
 
         if Style.Value == 1 then
             return Roact.createElement("Frame", {
@@ -90,7 +150,7 @@ function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Posit
                         BackgroundTransparency = 1;
                         Size = UDim2.fromScale(1, 0.6);
 
-                        Text = OreName;
+                        Text = OreName or "error getting name";
                         FontFace = UI.Theme.TextFont;
                         TextStrokeTransparency = 0;
                         TextScaled = true;
@@ -105,7 +165,7 @@ function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Posit
                         Size = UDim2.fromScale(1, 0.4);
                         BackgroundTransparency = 1;
 
-                        Text = tostring(OreData.Amount);
+                        Text = tostring(OreData.Amount) or "error getting amount";
                         FontFace = UI.Theme.TextFont;
                         TextStrokeTransparency = 0;
                         TextScaled = true;
@@ -181,7 +241,7 @@ function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Posit
                         Size = UDim2.fromScale(0.6, 1);
                         LayoutOrder = 1;
 
-                        Text = OreName;
+                        Text = OreName or "error getting name";
                         FontFace = UI.Theme.TextFont;
                         TextStrokeTransparency = 0;
                         TextScaled = true;
@@ -196,7 +256,7 @@ function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Posit
                         Size = UDim2.fromScale(0.22, 1);
                         LayoutOrder = 2;
 
-                        Text = tostring(OreData.Amount);
+                        Text = tostring(OreData.Amount) or "error getting amount";
                         FontFace = UI.Theme.TextFont;
                         TextStrokeTransparency = 0;
                         TextScaled = true;
@@ -209,6 +269,37 @@ function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Posit
             })
         end
     end
+end
+
+--[=[
+Returns a table of Ore frames as components in a table.
+]=]
+function UI:CreateOreFrames(OreList, Style :EnumList.EnumItem, Size :UDim2) :{Roact.Component}
+    local Frames = {}
+
+    for OreName, OreData in pairs(OreList:LoopList()) do
+        if OreData.Amount == nil then
+            warn("Can not process orelist with nil ore amount!")
+            continue
+        end
+        if OreData.Amount == 0 then continue end
+        if OreName == "Gold" then warn("Gold is not supported in ore frames!!!") continue end
+
+        local NewList = OreListClass.New()
+        if OreName == "Gold" then
+            NewList:AddGold(OreData.Amount)
+            Frames[OreName] = self:CreateOreFrame(NewList, Style, Size, UDim2.fromScale(0, 0))
+            NewList:Destroy()
+            continue
+        end
+
+        NewList:AddOre(OreName, OreData.Amount)
+        Frames[OreName] = self:CreateOreFrame(NewList, Style, Size, UDim2.fromScale(0, 0))
+        NewList:Destroy()
+        continue
+    end
+
+    return Frames
 end
 
 return UI
