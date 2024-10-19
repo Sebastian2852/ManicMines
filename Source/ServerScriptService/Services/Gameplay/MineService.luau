@@ -58,7 +58,7 @@ end
 local function ConvertYLevelToDepth(WorldY :number) :number
     local Top = TopLayerY
     local CellSize = Core.GameConfig.Mine.BlockSize.Y
-    return (Top - WorldY) / CellSize
+    return math.floor((Top - WorldY) / CellSize)
 end
 
 local function SetupStoneBlock(StoneBlock :BasePart)
@@ -255,6 +255,14 @@ end
 
 function MineService.Client:GetBlocksToCollapse()
     return self.Server.Settings.BlocksMinedForCollapse
+end
+
+function MineService.Client:ConvertToDepth(_, YLevel :number)
+    return ConvertYLevelToDepth(YLevel)
+end
+
+function MineService.Client:GetLayerConfig(_, YLevel :number) :Configuration
+    return self.Server:YLevelToLayer(YLevel)
 end
 
 
