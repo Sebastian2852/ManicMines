@@ -195,8 +195,8 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
         if Health <= 0 then
             PickaxeService:StopMining(Player)
             MineService:BlockMined(ObjectToMine)
-            task.wait(Pickaxe:GetAttribute("MiningCooldown") / 2)
             PlayerStatsService:MinedOre(Player, OreList)
+            task.wait(Pickaxe:GetAttribute("MiningCooldown") / 2)
             break
         end
 
