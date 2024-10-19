@@ -51,7 +51,9 @@ Config.Admins = {
 }
 
 Config.Mine = {
-    BlockSize = Vector3.new(6, 6, 6)
+    BlockSize = Vector3.new(6, 6, 6);
+    BlocksToCollapse = 1000;
+    ChanceToGenerateOre = 25;
 }
 
 return Config

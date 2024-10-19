@@ -26,11 +26,6 @@ MineService.MineStats = {
     OresGenerated = 0;
 }
 
-MineService.Settings = {
-    ChanceToGenerateOre = 25;
-    BlocksMinedForCollapse = 110;
-}
-
 -- [[ PRIVATE ]] --
 
 local function CollapseMine()
@@ -124,7 +119,7 @@ Generates a position at a given position, has a random chance to be an ore
 function MineService:GenerateBlockAtPosition(Position :Vector3)
     if table.find(self.UsedPositions, Position) then return end
 
-    local RandomNumber = math.random(1, self.Settings.ChanceToGenerateOre)
+    local RandomNumber = math.random(1, Core.GameConfig.Mine.ChanceToGenerateOre)
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
     local BlockToGenerate = StoneBlock
     local Tag = "_Stone"
@@ -221,7 +216,7 @@ end
 Generates blocks around a block that was mined aswell as destroying the block
 ]=]
 function MineService:BlockMined(Block :BasePart)
-    if self.MineStats.BlocksGenerated >= self.Settings.BlocksMinedForCollapse then
+    if self.MineStats.BlocksGenerated >= Core.GameConfig.Mine.BlocksToCollapse then
         CollapseMine()
         return
     end
@@ -254,7 +249,7 @@ end
 -- [[ CLIENT ]] --
 
 function MineService.Client:GetBlocksToCollapse()
-    return self.Server.Settings.BlocksMinedForCollapse
+    return Core.GameConfig.Mine.BlocksToCollapse
 end
 
 function MineService.Client:ConvertToDepth(_, YLevel :number)
@@ -273,6 +268,10 @@ function MineService:KnitStart()
     LogService = Knit.GetService("LogService")
     TeleportService = Knit.GetService("TeleportService")
     self:GenerateTopLayer()
+
+    if workspace:FindFirstChild("Baseplate") then
+        workspace:FindFirstChild("Baseplate"):Destroy()
+    end
 end
 
 

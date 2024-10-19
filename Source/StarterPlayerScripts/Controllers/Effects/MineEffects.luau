@@ -35,11 +35,11 @@ function MineEffects:KnitStart()
 
     RunService:BindToRenderStep("CharacterPositionInfo", Enum.RenderPriority.Input.Value + 1, function()
         local Character = Knit.Player.Character
-        if not Character then return end
+        if not Character or not Character:FindFirstChild("HumanoidRootPart") then return end
 
-        local X = math.floor(Character.PrimaryPart.CFrame.Position.X)
-        local Y = math.floor(Character.PrimaryPart.CFrame.Position.Y)
-        local Z = math.floor(Character.PrimaryPart.CFrame.Position.Z)
+        local X = math.floor(Character:FindFirstChild("HumanoidRootPart").CFrame.Position.X)
+        local Y = math.floor(Character:FindFirstChild("HumanoidRootPart").CFrame.Position.Y)
+        local Z = math.floor(Character:FindFirstChild("HumanoidRootPart").CFrame.Position.Z)
         local Position = Vector3.new(X, Y, Z)
 
         MineService:GetLayerConfig(Position.Y):andThen(function(Config :Configuration)
