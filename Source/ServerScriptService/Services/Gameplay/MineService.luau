@@ -55,6 +55,31 @@ local function CollapseMine()
     MineSpawn.Transparency = 1
 end
 
+local function ConvertYLevelToDepth(WorldY :number) :number
+    local Top = TopLayerY
+    local CellSize = Core.GameConfig.Mine.BlockSize.Y
+    return (Top - WorldY) / CellSize
+end
+
+local function SetupStoneBlock(StoneBlock :BasePart)
+    local NormalStone = Core.Assets.Stone
+    local Attribs = StoneBlock:GetAttributes()
+
+    for Key, _ in pairs(StoneBlock:GetAttributes()) do
+        StoneBlock:SetAttribute(Key, nil)
+    end
+
+    for Key, Value in pairs(NormalStone:GetAttributes()) do
+        StoneBlock:SetAttribute(Key, Value)
+    end
+
+    for Key, Value in pairs(Attribs) do
+        StoneBlock:SetAttribute(Key, Value)
+    end
+end
+
+
+
 -- [[ PUBLIC ]] --
 
 --[=[
@@ -62,8 +87,15 @@ Convert any Y level number into a layer config. If no valid layer config is foun
 layer is used.
 ]=]
 function MineService:YLevelToLayer(YLevel :number) :Configuration
-    -- This only returns the default layer for now
-    print(YLevel)
+    local Depth = ConvertYLevelToDepth(YLevel)
+
+    for _, LayerConfig in pairs(Core.Assets.Layers:GetChildren()) do
+        local LayerDepth :NumberRange = LayerConfig:GetAttribute("Depth")
+        if Depth >= LayerDepth.Min and Depth <= LayerDepth.Max then
+            return LayerConfig
+        end
+    end
+
     return game.ReplicatedStorage.Assets.Layers.Default
 end
 
@@ -120,6 +152,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
         end
     end
 
+    SetupStoneBlock(StoneBlock)
     local NewBlock :BasePart = BlockToGenerate:Clone()
     NewBlock.Parent = workspace.Game.Mine
     NewBlock.Position = Position

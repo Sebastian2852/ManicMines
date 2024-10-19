@@ -113,12 +113,5 @@ return {
         Data = Data;
     };
 
-    Assets = {
-        Layers = ReplicatedStorage.Assets.Layers;
-        Levels = ReplicatedStorage.Assets.Levels;
-        Ores = ReplicatedStorage.Assets.Ores;
-        Pickaxe = ReplicatedStorage.Assets.Pickaxe;
-        Tycoon = ReplicatedStorage.Assets.Tycoon;
-        UI = ReplicatedStorage.Assets.UI;
-    };
+    Assets = ReplicatedStorage.Assets
 }

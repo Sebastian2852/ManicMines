@@ -19,12 +19,4 @@ function LightingController:CreateFromConfig(Config :Configuration)
     end
 end
 
-function LightingController:KnitStart()
-    for i = 1, 5, 1 do
-        print(i)
-        task.wait(1)
-    end
-    self:CreateFromConfig(script.Parent:FindFirstChildWhichIsA("Configuration"))
-end
-
 return LightingController
