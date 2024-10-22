@@ -197,6 +197,10 @@ function InventoryController:KnitStart()
     DataService:GetPlayerDataFolder():andThen(function(Return)
         DataFolder = Return
 
+        repeat
+            task.wait(0.1)
+        until DataFolder.DataLoaded.Value
+
         local App = Core.Roact.createElement(InventoryComponent)
         Core.Roact.mount(App, Knit.Player.PlayerGui, "Inventory")
         LogService:Log("Mounted Inventory component")
