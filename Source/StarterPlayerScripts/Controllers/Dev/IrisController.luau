@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -250,23 +251,39 @@ function IrisController:AdminPanel(DataFolder :Core.DataFolder)
                 Iris.Text({"Upgrades"})
                 for _, Upgrade in pairs(DataFolder.Tycoon.Upgrades:GetChildren()) do
                     local Max = (#Core.Assets.Tycoon.Upgrades:FindFirstChild(Upgrade.Name):GetChildren()) - 1
-                    local Input = Iris.SliderNum({Upgrade.Name, 1, 0, Max}, {Admin_CurrentTycoon.Upgrades[Upgrade.Name]})
+                    local Input = Iris.SliderNum({Upgrade.Name, 1, 0, Max})
                     UpgradeInputs[Upgrade.Name] = Input.state.number.value
                 end
             end
-
-            Iris.SameLine()
 
             if Iris.Button({"Update"}).clicked() then
                 for Name, Value in pairs(UpgradeInputs) do
                     TycoonService:SetUpgradeValue(game.Players:GetPlayerByUserId(Admin_CurrentPlayer), Name, Value)
                 end
-                TycoonService:SetTycoonName(game.Players:GetPlayerByUserId(Admin_CurrentPlayer), NameInput)
+
+                if #NameInput < 0 then
+                    TycoonService:SetTycoonName(game.Players:GetPlayerByUserId(Admin_CurrentPlayer), NameInput)
+                end
+            end
+        end
+
+        if Admin_Permissions.GiveOres or Admin_Permissions.TakeOres then
+            Iris.SeparatorText({"Ores"})
+            local Ore = Iris.InputText({"Ore Name", "Stone"})
+            local Amount = Iris.InputNum({"Amount", 1, 0, 999})
+
+            Iris.SameLine()
+            if Admin_Permissions.GiveOres then
+                if Iris.Button({"Give"}).clicked() then
+                    AdminService:GiveOre(Players:GetPlayerByUserId(Admin_CurrentPlayer), Ore.text.value, Amount.state.number.value)
+                end
             end
 
-            if Iris.Button({"Reset"}).clicked() then
-                Iris.Text({"Test"})
-            end 
+            if Admin_Permissions.TakeOres then
+                if Iris.Button({"Take"}).clicked() then
+                    AdminService:TakeOre(Players:GetPlayerByUserId(Admin_CurrentPlayer), Ore.text.value, Amount.state.number.value)
+                end
+            end
             Iris.End()
         end
     else

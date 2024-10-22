@@ -46,6 +46,35 @@ function PlayerStatsService:GiveOres(Player :Player, OreList)
 end
 
 --[=[
+Takes ores from the player's inventory and storage
+]=]
+function PlayerStatsService:TakeOres(Player :Player, OreList)
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+
+    for OreName, Data in pairs(OreList:LoopList()) do
+        if Data.Amount == 0 then continue end
+
+        if OreName == "Gold" then
+            local NewAmount = DataFolder.Gold.Value - Data.Amount
+            if NewAmount <= 0 then
+                NewAmount = 0
+            end
+            DataFolder.Gold.Value = NewAmount
+            LogService:Log("removed "..Player.Name.." "..Data.Amount.." gold")
+            continue
+        end
+
+        local DataValue = FindInventoryValueByName(OreName, DataFolder)
+        local NewAmount = DataValue.Value - Data.Amount
+        if NewAmount <= 0 then
+            NewAmount = 0
+        end
+        DataValue.Value = NewAmount
+        LogService:Log("removed "..Player.Name.." "..Data.Amount.." "..Data.DisplayName)
+    end
+end
+
+--[=[
 Gives the player ores and adds 1 to its times mined value
 ]=]
 function PlayerStatsService:MinedOre(Player :Player, OreList)

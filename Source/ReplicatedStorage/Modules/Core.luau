@@ -75,6 +75,9 @@ Used for well admin permissions
 export type AdminPermissions = {
     EditTycoonName :boolean;
     EditTycoonUpgrades :boolean;
+
+    GiveOres :boolean;
+    TakeOres :boolean;
 }
 
 local GameConfig = require(script.Parent.ModulesInCore.GameConfig)

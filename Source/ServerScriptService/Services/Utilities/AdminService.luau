@@ -8,6 +8,8 @@ local AdminService = Knit.CreateService {
     Client = {},
 }
 
+local PlayerStatsService
+
 -- [[ PUBLIC ]] --
 
 --[=[
@@ -35,6 +37,14 @@ function AdminService:GetAdminPermissions(Player :Player) :Core.AdminPermissions
     return Core.GameConfig.Admins.Admins[Player.UserId]
 end
 
+--[=[
+returns true/false if the passed player has the given permission
+]=]
+function AdminService:HasPermission(Player :Player, Permission :string) :boolean
+    if not self:IsPlayerAdmin(Player) then return false end
+    local Permissions = self:GetAdminPermissions(Player)
+    return Permissions[Permission] :: boolean
+end
 
 
 -- [[ CLIENT ]] --
@@ -45,6 +55,31 @@ end
 
 function AdminService.Client:GetPermissions(Player :Player)
     return self.Server:GetAdminPermissions(Player)
+end
+
+function AdminService.Client:GiveOre(Admin :Player, Player :Player, OreName :string, Amount :number)
+    if not self:IsPlayerAdmin(Admin) then return end
+    if not self.Server:HasPermission(Admin, "GiveOres") then return end
+
+    local OreList = Core.OreList.CreateFromOre(OreName, Amount)
+    PlayerStatsService:GiveOres(Player, OreList)
+    OreList:Destroy()
+end
+
+function AdminService.Client:TakeOre(Admin :Player, Player :Player, OreName :string, Amount :number)
+    if not self:IsPlayerAdmin(Admin) then return end
+    if not self.Server:HasPermission(Admin, "TakeOres") then return end
+
+    local OreList = Core.OreList.CreateFromOre(OreName, Amount)
+    PlayerStatsService:TakeOres(Player, OreList)
+    OreList:Destroy()
+end
+
+
+--[[ KNIT ]]--
+
+function AdminService:KnitStart()
+    PlayerStatsService = Knit.GetService("PlayerStatsService")
 end
 
 return AdminService

@@ -46,6 +46,9 @@ Config.Admins = {
         [3092257097] = {
             EditTycoonName = true;
             EditTycoonUpgrades = true;
+
+            GiveOres = true;
+            TakeOres = true;
         }
     };
 }
