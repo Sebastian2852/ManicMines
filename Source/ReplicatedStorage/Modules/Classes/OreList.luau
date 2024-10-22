@@ -37,6 +37,15 @@ function OreList.New()
 end
 
 --[=[
+Create an ore list with 1 ore
+]=]
+function OreList.CreateFromOre(OreName :string, Amount :number)
+    local self = OreList.New()
+    self:AddOre(OreName, Amount)
+    return self
+end
+
+--[=[
 Check if an object is an OreList object
 ]=]
 function OreList.IsOreList(Object :any)
