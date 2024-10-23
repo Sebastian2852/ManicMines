@@ -80,6 +80,34 @@ export type AdminPermissions = {
     TakeOres :boolean;
 }
 
+
+--[=[
+A config for a sound type
+]=]
+export type SoundConfig = {
+    Positional :boolean;
+    PositionToPlay :BasePart|Vector3;
+    Looped :boolean;
+    Volume :number;
+    Pitch :number;
+
+    RollOffMode :Enum.RollOffMode;
+    RollOffDistanceBegin :number;
+    RollOffMaxDistance :number;
+}
+
+--[=[
+A sound type for use by the AudioEngine
+Contains all the functions and more complex options
+]=]
+export type Sound = {
+    SoundID :string;
+    Config :SoundConfig;
+
+    OnFinish :() -> ();
+    OnLoop :(TimesLooped :number) -> ();
+}
+
 local GameConfig = require(script.Parent.ModulesInCore.GameConfig)
 local Util = require(script.Parent.ModulesInCore.Util)
 local UI
