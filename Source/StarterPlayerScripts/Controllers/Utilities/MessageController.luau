@@ -20,7 +20,7 @@ local function SendChatMessage(MessageInfo :Core.ChatMessage)
     end
 
     TextChannel:SendAsync(Message)
-    LogService:Log("Sent chat message")
+    LogService:Log("Sent chat message", Message)
 end
 
 
@@ -50,7 +50,7 @@ function MessageController:KnitStart()
     task.wait(1)
 
     local JoinMessage :Core.ChatMessage = {
-        Message = Knit.Player.DisplayName.."(@"..Knit.Player.Name..") joined the game!";
+        Message = Knit.Player.DisplayName.." (@"..Knit.Player.Name..") joined the game!";
         HasPrefix = false;
     }
     SendChatMessage(JoinMessage)

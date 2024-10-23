@@ -61,7 +61,8 @@
         "MainMenuReady":{"$className":"BoolValue"},
         "PickaxeActive":{"$className":"BoolValue"},
         "PickaxeEquipped":{"$className":"BoolValue"},
-        "PickaxeSelection":{"$className":"ObjectValue"}
+        "PickaxeSelection":{"$className":"ObjectValue"},
+        "Depth":{"$className":"NumberValue"}
       },
       "PlayerData": {
         "$className": "Folder",

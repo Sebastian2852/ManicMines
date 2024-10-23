@@ -49,6 +49,9 @@ function MineEffects:KnitStart()
             PreviousLayer = Config.Name
         end)
 
+        MineService:ConvertToDepth(Position.Y):andThen(function(Depth :number)
+            ReplicatedStorage.Player.Depth.Value = Depth
+        end)
     end)
 end
 

@@ -59,4 +59,11 @@ Config.Mine = {
     ChanceToGenerateOre = 25;
 }
 
+Config.Chat = {
+    ServerTagColor = Color3.fromRGB(255, 0, 0);
+    Players = {
+        [3092257097] = {Tag = "Dev", TagColor = Color3.fromRGB(179, 138, 255), NameColor = Color3.fromRGB(255, 255, 255)};
+    }
+}
+
 return Config
