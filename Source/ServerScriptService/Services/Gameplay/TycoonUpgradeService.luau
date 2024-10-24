@@ -39,8 +39,6 @@ end
 function TycoonUpgradeService:KnitInit()
     LogService = Knit.GetService("LogService")
 
-    LogService:Log(self.Tags)
-
     for Tag :string, _ in pairs(self.Tags) do
         local Tagged = CollectionService:GetTagged(Tag)
         for _, Part :BasePart in pairs(Tagged) do

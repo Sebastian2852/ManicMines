@@ -160,9 +160,9 @@ function AudioEngine:KnitStart()
         print("Times looped:", TimesLooped)
     end
 
-    self:PlaySound(TestSound)
+    --self:PlaySound(TestSound)
     TestSound.Config.Pitch = 2
-    self:PlaySound(TestSound)
+    --self:PlaySound(TestSound)
     -----------------------------------------------------------------
 end
 

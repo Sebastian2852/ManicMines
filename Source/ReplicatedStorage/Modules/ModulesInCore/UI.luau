@@ -45,7 +45,7 @@ UI.Position = {
     BottomRight     = UDim2.fromScale(1, 1);
 
     Center          = UDim2.fromScale(0.5, 0.5);
-    TopCenter       = UDim2.fromOffset(0.5, 0);
+    TopCenter       = UDim2.fromScale(0.5, 0);
     BottomCenter    = UDim2.fromScale(0.5, 1);
 }
 
