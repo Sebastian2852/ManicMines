@@ -5,7 +5,9 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local TycoonUpgradeService = Knit.CreateService {
     Name = "TycoonUpgradeService";
-    Client = {};
+    Client = {
+        OpenStorage = Knit.CreateSignal();
+    };
 }
 
 local LogService
@@ -23,7 +25,7 @@ TycoonUpgradeService.Tags = {
         ProximityPrompt.Parent = Part
 
         ProximityPrompt.Triggered:Connect(function(Player)
-            print(Player, "opened storage")
+            TycoonUpgradeService.Client.OpenStorage:Fire(Player)
         end)
     end;
 }

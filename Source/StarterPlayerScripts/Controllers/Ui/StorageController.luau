@@ -8,11 +8,16 @@ local StorageController = Knit.CreateController { Name = "StorageController" }
 
 local StorageComponent = Roact.Component:extend("StorageComponent")
 local LogService
+local TycoonUpgradeService
 
 function StorageComponent:init()
     self:setState({
         Enabled = true
     })
+
+    TycoonUpgradeService.OpenStorage:Connect(function()
+        self:Enable()
+    end)
 end
 
 function StorageComponent:Enable()
@@ -148,6 +153,7 @@ end
 
 function StorageController:KnitStart()
     LogService = Knit.GetService("LogService")
+    TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")
 
     local App = Roact.createElement(StorageComponent)
     Roact.mount(App, Knit.Player.PlayerGui, "Storage")
