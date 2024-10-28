@@ -458,7 +458,7 @@ local function createPrompt(prompt, inputType, gui)
 
         wait(0.2)
 
-        promptUI.Parent = nil
+        promptUI.Parent = game.ReplicatedStorage.Assets.UI.Billboards
     end
 
     return cleanup
