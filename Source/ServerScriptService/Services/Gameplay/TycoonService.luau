@@ -122,6 +122,7 @@ local function CanBeUpgraded(Player :Player, UpgradeName :string)
 end
 
 
+
 --[[ PUBLIC ]]--
 
 --[=[
@@ -238,6 +239,7 @@ function TycoonService.Client:SetTycoonName(Setter :Player, Player :Player, Name
     local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
     PlayerData.Tycoon.TycoonName.Value = Name
 end
+
 
 
 --[[ KNIT ]]--
