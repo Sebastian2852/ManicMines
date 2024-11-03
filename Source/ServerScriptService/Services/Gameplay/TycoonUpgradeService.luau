@@ -31,6 +31,7 @@ TycoonUpgradeService.Tags = {
 }
 
 function TycoonUpgradeService:Dispatch(Part :BasePart, Tag :string)
+    LogService:Log("Dispatching upgrade part ("..Part:GetFullName()..") for setup with tag: "..Tag)
     self.Tags[Tag](Part)
 end
 
