@@ -2,11 +2,46 @@ local OreList = {}
 OreList.__index = OreList
 
 --[=[
+These types are forwarded to Core module. So these should only really be used in this module. Everything else should use the types in core
+rather than these.
+]=]
+
+--[=[
+Describes an item in the ore list table. Or as refered to in most parts of the game "OreData"
+]=]
+export type OreListItem = {
+    Name :string;
+    DisplayName :string;
+    Amount :number;
+    Emblem :string;
+    RealOre :Part;
+}
+
+--[=[
+The type for this whole class
+]=]
+export type OreList = {
+    New :() -> OreList;
+    CreateFromOre :() -> OreList;
+    CreateFromFolder :() -> OreList;
+    IsOreList :() -> boolean;
+
+    AddOre :(self :OreList, OreName :string, Amount :number) -> nil;
+    RemoveOre :(self :OreList, OreName :string, Amount :number) -> nil;
+
+    AddGold :(self :OreList, Amount :number) -> nil;
+    RemoveGold :(self :OreList, Amount :number) -> nil;
+
+    LoopList :(self :OreList) -> { OreListItem };
+    Destroy :(self :OreList) -> nil;
+}
+
+--[=[
 Override the tostring() function to return the object as a nice string in the format:  
 `Amount DisplayName (Name);`  
 `15 Test Ore (TestOre); 25 Stone (Stone)`
 ]=]
-function OreList.__tostring(OreListObject)
+function OreList.__tostring(OreListObject :OreList)
     local Text = ""
     for _, OreData in pairs(OreListObject._Ores) do
         Text = Text.." "..tostring(OreData.Amount).." "..tostring(OreData.DisplayName).." ("..tostring(OreData.Name)..");"
@@ -28,7 +63,7 @@ end
 --[=[
 Create a new blank ore list
 ]=]
-function OreList.New()
+function OreList.New() :OreList
     local self = setmetatable({}, OreList)
     self.ClassName = "OreList"
     self._Gold = 0
@@ -39,21 +74,42 @@ end
 --[=[
 Create an ore list with 1 ore
 ]=]
-function OreList.CreateFromOre(OreName :string, Amount :number)
+function OreList.CreateFromOre(OreName :string, Amount :number) :OreList
     local self = OreList.New()
     self:AddOre(OreName, Amount)
     return self
 end
 
 --[=[
-Check if an object is an OreList object
+Create an ore list from a given folder
 ]=]
-function OreList.IsOreList(Object :any)
-    if Object.ClassName == "OreList" then
-        return true
+function OreList.CreateFromFolder(Folder :Folder) :OreList
+    local self = OreList.New()
+
+    for _, Object :ValueBase in pairs(Folder:GetChildren()) do
+        if not Object:IsA("ValueBase") then continue end
+
+        if Object.Name == "Gold" then
+            self:AddGold(Object.Name)
+            continue
+        end
+
+        self:AddOre(Object.Name, Object.Value)
     end
 
-    return false
+    return self
+end
+
+--[=[
+Check if an object is an OreList object
+]=]
+function OreList.IsOreList(Object :any) :boolean
+    if Object == nil then return false end
+    if Object.ClassName ~= "OreList" then return false end
+    if not Object._Ores then return false end
+    if not Object._Gold then return false end
+
+    return true
 end
 
 --[=[
@@ -128,7 +184,7 @@ for OreName, OreData in pairs(OreList:LoopList()) do
     print(OreName, OreData)
 end
 ]=]
-function OreList:LoopList()
+function OreList:LoopList() :{ OreListItem }
     local List = self._Ores
     List["Gold"] = {Name = "Gold", Amount = self._Gold, DisplayName = "Gold"}
     return List
@@ -139,6 +195,7 @@ Delete the ore list
 ]=]
 function OreList:Destroy()
     self._Ores = nil
+    self._Gold = nil
 end
 
 

@@ -80,7 +80,6 @@ export type AdminPermissions = {
     TakeOres :boolean;
 }
 
-
 --[=[
 A config for a sound type
 ]=]
@@ -126,6 +125,9 @@ if RunService:IsClient() then
     Roact = require(ReplicatedStorage.Packages.Roact)
     UI = require(script.Parent.ModulesInCore.UI)
 end
+
+export type OreList = OreList.OreList
+export type OreListItem = OreList.OreListItem
 
 return {
     GameConfig = GameConfig;
