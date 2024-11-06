@@ -5,7 +5,8 @@
 
     "ReplicatedStorage": {
       "Game": {
-        "$path": "Source/ReplicatedStorage"
+        "$path": "Source/ReplicatedStorage",
+        "Tests": { "$path": "Tests" }
       },
       "Packages": {
         "$path": "Packages"
