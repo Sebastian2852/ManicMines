@@ -84,6 +84,7 @@ end
 Create an ore list from a folder
 ]=]
 function Util:CreateOreListFromFolder(Folder :Folder)
+    warn("!!! USING OUTDATED FUNCTION !!!")
     local NewList = OreList.New()
 
     for _, Object :ValueBase in pairs(Folder:GetChildren()) do
