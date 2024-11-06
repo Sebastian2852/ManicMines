@@ -146,5 +146,5 @@ return {
         Data = Data;
     };
 
-    Assets = ReplicatedStorage.Assets
+    Assets = ReplicatedStorage.Assets;
 }
