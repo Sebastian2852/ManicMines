@@ -112,7 +112,6 @@ local Util = require(script.Util)
 local UI
 local Roact
 
-local Timer = require(script.Parent.Classes.Timer)
 local OreList = require(script.Parent.Classes.OreList)
 
 local SaveData = require(script.Parent.Classes.SaveData.SaveData)
@@ -132,7 +131,6 @@ export type OreListItem = OreList.OreListItem
 return {
     GameConfig = GameConfig;
     Util = Util;
-    Timer = Timer;
     OreList = OreList;
 
     UI = UI;

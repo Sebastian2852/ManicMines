@@ -6,7 +6,7 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local Cmdr = require(ReplicatedStorage.Packages.cmdr)
 
 -- Game
-local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Tests = require(ReplicatedStorage.Game.Tests)
 
 
@@ -21,14 +21,11 @@ Tests:RunTests()
 
 Knit.AddServicesDeep(script.Parent.Services)
 
-local Timer = Core.Timer.new()
-Timer:Start()
+local Timer = Profiler.Timer.new("[RUNTIME] Start knit")
 
 Knit.Start():andThen(function()
-    Timer:End()
-    local TimeTaken = Timer:GetTime(10)
+    Timer:Stop()
     print("Knit started")
-    print("It took "..TimeTaken.."s to start knit")
 end):catch(warn)
 
 

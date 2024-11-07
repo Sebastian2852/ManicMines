@@ -3,6 +3,7 @@ local CollectionService = game:GetService("CollectionService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 
 local HideService = Knit.CreateService {
     Name = "HideService",
@@ -50,16 +51,14 @@ end
 function HideService:KnitStart()
     LogService = Knit.GetService("LogService")
 
-    local Timer = Core.Timer.new()
-    Timer:Start()
+    local Timer = Profiler.Timer.new("[HIDE SERVICE] Hide objects")
     local Tagged = CollectionService:GetTagged(HideTag)
 
     for _, Object in pairs(Tagged) do
         self:Hide(Object)
     end
 
-    local TimeTaken = Timer:End()
-    LogService:Log("Hidden "..#self.HiddenObjects.." objects in "..tostring(TimeTaken).." seconds")
+    Timer:Stop()
 end
 
 return HideService

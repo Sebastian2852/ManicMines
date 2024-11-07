@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 return function()
-    local Util = require(ReplicatedStorage.Game.Modules.ModulesInCore.Util)
+    local Util = require(ReplicatedStorage.Game.Modules.Core.Util)
 
     describe("ConvertNumberToString", function()
         it("Returns number if no conversion needed", function()
