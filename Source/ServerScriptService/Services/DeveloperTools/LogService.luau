@@ -61,6 +61,22 @@ function LogService:Warn(Message :string, ... :string)
 end
 
 --[=[
+Stop execution and print the message + anything else passed in red
+]=]
+function LogService:Error(Message :string, ... :string)
+    local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
+
+    local AssembledMessage = Message
+    if ... ~= nil then
+        for _, Item :string in pairs(...) do
+            AssembledMessage = AssembledMessage.." "..Item
+        end
+    end
+
+    error(ScriptName.." "..AssembledMessage)
+end
+
+--[=[
 Print out the message passed as well as anything else passed with a space between them in blue.
 Not recommended for use since roblox adds "test service: " before the mesage for some reason.
 ]=]
@@ -108,6 +124,16 @@ function LogService.Client:Warn(Player :Player, Message :string, ... :string)
     local Extras = {...}
     warn("[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
     SendLogToPlayers(Color3.fromRGB(255, 103, 0), "[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
+end
+
+function LogService.Client:Error(Player :Player, Message :string, ... :string)
+    local AssembledMessage = Message
+    if ... ~= nil then
+        for _, Item :string in pairs(...) do
+            AssembledMessage = AssembledMessage.." "..Item
+        end
+    end
+    error("[CLIENT] "..AssembledMessage)
 end
 
 function LogService.Client:Info(Player :Player, Message :string, ... :string)
