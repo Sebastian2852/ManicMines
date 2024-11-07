@@ -126,7 +126,7 @@ function LogService.Client:Warn(Player :Player, Message :string, ... :string)
     SendLogToPlayers(Color3.fromRGB(255, 103, 0), "[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
 end
 
-function LogService.Client:Error(Player :Player, Message :string, ... :string)
+function LogService.Client:Error(_, Message :string, ... :string)
     local AssembledMessage = Message
     if ... ~= nil then
         for _, Item :string in pairs(...) do

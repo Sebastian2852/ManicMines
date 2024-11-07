@@ -8,7 +8,7 @@ different requires for all the module.
 Since most of the scripts require all of the modules anyway this is easier.
 ]]
 
-local Private = require(script.Parent.ModulesInCore.Core_Private)
+local Private = require(script.Private)
 
 --[=[
 Settings used for when creating a new save slot
@@ -107,8 +107,8 @@ export type Sound = {
     OnLoop :(TimesLooped :number) -> ();
 }
 
-local GameConfig = require(script.Parent.ModulesInCore.GameConfig)
-local Util = require(script.Parent.ModulesInCore.Util)
+local GameConfig = require(script.GameConfig)
+local Util = require(script.Util)
 local UI
 local Roact
 
@@ -123,7 +123,7 @@ local EnumList = require(ReplicatedStorage.Packages.EnumList)
 
 if RunService:IsClient() then
     Roact = require(ReplicatedStorage.Packages.Roact)
-    UI = require(script.Parent.ModulesInCore.UI)
+    UI = require(script.UI)
 end
 
 export type OreList = OreList.OreList
