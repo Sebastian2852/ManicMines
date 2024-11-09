@@ -1,7 +1,10 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+
+local NumberGenerator = Random.new()
 
 local TeleportService
 local LogService
@@ -101,7 +104,7 @@ function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
     local SpawnableOres = {}
 
     for _, Ore in pairs(OresFolder:GetChildren()) do
-        if not Ore:FindFirstChildWhichIsA("Decal") or (Ore:GetAttribute("CaveOnly") and not InCave) then continue end
+        if Ore:GetAttribute("CaveOnly") and not InCave then continue end
         local SpawningRange = Ore:GetAttribute("SpawningRange")
 
         if (SpawningRange.Min * 6) <= math.abs(YLevel) and (SpawningRange.Max * 6) - 1 >= math.abs(YLevel) then
@@ -114,36 +117,54 @@ function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
 end
 
 --[=[
+Generate a random ore to use
+THIS RETURN THE PART; DOES NOT PUT IT IN THE MINE
+]=]
+function MineService:GenerateRandomOre(YLevel :number, Cave :boolean) :BasePart
+    local SpawnableOres = self:GetSpawnableOres(YLevel, Cave)
+    local GeneratedBlock = nil
+
+    if #SpawnableOres == 0 then
+        LogService:Warn("No possible ores that can spawn!")
+        return false
+    end
+
+    while GeneratedBlock == nil do
+        for _, PossibleOre :BasePart in pairs(SpawnableOres) do
+            local Rarity = PossibleOre:GetAttribute("Rarity")
+            local Number = NumberGenerator:NextInteger(1, Rarity)
+
+            if Number == 1 then
+                GeneratedBlock = PossibleOre
+                break
+            end
+        end
+    end
+
+    return true, GeneratedBlock
+end
+
+--[=[
 Generates a position at a given position, has a random chance to be an ore
 ]=]
 function MineService:GenerateBlockAtPosition(Position :Vector3)
     if table.find(self.UsedPositions, Position) then return end
 
-    local RandomNumber = math.random(1, Core.GameConfig.Mine.ChanceToGenerateOre)
+    local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
     local BlockToGenerate = StoneBlock
-    local Tag = "_Stone"
 
     if RandomNumber == 1 then
-        local SpawnableOres = self:GetSpawnableOres(Position.Y, false)
-        BlockToGenerate = nil
-
-        for _, Ore in pairs(SpawnableOres) do
-            if BlockToGenerate ~= nil then break end
-
-            local MaxValue = Ore:GetAttribute("Rarity")
-            local GeneratedNumber = math.random(1, MaxValue)
-
-            if GeneratedNumber == 1 then
-                BlockToGenerate = Ore
-                Tag = "_Ore"
-                self.MineStats.OresGenerated += 1
-            end
-        end
-
-        if BlockToGenerate == nil then
+        local Success, Ore = self:GenerateRandomOre(Position.Y, false)
+        if Success then
+            BlockToGenerate = Ore
+            LogService:Log("Generating ore:", BlockToGenerate:GetFullName())
+            BlockToGenerate:AddTag("Mine/BlockType/Ore")
+            self.MineStats.OresGenerated += 1
+        else
+            LogService:Warn("Generating stone")
             BlockToGenerate = StoneBlock
-            Tag = "_Stone"
+            BlockToGenerate:AddTag("Mine/BlockType/Stone")
         end
     end
 
@@ -152,7 +173,6 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     NewBlock.Parent = workspace.Game.Mine
     NewBlock.Position = Position
     NewBlock.Size = Core.GameConfig.Mine.BlockSize
-    NewBlock:AddTag(Tag)
 
     table.insert(self.UsedPositions, Position)
     self.MineStats.BlocksGenerated += 1
@@ -189,22 +209,37 @@ function MineService:GenerateTopLayer()
     LogService:Log("Generating top layer ("..(BlocksToGenerateX * BlocksToGenerateY).." blocks)")
     local TopLeftPosition = Vector3.new(MineSpawn.Position.X - ((MineSpawn.Size.X / 2) - (BlockSize.X / 2)), MineSpawn.Position.Y, MineSpawn.Position.Z - ((MineSpawn.Size.Z / 2) - (BlockSize.X / 2)))
 
+    MineSpawn.Position = OriginalMineSpawnPosition + Vector3.new(0, 0.01, 0)
+
     self.UsedPositions = {}
     self.TopLayerPositions = {}
     self.MineStats.BlocksGenerated = 0
     self.MineStats.OresGenerated = 0
 
-    for Y = 1, BlocksToGenerateY, 1 do
-        for X = 1, BlocksToGenerateX, 1 do
-            local Position = TopLeftPosition + Vector3.new((X - 1) * BlockSize.X, 0, (Y - 1) * BlockSize.Z)
-            if table.find(self.UsedPositions, Position) then continue end
+    local function Generate(Y)
+        return Promise.new(function(Resolve, Reject)
+            for X = 1, BlocksToGenerateX, 1 do
+                local Position = TopLeftPosition + Vector3.new((X - 1) * BlockSize.X, 0, (Y - 1) * BlockSize.Z)
+                if table.find(self.UsedPositions, Position) then
+                    Reject("Position is already used")
+                end
 
-            table.insert(self.TopLayerPositions, Position)
-            self:GenerateBlockAtPosition(Position)
-            local AbovePos = Position + Vector3.new(0, BlockSize.Y, 0)
-            table.insert(self.UsedPositions, AbovePos)
-        end
+                table.insert(self.TopLayerPositions, Position)
+                self:GenerateBlockAtPosition(Position)
+                local AbovePos = Position + Vector3.new(0, BlockSize.Y, 0)
+                table.insert(self.UsedPositions, AbovePos)
+            end
+            Resolve()
+        end)
     end
+
+    local Promises = {}
+
+    for Y = 1, BlocksToGenerateY, 1 do
+        table.insert(Promises, Generate(Y))
+    end
+
+    Promise.all(Promises):await()
 
     MineSpawn.Position = MineSpawn.Position + Vector3.new(0, 50, 0)
     MineSpawn.Transparency = 1
