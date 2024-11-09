@@ -20,6 +20,7 @@ local OriginalMineSpawnPosition = MineSpawn.Position
 local OresFolder = game.ReplicatedStorage.Assets.Ores
 local TopLayerY = 0
 local TopLayerCanGenerate = true
+local Collapsing = false
 
 MineService.TopLayerPositions = {}
 MineService.UsedPositions = {}
@@ -32,7 +33,10 @@ MineService.MineStats = {
 -- [[ PRIVATE ]] --
 
 local function CollapseMine()
+    if Collapsing then return end
+
     LogService:Log("Mine collapsing")
+    Collapsing = true
     for _, Player in pairs(game.Players:GetPlayers()) do
         TeleportService:TeleportPlayerToSurface(Player)
     end
@@ -196,6 +200,7 @@ Generates the top layer of the mine based of the mine spawn
 function MineService:GenerateTopLayer()
     if not TopLayerCanGenerate then return end
 
+    Collapsing = false
     TopLayerCanGenerate = false
     MineSpawn.Position = OriginalMineSpawnPosition
     MineSpawn.Transparency = 0
@@ -217,16 +222,13 @@ function MineService:GenerateTopLayer()
     self.MineStats.OresGenerated = 0
 
     local function Generate(Y)
-        return Promise.new(function(Resolve, Reject)
+        return Promise.new(function(Resolve)
             for X = 1, BlocksToGenerateX, 1 do
                 local Position = TopLeftPosition + Vector3.new((X - 1) * BlockSize.X, 0, (Y - 1) * BlockSize.Z)
-                if table.find(self.UsedPositions, Position) then
-                    Reject("Position is already used")
-                end
+                local AbovePos = Position + Vector3.new(0, BlockSize.Y, 0)
 
                 table.insert(self.TopLayerPositions, Position)
                 self:GenerateBlockAtPosition(Position)
-                local AbovePos = Position + Vector3.new(0, BlockSize.Y, 0)
                 table.insert(self.UsedPositions, AbovePos)
             end
             Resolve()
@@ -274,8 +276,17 @@ function MineService:BlockMined(Block :BasePart)
     local OriginalPosition = Block.Position
     Block:Destroy()
 
+    local function Gen(Offset)
+        return Promise.new(function(Resolve)
+            self:GenerateBlockAtPosition(OriginalPosition + Offset)
+            Resolve()
+        end)
+    end
+
+    local Generators = {}
+
     for _, Offset in pairs(PositionOffsets) do
-        self:GenerateBlockAtPosition(OriginalPosition + Offset)
+        table.insert(Generators, Gen(Offset))
     end
 end
 
