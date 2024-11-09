@@ -18,4 +18,11 @@ function LightingController:CreateFromConfig(Config :Configuration)
     end
 end
 
+function LightingController:KnitInit()
+    Lighting.EnvironmentDiffuseScale = 0
+    Lighting.EnvironmentSpecularScale = 0
+    Lighting.ExposureCompensation = 1
+    Lighting.Ambient = Color3.fromRGB(76, 76, 76)
+end
+
 return LightingController

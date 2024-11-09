@@ -35,6 +35,7 @@ function TycoonUpgradeService:SetupHitbox(Hitbox :BasePart)
         Hitbox.CanCollide = false
         Hitbox.Anchored = true
         Hitbox.Transparency = 0.5
+        Hitbox.CastShadow = false
         Hitbox:AddTag("Tycoon/Upgrades/Hitbox")
         Resolve()
     end)
