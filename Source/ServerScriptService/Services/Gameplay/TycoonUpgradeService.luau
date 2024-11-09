@@ -1,6 +1,4 @@
-local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 
 --[=[
 THIS SYSTEM NEEDS TO BE REWORKED
