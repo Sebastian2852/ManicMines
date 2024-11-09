@@ -24,6 +24,7 @@ local Collapsing = false
 
 MineService.TopLayerPositions = {}
 MineService.UsedPositions = {}
+MineService.LowestDepth = 0
 
 MineService.MineStats = {
     BlocksGenerated = 0;
@@ -111,9 +112,11 @@ function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
         if Ore:GetAttribute("CaveOnly") and not InCave then continue end
         local SpawningRange = Ore:GetAttribute("SpawningRange")
 
-        if (SpawningRange.Min * 6) <= math.abs(YLevel) and (SpawningRange.Max * 6) - 1 >= math.abs(YLevel) then
+        local MinY = SpawningRange.Min * Core.GameConfig.Mine.BlockSize.Y
+        local MaxY = SpawningRange.Max * Core.GameConfig.Mine.BlockSize.Y
+
+        if MinY <= math.abs(YLevel) and MaxY - 1 >= math.abs(YLevel) then
             table.insert(SpawnableOres, Ore)
-            continue
         end
     end
 
@@ -152,7 +155,7 @@ end
 Generates a position at a given position, has a random chance to be an ore
 ]=]
 function MineService:GenerateBlockAtPosition(Position :Vector3)
-    if table.find(self.UsedPositions, Position) then return end
+    if self.UsedPositions[Position] then return end
 
     local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
@@ -178,7 +181,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     NewBlock.Position = Position
     NewBlock.Size = Core.GameConfig.Mine.BlockSize
 
-    table.insert(self.UsedPositions, Position)
+    self.UsedPositions[Position] = 1
     self.MineStats.BlocksGenerated += 1
 
     NewBlock:SetAttribute("CanMine", true)
@@ -189,6 +192,12 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     end
 
     if Position.Y >= TopLayerY then 
+        NewBlock.Color = Color3.fromRGB(27, 42, 53)
+        NewBlock:SetAttribute("CanMine", false)
+    end
+
+    local Depth = ConvertYLevelToDepth(Position.Y)
+    if Depth > self.LowestDepth then
         NewBlock.Color = Color3.fromRGB(27, 42, 53)
         NewBlock:SetAttribute("CanMine", false)
     end
@@ -229,7 +238,7 @@ function MineService:GenerateTopLayer()
 
                 table.insert(self.TopLayerPositions, Position)
                 self:GenerateBlockAtPosition(Position)
-                table.insert(self.UsedPositions, AbovePos)
+                self.UsedPositions[AbovePos] = 1
             end
             Resolve()
         end)
@@ -276,17 +285,8 @@ function MineService:BlockMined(Block :BasePart)
     local OriginalPosition = Block.Position
     Block:Destroy()
 
-    local function Gen(Offset)
-        return Promise.new(function(Resolve)
-            self:GenerateBlockAtPosition(OriginalPosition + Offset)
-            Resolve()
-        end)
-    end
-
-    local Generators = {}
-
     for _, Offset in pairs(PositionOffsets) do
-        table.insert(Generators, Gen(Offset))
+        self:GenerateBlockAtPosition(OriginalPosition + Offset)
     end
 end
 
@@ -309,6 +309,20 @@ end
 
 
 --[[ KNIT ]]--
+
+function MineService:KnitInit()
+    local LowestDepth = 0
+    for _, Layer :Configuration in pairs(Core.Assets.Layers:GetChildren()) do
+        local LayerDepthRange :NumberRange = Layer:GetAttribute("Depth")
+        local LayerLowestDepth = LayerDepthRange.Max
+
+        if LayerLowestDepth > LowestDepth then
+            LowestDepth = LayerLowestDepth
+        end
+    end
+
+    self.LowestDepth = LowestDepth
+end
 
 function MineService:KnitStart()
     LogService = Knit.GetService("LogService")

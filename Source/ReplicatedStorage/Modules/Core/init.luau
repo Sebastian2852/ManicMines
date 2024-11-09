@@ -112,6 +112,7 @@ local UI = require(script.UI)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local OreList = require(script.Parent.Classes.OreList)
+local Queue = require(script.Parent.Classes.Queue)
 
 local SaveData = require(script.Parent.Classes.SaveData.SaveData)
 local Data = require(script.Parent.Classes.SaveData.Data)
@@ -126,6 +127,7 @@ return {
     GameConfig = GameConfig;
     Util = Util;
     OreList = OreList;
+    Queue = Queue;
 
     UI = UI;
     Roact = Roact;

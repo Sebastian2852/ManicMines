@@ -145,6 +145,8 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
 end
 
 function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
+    if ObjectToMine == nil then return end
+
     if not PickaxeService.Mining[Player.UserId] then
         LogService:Warn("Player should have an entry in mining table?")
         PickaxeService.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}

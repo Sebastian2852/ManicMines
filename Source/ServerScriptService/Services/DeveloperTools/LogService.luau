@@ -4,26 +4,12 @@ local Knit = require(game.ReplicatedStorage.Packages.Knit)
 
 local LogService = Knit.CreateService{
     Name = "LogService";
-    Client = {
-        ActionLog = Knit.CreateSignal()
-    };
+    Client = {};
 }
 
 LogService.LoggingEnabled = true
 LogService.WarningsEnabled = true
 LogService.AssertsEnabled = true
-
---[[ PRIVATE ]]--
-
-local function SendLogToPlayers(Color :Color3, ...)
-    local Args = {...}
-
-    for _, Player in pairs(game.Players:GetPlayers()) do
-        LogService.Client.ActionLog:Fire(Player, Color, table.unpack(Args))
-    end
-end
-
-
 
 --[[ PUBLIC ]]--
 
@@ -46,7 +32,6 @@ function LogService:Log(Message :string, ... :string)
     local Extras = {...}
     local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
     print(ScriptName, Message, table.unpack(Extras))
-    SendLogToPlayers(Color3.fromRGB(255, 255, 255), ScriptName, Message, table.unpack(Extras))
 end
 
 --[=[
@@ -57,7 +42,6 @@ function LogService:Warn(Message :string, ... :string)
     local Extras = {...}
     local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
     warn(ScriptName, "[WARNING]", Message, table.unpack(Extras))
-    SendLogToPlayers(Color3.fromRGB(255, 103, 0), ScriptName, "[WARNING]", Message, table.unpack(Extras))
 end
 
 --[=[
@@ -116,14 +100,12 @@ function LogService.Client:Log(Player :Player, Message :string, ... :string)
     if not LogService.WarningsEnabled then return end
     local Extras = {...}
     print("[CLIENT]", "["..Player.Name.."]", Message, table.unpack(Extras))
-    SendLogToPlayers(Color3.fromRGB(255, 255, 255), "[CLIENT]", "["..Player.Name.."]", Message, table.unpack(Extras))
 end
 
 function LogService.Client:Warn(Player :Player, Message :string, ... :string)
     if not LogService.WarningsEnabled then return end
     local Extras = {...}
     warn("[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
-    SendLogToPlayers(Color3.fromRGB(255, 103, 0), "[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
 end
 
 function LogService.Client:Error(_, Message :string, ... :string)
