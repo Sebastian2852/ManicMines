@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 --[[
 This module is basically the core of the game since it is required by most scripts and gives access to some core settings and functions
 that without the whole game would break down. They are all in this one module so that you can have 1 `require(core)` instead of a million
@@ -109,8 +108,8 @@ export type Sound = {
 
 local GameConfig = require(script.GameConfig)
 local Util = require(script.Util)
-local UI
-local Roact
+local UI = require(script.UI)
+local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local OreList = require(script.Parent.Classes.OreList)
 
@@ -119,11 +118,6 @@ local Data = require(script.Parent.Classes.SaveData.Data)
 
 local Maid = require(ReplicatedStorage.Packages.maid)
 local EnumList = require(ReplicatedStorage.Packages.EnumList)
-
-if RunService:IsClient() then
-    Roact = require(ReplicatedStorage.Packages.Roact)
-    UI = require(script.UI)
-end
 
 export type OreList = OreList.OreList
 export type OreListItem = OreList.OreListItem

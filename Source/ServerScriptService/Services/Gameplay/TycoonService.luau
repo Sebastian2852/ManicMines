@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -18,87 +19,17 @@ local LogService
 local DataService
 local TeleportService
 local AdminService
+local TycoonUpgradeService
 
 local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
 
 --[[ PRIVATE ]]--
 
-local function CreateUpgradeModelUI(UpgradeModelConfig :Configuration) :BillboardGui
-    local UpgradeName = UpgradeModelConfig.Parent:GetAttribute("UpgradeName")
-    local UpgradeNameColor = UpgradeModelConfig.Parent:GetAttribute("UpgradeNameColor")
-
-    local Level = UpgradeModelConfig.Name
-    local LevelColor = UpgradeModelConfig:GetAttribute("LevelColor")
-
-    local NewUI = ReplicatedStorage.Assets.UI.Tycoon.Upgrade:Clone()
-    NewUI.Main.UpgradeLevel.UIGradient.Color = LevelColor
-    NewUI.Main.UpgradeName.UIGradient.Color = UpgradeNameColor
-
-    NewUI.Main.UpgradeName.Text = UpgradeName
-    NewUI.Main.UpgradeLevel.Text = Level
-    return NewUI
-end
-
 local function AddUpgradeModels(DataFolder :Core.DataFolder, Tycoon :Model)
-    local RawUpgradesFolder = TycoonAssets.Upgrades
     local TycoonUpgradesFolder = Tycoon.Main.Upgrades
-    local DataFolderUpgradesFolder = DataFolder.Tycoon.Upgrades
 
     for _, UpgradeHitbox :BasePart in pairs(TycoonUpgradesFolder:GetChildren()) do
-        -- Setup upgrade hitbox
-        UpgradeHitbox.CanCollide = false
-        UpgradeHitbox.Anchored = true
-        UpgradeHitbox:AddTag("_UpgradeHitbox")
-
-        local DataValue = DataFolderUpgradesFolder:FindFirstChild(UpgradeHitbox.Name)
-        local UpgradeConfig :Configuration = RawUpgradesFolder:FindFirstChild(UpgradeHitbox.Name)
-
-        if not DataValue then
-            LogService:Warn("No data value for upgrade: "..UpgradeHitbox.Name)
-            continue
-        end
-        if not DataValue then
-            LogService:Warn("No upgrade config for upgrade: "..UpgradeHitbox.Name)
-            continue
-        end
-
-        local ModelConfig = UpgradeConfig:FindFirstChild(DataValue.Value)
-        if not ModelConfig then
-            LogService:Warn("No upgrade level config for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value)
-            continue
-        end
-
-        local UpgradeModel = ModelConfig:FindFirstChildWhichIsA("Model")
-        if not UpgradeModel then
-            LogService:Warn("No upgrade model for upgrade "..UpgradeHitbox.Name.." level "..DataValue.Value)
-            continue
-        end
-
-        local CurrentModel = UpgradeHitbox:FindFirstChildWhichIsA("Model")
-        if CurrentModel then
-            CurrentModel:Destroy()
-        end
-
-        local Model :Model = UpgradeModel:Clone()
-        Model.Parent = UpgradeHitbox
-        Model:PivotTo(UpgradeHitbox.CFrame)
-
-        local UI = CreateUpgradeModelUI(UpgradeModel.Parent)
-        UI.Parent = Model
-        UI.Adornee = Model
-        UI.StudsOffset = Vector3.new(0, (UpgradeHitbox.Size.Y / 2) + 2, 0)
-
-        LogService:Log("Added upgrade model "..UpgradeHitbox.Name.." level "..DataValue.Value)
-
-        local NewClickDetector = Instance.new("ClickDetector")
-        NewClickDetector.Name = "_SelectionClickDetector"
-        NewClickDetector.Parent = UpgradeHitbox
-        NewClickDetector.MaxActivationDistance = Core.GameConfig.Tycoon.UpgradeSelectionDistance
-
-        local NextConfig = UpgradeConfig:FindFirstChild(DataValue.Value + 1)
-        NewClickDetector.MouseClick:Connect(function(Player)
-            TycoonService.Client.SelectUpgrade:Fire(Player, UpgradeHitbox.Name, UpgradeConfig, ModelConfig, UpgradeHitbox, Model, NextConfig)
-        end)
+        TycoonUpgradeService:AddUpgradeToTycoonAsync(Players:GetPlayerByUserId(tonumber(DataFolder.Name)), UpgradeHitbox.Name, Tycoon)
     end
 end
 
@@ -262,9 +193,10 @@ function TycoonService:KnitInit()
 end
 
 function TycoonService:KnitStart()
-    DataService        = Knit.GetService("DataService")
-    TeleportService    = Knit.GetService("TeleportService")
-    AdminService       = Knit.GetService("AdminService")
+    DataService            = Knit.GetService("DataService")
+    TeleportService        = Knit.GetService("TeleportService")
+    AdminService           = Knit.GetService("AdminService")
+    TycoonUpgradeService   = Knit.GetService("TycoonUpgradeService")
 end
 
 return TycoonService

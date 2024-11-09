@@ -146,9 +146,14 @@ function TycoonSelectionController:KnitStart()
         DataFolder = Data
     end)
 
-    TycoonService.SelectUpgrade:Connect(function(UpgradeName :string, UpgradeConfig :Configuration, _, Hitbox :BasePart, _, NextConfig :Configuration)
-        self:UpdateUiInfo(UpgradeName, UpgradeConfig:GetAttribute("Description"), NextConfig)
-        self:SelectHitbox(Hitbox)
+    TycoonService.SelectUpgrade:Connect(function(UpgradeName :string)
+        TycoonService:GetPlayerTycoon():andThen(function(Tycoon :Model)
+            local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+            local NextConfig = UpgradeConfig:FindFirstChild(tostring(DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName).Value + 1))
+            local Hitbox = Tycoon.Main.Upgrades:FindFirstChild(UpgradeName)
+            self:UpdateUiInfo(UpgradeName, UpgradeConfig:GetAttribute("Description"), NextConfig)
+            self:SelectHitbox(Hitbox)
+        end)
     end)
 
     TycoonSelection.CloseButton.MouseButton1Click:Connect(function()
