@@ -255,8 +255,6 @@ function MineService:GenerateTopLayer()
     LogService:Log("Generating top layer ("..(BlocksToGenerateX * BlocksToGenerateY).." blocks)")
     local TopLeftPosition = Vector3.new(MineSpawn.Position.X - ((MineSpawn.Size.X / 2) - (BlockSize.X / 2)), MineSpawn.Position.Y, MineSpawn.Position.Z - ((MineSpawn.Size.Z / 2) - (BlockSize.X / 2)))
 
-    MineSpawn.Position = OriginalMineSpawnPosition + Vector3.new(0, 0.01, 0)
-
     UsedPositions = {}
     self.TopLayerPositions = {}
     self.MineStats.BlocksGenerated = 0
