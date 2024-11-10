@@ -16,4 +16,4 @@ end):catch(warn)
 
 -- [[ CMDR ]] --
 
-Cmdr:SetActivationKeys({ Enum.KeyCode.P })
+Cmdr:SetActivationKeys({ Enum.KeyCode.F2 })
