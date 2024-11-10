@@ -111,7 +111,7 @@ function MineService:YLevelToLayer(YLevel :number) :Configuration
         end
     end
 
-    return game.ReplicatedStorage.Assets.Layers.Default
+    return game.ReplicatedStorage.Assets.Layers.Surface
 end
 
 --[=[

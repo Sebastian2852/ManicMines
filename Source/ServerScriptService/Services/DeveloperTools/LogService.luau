@@ -52,7 +52,7 @@ function LogService:Error(Message :string, ... :string)
 
     local AssembledMessage = Message
     if ... ~= nil then
-        for _, Item :string in pairs(...) do
+        for _, Item :string in pairs({...}) do
             AssembledMessage = AssembledMessage.." "..Item
         end
     end
@@ -111,7 +111,7 @@ end
 function LogService.Client:Error(_, Message :string, ... :string)
     local AssembledMessage = Message
     if ... ~= nil then
-        for _, Item :string in pairs(...) do
+        for _, Item :string in pairs({...}) do
             AssembledMessage = AssembledMessage.." "..Item
         end
     end
