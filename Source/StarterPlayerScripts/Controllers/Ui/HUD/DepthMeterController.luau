@@ -46,22 +46,25 @@ function DepthMeterComponent:GetPositionText() :string
     local Y = ConvertToDepth(Position.Y)
     local Z = math.floor(Position.Z)
 
-    return X..", "..Y..", "..Z
+    return X..", "..Y.."m, "..Z
 end
 
 function DepthMeterComponent:render()
-    return Roact.createElement("ScreenGui", {}, {
+    return Roact.createElement("ScreenGui", {
+        IgnoreGuiInset = true
+    }, {
         Meter = self.state.Show and Roact.createElement("TextLabel", {
-            Size = UDim2.fromScale(1, 1);
-            Position = Core.UI.Position.Center;
-            AnchorPoint = Core.UI.AnchorPoint.Center;
+            Size = UDim2.fromScale(0.3, 0.05);
+            Position = UDim2.fromScale(0.5, 0);
+            AnchorPoint = Core.UI.AnchorPoint.TopCenter;
 
             BackgroundTransparency = 1;
 
             Text = self:GetPositionText();
+            TextStrokeTransparency = 0;
+            TextScaled = true;
             TextColor3 = Core.UI.Theme.TextColor3;
             FontFace = Core.UI.Theme.TextFont;
-            TextScaled = true;
         }, {})
     })
 end
