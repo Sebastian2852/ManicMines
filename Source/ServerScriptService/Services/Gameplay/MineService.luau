@@ -50,6 +50,9 @@ local function CollapseMine()
         Part:Destroy()
     end
 
+    -- Reset the random number generator so that there is a new seed
+    NumberGenerator = Random.new()
+
     task.wait(1)
 
     LogService:Log("Generating top layer")
@@ -119,6 +122,8 @@ function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
 
     for _, Ore in pairs(OresFolder:GetChildren()) do
         if Ore:GetAttribute("CaveOnly") and not InCave then continue end
+        if Ore:GetAttribute("NoCave") and InCave then continue end
+
         local SpawningRange = Ore:GetAttribute("SpawningRange")
 
         local MinY = SpawningRange.Min * Core.GameConfig.Mine.BlockSize.Y
@@ -150,7 +155,11 @@ function MineService:GenerateRandomOre(YLevel :number, Cave :boolean) :BasePart
     while GeneratedBlock == nil do
         for _, PossibleOre :BasePart in pairs(SpawnableOres) do
             local Rarity = PossibleOre:GetAttribute("Rarity")
-            local Number = NumberGenerator:NextInteger(1, Rarity)
+            local CaveMultiplier = PossibleOre:GetAttribute("CaveMultiplier")
+            local Multiplier = 1 + (CaveMultiplier / 100)
+            local AdjustedRarity = Cave and math.max(1, Rarity * Multiplier) or Rarity
+
+            local Number = NumberGenerator:NextInteger(1, AdjustedRarity)
 
             if Number == 1 then
 
