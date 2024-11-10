@@ -15,8 +15,7 @@
       "Assets":{
         "$className":"Folder",
         "Layers":{
-          "$className":"Folder",
-          "Default":{"$className":"Configuration"}
+          "$className":"Folder"
         },
         "Levels":{
           "$className":"Folder",

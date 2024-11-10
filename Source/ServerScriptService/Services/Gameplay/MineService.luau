@@ -2,6 +2,7 @@ local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local OctoTree = require(ReplicatedStorage.Packages["octo-tree"])
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local NumberGenerator = Random.new()
@@ -22,6 +23,7 @@ local TopLayerY = 0
 local TopLayerCanGenerate = true
 local Collapsing = false
 
+local MineOctree = OctoTree.new()
 local UsedPositions = {}
 
 MineService.TopLayerPositions = {}
@@ -50,6 +52,7 @@ local function CollapseMine(NewSeed :number?)
     for _, Part in ipairs(workspace.Game.Mine:GetChildren()) do
         Part:Destroy()
     end
+    MineOctree:ClearAllNodes()
 
     -- Reset the random number generator so that there is a new seed
     NumberGenerator = Random.new(NewSeed)
@@ -196,11 +199,9 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
         local Success, Ore = self:GenerateRandomOre(Position.Y, false)
         if Success then
             BlockToGenerate = Ore
-            LogService:Log("Generating ore:", BlockToGenerate:GetFullName())
             BlockToGenerate:AddTag("Mine/BlockType/Ore")
             self.MineStats.OresGenerated += 1
         else
-            LogService:Warn("Generating stone")
             BlockToGenerate = StoneBlock
             BlockToGenerate:AddTag("Mine/BlockType/Stone")
         end
@@ -215,6 +216,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
 
     UsedPositions[KeyPosition(Position)] = 1
     self.MineStats.BlocksGenerated += 1
+    MineOctree:CreateNode(Position, NewBlock)
 
     NewBlock:SetAttribute("CanMine", true)
 
@@ -233,6 +235,32 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
         NewBlock.Color = Color3.fromRGB(27, 42, 53)
         NewBlock:SetAttribute("CanMine", false)
     end
+end
+
+function MineService:GetBlockAtPosition(Position :Vector3)
+    local Nodes = MineOctree:GetNearest(Position, 6, 1)
+    local Node = Nodes and Nodes[1]
+    if not Node then return nil end
+
+    local Block = Node.Object
+    return Block
+end
+
+function MineService:ReplaceBlockAtPosition(Position :Vector3, NewBlock :BasePart)
+    local Block = self:GetBlockAtPosition(Position)
+    local Pos = Block.Position
+    local Color = Block.BrickColor
+
+    Block:Destroy()
+    MineOctree:RemoveNode(MineOctree:FindFirstNode(Block))
+
+    Block = NewBlock:Clone()
+    Block.Parent = workspace.Game.Mine
+    Block.Position = Pos
+    Block.BrickColor = Color
+    Block.Size = Core.GameConfig.Mine.BlockSize
+    MineOctree:CreateNode(Pos, Block)
+    Block:SetAttribute("CanMine", true)
 end
 
 --[=[
@@ -313,6 +341,8 @@ function MineService:BlockMined(Block :BasePart)
     }
 
     local OriginalPosition = Block.Position
+    local Node = MineOctree:FindFirstNode(Block)
+    MineOctree:RemoveNode(Node)
     Block:Destroy()
 
     for _, Offset in pairs(PositionOffsets) do
@@ -320,8 +350,20 @@ function MineService:BlockMined(Block :BasePart)
     end
 end
 
+--[=[
+Force the mine to collapse with an optional seed
+]=]
 function MineService:Collapse(NewSeed :number?)
     CollapseMine(NewSeed)
+end
+
+--[=[
+Returns the closest block to a given position
+]=]
+function MineService:GetClosestBlock(Position :number, Radius :number)
+    local Nodes = MineOctree:GetNearest(Position, Radius, 1)
+    local Node = Nodes[1]
+    return Node.Object or nil
 end
 
 
@@ -361,6 +403,13 @@ end
 function MineService:KnitStart()
     LogService = Knit.GetService("LogService")
     TeleportService = Knit.GetService("TeleportService")
+
+    for _, Object in pairs(ReplicatedStorage.Assets.Ores:GetChildren()) do
+        if not Object:IsA("BasePart") then
+            Object:Destroy()
+        end
+    end
+
     self:GenerateTopLayer()
 
     if workspace:FindFirstChild("Baseplate") then
