@@ -81,6 +81,12 @@ function TycoonService:GetPlayerTycoon(Player :Player) :Model?
     return nil
 end
 
+function TycoonService:GetTycoonOwner(Tycoon :Model) :Player?
+    local UserID = Tycoon.Name
+    local Player = Players:GetPlayerByUserId(UserID)
+    return Player
+end
+
 --[=[
 Create a tycoon for the player and put it in workspace. Then setup an event so when the player
 spawns they get teleported to their tycoon spawn instead of the SpawnLocation.

@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 --[=[
 THIS SYSTEM NEEDS TO BE REWORKED
@@ -26,6 +27,13 @@ local TycoonUpgradeService = Knit.CreateService {
 local TycoonService
 local DataService
 local LogService
+
+type UpgradeSetupModule = {
+    HasPrompt :boolean;
+    ParentToHitbox :boolean;
+    CreatePrompt :(TycoonName :string, Level :number, MaxLevel :number) -> (string, string);
+    Triggered :(Player :Player, IsOwner :boolean) -> ();
+}
 
 --[=[
 Setup a hitbox in a way so that all of the hitboxes look the same
@@ -105,8 +113,16 @@ function TycoonUpgradeService:AddUIToHitbox(Hitbox :BasePart, LevelConfig :Confi
     end)
 end
 
+--[=[
+Adds a click detector for selecting to the hitbox
+]=]
 function TycoonUpgradeService:AddClickDetectorToHitbox(HitBox :BasePart)
-    return Promise.new(function()
+    return Promise.new(function(Resolve)
+        local ClickDetector = HitBox:FindFirstAncestorWhichIsA("ClickDetector")
+        if ClickDetector then
+            ClickDetector:Destroy()
+        end
+
         local NewClickDetector = Instance.new("ClickDetector")
         NewClickDetector.Name = "_SelectionClickDetector"
         NewClickDetector.Parent = HitBox
@@ -115,9 +131,14 @@ function TycoonUpgradeService:AddClickDetectorToHitbox(HitBox :BasePart)
         NewClickDetector.MouseClick:Connect(function(Player)
             TycoonService.Client.SelectUpgrade:Fire(Player, HitBox.Name) -- Event should probably be moved to this service
         end)
+
+        Resolve()
     end)
 end
 
+--[=[
+Adds the model to a hitbox based on the passed level config
+]=]
 function TycoonUpgradeService:AddModelToHitbox(Hitbox :BasePart, LevelConfig :Configuration)
     return Promise.new(function(Resolve, Reject)
         local Model = LevelConfig:FindFirstChildWhichIsA("Model")
@@ -138,6 +159,48 @@ function TycoonUpgradeService:AddModelToHitbox(Hitbox :BasePart, LevelConfig :Co
 end
 
 --[=[
+Gives functionality to an upgrade
+]=]
+function TycoonUpgradeService:AddFunctionality(Hitbox :BasePart, SetupModule :UpgradeSetupModule, Tycoon :Model, LevelConfig :Configuration)
+    return Promise.new(function(Resolve, Reject)
+        if not SetupModule.HasPrompt then
+            Resolve()
+        end
+
+        local TycoonOwner = TycoonService:GetTycoonOwner(Tycoon)
+        if not TycoonOwner then
+            Reject("No owner for tycoon")
+        end
+        local OwnerData :Core.DataFolder = DataService:GetPlayerDataFolder(TycoonOwner)
+
+        local ActionText, ObjectText = SetupModule.CreatePrompt(OwnerData.Tycoon.TycoonName.Value, tonumber(LevelConfig.Name), self:GetUpgradeMaxLevel(LevelConfig.Parent))
+
+        local NewPrompt = Instance.new("ProximityPrompt")
+        NewPrompt.Name = "Interact"
+        NewPrompt.ActionText = ActionText
+        NewPrompt.ObjectText = ObjectText
+        NewPrompt.Parent = Hitbox
+
+        NewPrompt.Triggered:Connect(function(Player)
+            local IsOwner = Player == TycoonOwner
+            SetupModule.Triggered(Player, IsOwner)
+        end)
+
+        LogService:Log("Created proximity prompt")
+
+        Resolve()
+    end)
+end
+
+--[=[
+Takes in a level config and returns how many possible upgrades there are.
+]=]
+function TycoonUpgradeService:GetUpgradeMaxLevel(UpgradeConfig :Configuration)
+    local Children = UpgradeConfig:GetChildren()
+    return #Children - 1
+end
+
+--[=[
 This function add the model to the tycoon, sets up the hitbox (if needed) and adds the GUI to the hitbox
 ]=]
 function TycoonUpgradeService:AddUpgradeToTycoonAsync(Player :Player, UpgradeName :string, Tycoon :Model)
@@ -151,6 +214,7 @@ function TycoonUpgradeService:AddUpgradeToTycoonAsync(Player :Player, UpgradeNam
         local DataValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
         local TycoonHitbox = Tycoon.Main.Upgrades:FindFirstChild(UpgradeName)
         local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+        local SetupModule = ServerScriptService.Game.TycoonUpgradeSetups:FindFirstChild(UpgradeName)
         local LevelConfig = UpgradeConfig:FindFirstChild(tostring(DataValue.Value))
 
         if not UpgradeConfig then
@@ -162,8 +226,13 @@ function TycoonUpgradeService:AddUpgradeToTycoonAsync(Player :Player, UpgradeNam
         end
 
         if not TycoonHitbox then
-            LogService:Error("Cannot find tycoon hitbox for upgrade: ", UpgradeName)
+            LogService:Error("Cannot find tycoon hitbox for upgrade:", UpgradeName)
         end
+
+        if not SetupModule then
+            LogService:Error("Cannot find upgrade setup module for upgrade:", UpgradeName)
+        end
+        SetupModule = require(SetupModule)
 
         local Tasks = {}
 
@@ -171,6 +240,7 @@ function TycoonUpgradeService:AddUpgradeToTycoonAsync(Player :Player, UpgradeNam
         table.insert(Tasks, self:AddUIToHitbox(TycoonHitbox, LevelConfig))
         table.insert(Tasks, self:AddModelToHitbox(TycoonHitbox, LevelConfig))
         table.insert(Tasks, self:AddClickDetectorToHitbox(TycoonHitbox))
+        table.insert(Tasks, self:AddFunctionality(TycoonHitbox, SetupModule, Tycoon, LevelConfig))
 
         local Success = Promise.all(Tasks):await()
         if Success then
