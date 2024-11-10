@@ -65,4 +65,27 @@ return function()
             expect(ReturnedObject:GetFullName()).to.equal(OreToUse:GetFullName())
         end)
     end)
+
+    describe("EvaluateNumberSequence", function()
+        it("Can check a point in time", function()
+            local Numbers = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 0, 0);
+                NumberSequenceKeypoint.new(1, 1, 0);
+            })
+
+            local ReturnedValue = Util:EvaluateNumberSequence(Numbers, 1)
+            expect(ReturnedValue).to.equal(1)
+        end)
+
+        it("Can check between 2 points", function()
+            local Numbers = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 0, 0);
+                NumberSequenceKeypoint.new(0.8, 0, 0);
+                NumberSequenceKeypoint.new(1, 1, 0);
+            })
+
+            local ReturnedValue = Util:EvaluateNumberSequence(Numbers, 0.9)
+            expect(ReturnedValue).to.be.near(0.5, 0.05)
+        end)
+    end)
 end

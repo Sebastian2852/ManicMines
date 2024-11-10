@@ -81,6 +81,15 @@ local function SetupStoneBlock(StoneBlock :BasePart)
     end
 end
 
+local function GetProbabilityForOreUsingCurve(Curve :NumberSequence, NormalizedY :number)
+    local RawProbability = Core.Util:EvaluateNumberSequence(Curve, NormalizedY)
+    -- Add 1 so that if it is zero there is still a chance to generate the ore
+    -- Basically 0 in the curve means no change
+
+    -- Times by 100 so that there is some sort of chance and not just a between 0 and 1
+    return (RawProbability + 1) * 100
+end
+
 
 
 -- [[ PUBLIC ]] --
@@ -136,12 +145,29 @@ function MineService:GenerateRandomOre(YLevel :number, Cave :boolean) :BasePart
         return false
     end
 
+    local NormalizedY = math.clamp((YLevel - TopLayerY) / (self.LowestDepth - TopLayerY), 0, 1)
+
     while GeneratedBlock == nil do
         for _, PossibleOre :BasePart in pairs(SpawnableOres) do
             local Rarity = PossibleOre:GetAttribute("Rarity")
             local Number = NumberGenerator:NextInteger(1, Rarity)
 
             if Number == 1 then
+
+                -- Made this an if so that ores dont need to have a spawning curve
+                if PossibleOre:GetAttribute("SpawningCurve") then
+                    local Curve :NumberSequence = PossibleOre:GetAttribute("SpawningCurve")
+                    local Probability = GetProbabilityForOreUsingCurve(Curve, NormalizedY)
+                    local RandomNumber = NumberGenerator:NextInteger(1, Probability)
+
+                    if RandomNumber == 1 then
+                        GeneratedBlock = PossibleOre
+                    else
+                        GeneratedBlock = nil
+                        break
+                    end
+                end
+
                 GeneratedBlock = PossibleOre
                 break
             end

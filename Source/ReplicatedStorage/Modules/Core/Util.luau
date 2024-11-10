@@ -132,4 +132,27 @@ function Util:ConvertOreToType(Ore :BasePart, Amount :number) :{Name :string, Di
     return OreType
 end
 
+--[=[
+Returns the value at the given time in the given number sequence
+]=]
+function Util:EvaluateNumberSequence(Sequence :NumberSequence, Time :number)
+    local Keypoints = Sequence.Keypoints
+
+    if Time <= Keypoints[1].Time then
+        return Keypoints[1].Value
+    elseif Time >= Keypoints[# Keypoints].Time then
+        return Keypoints[# Keypoints].Value
+    end
+
+    for i = 1, #Keypoints - 1 do
+        local Current = Keypoints[i]
+        local Next = Keypoints[i + 1]
+
+        if Time >= Current.Time and Time <= Next.Time then
+            local Alpha = (Time - Current.Time) / (Next.Time - Current.Time)
+            return Current.Value + (Next.Value - Current.Value) * Alpha
+        end
+    end
+end
+
 return Util
