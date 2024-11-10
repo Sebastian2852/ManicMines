@@ -214,6 +214,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     local NewBlock :BasePart = BlockToGenerate:Clone()
     NewBlock.Parent = workspace.Game.Mine
     NewBlock.Position = Position
+    NewBlock.BrickColor = StoneBlock.BrickColor
     NewBlock.Size = Core.GameConfig.Mine.BlockSize
 
     self.UsedPositions[Position] = 1
