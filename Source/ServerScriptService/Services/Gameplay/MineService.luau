@@ -34,7 +34,7 @@ MineService.MineStats = {
 
 -- [[ PRIVATE ]] --
 
-local function CollapseMine()
+local function CollapseMine(NewSeed :number?)
     if Collapsing then return end
 
     LogService:Log("Mine collapsing")
@@ -52,7 +52,7 @@ local function CollapseMine()
     end
 
     -- Reset the random number generator so that there is a new seed
-    NumberGenerator = Random.new()
+    NumberGenerator = Random.new(NewSeed)
 
     task.wait(1)
 
@@ -318,6 +318,10 @@ function MineService:BlockMined(Block :BasePart)
     for _, Offset in pairs(PositionOffsets) do
         self:GenerateBlockAtPosition(OriginalPosition + Offset)
     end
+end
+
+function MineService:Collapse(NewSeed :number?)
+    CollapseMine(NewSeed)
 end
 
 
