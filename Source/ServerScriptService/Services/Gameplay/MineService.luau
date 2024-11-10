@@ -22,8 +22,9 @@ local TopLayerY = 0
 local TopLayerCanGenerate = true
 local Collapsing = false
 
+local UsedPositions = {}
+
 MineService.TopLayerPositions = {}
-MineService.UsedPositions = {}
 MineService.LowestDepth = 0
 
 MineService.MineStats = {
@@ -59,6 +60,10 @@ local function CollapseMine()
     TopLayerCanGenerate = true
     MineService:GenerateTopLayer()
     MineSpawn.Transparency = 1
+end
+
+local function KeyPosition(Vector :Vector3) :string
+    return Vector.X..";"..Core.Util:RoundToxDP(Vector.Y, 3)..";"..Vector.Z
 end
 
 local function ConvertYLevelToDepth(WorldY :number) :number
@@ -152,45 +157,40 @@ function MineService:GenerateRandomOre(YLevel :number, Cave :boolean) :BasePart
 
     local NormalizedY = math.clamp((YLevel - TopLayerY) / (self.LowestDepth - TopLayerY), 0, 1)
 
-    while GeneratedBlock == nil do
-        for _, PossibleOre :BasePart in pairs(SpawnableOres) do
-            local Rarity = PossibleOre:GetAttribute("Rarity")
-            local CaveMultiplier = PossibleOre:GetAttribute("CaveMultiplier")
-            local Multiplier = 1 + (CaveMultiplier / 100)
-            local AdjustedRarity = Cave and math.max(1, Rarity * Multiplier) or Rarity
+    for _, PossibleOre :BasePart in pairs(SpawnableOres) do
+        local Rarity = PossibleOre:GetAttribute("Rarity")
+        local CaveMultiplier = PossibleOre:GetAttribute("CaveMultiplier")
+        local Multiplier = 1 + (CaveMultiplier / 100)
+        local AdjustedRarity = Cave and math.max(1, Rarity * Multiplier) or Rarity
+        local Number = NumberGenerator:NextInteger(1, AdjustedRarity)
 
-            local Number = NumberGenerator:NextInteger(1, AdjustedRarity)
+        if Number == 1 then
+            if PossibleOre:GetAttribute("SpawningCurve") then
+                local Curve :NumberSequence = PossibleOre:GetAttribute("SpawningCurve")
+                local Probability = GetProbabilityForOreUsingCurve(Curve, NormalizedY)
+                local RandomNumber = NumberGenerator:NextInteger(1, Probability)
 
-            if Number == 1 then
-
-                -- Made this an if so that ores dont need to have a spawning curve
-                if PossibleOre:GetAttribute("SpawningCurve") then
-                    local Curve :NumberSequence = PossibleOre:GetAttribute("SpawningCurve")
-                    local Probability = GetProbabilityForOreUsingCurve(Curve, NormalizedY)
-                    local RandomNumber = NumberGenerator:NextInteger(1, Probability)
-
-                    if RandomNumber == 1 then
-                        GeneratedBlock = PossibleOre
-                    else
-                        GeneratedBlock = nil
-                        break
-                    end
+                if RandomNumber == Probability then
+                    GeneratedBlock = PossibleOre
                 end
-
+            else
                 GeneratedBlock = PossibleOre
-                break
             end
         end
     end
 
-    return true, GeneratedBlock
+    if GeneratedBlock then
+        return true, GeneratedBlock
+    end
+
+    return false
 end
 
 --[=[
 Generates a position at a given position, has a random chance to be an ore
 ]=]
 function MineService:GenerateBlockAtPosition(Position :Vector3)
-    if self.UsedPositions[Position] then return end
+    if UsedPositions[KeyPosition(Position)] then return end
 
     local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
@@ -217,7 +217,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     NewBlock.BrickColor = StoneBlock.BrickColor
     NewBlock.Size = Core.GameConfig.Mine.BlockSize
 
-    self.UsedPositions[Position] = 1
+    UsedPositions[KeyPosition(Position)] = 1
     self.MineStats.BlocksGenerated += 1
 
     NewBlock:SetAttribute("CanMine", true)
@@ -261,7 +261,7 @@ function MineService:GenerateTopLayer()
 
     MineSpawn.Position = OriginalMineSpawnPosition + Vector3.new(0, 0.01, 0)
 
-    self.UsedPositions = {}
+    UsedPositions = {}
     self.TopLayerPositions = {}
     self.MineStats.BlocksGenerated = 0
     self.MineStats.OresGenerated = 0
@@ -274,7 +274,7 @@ function MineService:GenerateTopLayer()
 
                 table.insert(self.TopLayerPositions, Position)
                 self:GenerateBlockAtPosition(Position)
-                self.UsedPositions[AbovePos] = 1
+                UsedPositions[KeyPosition(AbovePos)] = 1
             end
             Resolve()
         end)
