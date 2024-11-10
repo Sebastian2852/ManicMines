@@ -4,7 +4,9 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local PlayerDisplayService = Knit.CreateService {
     Name = "PlayerDisplayService",
-    Client = {},
+    Client = {
+        GiveHeadlight = Knit.CreateSignal()
+    },
 }
 
 local DataService
@@ -49,6 +51,7 @@ function PlayerDisplayService:GivePlayerOverheadGUI(Player :Player, ExtraTag :st
     end
     LevelName = LevelConfig:GetAttribute("LevelName")
 
+    self.Client.GiveHeadlight:FireAll(Player.Character)
     GiveChracterGUI(Player.Character, DisplayName, Username, LevelName, LevelConfig:GetAttribute("LevelColor"), ExtraTag)
 end
 

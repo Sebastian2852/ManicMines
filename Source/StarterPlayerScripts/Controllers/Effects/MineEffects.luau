@@ -9,6 +9,7 @@ local MineEffects = Knit.CreateController { Name = "MineEffects" }
 local MineService
 local LogService
 local LightingController
+local PlayerDisplayService
 
 local PreviousLayer = ""
 
@@ -32,6 +33,7 @@ function MineEffects:KnitStart()
     LogService = Knit.GetService("LogService")
     LightingController = Knit.GetController("LightingController")
     MineService = Knit.GetService("MineService")
+    PlayerDisplayService = Knit.GetService("PlayerDisplayService")
 
     RunService:BindToRenderStep("CharacterPositionInfo", Enum.RenderPriority.Input.Value + 1, function()
         local Character = Knit.Player.Character
@@ -52,6 +54,11 @@ function MineEffects:KnitStart()
         MineService:ConvertToDepth(Position.Y):andThen(function(Depth :number)
             ReplicatedStorage.Player.Depth.Value = Depth
         end)
+    end)
+
+    PlayerDisplayService.GiveHeadlight:Connect(function(Character)
+        local Light = Core.Assets.Misc.HeadLight:Clone()
+        Light.Parent = Character:WaitForChild("Head")
     end)
 end
 

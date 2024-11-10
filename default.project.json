@@ -52,6 +52,19 @@
           "OreFrame":{"$className":"Frame"}
         },
 
+        "Misc":{
+          "$className":"Folder",
+          "HeadLight":{
+            "$className":"PointLight",
+            "$properties": {
+              "Brightness":0.2,
+              "Enabled":true,
+              "Range":18,
+              "Shadows":false
+            }
+          }
+        },
+
         "Stone":{"$className":"Part"}
       },
 
