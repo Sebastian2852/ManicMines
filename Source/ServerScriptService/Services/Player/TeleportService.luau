@@ -124,6 +124,15 @@ function TeleportService:TeleportPlayerToSurface(Player :Player)
     self:TeleportPlayerToPosition(Player, workspace.Game.Teleports.Surface.Position)
 end
 
+-- [[ CLIENT ]] --
+
+--[=[
+Teleport the current player to the surface
+]=]
+function TeleportService.Client:TeleportToSurface(Player :Player)
+    self.Server:TeleportPlayerToSurface(Player)
+end
+
 
 
 --[[ KNIT ]]--

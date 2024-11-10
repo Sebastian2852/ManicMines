@@ -10,6 +10,13 @@ local NumberGenerator = Random.new()
 local TeleportService
 local LogService
 
+--[=[
+IDEA:
+
+When a block is starting to be mined then the mine automatically generates the blocks around it so its ready for when the block is broken,
+This will hopefully elimate the 1 frame time-frame where you can see the sky when mining
+]=]
+
 local MineService = Knit.CreateService {
     Name = "MineService",
     Client = {},
@@ -237,6 +244,9 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     end
 end
 
+--[=[
+Gets the block at a given position
+]=]
 function MineService:GetBlockAtPosition(Position :Vector3)
     local Nodes = MineOctree:GetNearest(Position, 6, 1)
     local Node = Nodes and Nodes[1]
@@ -246,6 +256,9 @@ function MineService:GetBlockAtPosition(Position :Vector3)
     return Block
 end
 
+--[=[
+Replaces a block at a given position
+]=]
 function MineService:ReplaceBlockAtPosition(Position :Vector3, NewBlock :BasePart)
     local Block = self:GetBlockAtPosition(Position)
     local Pos = Block.Position
