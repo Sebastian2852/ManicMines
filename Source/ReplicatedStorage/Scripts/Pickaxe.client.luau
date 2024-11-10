@@ -78,7 +78,7 @@ local function AddOutline(Object :BasePart)
 
     if Object:GetAttribute("BeingMined") then
         New.Color3 = Color3.new(1, 0, 0)
-     end
+    end
     Outline = New
 end
 
@@ -101,15 +101,19 @@ local function CanReach(OreBlock :BasePart)
 end
 
 local function DeselectOre()
-    if Outline then 
-        Outline:Destroy() 
-    end
-    PlayerFolder.PickaxeSelection.Value = nil
+    PickaxeService:StopMining()
     Deactivate()
+    PlayerFolder.PickaxeSelection.Value = nil
+    if Outline then
+        Outline:Destroy()
+    end
 end
 
 local function SelectOre(Ore :BasePart)
     if not Ore or not Ore.Parent then return end
+    if PlayerFolder.PickaxeSelection.Value == Ore then return end
+    Deactivate()
+    DeselectOre()
     if not Ore:GetAttribute("CanMine") then
         Deactivate()
         DeselectOre()
