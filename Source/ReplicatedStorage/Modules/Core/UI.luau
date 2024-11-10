@@ -81,7 +81,7 @@ Create a single ore frame from an ore list. This only creates a frame for the fi
 function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Position :UDim2) -- Maybe add an "include gold" param
     for OreName :string, OreData in pairs(OreList:LoopList()) do
         if OreData.Amount == 0 then continue end
-        if OreName == "Gold" then
+        if OreName == "GoldCoins" then
             warn("Gold is not supported in ore frames!!!")
             continue
         end
@@ -293,19 +293,12 @@ function UI:CreateOreFrames(OreList, Style :EnumList.EnumItem, Size :UDim2) :{Ro
             continue
         end
         if OreData.Amount == 0 then continue end
-        if OreName == "Gold" then
-            warn("Gold is not supported in ore frames!!!")
+        if OreName == "GoldCoins" then
+            warn("Gold coins is not supported in ore frames!!!")
             continue
         end
 
         local NewList = OreListClass.New()
-        if OreName == "Gold" then
-            NewList:AddGold(OreData.Amount)
-            Frames[OreName] = self:CreateOreFrame(NewList, Style, Size, UDim2.fromScale(0, 0))
-            NewList:Destroy()
-            continue
-        end
-
         NewList:AddOre(OreName, OreData.Amount)
         Frames[OreName] = self:CreateOreFrame(NewList, Style, Size, UDim2.fromScale(0, 0))
         NewList:Destroy()

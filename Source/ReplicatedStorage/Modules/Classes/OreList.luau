@@ -186,7 +186,7 @@ end
 ]=]
 function OreList:LoopList() :{ OreListItem }
     local List = self._Ores
-    List["Gold"] = {Name = "Gold", Amount = self._Gold, DisplayName = "Gold"}
+    List["GoldCoins"] = {Name = "Gold", Amount = self._Gold, DisplayName = "Gold"}
     return List
 end
 
