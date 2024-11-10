@@ -32,10 +32,10 @@ end):catch(warn)
 
 -- [[ COMPONENTS ]] --
 
-for _, Object in pairs(script.Parent.Components:GetDescendants()) do
-    if not Object:IsA("ModuleScript") then continue end
-    require(Object)
-end
+-- for _, Object in pairs(script.Parent.Components:GetDescendants()) do
+    -- if not Object:IsA("ModuleScript") then continue end
+    -- require(Object)
+-- end
 
 
 
