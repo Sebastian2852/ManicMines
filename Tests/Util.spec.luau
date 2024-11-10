@@ -88,4 +88,19 @@ return function()
             expect(ReturnedValue).to.be.near(0.5, 0.05)
         end)
     end)
+
+    describe("ApplyPropertiesFromTable", function()
+        it("Apply to part", function()
+            local TestPart = Instance.new("Part")
+            TestPart.Parent = workspace
+
+            local Props = {
+                Name = "Awesome test";
+            }
+
+            Util:ApplyPropertiesFromTable(TestPart, Props)
+            expect(TestPart.Name).to.equal("Awesome test")
+            TestPart:Destroy()
+        end)
+    end)
 end

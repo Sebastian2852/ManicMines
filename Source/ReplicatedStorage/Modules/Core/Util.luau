@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Util = {}
 
 local OreList = require(ReplicatedStorage.Game.Modules.Classes.OreList)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 
 --[=[
 Convertes a given number into a string, good for use in UI.
@@ -153,6 +154,34 @@ function Util:EvaluateNumberSequence(Sequence :NumberSequence, Time :number)
             return Current.Value + (Next.Value - Current.Value) * Alpha
         end
     end
+end
+
+--[=[
+Takes in an object and a table and tries to apply the values to the properties based on the key
+so if you put in a part and a table which looks like this {Size = Vector3.new(6, 6, 6)}
+This will change the part's size
+]=]
+function Util:ApplyPropertiesFromTable<T>(Object :T, Properties :{[string] :any})
+    for Key, Value in pairs(Properties) do
+        local Success = pcall(function()
+            Object[Key] = Value
+        end)
+
+        if not Success then
+            warn("Object: "..Util:LogObjectString(Object).." doesnt not have the property: "..Key)
+        end
+    end
+end
+
+--[=[
+Does the same thing as `ApplyPropertiesFromTable` but does it async  
+Returns a promise
+]=]
+function Util:ApplyPropertiesFromTableAsync<T>(Object :T, Properties :{[string] :any})
+    return Promise.new(function(Resolve)
+        Util:ApplyPropertiesFromTable(Object, Properties)
+        Resolve()
+    end)
 end
 
 return Util
