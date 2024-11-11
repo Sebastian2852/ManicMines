@@ -236,6 +236,7 @@ Generates a position at a given position, has a random chance to be an ore
 ]=]
 function MineService:GenerateBlockAtPosition(Position :Vector3)
     if UsedPositions[KeyPosition(Position)] then return end
+    if Position.Y > TopLayerY then return end
 
     local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
