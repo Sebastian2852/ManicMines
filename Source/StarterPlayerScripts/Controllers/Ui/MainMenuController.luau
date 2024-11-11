@@ -7,7 +7,6 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
 
 local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
-local PlayerGUI = Knit.Player.PlayerGui
 
 local DataService
 local TextFilteringService
@@ -126,8 +125,8 @@ end
 function MainMenuController:DisableAllUI()
     LogService:Log("Disabling all UI")
     MainScreenGui.Enabled = true
-    PlayerGUI.HUD.Enabled = false
-    PlayerGUI.Inventory.Enabled = false
+    --PlayerGUI.HUD.Enabled = false
+    --PlayerGUI.Inventory.Enabled = false
 end
 
 function MainMenuController:EnableAllUI()
@@ -135,8 +134,8 @@ function MainMenuController:EnableAllUI()
     MainScreenGui:Destroy()
     Blur:Destroy()
     LogService:Log("Destroyed main menu and blur")
-    PlayerGUI.HUD.Enabled = true
-    PlayerGUI.Inventory.Enabled = true
+    --PlayerGUI.HUD.Enabled = true
+    --PlayerGUI.Inventory.Enabled = true
 end
 
 function MainMenuController:CreateSlotFrame(SlotInfo)
