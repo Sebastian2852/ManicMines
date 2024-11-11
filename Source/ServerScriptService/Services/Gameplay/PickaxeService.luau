@@ -101,17 +101,19 @@ function PickaxeService:RemovePickaxeFromPlayer(Player :Player)
 
     LogService:Log("Removing "..Player.Name.."'s pickaxe")
 
-    for _, Tool in pairs(Player.Backpack:GetChildren()) do
-        if Tool:HasTag("Pickaxe") and Tool:IsA("Tool") then
-            Tool:Destroy()
-        end
+    for _, Tool :Tool in pairs(Player.Backpack:GetChildren()) do
+        if not Tool:IsA("Tool") then continue end
+        if not Tool:HasTag("Pickaxe") then continue end
+        Tool:Destroy()
+        break
     end
 
     if Player.Character then
         for _, Tool in pairs(Player.Character:GetChildren()) do
-            if Tool:HasTag("Pickaxe") and Tool:IsA("Tool") then
-                Tool:Destroy()
-            end
+            if not Tool:IsA("Tool") then continue end
+            if not Tool:HasTag("Pickaxe") then continue end
+            Tool:Destroy()
+            break
         end
     end
 end
