@@ -232,7 +232,7 @@ function MineService:GenerateRandomOre(YLevel :number, Cave :boolean) :BasePart
 end
 
 --[=[
-Generates a position at a given position, has a random chance to be an ore
+Generates a block at a given position, has a random chance to be an ore
 ]=]
 function MineService:GenerateBlockAtPosition(Position :Vector3)
     if UsedPositions[KeyPosition(Position)] then return end
@@ -262,8 +262,8 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     NewBlock.Size = Core.GameConfig.Mine.BlockSize
 
     UsedPositions[KeyPosition(Position)] = 1
-    self.MineStats.BlocksGenerated += 1
     MineOctree:CreateNode(Position, NewBlock)
+    self.MineStats.BlocksGenerated += 1
 
     NewBlock:SetAttribute("CanMine", true)
 
@@ -272,15 +272,20 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
         return
     end
 
-    if Position.Y >= TopLayerY then 
+    local function DisableBlock()
+        LogService:Warn("Making block unminable!")
+        NewBlock = self:ReplaceBlockAtPosition(Position, StoneBlock)
         NewBlock.Color = Color3.fromRGB(27, 42, 53)
         NewBlock:SetAttribute("CanMine", false)
     end
 
+    if Position.Y >= TopLayerY then
+        DisableBlock()
+    end
+
     local Depth = ConvertYLevelToDepth(Position.Y)
     if Depth > self.LowestDepth then
-        NewBlock.Color = Color3.fromRGB(27, 42, 53)
-        NewBlock:SetAttribute("CanMine", false)
+        DisableBlock()
     end
 end
 
@@ -299,7 +304,7 @@ end
 --[=[
 Replaces a block at a given position
 ]=]
-function MineService:ReplaceBlockAtPosition(Position :Vector3, NewBlock :BasePart)
+function MineService:ReplaceBlockAtPosition(Position :Vector3, NewBlock :BasePart) :BasePart
     local Block = self:GetBlockAtPosition(Position)
     local Pos = Block.Position
     local Color = Block.BrickColor
@@ -314,6 +319,7 @@ function MineService:ReplaceBlockAtPosition(Position :Vector3, NewBlock :BasePar
     Block.Size = Core.GameConfig.Mine.BlockSize
     MineOctree:CreateNode(Pos, Block)
     Block:SetAttribute("CanMine", true)
+    return Block
 end
 
 --[=[
