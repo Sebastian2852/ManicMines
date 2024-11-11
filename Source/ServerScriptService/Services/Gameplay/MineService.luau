@@ -35,14 +35,41 @@ local MineOctree = OctoTree.new()
 local UsedPositions = {}
 
 local BlockGenerationOffsets = {
+    -- Direct neighbors
     Vector3.new(BlockSize.X, 0, 0);
     Vector3.new(-BlockSize.X, 0, 0);
-
     Vector3.new(0, BlockSize.Y, 0);
     Vector3.new(0, -BlockSize.Y, 0);
-
     Vector3.new(0, 0, BlockSize.Z);
     Vector3.new(0, 0, -BlockSize.Z);
+
+    -- Diagonal neighbors (XY plane)
+    Vector3.new(BlockSize.X, BlockSize.Y, 0);
+    Vector3.new(-BlockSize.X, BlockSize.Y, 0);
+    Vector3.new(BlockSize.X, -BlockSize.Y, 0);
+    Vector3.new(-BlockSize.X, -BlockSize.Y, 0);
+
+    -- Diagonal neighbors (XZ plane)
+    Vector3.new(BlockSize.X, 0, BlockSize.Z);
+    Vector3.new(-BlockSize.X, 0, BlockSize.Z);
+    Vector3.new(BlockSize.X, 0, -BlockSize.Z);
+    Vector3.new(-BlockSize.X, 0, -BlockSize.Z);
+
+    -- Diagonal neighbors (YZ plane)
+    Vector3.new(0, BlockSize.Y, BlockSize.Z);
+    Vector3.new(0, -BlockSize.Y, BlockSize.Z);
+    Vector3.new(0, BlockSize.Y, -BlockSize.Z);
+    Vector3.new(0, -BlockSize.Y, -BlockSize.Z);
+
+    -- Corner neighbors
+    Vector3.new(BlockSize.X, BlockSize.Y, BlockSize.Z);
+    Vector3.new(-BlockSize.X, BlockSize.Y, BlockSize.Z);
+    Vector3.new(BlockSize.X, -BlockSize.Y, BlockSize.Z);
+    Vector3.new(-BlockSize.X, -BlockSize.Y, BlockSize.Z);
+    Vector3.new(BlockSize.X, BlockSize.Y, -BlockSize.Z);
+    Vector3.new(-BlockSize.X, BlockSize.Y, -BlockSize.Z);
+    Vector3.new(BlockSize.X, -BlockSize.Y, -BlockSize.Z);
+    Vector3.new(-BlockSize.X, -BlockSize.Y, -BlockSize.Z);
 }
 
 MineService.TopLayerPositions = {}
