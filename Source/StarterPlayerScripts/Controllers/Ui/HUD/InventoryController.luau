@@ -33,13 +33,6 @@ end
 local InventoryComponent = Core.Roact.Component:extend("InventoryComponent")
 
 function InventoryComponent:init()
-    local Ores = {}
-
-    for _, RealOre in pairs(Core.Assets.Ores:GetChildren()) do
-        local DisplayName = RealOre:GetAttribute("DisplayName") or "error getting display name for ore: "..RealOre.Name
-        Ores[DisplayName] = 0
-    end
-
     self:setState({
         StyleToUse = Core.UI.OreFrameStyle.Normal;
         OreList = {};

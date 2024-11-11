@@ -30,8 +30,47 @@ local TopLayerY = 0
 local TopLayerCanGenerate = true
 local Collapsing = false
 
+local BlockSize = Core.GameConfig.Mine.BlockSize
 local MineOctree = OctoTree.new()
 local UsedPositions = {}
+
+local BlockGenerationOffsets = {
+    -- Direct neighbors
+    Vector3.new(BlockSize.X, 0, 0);
+    Vector3.new(-BlockSize.X, 0, 0);
+    Vector3.new(0, BlockSize.Y, 0);
+    Vector3.new(0, -BlockSize.Y, 0);
+    Vector3.new(0, 0, BlockSize.Z);
+    Vector3.new(0, 0, -BlockSize.Z);
+
+    -- Diagonal neighbors (XY plane)
+    Vector3.new(BlockSize.X, BlockSize.Y, 0);
+    Vector3.new(-BlockSize.X, BlockSize.Y, 0);
+    Vector3.new(BlockSize.X, -BlockSize.Y, 0);
+    Vector3.new(-BlockSize.X, -BlockSize.Y, 0);
+
+    -- Diagonal neighbors (XZ plane)
+    Vector3.new(BlockSize.X, 0, BlockSize.Z);
+    Vector3.new(-BlockSize.X, 0, BlockSize.Z);
+    Vector3.new(BlockSize.X, 0, -BlockSize.Z);
+    Vector3.new(-BlockSize.X, 0, -BlockSize.Z);
+
+    -- Diagonal neighbors (YZ plane)
+    Vector3.new(0, BlockSize.Y, BlockSize.Z);
+    Vector3.new(0, -BlockSize.Y, BlockSize.Z);
+    Vector3.new(0, BlockSize.Y, -BlockSize.Z);
+    Vector3.new(0, -BlockSize.Y, -BlockSize.Z);
+
+    -- Corner neighbors
+    Vector3.new(BlockSize.X, BlockSize.Y, BlockSize.Z);
+    Vector3.new(-BlockSize.X, BlockSize.Y, BlockSize.Z);
+    Vector3.new(BlockSize.X, -BlockSize.Y, BlockSize.Z);
+    Vector3.new(-BlockSize.X, -BlockSize.Y, BlockSize.Z);
+    Vector3.new(BlockSize.X, BlockSize.Y, -BlockSize.Z);
+    Vector3.new(-BlockSize.X, BlockSize.Y, -BlockSize.Z);
+    Vector3.new(BlockSize.X, -BlockSize.Y, -BlockSize.Z);
+    Vector3.new(-BlockSize.X, -BlockSize.Y, -BlockSize.Z);
+}
 
 MineService.TopLayerPositions = {}
 MineService.LowestDepth = 0
@@ -193,10 +232,11 @@ function MineService:GenerateRandomOre(YLevel :number, Cave :boolean) :BasePart
 end
 
 --[=[
-Generates a position at a given position, has a random chance to be an ore
+Generates a block at a given position, has a random chance to be an ore
 ]=]
 function MineService:GenerateBlockAtPosition(Position :Vector3)
     if UsedPositions[KeyPosition(Position)] then return end
+    if Position.Y > TopLayerY then return end
 
     local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
@@ -222,8 +262,8 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     NewBlock.Size = Core.GameConfig.Mine.BlockSize
 
     UsedPositions[KeyPosition(Position)] = 1
-    self.MineStats.BlocksGenerated += 1
     MineOctree:CreateNode(Position, NewBlock)
+    self.MineStats.BlocksGenerated += 1
 
     NewBlock:SetAttribute("CanMine", true)
 
@@ -232,15 +272,20 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
         return
     end
 
-    if Position.Y >= TopLayerY then 
+    local function DisableBlock()
+        LogService:Warn("Making block unminable!")
+        NewBlock = self:ReplaceBlockAtPosition(Position, StoneBlock)
         NewBlock.Color = Color3.fromRGB(27, 42, 53)
         NewBlock:SetAttribute("CanMine", false)
     end
 
+    if Position.Y >= TopLayerY then
+        DisableBlock()
+    end
+
     local Depth = ConvertYLevelToDepth(Position.Y)
     if Depth > self.LowestDepth then
-        NewBlock.Color = Color3.fromRGB(27, 42, 53)
-        NewBlock:SetAttribute("CanMine", false)
+        DisableBlock()
     end
 end
 
@@ -259,7 +304,7 @@ end
 --[=[
 Replaces a block at a given position
 ]=]
-function MineService:ReplaceBlockAtPosition(Position :Vector3, NewBlock :BasePart)
+function MineService:ReplaceBlockAtPosition(Position :Vector3, NewBlock :BasePart) :BasePart
     local Block = self:GetBlockAtPosition(Position)
     local Pos = Block.Position
     local Color = Block.BrickColor
@@ -274,6 +319,7 @@ function MineService:ReplaceBlockAtPosition(Position :Vector3, NewBlock :BasePar
     Block.Size = Core.GameConfig.Mine.BlockSize
     MineOctree:CreateNode(Pos, Block)
     Block:SetAttribute("CanMine", true)
+    return Block
 end
 
 --[=[
@@ -289,7 +335,6 @@ function MineService:GenerateTopLayer()
     MineSpawn.CanCollide = true
     TopLayerY = MineSpawn.Position.Y
 
-    local BlockSize = Core.GameConfig.Mine.BlockSize
     local BlocksToGenerateX = math.round(MineSpawn.Size.X / BlockSize.X)
     local BlocksToGenerateY = math.round(MineSpawn.Size.Z / BlockSize.Z)
 
@@ -338,29 +383,25 @@ function MineService:BlockMined(Block :BasePart)
         return
     end
 
-    local XOffset = Core.GameConfig.Mine.BlockSize.X
-    local YOffset = Core.GameConfig.Mine.BlockSize.Y
-    local ZOffset = Core.GameConfig.Mine.BlockSize.Z
-
-    local PositionOffsets = {
-        Vector3.new(XOffset, 0, 0);
-        Vector3.new(-XOffset, 0, 0);
-
-        Vector3.new(0, YOffset, 0);
-        Vector3.new(0, -YOffset, 0);
-
-        Vector3.new(0, 0, ZOffset);
-        Vector3.new(0, 0, -ZOffset);
-    }
-
-    local OriginalPosition = Block.Position
+    self:GenerateAroundBlockAsync(Block)
     local Node = MineOctree:FindFirstNode(Block)
     MineOctree:RemoveNode(Node)
     Block:Destroy()
+end
 
-    for _, Offset in pairs(PositionOffsets) do
-        self:GenerateBlockAtPosition(OriginalPosition + Offset)
-    end
+--[=[
+Generate blocks around the passed part using offsets
+]=]
+function MineService:GenerateAroundBlockAsync(Block :BasePart)
+    return Promise.new(function(Resolve)
+        local Origin = Block.Position
+
+        for _, Offset :Vector3 in pairs(BlockGenerationOffsets) do
+            self:GenerateBlockAtPosition(Origin + Offset)
+        end
+
+        Resolve()
+    end)
 end
 
 --[=[

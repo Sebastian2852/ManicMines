@@ -25,6 +25,40 @@ end
 -- [[ PUBLIC ]]--
 
 --[=[
+Give a player a certain amount of levels
+]=]
+function PlayerStatsService:AwardLevel(Player :Player, Amount :number)
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    DataFolder.Level.Value += Amount
+end
+
+--[=[
+Give a player a certain amount of XP
+]=]
+function PlayerStatsService:AwardXP(Player: Player, Amount: number)
+    local DataFolder: Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    local CurrentLevel = DataFolder.Level.Value
+    local NextLevelConfig = Core.Assets.Levels:FindFirstChild(tostring(CurrentLevel + 1))
+
+    if not NextLevelConfig then
+        DataFolder.XP.Value += Amount
+        return
+    end
+
+    local XpNeeded = NextLevelConfig:GetAttribute("XpNeeded")
+    local CurrentXp = DataFolder.XP.Value
+    local NewXp = CurrentXp + Amount
+
+    if NewXp >= XpNeeded then
+        local ExtraXp = NewXp - XpNeeded
+        self:AwardLevel(Player, 1)
+        self:AwardXP(Player, ExtraXp)
+    else
+        DataFolder.XP.Value = NewXp
+    end
+end
+
+--[=[
 Gives ores to the players inventory, doesnt matter if they dont have enough space to carry it
 ]=]
 function PlayerStatsService:GiveOres(Player :Player, OreList)
