@@ -180,6 +180,7 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
 
     local OreList = Core.OreList.New()
     OreList:AddOre(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
+    MineService:GenerateAroundBlockAsync(ObjectToMine)
     while PickaxeService.Mining[Player.UserId].Mining and PickaxeService:VerifyIfCanMine(Player, Character, ObjectToMine) do
         local Health :number = ObjectToMine:GetAttribute("Health")
 
