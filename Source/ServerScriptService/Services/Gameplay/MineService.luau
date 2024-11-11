@@ -377,7 +377,7 @@ function MineService:BlockMined(Block :BasePart)
         return
     end
 
-    self:GenerateAroundBlock(Block)
+    self:GenerateAroundBlockAsync(Block)
     local Node = MineOctree:FindFirstNode(Block)
     MineOctree:RemoveNode(Node)
     Block:Destroy()
@@ -386,12 +386,16 @@ end
 --[=[
 Generate blocks around the passed part using offsets
 ]=]
-function MineService:GenerateAroundBlock(Block :BasePart)
-    local Origin = Block.Position
+function MineService:GenerateAroundBlockAsync(Block :BasePart)
+    return Promise.new(function(Resolve)
+        local Origin = Block.Position
 
-    for _, Offset :Vector3 in pairs(BlockGenerationOffsets) do
-        self:GenerateBlockAtPosition(Origin + Offset)
-    end
+        for _, Offset :Vector3 in pairs(BlockGenerationOffsets) do
+            self:GenerateBlockAtPosition(Origin + Offset)
+        end
+
+        Resolve()
+    end)
 end
 
 --[=[
