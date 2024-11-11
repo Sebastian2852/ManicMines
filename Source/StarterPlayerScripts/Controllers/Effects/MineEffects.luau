@@ -11,6 +11,8 @@ local LogService
 local LightingController
 local PlayerDisplayService
 local DataService
+local PickaxeService
+local AudioEngine
 
 local PreviousLayer = ""
 local Animation
@@ -36,18 +38,20 @@ end
 -- [[ KNIT ]] --
 
 function MineEffects:KnitInit()
-    local AnimationID = "rbxassetid://120997683811787"
+    local AnimationID = "rbxassetid://16827661763"
     Animation = Instance.new("Animation")
     Animation.AnimationId = AnimationID
     Animation.Parent = script
 end
 
 function MineEffects:KnitStart()
-    LogService               = Knit.GetService("LogService")
+    AudioEngine              = Knit.GetController("AudioEngine")
     LightingController       = Knit.GetController("LightingController")
+    LogService               = Knit.GetService("LogService")
     MineService              = Knit.GetService("MineService")
     PlayerDisplayService     = Knit.GetService("PlayerDisplayService")
     DataService              = Knit.GetService("DataService")
+    PickaxeService           = Knit.GetService("PickaxeService")
 
     RunService:BindToRenderStep("CharacterPositionInfo", Enum.RenderPriority.Input.Value + 1, function()
         local Character = Knit.Player.Character
@@ -81,27 +85,56 @@ function MineEffects:KnitStart()
     local Humanoid = Character:WaitForChild("Humanoid")
     local Animator = Humanoid:WaitForChild("Animator")
 
-    local AnimationTrack = Animator:LoadAnimation(Animation)
-    AnimationTrack.Looped = true
+    local AnimationTrack :AnimationTrack = Animator:LoadAnimation(Animation)
+    AnimationTrack.Looped = false
     AnimationTrack.Priority = Enum.AnimationPriority.Action
-    LogService:Log("Set animation track")
+    LogService:Log("Set animation track:", AnimationTrack)
+
+    AnimationTrack:GetMarkerReachedSignal("HitSound"):Connect(function()
+        LogService:Log("Reached sound marker")
+
+        local Sound :Core.Sound = AudioEngine:CreateBlankSound()
+        Sound.SoundID = "rbxassetid://156951885"
+
+        local Config :Core.SoundConfig = AudioEngine:CreateBlankConfig()
+        Config.Looped = false
+        Config.Pitch = 1
+        Config.Positional = false
+        Config.Volume = 1
+        Config.Speed = 0.5
+        Sound.Config = Config
+
+        AudioEngine:PlaySound(Sound)
+    end)
 
     RunService:BindToRenderStep("MiningAnimation", Enum.RenderPriority.Input.Value, function()
-        if not AnimationTrack then return end
+        if not AnimationTrack then
+            LogService:Warn("No animation!!")
+            return
+        end
 
         DataService:GetPlayerDataFolder():andThen(function(DataFolder : Core.DataFolder)
             local Mining = DataFolder.ServerMining.Value
             if Mining == WasMining then return end
-            WasMining = Mining
+            PickaxeService:GetPickaxe():andThen(function(Pickaxe :Tool)
+                --local HitSpeed = Pickaxe:GetAttribute("MiningCooldown") or 1
+                --local AnimationLength = AnimationTrack.Length
 
-            if Mining then
-                if not AnimationTrack.IsPlaying then
-                    AnimationTrack:Play(0.1, 1, 1)
+                local AnimationSpeed = 1
+                AnimationTrack:AdjustSpeed(AnimationSpeed)
+
+                WasMining = Mining
+
+                while Mining do
+                    if not AnimationTrack.IsPlaying then
+                        AnimationTrack:Play(0.1, 1)
+                    end
+                    task.wait(AnimationSpeed)
                 end
-            else
-                if AnimationTrack.IsPlaying then
-                    AnimationTrack:Stop(0.1)
-                end
+            end)
+
+            if not Mining and AnimationTrack.IsPlaying then
+                AnimationTrack:Stop(0.1)
             end
         end)
     end)

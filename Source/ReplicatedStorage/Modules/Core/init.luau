@@ -88,6 +88,7 @@ export type SoundConfig = {
     Looped :boolean;
     Volume :number;
     Pitch :number;
+    Speed :number;
 
     RollOffMode :Enum.RollOffMode;
     RollOffDistanceBegin :number;

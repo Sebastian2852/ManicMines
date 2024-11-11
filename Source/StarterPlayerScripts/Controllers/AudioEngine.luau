@@ -46,13 +46,19 @@ function AudioEngine:_ConstructObject(SoundObject :Core.Sound)
     Sound.Name = `AE_{AudioID}_{SoundObject.SoundID}`
     Sound.SoundId = SoundObject.SoundID
     Sound.Looped = SoundObject.Looped or false
-    Sound.Volume = SoundObject.Config.Volume
+    Sound.Volume = SoundObject.Config.Volume or 1
+    Sound.PlaybackSpeed = SoundObject.Config.Speed or 1
 
     Sound.RollOffMode = SoundObject.Config.RollOffMode or Enum.RollOffMode.Inverse
     Sound.RollOffMinDistance = SoundObject.Config.RollOffDistanceBegin or 100
     Sound.RollOffMaxDistance = SoundObject.Config.RollOffMaxDistance or 120
 
+    Sound.Ended:Connect(function()
+        self:StopSound(AudioID)
+    end)
+
     Sound.Parent = Location
+    self.Sounds[AudioID] = Location
 
     if SoundObject.Config.Pitch ~= 1 and SoundObject.Config.Pitch ~= nil then
         local PitchShifter = Instance.new("PitchShiftSoundEffect")
@@ -109,10 +115,9 @@ function AudioEngine:PlaySound(SoundObject :Core.Sound) :number
     assert(type(SoundObject.Config) == "table", "Sound object config must be a table")
     assert(SoundObject.Config.ClassName == "SoundObjConfig", "Invalid sound config passed")
 
-    local Parent, Sound, ID = self:_ConstructObject(SoundObject)
+    local _, Sound, ID = self:_ConstructObject(SoundObject)
     self:_ConnectEvents(Sound, SoundObject)
     Sounds += 1
-    self.Sounds[ID] = Parent
 
     Sound:Play()
 
@@ -125,7 +130,7 @@ Takes in the AudioEngine ID of the sound
 ]=]
 function AudioEngine:StopSound(ID :number)
     assert(type(ID) == "number", "SoundID must be a sound")
-    if self.Sounds[ID] == nil then return end
+    if self.Sounds[ID] == nil then return warn("No sound with that ID") end
 
     self.Sounds[ID]:Destroy()
 end
