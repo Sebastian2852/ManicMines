@@ -11,12 +11,6 @@ local DepthMeterController = Knit.CreateController { Name = "DepthMeterControlle
 local DepthMeterComponent = Roact.Component:extend("DepthMeter")
 local Player = Knit.Player
 
-local function ConvertToDepth(Y :number)
-    local Top = workspace.Game.MineSpawn.Position.Y
-    local CellSize = Core.GameConfig.Mine.BlockSize.Y
-    return math.floor((Top - Y) / CellSize) - math.floor(50 / 6)
-end
-
 function DepthMeterComponent:init()
     self:setState({
         Position = Vector3.new(0, 0, 0);
@@ -43,7 +37,7 @@ end
 function DepthMeterComponent:GetPositionText() :string
     local Position = self.state.Position
     local X = math.floor(Position.X)
-    local Y = ConvertToDepth(Position.Y)
+    local Y = ReplicatedStorage.Player.Depth.Value
     local Z = math.floor(Position.Z)
 
     return X..", "..Y.."m, "..Z

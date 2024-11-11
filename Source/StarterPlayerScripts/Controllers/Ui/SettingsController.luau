@@ -166,11 +166,10 @@ function SettingsComponent:render()
             Position = UDim2.fromScale(0.01, 0.98);
             AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
 
-            Image = "rbxassetid://88251609691626";
+            Image = "rbxassetid://129623448532589";
             BorderSizePixel = 0;
 
-            BackgroundColor3 = Core.UI.Theme.BackgroundColor;
-            BackgroundTransparency = Core.UI.Theme.BackgroundColorTransparency;
+            BackgroundTransparency = 1;
 
             [Core.Roact.Event.Activated] = function()
                 self:setState({

@@ -12,7 +12,6 @@ local DataService
 local LogService
 
 local GeneralComponent = Roact.Component:extend("General")
-local Player = Knit.Player
 
 function GeneralComponent:render()
     return Roact.createElement("ScreenGui", {}, {
@@ -21,10 +20,9 @@ function GeneralComponent:render()
             Position = UDim2.fromScale(0.06, 0.98);
             AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
             BackgroundTransparency = 1;
-
             BorderSizePixel = 0;
-            Image = "rbxassetid://16847077275";
-            ImageTransparency = 0.5;
+
+            Image = "rbxassetid://119967532396729";
 
             [Roact.Event.Activated] = function()
                 LogService:Log("Surface button pressed")
