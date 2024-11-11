@@ -30,8 +30,20 @@ local TopLayerY = 0
 local TopLayerCanGenerate = true
 local Collapsing = false
 
+local BlockSize = Core.GameConfig.Mine.BlockSize
 local MineOctree = OctoTree.new()
 local UsedPositions = {}
+
+local BlockGenerationOffsets = {
+    Vector3.new(BlockSize.X, 0, 0);
+    Vector3.new(-BlockSize.X, 0, 0);
+
+    Vector3.new(0, BlockSize.Y, 0);
+    Vector3.new(0, -BlockSize.Y, 0);
+
+    Vector3.new(0, 0, BlockSize.Z);
+    Vector3.new(0, 0, -BlockSize.Z);
+}
 
 MineService.TopLayerPositions = {}
 MineService.LowestDepth = 0
@@ -289,7 +301,6 @@ function MineService:GenerateTopLayer()
     MineSpawn.CanCollide = true
     TopLayerY = MineSpawn.Position.Y
 
-    local BlockSize = Core.GameConfig.Mine.BlockSize
     local BlocksToGenerateX = math.round(MineSpawn.Size.X / BlockSize.X)
     local BlocksToGenerateY = math.round(MineSpawn.Size.Z / BlockSize.Z)
 
@@ -338,27 +349,12 @@ function MineService:BlockMined(Block :BasePart)
         return
     end
 
-    local XOffset = Core.GameConfig.Mine.BlockSize.X
-    local YOffset = Core.GameConfig.Mine.BlockSize.Y
-    local ZOffset = Core.GameConfig.Mine.BlockSize.Z
-
-    local PositionOffsets = {
-        Vector3.new(XOffset, 0, 0);
-        Vector3.new(-XOffset, 0, 0);
-
-        Vector3.new(0, YOffset, 0);
-        Vector3.new(0, -YOffset, 0);
-
-        Vector3.new(0, 0, ZOffset);
-        Vector3.new(0, 0, -ZOffset);
-    }
-
     local OriginalPosition = Block.Position
     local Node = MineOctree:FindFirstNode(Block)
     MineOctree:RemoveNode(Node)
     Block:Destroy()
 
-    for _, Offset in pairs(PositionOffsets) do
+    for _, Offset in pairs(BlockGenerationOffsets) do
         self:GenerateBlockAtPosition(OriginalPosition + Offset)
     end
 end
