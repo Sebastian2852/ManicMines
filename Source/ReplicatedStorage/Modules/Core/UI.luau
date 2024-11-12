@@ -9,7 +9,9 @@ local EnumList = require(ReplicatedStorage.Packages.EnumList)
 local OreListClass = require(ReplicatedStorage.Game.Modules.Classes.OreList)
 
 UI.Theme = {
-    BackgroundColor = Color3.new(0, 0, 0);
+    BackgroundColorLight = Color3.fromRGB(75, 75, 75);
+    BackgroundColorPrimary = Color3.fromRGB(50, 50, 50);
+    BackgroundColorDark = Color3.fromRGB(25, 25, 25);
     BackgroundColorTransparency = 0.5;
 
     TextColor3 = Color3.new(1, 1, 1);
@@ -78,7 +80,7 @@ UI.OreFrameStyle = EnumList.new("OreFrameStyle", {
 --[=[
 Create a single ore frame from an ore list. This only creates a frame for the first thing in the ore list
 ]=]
-function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Position :UDim2) -- Maybe add an "include gold" param
+function UI:CreateOreFrame(OreList :OreListClass.OreList, Style :EnumList.EnumItem, Size :UDim2, Position :UDim2) -- Maybe add an "include gold" param
     for OreName :string, OreData in pairs(OreList:LoopList()) do
         if OreData.Amount == 0 then continue end
         if OreName == "GoldCoins" then

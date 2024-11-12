@@ -3,8 +3,8 @@ local UserInputService = game:GetService("UserInputService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local Random = Random.new()
 local LastInputType = "None"
 
 local InventoryController = Knit.CreateController { Name = "InventoryController" }
@@ -46,6 +46,8 @@ function InventoryComponent:init()
         end)
     end
 
+    self:UpdateInventory(0, 0, CreateInventoryOreList())
+
     UserInputService.InputBegan:Connect(function()
         local InputType = UserInputService:GetLastInputType()
 
@@ -74,95 +76,52 @@ function InventoryComponent:render()
     local Components = Core.UI:CreateOreFrames(self.state.OreList, self.state.StyleToUse, UDim2.fromScale(1, 0.1))
     Components["Layout"] = Core.Roact.createElement("UIListLayout", {}, {})
 
-
-    return Core.Roact.createElement("ScreenGui", {}, {
-        Inventory = Core.Roact.createElement("Frame", {
-            Size = UDim2.fromScale(0.22, 0.55);
-            AnchorPoint = Core.UI.AnchorPoint.BottomRight;
+    return Roact.createElement("ScreenGui", {}, {
+        Container = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.22, 0.6);
             Position = Core.UI.Position.BottomRight;
+            AnchorPoint = Core.UI.AnchorPoint.BottomRight;
+
             BackgroundTransparency = 1;
         }, {
-            Layout = Core.Roact.createElement("UIListLayout", {
-                FillDirection = Enum.FillDirection.Horizontal;
-                SortOrder = Enum.SortOrder.LayoutOrder;
+            LevelContainer = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(0.75, 0.2);
+                Position = Core.UI.Position.TopRight;
+                AnchorPoint = Core.UI.AnchorPoint.TopRight;
 
-                HorizontalAlignment = Enum.HorizontalAlignment.Right;
-                VerticalAlignment = Enum.VerticalAlignment.Bottom;
-
-                HorizontalFlex = Enum.UIFlexAlignment.Fill;
-                VerticalFlex = Enum.UIFlexAlignment.None;
+                BackgroundTransparency = 1;
             }, {});
 
-            MainInventoryFrame = Core.Roact.createElement("Frame", {
-                Size = UDim2.fromScale(0.6, 1);
+            InventoryContainer = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(1, 0.8);
                 Position = Core.UI.Position.BottomRight;
                 AnchorPoint = Core.UI.AnchorPoint.BottomRight;
-                LayoutOrder = 2;
 
-                BackgroundColor3 = Core.UI.Theme.BackgroundColor;
-                BackgroundTransparency = Core.UI.Theme.BackgroundColorTransparency;
-            }, {
-                AspectRatio = Core.Roact.createElement("UIAspectRatioConstraint", {
-                    AspectRatio = 0.5;
-                    AspectType = Enum.AspectType.FitWithinMaxSize;
-                    DominantAxis = Enum.DominantAxis.Height;
-                }, {});
-
-                Ores = Core.Roact.createElement("ScrollingFrame", {
-                    Size = UDim2.fromScale(1, 1);
-                    Position = Core.UI.Position.Center;
-                    AnchorPoint = Core.UI.AnchorPoint.Center;
-                    BackgroundTransparency = 1;
-                    BorderSizePixel = 0;
-                    ScrollBarThickness = 5;
-                    ScrollBarImageColor3 = Core.UI.Color.White;
-                    AutomaticCanvasSize = Enum.AutomaticSize.Y;
-                }, Components)
-            });
-
-            Information = Core.Roact.createElement("Frame", {
-                Size = UDim2.fromScale(0.3, 0.15);
                 BackgroundTransparency = 1;
-                LayoutOrder = 1;
             }, {
-                Layout = Core.Roact.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder;
-                    HorizontalAlignment = Enum.HorizontalAlignment.Right;
-                }, {});
+                Inventory = Roact.createElement("Frame", {
+                    Size = UDim2.fromScale(0.6, 1);
+                    Position = Core.UI.Position.TopRight;
+                    AnchorPoint = Core.UI.AnchorPoint.TopRight;
 
-                CloseButton = Core.Roact.createElement("TextButton", {
-                    Size = UDim2.fromScale(0.5, 0.5);
-                    LayoutOrder = 1;
-                    SizeConstraint = Enum.SizeConstraint.RelativeYY;
-
-                    Text = ">";
-                    TextScaled = true;
-                    TextStrokeTransparency = 0;
-
-                    BackgroundColor3 = Core.UI.Color.Black;
-                    BackgroundTransparency = Core.UI.Theme.BackgroundColorTransparency;
-                    TextColor3 = Core.UI.Theme.TextColor3;
-                    FontFace = Core.UI.Theme.TextFont;
+                    BackgroundColor3 = Core.UI.Theme.BackgroundColorPrimary;
+                    BorderSizePixel = 0;
                 }, {
-                    Circle = Core.Roact.createElement("UICorner", {
-                        CornerRadius = UDim.new(1, 0)
-                    }, {})
-                });
+                    Ores = Roact.createElement("ScrollingFrame", {
+                        Size = UDim2.fromScale(1, 1);
+                        BackgroundTransparency = 1;
+                        BorderSizePixel = 0;
 
-                Capacity = Core.Roact.createElement("TextLabel", {
-                    Size = UDim2.fromScale(1, 0.5);
-                    LayoutOrder = 2;
-                    BackgroundTransparency = 1;
-
-                    Text = self.state.Amount.." / "..self.state.Capacity;
-                    TextScaled = true;
-                    TextStrokeTransparency = 0;
-                    TextXAlignment = Enum.TextXAlignment.Right;
-
-                    FontFace = Core.UI.Theme.TextFont;
-                    TextColor3 = Core.UI.Theme.TextColor3;
-                }, {})
-            });
+                        ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255);
+                        ScrollBarThickness = 5;
+                        VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right;
+                        VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar;
+                        AutomaticCanvasSize = Enum.AutomaticSize.Y;
+                        ScrollingDirection = Enum.ScrollingDirection.Y;
+                        CanvasSize = UDim2.fromScale(1, 1)
+                    }, Components)
+                })
+            })
         })
     })
 end
@@ -187,6 +146,7 @@ end
 function InventoryController:KnitStart()
     DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
+
     DataService:GetPlayerDataFolder():andThen(function(Return)
         DataFolder = Return
 
