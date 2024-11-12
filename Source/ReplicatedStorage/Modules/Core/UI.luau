@@ -21,6 +21,11 @@ UI.Theme = {
     TextColorDisabled = Color3.new(0.278431, 0.278431, 0.278431);
 }
 
+UI.Images = {
+    Missing = "http://www.roblox.com/asset/?id=925810526";
+    GoldCoins = "";
+}
+
 --[=[
 A set of preset anchor points
 ]=]
@@ -34,6 +39,8 @@ UI.AnchorPoint = {
     Center          = Vector2.new(0.5, 0.5);
     TopCenter       = Vector2.new(0.5, 0);
     BottomCenter    = Vector2.new(0.5, 1);
+    LeftCenter      = Vector2.new(0, 0.5);
+    RightCenter     = Vector2.new(1, 0.5);
 }
 
 --[=[
@@ -49,6 +56,8 @@ UI.Position = {
     Center          = UDim2.fromScale(0.5, 0.5);
     TopCenter       = UDim2.fromScale(0.5, 0);
     BottomCenter    = UDim2.fromScale(0.5, 1);
+    LeftCenter      = UDim2.fromScale(0, 0.5);
+    RightCenter     = UDim2.fromScale(1, 0.5);
 }
 
 --[=[

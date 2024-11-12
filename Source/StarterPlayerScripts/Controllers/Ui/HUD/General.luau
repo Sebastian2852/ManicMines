@@ -11,10 +11,62 @@ local TeleportService
 local DataService
 local LogService
 
+local DataFolder :Core.DataFolder
+
 local GeneralComponent = Roact.Component:extend("General")
 
+function GeneralComponent:init()
+    DataFolder.Gold:GetPropertyChangedSignal("Value"):Connect(function()
+        self:setState({
+            Gold = tostring(DataFolder.Gold.Value)
+        })
+    end)
+
+    self:setState({
+        Gold = tostring(DataFolder.Gold.Value)
+    })
+end
+
 function GeneralComponent:render()
-    return Roact.createElement("ScreenGui", {}, {
+    return Roact.createElement("ScreenGui", {
+        ResetOnSpawn = false;
+    }, {
+        Gold = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.1, 0.05);
+            Position = Core.UI.Position.LeftCenter;
+            AnchorPoint = Core.UI.AnchorPoint.LeftCenter;
+
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+        }, {
+            Layout = Roact.createElement("UIListLayout", {
+                FillDirection = Enum.FillDirection.Horizontal;
+                HorizontalFlex = Enum.UIFlexAlignment.Fill;
+            }, {});
+
+            Icon = Roact.createElement("ImageLabel", {
+                Size = UDim2.fromScale(1, 1);
+                SizeConstraint = Enum.SizeConstraint.RelativeYY;
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Image = Core.UI.Images.Missing;
+                ScaleType = Enum.ScaleType.Fit;
+            }, {});
+
+            Text = Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(0.9, 1);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Text = " "..self.state.Gold;
+                FontFace = Core.UI.Theme.TextFont;
+                TextColor3 = Core.UI.Theme.TextColor3;
+                TextScaled = true;
+                TextXAlignment = Enum.TextXAlignment.Left;
+            }, {})
+        });
+
         SurfaceButton = Roact.createElement("ImageButton", {
             Size = UDim2.fromScale(0.04, 0.08);
             Position = UDim2.fromScale(0.06, 0.98);
@@ -38,6 +90,8 @@ function GeneralController:KnitStart()
     LogService = Knit.GetService("LogService")
 
     DataService:GetPlayerDataFolder():andThen(function(Return)
+        DataFolder = Return
+
         repeat
             task.wait(0.1)
         until Return.DataLoaded.Value
