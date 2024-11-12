@@ -15,7 +15,8 @@ AudioEngine.Sounds = {}
 function AudioEngine:_ConstructObject(SoundObject :Core.Sound)
     local Location = GLOBALSTORAGEFOLDER
     local TopLevelParent
-    local AudioID = Sounds + 1
+    Sounds += 1
+    local AudioID = Sounds
 
     if SoundObject.Config.Positional then
         local Attachment = Instance.new("Attachment")
@@ -53,12 +54,16 @@ function AudioEngine:_ConstructObject(SoundObject :Core.Sound)
     Sound.RollOffMinDistance = SoundObject.Config.RollOffDistanceBegin or 100
     Sound.RollOffMaxDistance = SoundObject.Config.RollOffMaxDistance or 120
 
+    Sound.Parent = Location
+    if Location == GLOBALSTORAGEFOLDER then
+        self.Sounds[AudioID] = Sound
+    else
+        self.Sounds[AudioID] = TopLevelParent
+    end
+
     Sound.Ended:Connect(function()
         self:StopSound(AudioID)
     end)
-
-    Sound.Parent = Location
-    self.Sounds[AudioID] = Location
 
     if SoundObject.Config.Pitch ~= 1 and SoundObject.Config.Pitch ~= nil then
         local PitchShifter = Instance.new("PitchShiftSoundEffect")
@@ -141,7 +146,6 @@ function AudioEngine:PlaySound(SoundObject :Core.Sound) :number
 
     local _, Sound, ID = self:_ConstructObject(SoundObject)
     self:_ConnectEvents(Sound, SoundObject)
-    Sounds += 1
 
     Sound:Play()
 
@@ -154,7 +158,7 @@ Takes in the AudioEngine ID of the sound
 ]=]
 function AudioEngine:StopSound(ID :number)
     assert(type(ID) == "number", "SoundID must be a sound")
-    if self.Sounds[ID] == nil then return warn("No sound with that ID") end
+    if self.Sounds[ID] == nil then return warn("No sound with ID: "..tostring(ID)) end
 
     self.Sounds[ID]:Destroy()
 end
@@ -167,35 +171,6 @@ function AudioEngine:KnitInit()
     POSITIONALSTORAGEFOLDER = Instance.new("Folder")
     POSITIONALSTORAGEFOLDER.Name = "AudioEngine"
     POSITIONALSTORAGEFOLDER.Parent = workspace
-end
-
-function AudioEngine:KnitStart()
-    -- TESTING ------------------------------------------------------
-    local TestConfig = self:CreateBlankConfig()
-    TestConfig.Positional = true
-    TestConfig.PositionToPlay = Vector3.zero
-    TestConfig.Volume = 1
-
-    local TestSound = self:CreateBlankSound()
-    TestSound.SoundID = "rbxassetid://7098934716" -- Random sound off toolbox
-    TestSound.Looped = false
-    TestSound.Config = TestConfig
-
-    local TestSound2 = Instance.new("Sound")
-    TestSound2.SoundId = "rbxassetid://7098934716"
-
-    TestSound.OnFinish = function()
-        print("Finished")
-    end
-
-    TestSound.OnLoop = function(TimesLooped :number)
-        print("Times looped:", TimesLooped)
-    end
-
-    --self:PlaySound(TestSound)
-    TestSound.Config.Pitch = 2
-    --self:PlaySound(TestSound)
-    -----------------------------------------------------------------
 end
 
 return AudioEngine
