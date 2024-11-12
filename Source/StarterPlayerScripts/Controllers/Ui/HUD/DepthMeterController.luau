@@ -19,7 +19,7 @@ function DepthMeterComponent:init()
 
     RunService:BindToRenderStep("CharacterPosition", Enum.RenderPriority.Input.Value, function()
         local Character = Player.Character
-        if not Character then
+        if not Character or ReplicatedStorage.Player.Depth.Value <= 0 then
             self:setState({
                 Position = Vector3.zero;
                 Show = false;
@@ -45,11 +45,12 @@ end
 
 function DepthMeterComponent:render()
     return Roact.createElement("ScreenGui", {
-        IgnoreGuiInset = true
+        IgnoreGuiInset = true;
+        ResetOnSpawn = false;
     }, {
         Meter = self.state.Show and Roact.createElement("TextLabel", {
             Size = UDim2.fromScale(0.3, 0.05);
-            Position = UDim2.fromScale(0.5, 0);
+            Position = Core.UI.Position.TopCenter;
             AnchorPoint = Core.UI.AnchorPoint.TopCenter;
 
             BackgroundTransparency = 1;
