@@ -7,7 +7,6 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
 
 local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
-local PlayerGUI = Knit.Player.PlayerGui
 
 local DataService
 local TextFilteringService

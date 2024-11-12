@@ -6,13 +6,14 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local MineEffects = Knit.CreateController { Name = "MineEffects" }
 
-local MineService
-local LogService
-local LightingController
+local PickaxeSelectionController
 local PlayerDisplayService
-local DataService
+local LightingController
 local PickaxeService
 local AudioEngine
+local DataService
+local MineService
+local LogService
 
 local PreviousLayer = ""
 local Animation
@@ -45,13 +46,14 @@ function MineEffects:KnitInit()
 end
 
 function MineEffects:KnitStart()
-    AudioEngine              = Knit.GetController("AudioEngine")
-    LightingController       = Knit.GetController("LightingController")
-    LogService               = Knit.GetService("LogService")
-    MineService              = Knit.GetService("MineService")
-    PlayerDisplayService     = Knit.GetService("PlayerDisplayService")
-    DataService              = Knit.GetService("DataService")
-    PickaxeService           = Knit.GetService("PickaxeService")
+    AudioEngine                  = Knit.GetController("AudioEngine")
+    LightingController           = Knit.GetController("LightingController")
+    PickaxeSelectionController   = Knit.GetController("PickaxeSelectionController")
+    LogService                   = Knit.GetService("LogService")
+    MineService                  = Knit.GetService("MineService")
+    PlayerDisplayService         = Knit.GetService("PlayerDisplayService")
+    DataService                  = Knit.GetService("DataService")
+    PickaxeService               = Knit.GetService("PickaxeService")
 
     RunService:BindToRenderStep("CharacterPositionInfo", Enum.RenderPriority.Input.Value + 1, function()
         local Character = Knit.Player.Character
@@ -79,64 +81,20 @@ function MineEffects:KnitStart()
         Light.Parent = Character:WaitForChild("Head")
     end)
 
-    local WasMining = false
-
-    local Character = Knit.Player.Character or Knit.Player.CharacterAdded:Wait()
+    local Player = Knit.Player
+    local Character = Player.Character or Player.CharacterAdded:Wait()
     local Humanoid = Character:WaitForChild("Humanoid")
-    local Animator = Humanoid:WaitForChild("Animator")
+    local AnimationTrack = Humanoid:LoadAnimation(Animation)
 
-    local AnimationTrack :AnimationTrack = Animator:LoadAnimation(Animation)
-    AnimationTrack.Looped = false
-    AnimationTrack.Priority = Enum.AnimationPriority.Action
-    LogService:Log("Set animation track:", AnimationTrack)
+    ReplicatedStorage.Player.PickaxeActive:GetPropertyChangedSignal("Value"):Connect(function()
+        local Mining = ReplicatedStorage.Player.PickaxeActive.Value
 
-    AnimationTrack:GetMarkerReachedSignal("HitSound"):Connect(function()
-        LogService:Log("Reached sound marker")
-
-        local Sound :Core.Sound = AudioEngine:CreateBlankSound()
-        Sound.SoundID = "rbxassetid://156951885"
-
-        local Config :Core.SoundConfig = AudioEngine:CreateBlankConfig()
-        Config.Looped = false
-        Config.Pitch = 1
-        Config.Positional = false
-        Config.Volume = 1
-        Config.Speed = 0.5
-        Sound.Config = Config
-
-        AudioEngine:PlaySound(Sound)
-    end)
-
-    RunService:BindToRenderStep("MiningAnimation", Enum.RenderPriority.Input.Value, function()
-        if not AnimationTrack then
-            LogService:Warn("No animation!!")
-            return
+        if Mining then
+            AnimationTrack:Play(0.1, 1, 1)
+        else
+            AnimationTrack:Stop(0.1)
+            task.wait(3)
         end
-
-        DataService:GetPlayerDataFolder():andThen(function(DataFolder : Core.DataFolder)
-            local Mining = DataFolder.ServerMining.Value
-            if Mining == WasMining then return end
-            PickaxeService:GetPickaxe():andThen(function(Pickaxe :Tool)
-                --local HitSpeed = Pickaxe:GetAttribute("MiningCooldown") or 1
-                --local AnimationLength = AnimationTrack.Length
-
-                local AnimationSpeed = 1
-                AnimationTrack:AdjustSpeed(AnimationSpeed)
-
-                WasMining = Mining
-
-                while Mining do
-                    if not AnimationTrack.IsPlaying then
-                        AnimationTrack:Play(0.1, 1)
-                    end
-                    task.wait(AnimationSpeed)
-                end
-            end)
-
-            if not Mining and AnimationTrack.IsPlaying then
-                AnimationTrack:Stop(0.1)
-            end
-        end)
     end)
 end
 

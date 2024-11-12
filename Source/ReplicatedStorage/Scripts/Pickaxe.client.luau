@@ -43,12 +43,14 @@ local function Activate()
         Active = true
         PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
         while Active do
+            PlayerFolder.PickaxeActive.Value = Active
             PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
             if PlayerFolder.PickaxeSelection.Value == nil then
                 break
             end
             task.wait(0.1)
         end
+        PlayerFolder.PickaxeActive.Value = false
     end
 end
 
@@ -59,8 +61,8 @@ local function Deactivate()
 end
 
 local function AddOutline(Object :BasePart)
-    if Outline ~= nil then 
-        Outline:Destroy() 
+    if Outline ~= nil then
+        Outline:Destroy()
     end
 
     if not Object:GetAttribute("CanMine") then return end
