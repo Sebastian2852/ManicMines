@@ -71,6 +71,12 @@ function InventoryComponent:init()
     end)
 end
 
+--[=[
+IDEA:
+On mobile the inventory is hidden by default, when the use wants to see the inventroy they press a button and the invetory opens
+covering 1/3 of their screen on the right. When they press anywhere else the GUI hides and button reappears.
+]=]
+
 function InventoryComponent:render()
     LogService:Log("Rendering inventory")
     local Components = Core.UI:CreateOreFrames(self.state.OreList, self.state.StyleToUse, UDim2.fromScale(1, 0.1))
@@ -86,6 +92,12 @@ function InventoryComponent:render()
 
             BackgroundTransparency = 1;
         }, {
+            AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
+                AspectRatio = 0.72;
+                AspectType = Enum.AspectType.ScaleWithParentSize;
+                DominantAxis = Enum.DominantAxis.Height;
+            }, {});
+
             LevelContainer = Roact.createElement("Frame", {
                 Size = UDim2.fromScale(0.75, 0.2);
                 Position = Core.UI.Position.TopRight;
