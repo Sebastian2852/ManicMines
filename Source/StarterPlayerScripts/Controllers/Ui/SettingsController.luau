@@ -176,6 +176,10 @@ function SettingsComponent:render()
                     IsSettingsVisible = not self.state.IsSettingsVisible
                 })
             end
+        }, {
+            AspectRatio = Core.Roact.createElement("UIAspectRatioConstraint", {
+                AspectRatio = 1;
+            }, {})
         }),
 
         SettingsPanel = self.state.IsSettingsVisible and Core.Roact.createElement("Frame", {

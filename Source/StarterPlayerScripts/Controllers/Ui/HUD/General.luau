@@ -80,7 +80,11 @@ function GeneralComponent:render()
                 LogService:Log("Surface button pressed")
                 TeleportService:TeleportToSurface()
             end
-        }, {})
+        }, {
+            AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
+                AspectRatio = 1;
+            }, {})
+        })
     })
 end
 
