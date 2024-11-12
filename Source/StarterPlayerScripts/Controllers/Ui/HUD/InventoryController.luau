@@ -76,7 +76,9 @@ function InventoryComponent:render()
     local Components = Core.UI:CreateOreFrames(self.state.OreList, self.state.StyleToUse, UDim2.fromScale(1, 0.1))
     Components["Layout"] = Core.Roact.createElement("UIListLayout", {}, {})
 
-    return Roact.createElement("ScreenGui", {}, {
+    return Roact.createElement("ScreenGui", {
+        ResetOnSpawn = false
+    }, {
         Container = Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.22, 0.6);
             Position = Core.UI.Position.BottomRight;
