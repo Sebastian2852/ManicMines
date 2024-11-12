@@ -13,6 +13,7 @@ until script.Parent:IsA("Tool")
 
 local Tool :Tool = script.Parent
 local PickaxeService = Knit.GetService("PickaxeService")
+local Workspace = game:GetService("Workspace")
 
 local PlayerFolder = game.ReplicatedStorage.Player
 local PlayerDataFolder = game.ReplicatedStorage.PlayerData:WaitForChild(Player.UserId)
@@ -145,11 +146,11 @@ local function GetOreFromRayCast(X, Y)
     local CameraRay = Camera:ScreenPointToRay(X, Y)
 
     local RaycastParamaters = RaycastParams.new()
-    RaycastParamaters.FilterDescendantsInstances = {workspace.Game.Players:GetDescendants()}
+    RaycastParamaters.FilterDescendantsInstances = {workspace.Game.Players:GetDescendants(), Workspace:WaitForChild("AudioEngine"):GetDescendants()}
     RaycastParamaters.FilterType = Enum.RaycastFilterType.Exclude
 
     local RayCastResult = workspace:Raycast(CameraRay.Origin, CameraRay.Direction * 100, RaycastParamaters)
-    local Ore = nil
+    local Ore :BasePart = nil
 
     if RayCastResult then
         Ore = RayCastResult.Instance
@@ -157,7 +158,7 @@ local function GetOreFromRayCast(X, Y)
 
     if Ore == nil then return nil end
     if not CanReach(Ore) then return nil end
-    if Ore.Parent ~= game.Workspace.Game.Mine then return nil end
+    if not Ore:IsDescendantOf(workspace.Game.Mine) then return nil end
 
     return Ore
 end

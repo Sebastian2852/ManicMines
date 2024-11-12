@@ -92,9 +92,13 @@ function MineEffects:KnitStart()
 
     ReplicatedStorage.Player.PickaxeActive:GetPropertyChangedSignal("Value"):Connect(function()
         local Mining = ReplicatedStorage.Player.PickaxeActive.Value
+        local Pickaxe = Character:FindFirstChildWhichIsA("Tool")
+        if Pickaxe:HasTag("Pickaxe") then
+            AnimationTrack:AdjustSpeed((Pickaxe:GetAttribute("Delay") / 2) or 1)
+        end
 
         if Mining then
-            AnimationTrack:Play(0.1, 1, 1)
+            AnimationTrack:Play(0.1, 1)
         else
             AnimationTrack:Stop(0.1)
             task.wait(3)

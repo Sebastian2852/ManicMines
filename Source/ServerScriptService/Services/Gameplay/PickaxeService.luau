@@ -1,6 +1,7 @@
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local PlayerStatsService
@@ -219,31 +220,35 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
 end
 
 function PickaxeService:StopMining(Player :Player)
-    if not self.Mining[Player.UserId] then
-        self.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}
-    end
+    return Promise.new(function(Resolve, Reject)
+        if not self.Mining[Player.UserId] then
+            self.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}
+            Reject(Player.Name.." has no entry in the table")
+        end
 
-    if not self.Mining[Player.UserId].Mining then return end
+        if not self.Mining[Player.UserId].Mining then return end
 
-    local DataFolder = DataService:GetPlayerDataFolder(Player)
-    if not DataFolder then return end
+        local DataFolder = DataService:GetPlayerDataFolder(Player)
+        if not DataFolder then return end
 
-    if self.Mining[Player.UserId].Object ~= nil then
-        self.Mining[Player.UserId].Object:SetAttribute("MinedBy", 0)
-        self.Mining[Player.UserId].Object:SetAttribute("BeingMined", false)
-    end
+        if self.Mining[Player.UserId].Object ~= nil then
+            self.Mining[Player.UserId].Object:SetAttribute("MinedBy", 0)
+            self.Mining[Player.UserId].Object:SetAttribute("BeingMined", false)
+        end
 
-    local Pickaxe = self:GetPlayerPickaxe(Player)
-    LogService:Log(Player.Name.." stopped mining")
+        local Pickaxe = self:GetPlayerPickaxe(Player)
+        LogService:Log(Player.Name.." stopped mining")
 
-    DataFolder.ServerMining.Value = false
-    self.Mining[Player.UserId].Mining = false
-    self.Mining[Player.UserId].Object = nil
+        DataFolder.ServerMining.Value = false
+        self.Mining[Player.UserId].Mining = false
+        self.Mining[Player.UserId].Object = nil
 
-    self.Mining[Player.UserId].Cooldown = true
-    task.spawn(function()
+        self.Mining[Player.UserId].Cooldown = true
+
         task.wait(Pickaxe:GetAttribute("Delay"))
         self.Mining[Player.UserId].Cooldown = false
+
+        Resolve()
     end)
 end
 
