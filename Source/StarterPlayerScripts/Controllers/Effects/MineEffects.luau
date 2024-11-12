@@ -84,6 +84,8 @@ function MineEffects:KnitStart()
     local Player = Knit.Player
     local Character = Player.Character or Player.CharacterAdded:Wait()
     local Humanoid = Character:WaitForChild("Humanoid")
+    -- This is deprecated and should probably be changed
+    -- but i cba rn :)
     local AnimationTrack = Humanoid:LoadAnimation(Animation)
 
     ReplicatedStorage.Player.PickaxeActive:GetPropertyChangedSignal("Value"):Connect(function()

@@ -28,8 +28,8 @@ Calculates the time to mine based on the health passed
 function PickaxeService:CalculateTimeToMine(Player :Player, Health :number) :number
     local Pickaxe :Instance = self:GetPlayerPickaxe(Player)
 
-    local HitsNeeded = math.ceil(Health / Pickaxe:GetAttribute("HitDamage"))
-    local TimePerHit = Pickaxe:GetAttribute("MiningCooldown")
+    local HitsNeeded = math.ceil(Health / Pickaxe:GetAttribute("Damage"))
+    local TimePerHit = Pickaxe:GetAttribute("Delay")
     local TotalTime = HitsNeeded * TimePerHit
     return Core.Util:RoundToxDP(TotalTime, 1)
 end
@@ -44,7 +44,7 @@ function PickaxeService:VerifyIfCanMine(Player :Player, Character :Model, Object
 
     local Distance :number = (Character.PrimaryPart.Position - ObjectToMine.Position).Magnitude
 
-    if Distance > Pickaxe:GetAttribute("MiningRange") then return false end
+    if Distance > Pickaxe:GetAttribute("Range") then return false end
     if not ObjectToMine:GetAttribute("CanMine") then return false end
 
     return true
@@ -184,7 +184,10 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
     OreList:AddOre(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
     MineService:GenerateAroundBlockAsync(ObjectToMine)
     while self.Mining[Player.UserId].Mining and self:VerifyIfCanMine(Player, Character, ObjectToMine) do
-        local Health :number = ObjectToMine:GetAttribute("Health")
+        local Health = ObjectToMine:GetAttribute("Health")
+        local MaxHealth = ObjectToMine:GetAttribute("MaxHealth")
+        local Damage = Pickaxe:GetAttribute("Damage")
+        local Delay = Pickaxe:GetAttribute("Delay")
 
         if Health <= 0 then
             self:StopMining(Player)
@@ -193,19 +196,19 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
             break
         end
 
-        Health -= Pickaxe:GetAttribute("HitDamage")
+        Health -= Damage
         ObjectToMine:SetAttribute("Health", Health)
-        self.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
+        self.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / MaxHealth)) * 100), (Health / MaxHealth))
 
         if Health <= 0 then
             self:StopMining(Player)
             MineService:BlockMined(ObjectToMine)
             PlayerStatsService:MinedOre(Player, OreList)
-            task.wait(Pickaxe:GetAttribute("MiningCooldown") / 2)
+            task.wait(Delay / 2)
             break
         end
 
-        task.wait(Pickaxe:GetAttribute("MiningCooldown"))
+        task.wait(Delay)
     end
 
     OreList:Destroy()
@@ -235,7 +238,7 @@ function PickaxeService:StopMining(Player :Player)
 
     self.Mining[Player.UserId].Cooldown = true
     task.spawn(function()
-        task.wait(Pickaxe:GetAttribute("MiningCooldown"))
+        task.wait(Pickaxe:GetAttribute("Delay"))
         self.Mining[Player.UserId].Cooldown = false
     end)
 end

@@ -74,7 +74,7 @@ local function AddOutline(Object :BasePart)
     New.Parent = Object
     New.Color3 = Object:GetAttribute("SelectionColor")
 
-    if PlayerDataFolder.Inventory["InventoryItemCount"].Value + Object:GetAttribute("AmountDroppedWhenMined") > PlayerDataFolder.Inventory["InventoryCap"].Value then 
+    if PlayerDataFolder.Inventory["InventoryItemCount"].Value + Object:GetAttribute("AmountDroppedWhenMined") > PlayerDataFolder.Inventory["InventoryCap"].Value then
         New.Color3 = Color3.new(1, 0, 0)
     end
 
@@ -93,7 +93,7 @@ end
 
 local function CanReach(OreBlock :BasePart)
     local Distance = (Player.Character.PrimaryPart.Position - OreBlock.Position).Magnitude
-    local Range = Tool:GetAttribute("MiningRange")
+    local Range = Tool:GetAttribute("Range")
 
     if Distance > Range then
         return false
