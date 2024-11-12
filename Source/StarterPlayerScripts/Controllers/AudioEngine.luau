@@ -104,6 +104,30 @@ function AudioEngine:CreateBlankConfig() :Core.SoundConfig
 end
 
 --[=[
+Returns a sound type to use for playsound
+Note: This function doesnt change anything about the sound passed
+]=]
+function AudioEngine:CreateFromSound(Sound :Sound, Positional :boolean?, PositionToPlay :Vector3|BasePart|nil)
+    local NewSound = self:CreateBlankSound()
+    NewSound.SoundID = Sound.SoundId
+
+    local SoundConfig = self:CreateBlankConfig()
+    SoundConfig.Looped = Sound.Looped
+    SoundConfig.Positional = Positional or false
+    SoundConfig.PositionToPlay = PositionToPlay
+    SoundConfig.Speed = Sound.PlaybackSpeed
+    SoundConfig.Pitch = 1
+
+    if Sound:FindFirstChildWhichIsA("PitchShiftSoundEffect") then
+        SoundConfig.Pitch = Sound:FindFirstChildWhichIsA("PitchShiftSoundEffect").Octave
+    end
+
+    NewSound.Config = SoundConfig
+
+    return NewSound
+end
+
+--[=[
 Play a sound!
 returns the AudioEngine ID of the sound
 ]=]
@@ -149,13 +173,16 @@ function AudioEngine:KnitStart()
     -- TESTING ------------------------------------------------------
     local TestConfig = self:CreateBlankConfig()
     TestConfig.Positional = true
-    TestConfig.PositionToPlay = Vector3.new(0, 0, 0)
+    TestConfig.PositionToPlay = Vector3.zero
     TestConfig.Volume = 1
 
     local TestSound = self:CreateBlankSound()
     TestSound.SoundID = "rbxassetid://7098934716" -- Random sound off toolbox
     TestSound.Looped = false
     TestSound.Config = TestConfig
+
+    local TestSound2 = Instance.new("Sound")
+    TestSound2.SoundId = "rbxassetid://7098934716"
 
     TestSound.OnFinish = function()
         print("Finished")
