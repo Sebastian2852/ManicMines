@@ -15,6 +15,8 @@ local PickaxeService = Knit.CreateService {
     Name = "PickaxeService",
     Client = {
         UpdateMiningSelection = Knit.CreateSignal();
+        PlayHitSound = Knit.CreateSignal();
+        PlayBreakSound = Knit.CreateSignal();
     },
 }
 
@@ -190,6 +192,7 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
         local Delay = Pickaxe:GetAttribute("Delay")
 
         if Health <= 0 then
+            self.Client.PlayBreakSound:FireAll(ObjectToMine)
             self:StopMining(Player)
             MineService:BlockMined(ObjectToMine)
             PlayerStatsService:MinedOre(Player, OreList)
@@ -201,6 +204,7 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
         self.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / MaxHealth)) * 100), (Health / MaxHealth))
 
         if Health <= 0 then
+            self.Client.PlayBreakSound:FireAll(ObjectToMine)
             self:StopMining(Player)
             MineService:BlockMined(ObjectToMine)
             PlayerStatsService:MinedOre(Player, OreList)
@@ -268,6 +272,9 @@ function PickaxeService.Client:StopMining(Player :Player)
     self.Server:StopMining(Player)
 end
 
+--[=[
+returns the time it will take to mine a block with the given health
+]=]
 function PickaxeService.Client:CalculateTimeToMine(Player :Player, Health :number)
     return self.Server:CalculateTimeToMine(Player, Health)
 end
@@ -294,6 +301,10 @@ function PickaxeService:KnitStart()
         if self.Mining[Player.UserId] then
             self.Mining[Player.UserId] = nil
         end
+    end)
+
+    self.Client.PlayHitSound:Connect(function(_, Block)
+        self.Client.PlayHitSound:FireAll(Block)
     end)
 end
 
