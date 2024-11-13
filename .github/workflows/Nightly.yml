@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - 'Dev'
+      
+  workflow_dispatch:
 
 jobs:
   create-release:
