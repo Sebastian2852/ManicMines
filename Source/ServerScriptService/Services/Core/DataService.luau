@@ -228,6 +228,7 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
     LoadingService:StartLoading(Player)
+    LoadingService:UpdateActionText(Player, "Loading data")
 
     local Maid = Core.Maid.new()
     local OreDataData = Core.Data.Data.New("Ore", {})
@@ -334,18 +335,34 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     end
 
     LogService:Log("["..Player.Name.."]", "Player data loaded")
-    PlayerDisplayService:GivePlayerOverheadGUI(Player)
-    PickaxeService:GivePickaxeToPlayer(Player)
-    TycoonService:CreateTycoonForPlayer(Player)
-    Player.CharacterAdded:Connect(function()
+    task.spawn(function()
+        task.wait(1)
+
+        LoadingService:UpdateActionText(Player, "Loading GUI")
+        self.Client.DataLoaded:Fire(Player, DataFolder)
         PlayerDisplayService:GivePlayerOverheadGUI(Player)
+        task.wait(1)
+
+        LoadingService:UpdateActionText(Player, "Giving tools")
         PickaxeService:GivePickaxeToPlayer(Player)
+        task.wait(1)
+
+        LoadingService:UpdateActionText(Player, "Creating tycoon")
+        TycoonService:CreateTycoonForPlayer(Player)
+        task.wait(1)
+
+        LoadingService:UpdateActionText(Player, "Connecting events")
+        Player.CharacterAdded:Connect(function()
+            PlayerDisplayService:GivePlayerOverheadGUI(Player)
+            PickaxeService:GivePickaxeToPlayer(Player)
+        end)
+
+        task.wait(1)
+        LoadingService:EndLoading(Player)
     end)
 
-    self.Client.DataLoaded:Fire(Player, DataFolder)
     DataFolder.DataLoaded.Value = true
     Maid:DoCleaning()
-    LoadingService:EndLoading(Player)
 end
 
 --[=[
