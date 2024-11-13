@@ -170,7 +170,7 @@ function InventoryController:KnitStart()
         DataFolder = LoadedDataFolder
 
         local App = Core.Roact.createElement(InventoryComponent)
-        Core.Roact.mount(App, Knit.Player.PlayerGui, "HUD")
+        Roact.mount(App, Knit.Player.PlayerGui, "Inventory")
         LogService:Log("Mounted inventory component")
     end)
 end

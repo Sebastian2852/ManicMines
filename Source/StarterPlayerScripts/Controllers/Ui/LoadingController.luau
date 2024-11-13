@@ -150,8 +150,11 @@ end
 function LoadingController:KnitStart()
     LoadingService = Knit.GetService("LoadingService")
 
+    local LogService = Knit.GetService("LogService")
+
     local App = Roact.createElement(LoadingScreen)
     Roact.mount(App, Player.PlayerGui, "LoadingScreen")
+    LogService:Log("Mounted loading screen component")
 end
 
 return LoadingController

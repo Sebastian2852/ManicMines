@@ -7,7 +7,6 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local StorageController = Knit.CreateController { Name = "StorageController" }
 
 local StorageComponent = Roact.Component:extend("StorageComponent")
-local LogService
 local TycoonUpgradeService
 
 function StorageComponent:init()
@@ -152,12 +151,7 @@ function StorageComponent:render()
 end
 
 function StorageController:KnitStart()
-    LogService = Knit.GetService("LogService")
     TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")
-
-    local App = Roact.createElement(StorageComponent)
-    Roact.mount(App, Knit.Player.PlayerGui, "Storage")
-    LogService:Log("Mounted storage GUI component")
 end
 
 return StorageController

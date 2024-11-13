@@ -65,8 +65,11 @@ function DepthMeterComponent:render()
 end
 
 function DepthMeterController:KnitStart()
+    local LogService = Knit.GetService("LogService")
+
     local App = Roact.createElement(DepthMeterComponent)
     Roact.mount(App, Player.PlayerGui, "DepthMeter")
+    LogService:Log("Mounted depth meter component")
 end
 
 return DepthMeterController
