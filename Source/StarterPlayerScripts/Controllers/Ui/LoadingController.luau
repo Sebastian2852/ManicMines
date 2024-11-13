@@ -23,6 +23,8 @@ local function PlayTweens(Tweens :{Tween})
 end
 
 local function FadeGuiIn(Animated :boolean, AwaitFinish :boolean)
+    FadeFrame.Action.Text = ""
+
     if Animated then
         local Fades = {
             TweenService:Create(FadeFrame, FadeTweenInfo, {BackgroundTransparency = 0});

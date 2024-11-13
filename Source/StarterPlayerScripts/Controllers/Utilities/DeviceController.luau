@@ -10,11 +10,16 @@ Despite the name this is just a controller to get device type and stuff
 
 local DeviceController = Knit.CreateController { Name = "DeviceController" }
 
-local LogService
-
 local LastDeviceType = Enums.DeviceType.Unkown
+
+--[=[
+Fires whenever the player's device is changed
+]=]
 DeviceController.DeviceChanged = nil
 
+--[=[
+Returns the current device type for the player
+]=]
 function DeviceController:GetDeviceType() :Enums.Enum
     local DeviceType = Enums.DeviceType.Unkown
 
@@ -32,9 +37,11 @@ function DeviceController:GetDeviceType() :Enums.Enum
     return DeviceType
 end
 
-function DeviceController:KnitStart()
-    LogService = Knit.GetService("LogService")
 
+
+-- [[ KNIT ]] --
+
+function DeviceController:KnitStart()
     local DeviceChangedEvent = Instance.new("BindableEvent")
     self.DeviceChanged = DeviceChangedEvent.Event
 
@@ -44,9 +51,6 @@ function DeviceController:KnitStart()
     UserInputService.InputBegan:Connect(function()
         local NewDeviceType = self:GetDeviceType()
         if NewDeviceType == LastDeviceType then return end
-        LogService:Log("Enums:", Enums.DeviceType)
-        LogService:Log("New device type:", NewDeviceType)
-        LogService:Log("Last device type:", LastDeviceType)
         LastDeviceType = DeviceType
         DeviceChangedEvent:Fire(NewDeviceType)
     end)
@@ -54,9 +58,6 @@ function DeviceController:KnitStart()
     UserInputService.LastInputTypeChanged:Connect(function()
         local NewDeviceType = self:GetDeviceType()
         if NewDeviceType == LastDeviceType then return end
-        LogService:Log("Enums:", Enums.DeviceType)
-        LogService:Log("New device type:", NewDeviceType)
-        LogService:Log("Last device type:", LastDeviceType)
         LastDeviceType = DeviceType
         DeviceChangedEvent:Fire(NewDeviceType)
     end)
