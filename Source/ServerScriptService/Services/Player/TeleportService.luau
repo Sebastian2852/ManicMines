@@ -79,6 +79,7 @@ function TeleportService:TeleportPlayerToPosition(Player :Player, Position :Vect
 
     if WithLoadingScreen then
         LoadingService:StartLoading(Player)
+        LoadingService:UpdateActionText(Player, "Teleporting")
     end
     FadeCharacterOut(1, Character)
     task.wait(1)
@@ -86,6 +87,7 @@ function TeleportService:TeleportPlayerToPosition(Player :Player, Position :Vect
     task.wait(1)
     FadeCharacterIn(1, Character)
     if WithLoadingScreen then
+        task.wait(1)
         LoadingService:EndLoading(Player)
     end
 end
@@ -125,7 +127,7 @@ end
 Teleport the given player to the surface of the mine
 ]=]
 function TeleportService:TeleportPlayerToSurface(Player :Player)
-    self:TeleportPlayerToPosition(Player, workspace.Game.Teleports.Surface.Position)
+    self:TeleportPlayerToPosition(Player, workspace.Game.Teleports.Surface.Position, true)
 end
 
 -- [[ CLIENT ]] --

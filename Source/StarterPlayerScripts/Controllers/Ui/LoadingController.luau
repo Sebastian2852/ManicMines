@@ -27,7 +27,7 @@ function LoadingScreen:init()
     RunService.Heartbeat:Connect(function(DeltaTime)
         if not self.state.Visible then return end
         self:setState({
-            Rotation = self.state.Rotation + (60 * DeltaTime);
+            Rotation = self.state.Rotation + (180 * DeltaTime);
         })
 
         if self.state.Rotation >= 180 then
