@@ -1,275 +1,760 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Roact = require(ReplicatedStorage.Packages.Roact)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
-
 
 local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
 
-local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
-
 local DataService
-local TextFilteringService
 local LogService
+local TextFilteringService
 
-local Blur :BlurEffect
-local MainScreenGui :ScreenGui
-local MainFrame :Frame
-local SlotFrameTemplate :Frame
+-- [[ GUI ]] --
 
-local TitleScreen :Frame
-local NewSlotFrame :Frame
-local SlotSelectionFrame :Frame
+local MainMenuComponent = Roact.Component:extend("MainMenu")
 
+local HideMenu = Instance.new("BindableEvent")
 
-
---[[ PRIVATE ]]--
-
-local SlotCreation_CurrentName = ""
-local SlotCreation_CurrentSlotID = 0
-
-local function IsNameValidLength(Name :string) :boolean
-    local MaxCharacters = Core.GameConfig.Tycoon.MaxNameCharacters
-
-    if #Name > MaxCharacters then return false end
-    return true
+function MainMenuComponent:Text(Hovered :boolean, HoveredText :string, NormalText :string) :string
+    return Hovered and HoveredText or NormalText
 end
 
-local function PickRandomTycoonName() :string
-    local RandomNames = Core.GameConfig.Tycoon.RandomName
+function MainMenuComponent:CreateUsedSlotFrame(Slot :Core.SlotInfo)
+    local TimeNow = os.time()
+    local TimeDifferent = TimeNow - (Slot.LastPlayed or 0)
+    local TimeText = Core.Util:TimeAgo(TimeDifferent)
 
-    local RandomAdjective = RandomNames.Adjectives[math.random(1, #RandomNames.Adjectives)]
-    local RandomNoun = RandomNames.Nouns[math.random(1, #RandomNames.Nouns)]
-    local Prefix = RandomNames.Prefix
-    local Name = Prefix.." "..RandomAdjective.." "..RandomNoun
+    local ShowSlotDelete = self.state.CurrentDeletingSlot == Slot.SlotID
+    LogService:Log("ShowSlot"..tostring(Slot.SlotID).."Delete: "..tostring(ShowSlotDelete))
 
-    if IsNameValidLength(Name) then return Name end
+    return Roact.createElement("Frame", {
+        Size = UDim2.fromScale(1, 0.3);
+        BackgroundTransparency = 1;
+        BorderSizePixel = 0;
+        LayoutOrder = Slot.SlotID;
+    }, {
+        DeleteSlot = ShowSlotDelete and Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.6, 0.9);
+            Position = UDim2.fromScale(1.1, 0.5);
+            AnchorPoint = Core.UI.AnchorPoint.LeftCenter;
 
-    -- Probs not the best but it works
-    repeat
-        RandomAdjective = RandomNames.Adjectives[math.random(1, #RandomNames.Adjectives)]
-        RandomNoun = RandomNames.Nouns[math.random(1, #RandomNames.Nouns)]
-        Prefix = RandomNames.Prefix
-        Name = Prefix.." "..RandomAdjective.." "..RandomNoun
-    until IsNameValidLength(Name)
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+        }, {
+            Arrow = Roact.createElement("ImageLabel", {
+                Size = UDim2.fromScale(0.3, 1);
+                Position = Core.UI.Position.LeftCenter;
+                AnchorPoint = Core.UI.AnchorPoint.LeftCenter;
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
 
-    return Name
+                Image = "rbxassetid://12008863261";
+                Rotation = 180;
+                ImageTransparency = 0.5;
+                ImageColor3 = Core.UI.Theme.BackgroundColorPrimary;
+                ScaleType = Enum.ScaleType.Fit;
+            }, {});
+
+            Container = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(0.7, 0.9);
+                Position = Core.UI.Position.RightCenter;
+                AnchorPoint = Core.UI.AnchorPoint.RightCenter;
+
+                BorderSizePixel = 0;
+                BackgroundColor3 = Core.UI.Theme.BackgroundColorPrimary;
+                BackgroundTransparency = 0.5;
+            }, {
+                Title = Roact.createElement("TextLabel", {
+                    Size = UDim2.fromScale(1, 0.5);
+                    BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
+
+                    Text = "Delete slot "..tostring(Slot.SlotID).."?";
+                    TextScaled = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+                }, {});
+
+                Buttons = Roact.createElement("Frame", {
+                    Size = UDim2.fromScale(1, 0.5);
+                    Position = Core.UI.Position.BottomCenter;
+                    AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
+
+                    BorderSizePixel = 0;
+                    BackgroundTransparency = 1;
+                }, {
+                    Layout = Roact.createElement("UIListLayout", {
+                        Padding = UDim.new(0.1, 0);
+                        SortOrder = Enum.SortOrder.LayoutOrder;
+                        FillDirection = Enum.FillDirection.Horizontal;
+                        VerticalAlignment = Enum.VerticalAlignment.Center;
+                        HorizontalAlignment = Enum.HorizontalAlignment.Center;
+                    }, {});
+
+                    YesButton = Roact.createElement("TextButton", {
+                        Size = UDim2.fromScale(0.4, 0.35);
+                        BackgroundColor3 = Core.UI.Color.Red;
+                        LayoutOrder = 2;
+
+                        Text = "Yes";
+                        TextScaled = true;
+                        FontFace = Core.UI.Theme.TextFont;
+                        TextColor3 = Core.UI.Color.White;
+
+                        [Roact.Event.MouseButton1Click] = function()
+                            self:setState({
+                                SlotInfos = "none";
+                            })
+                            DataService:DeleteSlot(Slot.SlotID)
+                            task.wait(1)
+                            DataService:GetSlotsInfo():andThen(function(Info)
+                                LogService:Log("Updating slot info")
+                                self:setState({
+                                    SlotInfos = Info;
+                                })
+                            end)
+                        end
+                    }, {
+                        Corners = Roact.createElement("UICorner", {
+                            CornerRadius = UDim.new(0.3, 0)
+                        }, {});
+                    });
+
+                    NoButton = Roact.createElement("TextButton", {
+                        Size = UDim2.fromScale(0.4, 0.35);
+                        BackgroundColor3 = Core.UI.Color.Green;
+                        LayoutOrder = 1;
+
+                        Text = "No";
+                        TextScaled = true;
+                        FontFace = Core.UI.Theme.TextFont;
+                        TextColor3 = Core.UI.Color.White;
+
+                        [Roact.Event.MouseButton1Click] = function()
+                            self:setState({
+                                CurrentDeletingSlot = 0;
+                            })
+                        end;
+                    }, {
+                        Corners = Roact.createElement("UICorner", {
+                            CornerRadius = UDim.new(0.3, 0)
+                        }, {});
+                    });
+                })
+            })
+        });
+
+        Left = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.5, 1);
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+        }, {
+            TycoonName = Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(1, 0.3);
+                Position = UDim2.fromScale(0.5, 0.2);
+                AnchorPoint = Core.UI.AnchorPoint.TopCenter;
+
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Text = Slot.TycoonName;
+                TextScaled = true;
+                FontFace = Core.UI.Theme.TextFont;
+                TextColor3 = Core.UI.Theme.TextColor3;
+            }, {});
+
+            Buttons = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(1, 0.5);
+                Position = Core.UI.Position.BottomCenter;
+                AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
+
+                BorderSizePixel = 0;
+                BackgroundTransparency = 1;
+            }, {
+                Layout = Roact.createElement("UIListLayout", {
+                    Padding = UDim.new(0.1, 0);
+                    SortOrder = Enum.SortOrder.LayoutOrder;
+                    FillDirection = Enum.FillDirection.Horizontal;
+                    VerticalAlignment = Enum.VerticalAlignment.Center;
+                    HorizontalAlignment = Enum.HorizontalAlignment.Center;
+                }, {});
+
+                PlayButton = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(0.4, 0.35);
+                    BackgroundColor3 = Core.UI.Color.Green;
+                    LayoutOrder = 1;
+
+                    Text = "Play";
+                    TextScaled = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Color.White;
+
+                    [Roact.Event.MouseButton1Click] = function()
+                        DataService:LoadData(Slot.SlotID)
+                        task.wait(1)
+                        HideMenu:Fire()
+                    end
+                }, {
+                    Corners = Roact.createElement("UICorner", {
+                        CornerRadius = UDim.new(0.3, 0)
+                    }, {});
+                });
+
+                DeleteButton = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(0.4, 0.35);
+                    BackgroundColor3 = Core.UI.Color.Red;
+                    LayoutOrder = 2;
+
+                    Text = "Delete";
+                    TextScaled = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Color.White;
+
+                    [Roact.Event.MouseButton1Click] = function()
+                        self:setState({
+                            CurrentDeletingSlot = Slot.SlotID;
+                        })
+                    end;
+                }, {
+                    Corners = Roact.createElement("UICorner", {
+                        CornerRadius = UDim.new(0.3, 0)
+                    }, {});
+                });
+            })
+        });
+
+        Right = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.45, 1);
+            Position = Core.UI.Position.RightCenter;
+            AnchorPoint = Core.UI.AnchorPoint.RightCenter;
+
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+        }, {
+            Layout = Roact.createElement("UIListLayout", {
+                SortOrder = Enum.SortOrder.LayoutOrder;
+                VerticalAlignment = Enum.VerticalAlignment.Center;
+            }, {});
+
+            LastPlayed = Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(1, 0.2);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Text = "- Last Played: "..TimeText;
+                TextScaled = true;
+                FontFace = Core.UI.Theme.TextFont;
+                TextColor3 = Core.UI.Theme.TextColor3;
+                TextXAlignment = Enum.TextXAlignment.Left;
+            }, {});
+
+            Gold = Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(1, 0.2);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Text = "- Gold: "..tostring(Slot.Gold);
+                TextScaled = true;
+                FontFace = Core.UI.Theme.TextFont;
+                TextColor3 = Core.UI.Theme.TextColor3;
+                TextXAlignment = Enum.TextXAlignment.Left;
+            }, {});
+        })
+    })
 end
 
-local function SetTycoonName(Name :string)
-    TextFilteringService:FilterTextFromUserToEveryone(Name):andThen(function(Text)
-        SlotCreation_CurrentName = Text
-        NewSlotFrame.NameInput.Input.Text = Text
-        NewSlotFrame.NameInput.Input.PlaceholderText = Text
-        NewSlotFrame.Title.Text = "New Slot - "..Text
-        LogService:Log("Set tycoon name:", Text)
-    end)
-end
+function MainMenuComponent:CreateUnUsedSlotFrame(Slot :Core.SlotInfo)
+    return Roact.createElement("Frame", {
+        Size = UDim2.fromScale(1, 0.3);
+        BackgroundTransparency = 1;
+        BorderSizePixel = 0;
+        LayoutOrder = Slot.SlotID;
+    }, {
+        Title = Roact.createElement("TextLabel", {
+            Size = UDim2.fromScale(1, 0.25);
+            Position = UDim2.fromScale(0, 0.1);
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
 
-local function BeginSlotCreation(SlotID :number)
-    LogService:Log("Starting slot creation for slot "..tostring(SlotID))
-    SetTycoonName(PickRandomTycoonName())
-    SlotCreation_CurrentSlotID = SlotID
-    TitleScreen.Visible = false
-    SlotSelectionFrame.Visible = false
-    NewSlotFrame.Visible = true
-end
+            Text = "Unused slot";
+            TextScaled = true;
+            FontFace = Core.UI.Theme.TextFont;
+            TextColor3 = Core.UI.Theme.TextColor3;
+        }, {});
 
-local function SetupNewSlotFrame()
-    NewSlotFrame.NameInput.SubmitButton.MouseButton1Click:Connect(function()
-        SetTycoonName(NewSlotFrame.NameInput.Input.Text)
-    end)
+        Buttons = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(1, 0.5);
+            Position = Core.UI.Position.BottomCenter;
+            AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
 
-    NewSlotFrame.Actions.CancelButton.MouseButton1Click:Connect(function()
-        NewSlotFrame.Visible = false
-        TitleScreen.Visible = true
-        SlotSelectionFrame.Visible = true
-    end)
+            BorderSizePixel = 0;
+            BackgroundTransparency = 1;
+        }, {
+            Layout = Roact.createElement("UIListLayout", {
+                Padding = UDim.new(0.1, 0);
+                SortOrder = Enum.SortOrder.LayoutOrder;
+                FillDirection = Enum.FillDirection.Horizontal;
+                VerticalAlignment = Enum.VerticalAlignment.Center;
+                HorizontalAlignment = Enum.HorizontalAlignment.Center;
+            }, {});
 
-    NewSlotFrame.Actions.CreateButton.MouseButton1Click:Connect(function()
-        local SlotInfo :Core.SaveSlotSettings = {
-            Name = SlotCreation_CurrentName;
-            Tutorial = false;
-        }
+            CreateButton = Roact.createElement("TextButton", {
+                Size = UDim2.fromScale(0.4, 0.35);
+                BackgroundColor3 = Core.UI.Color.Green;
+                LayoutOrder = 1;
 
-        DataService:NewSlot(SlotCreation_CurrentSlotID, SlotInfo)
-        MainMenuController:EnableAllUI()
-    end)
+                Text = "Create";
+                TextScaled = true;
+                FontFace = Core.UI.Theme.TextFont;
+                TextColor3 = Core.UI.Color.White;
 
-    NewSlotFrame.NameInput.RandomiseName.MouseButton1Click:Connect(function()
-        SetTycoonName(PickRandomTycoonName())
-    end)
-
-    LogService:Log("Setup slot creation")
-end
-
-
-
---[[ PUBLIC ]]--
-
-function MainMenuController:DisableAllUI()
-    LogService:Log("Disabling all UI")
-    MainScreenGui.Enabled = true
-    --PlayerGUI.HUD.Enabled = false
-    --PlayerGUI.Inventory.Enabled = false
-end
-
-function MainMenuController:EnableAllUI()
-    LogService:Log("Enabling all UI")
-    MainScreenGui:Destroy()
-    Blur:Destroy()
-    LogService:Log("Destroyed main menu and blur")
-    --PlayerGUI.HUD.Enabled = true
-    --PlayerGUI.Inventory.Enabled = true
-end
-
-function MainMenuController:CreateSlotFrame(SlotInfo)
-    LogService:Log("Creating slot frame")
-    local New = SlotFrameTemplate:Clone()
-
-    New.Parent = SlotSelectionFrame.Slots
-    New.Name = SlotInfo.SlotID
-    New.LayoutOrder = SlotInfo.SlotID
-    LogService:Log("    - ID:", SlotInfo.SlotID)
-    LogService:Log("    - Used:", SlotInfo.Used)
-
-    if SlotInfo.Used then
-        New.TycoonName.Text = tostring(SlotInfo.TycoonName)
-        New.Info.GoldAmount.TextLabel.Text = Core.Util:ConvertNumberToString(SlotInfo.Gold or 0)
-
-        local TimeNow = os.time()
-        local TimeDifference = TimeNow - (SlotInfo.LastPlayed or 0)
-        local TimeText = Core.Util:TimeAgo(TimeDifference)
-
-        New.Info.LastPlayed.TextLabel.Text = TimeText
-        New:AddTag("_UsedSlot")
-
-        New.Actions.PlayButton.MouseButton1Click:Connect(function()
-            DataService:LoadData(tonumber(New.Name))
-            self:EnableAllUI()
-        end)
-
-        LogService:Log("    - Setup play button")
-
-        New.Actions.DeleteButton.MouseButton1Click:Connect(function()
-            New.SlotDelete.Visible = not New.SlotDelete.Visible
-        end)
-
-        New.SlotDelete.Delete.MouseButton1Click:Connect(function()
-            for _, SlotFrame :Frame in pairs(SlotSelectionFrame.Slots:GetChildren()) do
-                if SlotFrame:IsA("Frame") then
-                    SlotFrame:Destroy()
+                [Roact.Event.MouseButton1Click] = function()
+                    self:setState({
+                        SelectSlotVisible = false;
+                        CreateSlotVisible = true;
+                        CurrentSlot = Slot.SlotID;
+                    })
                 end
-            end
-
-            SlotSelectionFrame.Slots.LoadingText.Visible = true
-            DataService:DeleteSlot(tonumber(New.Name))
-            SlotSelectionFrame.Slots.LoadingText.Text = "Loading ."
-            task.wait(0.25)
-            SlotSelectionFrame.Slots.LoadingText.Text = "Loading .."
-            task.wait(0.25)
-            SlotSelectionFrame.Slots.LoadingText.Text = "Loading ..."
-            task.wait(0.25)
-            SlotSelectionFrame.Slots.LoadingText.Visible = false
-
-            self:CreateSlotFrames()
-        end)
-
-        New.SlotDelete.Cancel.MouseButton1Click:Connect(function()
-            New.SlotDelete.Visible = false
-        end)
-
-        LogService:Log("    - Setup delete button")
-    else
-        New.TycoonName.Text = "Empty Slot"
-        New.Info.Visible = false
-        New.Actions.DeleteButton.Visible = false
-        New.Actions.PlayButton.Text = "Create Slot"
-        New:AddTag("_NewSlot")
-
-        New.Actions.PlayButton.MouseButton1Click:Connect(function()
-            BeginSlotCreation(tonumber(New.Name))
-        end)
-        LogService:Log("    - Setup setup slot button")
-    end
+            }, {
+                Corners = Roact.createElement("UICorner", {
+                    CornerRadius = UDim.new(0.3, 0)
+                }, {});
+            });
+        });
+    })
 end
 
-function MainMenuController:CreateSlotFrames()
-    DataService:GetSlotsInfo():andThen(function(SlotsInfo)
-        for _, SlotFrame :Frame in pairs(SlotSelectionFrame.Slots:GetChildren()) do
-            if SlotFrame:IsA("Frame") then
-                SlotFrame:Destroy()
-            end
-        end
+function MainMenuComponent:CreateSlotFrames()
+    local SlotInfos = self.state.SlotInfos
 
-        for _, Slot in pairs(SlotsInfo) do
-            self:CreateSlotFrame(Slot)
+    local Elements = {
+        Layout = Roact.createElement("UIListLayout", {
+            SortOrder = Enum.SortOrder.LayoutOrder;
+        }, {})
+    }
+
+    for _, Slot in pairs(SlotInfos) do
+        if Slot.Used then
+            Elements[tostring(Slot.SlotID)] = self:CreateUsedSlotFrame(Slot)
+        else
+            Elements[tostring(Slot.SlotID)] = self:CreateUnUsedSlotFrame(Slot)
         end
+    end
+
+    return Elements
+end
+
+function MainMenuComponent:init()
+    self:setState({
+        SelectSlotVisible = false;
+        SlotInfos = "none";
+    })
+
+    DataService:GetSlotsInfo():andThen(function(Info)
+        LogService:Log("Updating slot info")
+        self:setState({
+            SlotInfos = Info;
+        })
     end)
 end
 
+function MainMenuComponent:render()
+    LogService:Log("Rendering main menu")
+    local SlotFrames = {}
 
+    if self.state.SlotInfos == "none" then
+        SlotFrames = {Text = Roact.createElement("TextLabel", {
+            Size = UDim2.fromScale(1, 1);
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
 
---[[ KNIT ]]--
+            Text = "Loading";
+            TextScaled = true;
+            FontFace = Core.UI.Theme.TextFont;
+            TextColor3 = Core.UI.Theme.TextColorDisabled;
+        }, {})}
+    else
+        SlotFrames = self:CreateSlotFrames()
+    end
 
-function MainMenuController:KnitInit()
-    LogService = Knit.GetService("LogService")
+    local SlotCreationNameInputRef = Roact.createRef()
 
-    SlotFrameTemplate = AssetsFolder.SaveSlot
+    return Roact.createElement("ScreenGui", {
+        ResetOnSpawn = false;
+        IgnoreGuiInset = true;
+    }, {
+        LeftSide = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.7, 1);
+            BackgroundColor3 = Core.UI.Color.White;
+            BorderSizePixel = 0;
+        }, {
+            Gradient = Roact.createElement("UIGradient", {
+                Color = ColorSequence.new(Core.UI.Theme.BackgroundColorDark);
+                Transparency = NumberSequence.new({
+                    NumberSequenceKeypoint.new(0, 0, 0);
+                    NumberSequenceKeypoint.new(1, 1, 0);
+                })
+            }, {});
 
-    MainScreenGui = AssetsFolder.MainMenu:Clone()
-    MainScreenGui.Parent = Knit.Player.PlayerGui
+            TextArea = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(0.5, 0.2);
+                Position = UDim2.fromScale(0.05, 0.1);
+                AnchorPoint = Core.UI.AnchorPoint.TopLeft;
 
-    MainFrame = MainScreenGui.Main
-    TitleScreen = MainFrame.TitleScreen
-    NewSlotFrame = MainFrame.CreateNewSlot
-    SlotSelectionFrame = MainFrame.SlotSelector
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+            }, {
+                Layout = Roact.createElement("UIListLayout", {
+                    SortOrder = Enum.SortOrder.LayoutOrder;
+                }, {});
 
-    Blur = Instance.new("BlurEffect")
-    Blur.Size = 10
-    Blur.Parent = game.Lighting
-    Blur.Name = "_MainMenuBlur"
-    LogService:Log("Created blur")
+                GameName = Roact.createElement("TextLabel", {
+                    Size = UDim2.fromScale(1, 0.8);
+                    LayoutOrder = 1;
+                    BackgroundTransparency = 1;
 
-    SetupNewSlotFrame()
+                    Text = "Manic Mines";
+                    TextScaled = true;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextYAlignment = Enum.TextYAlignment.Bottom;
+                    TextXAlignment = Enum.TextXAlignment.Left;
+                }, {});
+
+                UpdateName = Roact.createElement("TextLabel", {
+                    Size = UDim2.fromScale(1, 0.2);
+                    LayoutOrder = 1;
+                    BackgroundTransparency = 1;
+
+                    Text = "The recode update";
+                    TextScaled = true;
+                    TextColor3 = Core.UI.Theme.TextColorDisabled;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextYAlignment = Enum.TextYAlignment.Top;
+                    TextXAlignment = Enum.TextXAlignment.Left;
+                }, {});
+            });
+
+            Buttons = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(0.5, 0.4);
+                Position = UDim2.fromScale(0.05, 0.5);
+                AnchorPoint = Core.UI.AnchorPoint.TopLeft;
+
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+            }, {
+                Layout = Roact.createElement("UIListLayout", {
+                    SortOrder = Enum.SortOrder.LayoutOrder;
+                }, {});
+
+                PlayButton = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(1, 0.1);
+                    BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
+                    LayoutOrder = 1;
+
+                    Text = self:Text(self.state.PlayHovered, "<b><u>> Play</u></b>", "> Play");
+                    TextScaled = true;
+                    RichText = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Color.White;
+                    TextXAlignment = Enum.TextXAlignment.Left;
+
+                    [Roact.Event.MouseEnter] = function()
+                        self:setState({
+                            PlayHovered = true;
+                        })
+                    end;
+
+                    [Roact.Event.MouseLeave] = function()
+                        self:setState({
+                            PlayHovered = false;
+                        })
+                    end;
+
+                    [Roact.Event.MouseButton1Click] = function()
+                        self:setState({
+                            SelectSlotVisible = not self.state.SelectSlotVisible;
+                            CreateSlotVisible = false;
+                        })
+                    end;
+                }, {});
+
+                CreditsButton = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(1, 0.1);
+                    BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
+                    LayoutOrder = 2;
+
+                    Text = self:Text(self.state.CreditsHovered, "<b><u>> Credits</u></b>", "> Credits");
+                    TextScaled = true;
+                    RichText = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Color.White;
+                    TextXAlignment = Enum.TextXAlignment.Left;
+
+                    [Roact.Event.MouseEnter] = function()
+                        self:setState({
+                            CreditsHovered = true;
+                        })
+                    end;
+
+                    [Roact.Event.MouseLeave] = function()
+                        self:setState({
+                            CreditsHovered = false;
+                        })
+                    end;
+                }, {});
+
+                QuitButton = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(1, 0.1);
+                    BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
+                    LayoutOrder = 3;
+
+                    Text = self:Text(self.state.QuitHovered, "<b><u>> Quit</u></b>", "> Quit");
+                    TextScaled = true;
+                    RichText = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Color.White;
+                    TextXAlignment = Enum.TextXAlignment.Left;
+
+                    [Roact.Event.MouseEnter] = function()
+                        self:setState({
+                            QuitHovered = true;
+                        })
+                    end;
+
+                    [Roact.Event.MouseLeave] = function()
+                        self:setState({
+                            QuitHovered = false;
+                        })
+                    end;
+
+                    [Roact.Event.MouseButton1Click] = function()
+                        Knit.Player:Kick("You quit :(")
+                    end
+                }, {});
+            })
+        });
+
+        SelectSlot = self.state.SelectSlotVisible and Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.3, 0.5);
+            Position = Core.UI.Position.Center;
+            AnchorPoint = Core.UI.AnchorPoint.Center;
+
+            BackgroundTransparency = 0.5;
+            BackgroundColor3 = Core.UI.Theme.BackgroundColorPrimary;
+        }, {
+            Title = Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(1, 0.1);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Text = "Save slots";
+                TextColor3 = Core.UI.Theme.TextColor3;
+                TextScaled = true;
+                FontFace = Core.UI.Theme.TextFont;
+            }, {});
+
+            Slots = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(1, 0.9);
+                Position = Core.UI.Position.BottomCenter;
+                AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
+                BackgroundTransparency = 1;
+            }, SlotFrames);
+        });
+
+        CreateSlot = self.state.CreateSlotVisible and Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.3, 0.5);
+            Position = Core.UI.Position.Center;
+            AnchorPoint = Core.UI.AnchorPoint.Center;
+
+            BackgroundTransparency = 0.5;
+            BackgroundColor3 = Core.UI.Theme.BackgroundColorPrimary;
+        }, {
+            Layout = Roact.createElement("UIListLayout", {
+                SortOrder = Enum.SortOrder.LayoutOrder;
+                VerticalFlex = Enum.UIFlexAlignment.Fill;
+            }, {});
+
+            Title = Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(1, 0.1);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+                LayoutOrder = 1;
+
+                Text = "Create slot";
+                TextColor3 = Core.UI.Theme.TextColor3;
+                TextScaled = true;
+                FontFace = Core.UI.Theme.TextFont;
+            }, {});
+
+            NameInput = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(1, 0.3);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+                LayoutOrder = 2;
+            }, {
+                Title = Roact.createElement("TextLabel", {
+                    Size = UDim2.fromScale(1, 0.25);
+                    BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
+
+                    Text = "Tycoon name";
+                    TextScaled = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+                    TextXAlignment = Enum.TextXAlignment.Left;
+                }, {});
+
+                Input = Roact.createElement("TextBox", {
+                    Size = UDim2.fromScale(0.9, 0.2);
+                    Position = Core.UI.Position.Center;
+                    AnchorPoint = Core.UI.AnchorPoint.Center;
+                    BackgroundTransparency = 0.75;
+                    BackgroundColor3 = Core.UI.Theme.BackgroundColorLight;
+                    BorderSizePixel = 0;
+
+                    Text = "";
+                    PlaceholderText = "Tycoon name";
+                    TextScaled = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+
+                    [Roact.Ref] = SlotCreationNameInputRef;
+
+                    [Roact.Event.FocusLost] = function()
+                        local Text = SlotCreationNameInputRef:getValue().Text
+                        TextFilteringService:FilterTextFromUserToEveryone(Text):andThen(function(FilteredText)
+                            SlotCreationNameInputRef:getValue().Text = FilteredText
+                        end)
+                    end;
+                }, {});
+            });
+
+            Settings = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(1, 0.3);
+                BackgroundTransparency = 0.5;
+                BackgroundColor3 = Core.UI.Color.Black;
+                BorderSizePixel = 0;
+                LayoutOrder = 3;
+            }, {
+                Blocked = Roact.createElement("Frame", {
+                    Size = UDim2.fromScale(1, 1);
+                    BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
+                }, {
+                    Label = Roact.createElement("TextLabel", {
+                        Size = UDim2.fromScale(1, 1);
+                        Position = Core.UI.Position.Center;
+                        AnchorPoint = Core.UI.AnchorPoint.Center;
+                        BackgroundTransparency = 1;
+                        BorderSizePixel = 0;
+
+                        Rotation = 10;
+                        Text = "Coming Soon!";
+                        TextScaled = true;
+                        FontFace = Core.UI.Theme.TextFont;
+                        TextColor3 = Core.UI.Color.White;
+                    }, {})
+                });
+
+                Title = Roact.createElement("TextLabel", {
+                    Size = UDim2.fromScale(1, 0.25);
+                    BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
+
+                    Text = "Settings";
+                    TextScaled = true;
+                    TextTransparency = 0.5;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+                    TextXAlignment = Enum.TextXAlignment.Left;
+                }, {});
+            });
+
+            Buttons = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(1, 0.1);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+                LayoutOrder = 4;
+            }, {
+                Layout = Roact.createElement("UIListLayout", {
+                    Padding = UDim.new(0.1, 0);
+                    SortOrder = Enum.SortOrder.LayoutOrder;
+                    FillDirection = Enum.FillDirection.Horizontal;
+                    HorizontalAlignment = Enum.HorizontalAlignment.Center;
+                    VerticalAlignment = Enum.VerticalAlignment.Center;
+                }, {});
+
+                CreateButton = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(0.4, 0.35);
+                    BackgroundColor3 = Core.UI.Color.Green;
+                    LayoutOrder = 2;
+
+                    Text = "Create";
+                    TextScaled = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Color.White;
+
+                    [Roact.Event.MouseButton1Click] = function()
+                        local SlotInfo = {
+                            Name = SlotCreationNameInputRef:getValue().Text;
+                            Tutorial = false; -- For later when slot settings are made
+                        }
+                        DataService:NewSlot(self.state.CurrentSlot, SlotInfo)
+                        task.wait(1)
+                        HideMenu:Fire()
+                    end;
+                }, {
+                    Corners = Roact.createElement("UICorner", {
+                        CornerRadius = UDim.new(0.3, 0)
+                    }, {});
+                });
+
+                CancelButton = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(0.4, 0.35);
+                    BackgroundColor3 = Core.UI.Color.Red;
+                    LayoutOrder = 1;
+
+                    Text = "Cancel";
+                    TextScaled = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Color.White;
+
+                    [Roact.Event.MouseButton1Click] = function()
+                        self:setState({
+                            SelectSlotVisible = true;
+                            CreateSlotVisible = false;
+                        })
+                    end;
+                }, {
+                    Corners = Roact.createElement("UICorner", {
+                        CornerRadius = UDim.new(0.3, 0)
+                    }, {});
+                });
+            });
+        })
+    })
 end
+
+-- [[ KNIT ]] --
 
 function MainMenuController:KnitStart()
     DataService = Knit.GetService("DataService")
     TextFilteringService = Knit.GetService("TextFilteringService")
+    LogService = Knit.GetService("LogService")
 
-    self:DisableAllUI()
+    local App = Roact.createElement(MainMenuComponent)
+    local MainMenuTree = Roact.mount(App, Knit.Player.PlayerGui, "MainMenu")
+    LogService:Log("Mounted main menu")
 
-    for _, Button :TextButton in pairs(TitleScreen.LeftSide.Buttons:GetChildren()) do
-        if not Button:IsA("TextButton") then continue end
-
-        local OriginalText = Button.Text
-        local BoldText = "<b>"..Button.Text.."</b>"
-
-        Button.MouseEnter:Connect(function()
-            Button.Text = BoldText
-        end)
-
-        Button.MouseLeave:Connect(function()
-            Button.Text = OriginalText
-        end)
-    end
-
-    TitleScreen.LeftSide.Buttons.PlayButton.MouseButton1Click:Connect(function()
-        MainFrame.Credits.Visible = false
-        SlotSelectionFrame.Visible = not SlotSelectionFrame.Visible
+    HideMenu.Event:Connect(function()
+        Roact.unmount(MainMenuTree)
+        LogService:Log("unmounted main menu")
     end)
-
-    TitleScreen.LeftSide.Buttons.CreditsButton.MouseButton1Click:Connect(function()
-        MainFrame.Credits.Visible = not MainFrame.Credits.Visible
-        SlotSelectionFrame.Visible = false
-    end)
-
-    TitleScreen.LeftSide.Buttons.QuitButton.MouseButton1Click:Connect(function()
-        Knit.Player:Kick("Left the game!")
-    end)
-
-    self:CreateSlotFrames()
 end
 
 return MainMenuController
