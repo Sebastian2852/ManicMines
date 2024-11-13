@@ -12,19 +12,20 @@ UI.Theme = {
     BackgroundColorLight = Color3.fromRGB(75, 75, 75);
     BackgroundColorPrimary = Color3.fromRGB(50, 50, 50);
     BackgroundColorDark = Color3.fromRGB(25, 25, 25);
-    BackgroundColorTransparency = 0.5;
 
-    TextColor3 = Color3.new(1, 1, 1);
+    TextColor3 = Color3.fromRGB(255, 255, 255);
+    TextColorDisabled = Color3.fromRGB(100, 100, 100);
     TextFont = Font.fromEnum(Enum.Font.Highway);
-    TextStrokeTransparency = 0;
-
-    TextColorDisabled = Color3.new(0.278431, 0.278431, 0.278431);
 }
 
 UI.Images = {
     Missing = "http://www.roblox.com/asset/?id=925810526";
     GoldCoins = "";
     LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one
+
+    SettingsButton = "rbxassetid://129623448532589";
+    CheckBoxChecked = "rbxassetid://4458804262";
+    CheckBoxUnchecked = "rbxassetid://4458801905";
 }
 
 --[=[

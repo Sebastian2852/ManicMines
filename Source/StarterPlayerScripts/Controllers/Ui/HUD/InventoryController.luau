@@ -136,7 +136,7 @@ function InventoryComponent:render()
                         VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar;
                         AutomaticCanvasSize = Enum.AutomaticSize.Y;
                         ScrollingDirection = Enum.ScrollingDirection.Y;
-                        CanvasSize = UDim2.fromScale(1, 1)
+                        CanvasSize = UDim2.fromScale(1, 1);
                     }, Components)
                 })
             })
