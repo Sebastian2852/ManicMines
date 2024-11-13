@@ -3,7 +3,7 @@ name: Create Nightly Release
 on:
   push:
     branches:
-      - '**'  # Trigger on push to any branch
+      - 'Dev'
 
 jobs:
   create-release:
@@ -20,8 +20,9 @@ jobs:
       - name: Create GitHub release
         uses: actions/create-release@v1
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: "Nightly"
           release_name: ${{ env.message }}
           body: "Nightly release created from commit ${{ github.sha }}."
           draft: false
-          prerelease: true  # Mark as prerelease
+          prerelease: true
