@@ -24,6 +24,7 @@ UI.Theme = {
 UI.Images = {
     Missing = "http://www.roblox.com/asset/?id=925810526";
     GoldCoins = "";
+    LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one
 }
 
 --[=[
