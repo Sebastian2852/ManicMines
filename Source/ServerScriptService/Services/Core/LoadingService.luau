@@ -4,8 +4,8 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local LoadingService = Knit.CreateService {
     Name = "LoadingService",
     Client = {
-        LoadingStarted = Knit.CreateSignal(),
-        LoadingEnded = Knit.CreateSignal(),
+        LoadingStarted = Knit.CreateSignal();
+        LoadingEnded = Knit.CreateSignal();
     },
 }
 
@@ -16,6 +16,9 @@ LoadingService.Players = {}
 
 -- [[ PUBLIC ]] --
 
+--[=[
+Start a loading screen for the given player
+]=]
 function LoadingService:StartLoading(Player :Player)
     if self.Players[Player.UserId] then
         LogService:Warn("Player is already loading: "..Player.Name)
@@ -27,6 +30,9 @@ function LoadingService:StartLoading(Player :Player)
     self.Client.LoadingStarted:Fire(Player)
 end
 
+--[=[
+Stop the loading screen for the given player
+]=]
 function LoadingService:EndLoading(Player :Player)
     if not self.Players[Player.UserId] then
         LogService:Warn("Player is not currently loading: "..Player.Name)

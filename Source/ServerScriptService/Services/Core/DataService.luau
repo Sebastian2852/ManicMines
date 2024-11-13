@@ -4,6 +4,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(game.ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
+local DataService = Knit.CreateService {
+    Name = "DataService",
+    Client = {},
+}
+
+local PickaxeService
+local LogService
+local TycoonService
+local PlayerDisplayService
+local LoadingService
+
 local RootDataFolder :Folder = game.ReplicatedStorage.PlayerData
 local TemplateDataFolder :Core.DataFolder = RootDataFolder:FindFirstChild("Template")
 
@@ -11,15 +22,7 @@ local OresFolder :Folder = ReplicatedStorage.Assets.Ores
 local PickaxesFolder :Folder = ReplicatedStorage.Assets.Pickaxe.Pickaxes
 local TycoonUpgradesFolder :Folder = ReplicatedStorage.Assets.Tycoon.Upgrades
 
-local PickaxeService
-local LogService
-local TycoonService
-local PlayerDisplayService
 
-local DataService = Knit.CreateService {
-    Name = "DataService",
-    Client = {},
-}
 
 --[[ PRIVATE ]]--
 
@@ -222,6 +225,8 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     LogService:Assert(DataFolder, "Tried loading data with No data folder")
     LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
+    LoadingService:StartLoading(Player)
+
     local Maid = Core.Maid.new()
     local OreDataData = Core.Data.Data.New("Ore", {})
     local PlayerData = Core.Data.Data.New("PlayerData", {})
@@ -337,6 +342,7 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
 
     DataFolder.DataLoaded.Value = true
     Maid:DoCleaning()
+    LoadingService:EndLoading(Player)
 end
 
 --[=[
@@ -570,6 +576,7 @@ function DataService:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
     TycoonService = Knit.GetService("TycoonService")
     PlayerDisplayService = Knit.GetService("PlayerDisplayService")
+    LoadingService = Knit.GetService("LoadingService")
 
     game.Players.PlayerAdded:Connect(function(Player)
         self:CreateDataFolderForPlayer(Player)

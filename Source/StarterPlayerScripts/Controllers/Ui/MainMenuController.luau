@@ -10,7 +10,6 @@ local AssetsFolder = ReplicatedStorage.Assets.UI.MainMenu
 
 local DataService
 local TextFilteringService
-local LoadingService
 local LogService
 
 local Blur :BlurEffect
@@ -94,21 +93,6 @@ local function SetupNewSlotFrame()
         }
 
         DataService:NewSlot(SlotCreation_CurrentSlotID, SlotInfo)
-        LoadingService:StartLoading()
-        local InTycoon = false
-        MainMenuController:EnableAllUI()
-        SlotSelectionFrame.Visible = false
-        DataService:GetPlayerDataFolder():andThen(function(DataFolder)
-            repeat
-                task.wait(1)
-            until DataFolder.InTycoon.Value
-            InTycoon = true
-        end)
-
-        repeat
-            task.wait(1)
-        until InTycoon
-        LoadingService:EndLoading()
     end)
 
     NewSlotFrame.NameInput.RandomiseName.MouseButton1Click:Connect(function()
@@ -160,22 +144,8 @@ function MainMenuController:CreateSlotFrame(SlotInfo)
         New:AddTag("_UsedSlot")
 
         New.Actions.PlayButton.MouseButton1Click:Connect(function()
-            LoadingService:StartLoading()
             DataService:LoadData(tonumber(New.Name))
-            local InTycoon = false
             self:EnableAllUI()
-            SlotSelectionFrame.Visible = false
-            DataService:GetPlayerDataFolder():andThen(function(DataFolder)
-                repeat
-                    task.wait(1)
-                until DataFolder.InTycoon.Value
-                InTycoon = true
-            end)
-
-            repeat
-                task.wait(1)
-            until InTycoon
-            LoadingService:EndLoading()
         end)
 
         LogService:Log("    - Setup play button")
@@ -266,7 +236,6 @@ end
 function MainMenuController:KnitStart()
     DataService = Knit.GetService("DataService")
     TextFilteringService = Knit.GetService("TextFilteringService")
-    LoadingService = Knit.GetService("LoadingService")
 
     self:DisableAllUI()
 
