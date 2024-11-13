@@ -16,29 +16,43 @@ local FadeTweenInfo :TweenInfo = nil
 
 --[[ PRIVATE ]]--
 
+local function PlayTweens(Tweens :{Tween})
+    for _, Tween in pairs(Tweens) do
+        Tween:Play()
+    end
+end
+
 local function FadeGuiIn(Animated :boolean, AwaitFinish :boolean)
     if Animated then
-        local Fade = TweenService:Create(FadeFrame, FadeTweenInfo, {BackgroundTransparency = 0})
-        Fade:Play()
+        local Fades = {
+            TweenService:Create(FadeFrame, FadeTweenInfo, {BackgroundTransparency = 0});
+            TweenService:Create(FadeFrame.Action, FadeTweenInfo, {TextTransparency = 0});
+        }
+        PlayTweens(Fades)
 
-        if AwaitFinish then 
-            Fade.Completed:Wait() 
+        if AwaitFinish then
+            Fades[1].Completed:Wait()
         end
     else
         FadeFrame.BackgroundTransparency = 0
+        FadeFrame.Action.TextTransparency = 0
     end
 end
 
 local function FadeGuiOut(Animated :boolean, AwaitFinish :boolean)
     if Animated then
-        local Fade = TweenService:Create(FadeFrame, FadeTweenInfo, {BackgroundTransparency = 1})
-        Fade:Play()
+        local Fades = {
+            TweenService:Create(FadeFrame, FadeTweenInfo, {BackgroundTransparency = 1});
+            TweenService:Create(FadeFrame.Action, FadeTweenInfo, {TextTransparency = 1});
+        }
+        PlayTweens(Fades)
 
-        if AwaitFinish then 
-            Fade.Completed:Wait()
+        if AwaitFinish then
+            Fades[1].Completed:Wait()
         end
     else
         FadeFrame.BackgroundTransparency = 1
+        FadeFrame.Action.TextTransparency = 1
     end
 end
 
@@ -63,6 +77,13 @@ will not return until the fade has finished
 function LoadingController:FadeGameplayIn(AwaitFinish :boolean)
     LogService:Log("Fading gameplay in")
     FadeGuiOut(true, AwaitFinish)
+end
+
+--[=[
+Tell the user what is currently being done
+]=]
+function LoadingController:SetActionText(NewText :string)
+    FadeFrame.Action.Text = NewText
 end
 
 --[=[
@@ -101,6 +122,15 @@ function LoadingController:KnitInit()
     NewFrame.BackgroundTransparency = 1
     NewFrame.BackgroundColor3 = Color3.new(0, 0, 0)
 
+    local Action = Instance.new("TextLabel")
+    Action.Parent = NewFrame
+    Action.Name = "Action"
+    Action.Size = UDim2.fromScale(1, 1)
+    Action.BackgroundTransparency = 1
+    Action.TextScaled = true
+    Action.Text = ""
+    Action.TextColor3 = Color3.new(1, 1, 1)
+
     FadeFrame = NewFrame
     FadeTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false, 0)
 end
@@ -110,11 +140,15 @@ function LoadingController:KnitStart()
     LogService = Knit.GetService("LogService")
 
     LoadingService.LoadingStarted:Connect(function()
-        LoadingController:FadeGameplayOut(false)
+        self:FadeGameplayOut(false)
     end)
 
     LoadingService.LoadingEnded:Connect(function()
-        LoadingController:FadeGameplayIn(false)
+        self:FadeGameplayIn(false)
+    end)
+
+    LoadingService.UpdateActionText:Connect(function(Text)
+        self:SetActionText(Text)
     end)
 end
 

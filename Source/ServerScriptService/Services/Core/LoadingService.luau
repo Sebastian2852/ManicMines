@@ -6,6 +6,7 @@ local LoadingService = Knit.CreateService {
     Client = {
         LoadingStarted = Knit.CreateSignal();
         LoadingEnded = Knit.CreateSignal();
+        UpdateActionText = Knit.CreateSignal();
     },
 }
 
@@ -42,6 +43,13 @@ function LoadingService:EndLoading(Player :Player)
     LogService:Log("Stopping loading for player: "..Player.Name)
     self.Client.LoadingEnded:Fire(Player)
     self.Players[Player.UserId] = false
+end
+
+--[=[
+Update the text that says what is loading for the given player with the given text
+]=]
+function LoadingService:UpdateActionText(Player :Player, Text :string)
+    self.Client.UpdateActionText:Fire(Player, Text)
 end
 
 
