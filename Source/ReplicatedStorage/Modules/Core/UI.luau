@@ -5,7 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UI = {}
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
-local EnumList = require(ReplicatedStorage.Packages.EnumList)
+local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local OreListClass = require(ReplicatedStorage.Game.Modules.Classes.OreList)
 
 UI.Theme = {
@@ -81,15 +81,10 @@ UI.Color = {
     Lime       = Color3.fromRGB(50, 205, 50);
 }
 
-UI.OreFrameStyle = EnumList.new("OreFrameStyle", {
-    "PcInventory";
-    "Normal";
-})
-
 --[=[
 Create a single ore frame from an ore list. This only creates a frame for the first thing in the ore list
 ]=]
-function UI:CreateOreFrame(OreList :OreListClass.OreList, Style :EnumList.EnumItem, Size :UDim2, Position :UDim2) -- Maybe add an "include gold" param
+function UI:CreateOreFrame(OreList :OreListClass.OreList, Style :Enums.Enum, Size :UDim2, Position :UDim2) -- Maybe add an "include gold" param
     for OreName :string, OreData in pairs(OreList:LoopList()) do
         if OreData.Amount == 0 then continue end
         if OreName == "GoldCoins" then
@@ -97,12 +92,7 @@ function UI:CreateOreFrame(OreList :OreListClass.OreList, Style :EnumList.EnumIt
             continue
         end
 
-        if not UI.OreFrameStyle:BelongsTo(Style) then
-            warn("Invalid ore frame style passed: "..tostring(Style))
-            return {}
-        end
-
-        if Style.Value == 1 then
+        if Style == Enums.OreFrameStyle.PC then
             return Roact.createElement("Frame", {
                 Size = Size;
                 Position = Position;
@@ -290,7 +280,7 @@ end
 --[=[
 Returns a table of Ore frames as components in a table.
 ]=]
-function UI:CreateOreFrames(OreList, Style :EnumList.EnumItem, Size :UDim2) :{Roact.Component}
+function UI:CreateOreFrames(OreList, Style :Enums.Enum, Size :UDim2) :{Roact.Component}
     if not OreListClass.IsOreList(OreList) then
         warn("Invalid ore list passed:", OreList)
         return {}

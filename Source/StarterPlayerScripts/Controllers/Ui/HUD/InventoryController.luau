@@ -1,16 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Roact = require(ReplicatedStorage.Packages.Roact)
-
-local LastInputType = "None"
+local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 
 local InventoryController = Knit.CreateController { Name = "InventoryController" }
 
 local LogService
 local DataService
+local DeviceController
 local DataFolder :Core.DataFolder
 
 -- [[ PRIVATE ]]--
@@ -34,7 +33,7 @@ local InventoryComponent = Core.Roact.Component:extend("InventoryComponent")
 
 function InventoryComponent:init()
     self:setState({
-        StyleToUse = Core.UI.OreFrameStyle.Normal;
+        StyleToUse = Enums.OreFrameStyle.Normal;
         OreList = {};
         Capacity = 0;
         Amount = 0;
@@ -48,27 +47,32 @@ function InventoryComponent:init()
 
     self:UpdateInventory(0, 0, CreateInventoryOreList())
 
-    UserInputService.InputBegan:Connect(function()
-        local InputType = UserInputService:GetLastInputType()
-
-        -- Long ass if statment to check all the possible PC input types
-        -- Thanks roblox for not making any simple way to check device :D
-        if InputType == Enum.UserInputType.Keyboard or InputType == Enum.UserInputType.MouseMovement or InputType == Enum.UserInputType.MouseButton1 or InputType == Enum.UserInputType.MouseButton2 or InputType == Enum.UserInputType.MouseButton3 then
-            if LastInputType == "PC" then return end
+    DeviceController.DeviceChanged:Connect(function(NewDeviceType :Enums.Enum)
+        if NewDeviceType == Enums.DeviceType.PC then
             self:setState(function(PreviousState :{any})
-                PreviousState.StyleToUse = Core.UI.OreFrameStyle.PcInventory
+                PreviousState.StyleToUse = Enums.OreFrameStyle.PC
                 return PreviousState
             end)
-            LastInputType = "PC"
-        else
-            if LastInputType == "Mobile" then return end
+        elseif NewDeviceType == Enums.DeviceType.Mobile then
             self:setState(function(PreviousState :{any})
-                PreviousState.StyleToUse = Core.UI.OreFrameStyle.Normal
+                PreviousState.StyleToUse = Enums.OreFrameStyle.Normal
                 return PreviousState
             end)
-            LastInputType = "Mobile"
         end
     end)
+
+    local DeviceType = DeviceController:GetDeviceType()
+    if DeviceType == Enums.DeviceType.PC then
+        self:setState(function(PreviousState :{any})
+            PreviousState.StyleToUse = Enums.OreFrameStyle.PC
+            return PreviousState
+        end)
+    elseif DeviceType == Enums.DeviceType.Mobile then
+        self:setState(function(PreviousState :{any})
+            PreviousState.StyleToUse = Enums.OreFrameStyle.Normal
+            return PreviousState
+        end)
+    end
 end
 
 --[=[
@@ -160,6 +164,7 @@ end
 function InventoryController:KnitStart()
     DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
+    DeviceController = Knit.GetController("DeviceController")
 
     DataService:GetPlayerDataFolder():andThen(function(Return)
         DataFolder = Return
