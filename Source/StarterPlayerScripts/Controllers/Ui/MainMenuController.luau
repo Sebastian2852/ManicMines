@@ -747,12 +747,22 @@ function MainMenuController:KnitStart()
     TextFilteringService = Knit.GetService("TextFilteringService")
     LogService = Knit.GetService("LogService")
 
+    local LightingController = Knit.GetController("LightingController")
+
     local App = Roact.createElement(MainMenuComponent)
     local MainMenuTree = Roact.mount(App, Knit.Player.PlayerGui, "MainMenu")
     LogService:Log("Mounted main menu")
 
+    local Blur = Instance.new("BlurEffect")
+    Blur.Name = "MainMenuBlur"
+    Blur.Size = 15
+    Blur.Enabled = true
+
+    Blur = LightingController:AddPersistentObject(Blur)
+
     HideMenu.Event:Connect(function()
         Roact.unmount(MainMenuTree)
+        Blur:Destroy()
         LogService:Log("unmounted main menu")
     end)
 end

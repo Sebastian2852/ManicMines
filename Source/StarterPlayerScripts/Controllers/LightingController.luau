@@ -6,6 +6,22 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local LightingController = Knit.CreateController { Name = "LightingController" }
 
+-- [[ PUBLUC ]] --
+
+--[=[
+Adds an object to lighting that cannot be deleted.
+The script that adds the object is in charge of deleting the object
+]=]
+function LightingController:AddPersistentObject<Instance>(Object :Instance)
+    local New = Object:Clone()
+    New.Name = "_"..New.Name
+    New.Parent = Lighting
+    return New
+end
+
+--[=[
+Creates lighting objects from the given config instance
+]=]
 function LightingController:CreateFromConfig(Config :Configuration)
     local Objects = Config:GetChildren()
 
