@@ -20,4 +20,5 @@ Enums.OreFrameStyle = {
     PC = CreateEnumValue();
 }
 
+table.freeze(Enums)
 return Enums
