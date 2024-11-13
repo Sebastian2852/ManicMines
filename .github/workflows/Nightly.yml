@@ -1,37 +1,27 @@
-name: Nightly Release
+name: Create Nightly Release
 
 on:
-  schedule:
-    - cron: '0 0 * * *' # Runs every day at 00:00 GMT
-  workflow_dispatch: # Allows manual triggering
+  push:
+    branches:
+      - '**'  # Trigger on push to any branch
 
 jobs:
-  nightly-release:
+  create-release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js (optional, remove if not using Node)
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+      - name: Get latest commit message
+        id: get_commit_message
+        run: echo "message=$(git log -1 --pretty=format:%s)" >> $GITHUB_ENV
 
-      - name: Create Nightly Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
+      - name: Create GitHub release
+        uses: actions/create-release@v1
         with:
           tag_name: "Nightly"
-          release_name: "Nightly Release"
+          release_name: ${{ env.message }}
+          body: "Nightly release created from commit ${{ github.sha }}."
           draft: false
-          prerelease: true
-          overwrite: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Assets
-        uses: actions/upload-artifact@v3
-        with:
-          name: nightly-build.zip
-          path: ./Source
+          prerelease: true  # Mark as prerelease
