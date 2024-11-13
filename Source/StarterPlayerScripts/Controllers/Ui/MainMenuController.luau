@@ -93,6 +93,7 @@ local function SetupNewSlotFrame()
         }
 
         DataService:NewSlot(SlotCreation_CurrentSlotID, SlotInfo)
+        MainMenuController:EnableAllUI()
     end)
 
     NewSlotFrame.NameInput.RandomiseName.MouseButton1Click:Connect(function()

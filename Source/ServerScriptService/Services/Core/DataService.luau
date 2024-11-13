@@ -501,6 +501,8 @@ function DataService:NewSlot(Player :Player, SlotNumber :number, SlotSettings :C
     PlayerData.Tycoon.TycoonName.Value = SlotSettings.Name
 
     self.Players[Player.UserId] = AsDataStore
+    LoadingService:StartLoading(Player)
+    LoadingService:UpdateActionText(Player, "Creating slot")
     DataService:SavePlayerData(Player)
     DataService:LoadPlayerData(Player, AsDataStore)
 end
