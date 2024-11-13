@@ -246,12 +246,8 @@ function SettingsController:KnitStart()
     SettingsService = Knit.GetService("SettingsService")
     DataService = Knit.GetService("DataService")
 
-    DataService:GetPlayerDataFolder():andThen(function(PlayerData :Core.DataFolder)
-        repeat
-            task.wait(0.1)
-        until PlayerData.DataLoaded.Value
-
-        for _, SettingValue :ValueBase in pairs(PlayerData.Settings:GetChildren()) do
+    DataService.DataLoaded:Connect(function(DataFolder :Core.DataFolder)
+        for _, SettingValue :ValueBase in pairs(DataFolder.Settings:GetChildren()) do
             Settings[SettingValue.Name] = SettingValue.Value
 
             SettingValue:GetPropertyChangedSignal("Value"):Connect(function()
@@ -263,7 +259,7 @@ function SettingsController:KnitStart()
         Update()
 
         local App = Core.Roact.createElement(SettingsComponent)
-        Core.Roact.mount(App, Knit.Player.PlayerGui, "Settings")
+        Core.Roact.mount(App, Knit.Player.PlayerGui, "HUD")
         LogService:Log("Mounted settings component")
     end)
 end

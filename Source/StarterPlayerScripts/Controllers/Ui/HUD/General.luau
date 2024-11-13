@@ -93,12 +93,8 @@ function GeneralController:KnitStart()
     DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
 
-    DataService:GetPlayerDataFolder():andThen(function(Return)
-        DataFolder = Return
-
-        repeat
-            task.wait(0.1)
-        until Return.DataLoaded.Value
+    DataService.DataLoaded:Connect(function(LoadedDataFolder :Core.DataFolder)
+        DataFolder = LoadedDataFolder
 
         local App = Core.Roact.createElement(GeneralComponent)
         Core.Roact.mount(App, Knit.Player.PlayerGui, "HUD")

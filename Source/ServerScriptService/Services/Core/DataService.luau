@@ -6,7 +6,9 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local DataService = Knit.CreateService {
     Name = "DataService",
-    Client = {},
+    Client = {
+        DataLoaded = Knit.CreateSignal();
+    },
 }
 
 local PickaxeService
@@ -340,6 +342,7 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
         PickaxeService:GivePickaxeToPlayer(Player)
     end)
 
+    self.Client.DataLoaded:Fire(Player, DataFolder)
     DataFolder.DataLoaded.Value = true
     Maid:DoCleaning()
     LoadingService:EndLoading(Player)
