@@ -107,7 +107,7 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
 
     AddUpgradeModels(DataFolder, NewTycoon)
     if Player.Character then
-        TeleportService:TeleportPlayerToTycoon(Player, NewTycoon)
+        TeleportService:TeleportPlayerToTycoon(Player, NewTycoon, false)
     end
 
 

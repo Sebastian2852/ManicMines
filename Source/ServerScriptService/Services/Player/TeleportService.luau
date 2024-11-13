@@ -66,7 +66,7 @@ end
 Teleports a player's character to the given position. If the player doesnt have a character
 the function waits until a character is present
 ]=]
-function TeleportService:TeleportPlayerToPosition(Player :Player, Position :Vector3)
+function TeleportService:TeleportPlayerToPosition(Player :Player, Position :Vector3, WithLoadingScreen :boolean?)
     LogService:Log("Teleporting", Player.Name, "to", tostring(Position))
     local Character = Player.Character
     if not Character then
@@ -77,28 +77,32 @@ function TeleportService:TeleportPlayerToPosition(Player :Player, Position :Vect
         until Character
     end
 
-    LoadingService:StartLoading(Player)
+    if WithLoadingScreen then
+        LoadingService:StartLoading(Player)
+    end
     FadeCharacterOut(1, Character)
     task.wait(1)
     Character:PivotTo(CFrame.new(Position))
     task.wait(1)
     FadeCharacterIn(1, Character)
-    LoadingService:EndLoading(Player)
+    if WithLoadingScreen then
+        LoadingService:EndLoading(Player)
+    end
 end
 
 --[=[
 Teleports a player's character to the given part's potiion. If the player doesnt have a character
 the function waits until a character is present
 ]=]
-function TeleportService:TeleportPlayertoPart(Player :Player, Part :BasePart)
-    self:TeleportPlayerToPosition(Player, Part.CFrame.Position)
+function TeleportService:TeleportPlayertoPart(Player :Player, Part :BasePart, WithLoadingScreen :boolean?)
+    self:TeleportPlayerToPosition(Player, Part.CFrame.Position, WithLoadingScreen)
 end
 
 --[=[
 Teleports a player to a given tycoon's spawn. If no tycoon is passed the player is teleported to their own
 tycoon.
 ]=]
-function TeleportService:TeleportPlayerToTycoon(Player :Player, Tycoon :Model?)
+function TeleportService:TeleportPlayerToTycoon(Player :Player, Tycoon :Model?, WithLoadingScreen :boolean?)
     LogService:Log("Teleporting", Player.Name, "to their player")
     local DataFolder = DataService:GetPlayerDataFolder(Player)
     local TeleportLocation
@@ -114,7 +118,7 @@ function TeleportService:TeleportPlayerToTycoon(Player :Player, Tycoon :Model?)
         DataFolder.InTycoon.Value = true
     end
 
-    self:TeleportPlayerToPosition(Player, TeleportLocation)
+    self:TeleportPlayerToPosition(Player, TeleportLocation, WithLoadingScreen)
 end
 
 --[=[
