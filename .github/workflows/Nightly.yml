@@ -22,11 +22,10 @@ jobs:
         run: echo "message=$(git log -1 --pretty=format:%s)" >> $GITHUB_ENV
 
       - name: Create GitHub release
-        uses: actions/create-release@v1
+        uses: elgohr/Github-Release-Action@v5
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: "Nightly"
-          release_name: ${{ env.message }}
-          body: "Nightly release created from commit ${{ github.sha }}."
-          draft: false
+          title: ${{ env.message }}
+          tag: Nightly
           prerelease: true
