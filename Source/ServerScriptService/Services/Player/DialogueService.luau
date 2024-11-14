@@ -1,0 +1,77 @@
+local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Knit = require(ReplicatedStorage.Packages.Knit)
+
+local DialogueService = Knit.CreateService {
+    Name = "DialogueService",
+    Client = {
+        StartDialogue = Knit.CreateSignal();
+    },
+}
+
+local LogService
+
+type DialogueChoice = {
+    Text :string;
+    Choices :{[string] :DialogChoice}
+}
+
+type InfoModule = {
+    NpcName :string;
+    InteractMessage :string;
+
+    Dialogue :DialogueChoice;
+}
+
+-- [[ PUBLUC ]] --
+
+DialogueService.NpcTag = "Dialogue/Prompt/NPC"
+DialogueService.ModuleTag = "Dialogue/Module"
+
+function DialogueService:ConnectNpcsWithModules(Npcs :{Model}, Modules :{ModuleScript})
+    local New = {}
+
+    for _, Npc in pairs(Npcs) do
+        for _, Module in pairs(Modules) do
+            if Module:IsDescendantOf(Npc) then
+                New[Npc] = Module
+                break
+            end
+        end
+    end
+
+    return New
+end
+
+
+
+-- [[ KNIT ]] --
+
+function DialogueService:KnitStart()
+    LogService = Knit.GetService("LogService")
+
+    local NPCs = CollectionService:GetTagged(self.NpcTag)
+    local Modules = CollectionService:GetTagged(self.ModuleTag)
+
+    LogService:Log("Sorting NPCs with their modules")
+    local NpcsSorted = self:ConnectNpcsWithModules(NPCs, Modules)
+
+    LogService:Log("Creating proximity prompts")
+    for Npc, Module in pairs(NpcsSorted) do
+        local Info :InfoModule = require(Module)
+
+        local ProximityPrompt = Instance.new("ProximityPrompt")
+        ProximityPrompt.Name = "DialogueInteraction"
+        ProximityPrompt.ObjectText = Info.NpcName
+        ProximityPrompt.ActionText = Info.InteractMessage
+        ProximityPrompt.Parent = Npc
+
+        ProximityPrompt.Triggered:Connect(function(Player)
+            self.Client.StartDialogue:Fire(Player, ProximityPrompt, Info)
+        end)
+
+        LogService:Log("Created proximity prompt for: "..Info.NpcName)
+    end
+end
+
+return DialogueService
