@@ -85,6 +85,12 @@ function MineEffects:KnitStart()
     -- but i cba rn :)
     local AnimationTrack = Humanoid:LoadAnimation(Animation)
 
+    Player.CharacterAdded:Connect(function(NewCharacter)
+        Character = NewCharacter
+        Humanoid = Character:WaitForChild("Humanoid")
+        AnimationTrack = Humanoid:LoadAnimation(Animation)
+    end)
+
     AnimationTrack:GetMarkerReachedSignal("HitSound"):Connect(function()
         local Block = ReplicatedStorage.Player.PickaxeSelection.Value
         PickaxeService.PlayHitSound:Fire(Block)
