@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
@@ -12,6 +11,18 @@ local PlayerFolder = ReplicatedStorage.Player
 local PickaxeService
 local DataService
 local LogService
+
+-- [[ PRIVATE ]] --
+
+local function CalculateTimeToMine(Health)
+    local Pickaxe :Instance = Knit.Player.Character:FindFirstChild("Pickaxe")
+
+    local HitsNeeded = math.ceil(Health / Pickaxe:GetAttribute("Damage"))
+    local TimePerHit = Pickaxe:GetAttribute("Delay")
+    local TotalTime = HitsNeeded * TimePerHit
+    return Core.Util:RoundToxDP(TotalTime, 1)
+end
+
 
 -- [[ GUI ]] --
 
@@ -39,38 +50,43 @@ function PickaxeSelectionComponent:init()
     end)
 
     PlayerFolder.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
-        local ObjectToMine :BasePart = PlayerFolder.PickaxeSelection.Value
-
-        if not ObjectToMine or not ObjectToMine:IsDescendantOf(Workspace.Game.Mine) or not ObjectToMine:IsA("BasePart") then
+        local ObjectToMine = PlayerFolder.PickaxeSelection.Value
+        if ObjectToMine == nil then
             self:setState({
                 Show = false;
             })
             return
         end
 
-        local RealOre = Core.Util:GetOreByName(ObjectToMine.Name)
-        if not RealOre then return end
-
+        local DisplayName = ObjectToMine:GetAttribute("DisplayName")
         local Health = ObjectToMine:GetAttribute("Health")
         local MaxHealth = ObjectToMine:GetAttribute("MaxHealth")
-        local Percentage = math.ceil((1 - (Health / MaxHealth)) * 100)
-        PickaxeService:CalculateTimeToMine(Health):andThen(function(TimeToMine)
-            self:setState({
-                Show = true;
-                Ore = RealOre;
-                OreName = ObjectToMine:GetAttribute("DisplayName");
-                TimeToMine = TimeToMine.."s - "..Percentage.."%";
-                MiningProgress = (Health / MaxHealth);
-            })
-        end)
+        local PercentageMined = math.ceil((1 - (Health / MaxHealth)) * 100)
+        local MiningProgress = (Health / MaxHealth)
+        local TimeToMine = CalculateTimeToMine(Health)
+
+        self:setState({
+            Show = true;
+            Ore = ObjectToMine;
+            OreName = DisplayName;
+            TimeToMine = TimeToMine.."s - "..PercentageMined.."%";
+            MiningProgress = MiningProgress;
+        })
     end)
 end
 
 function PickaxeSelectionComponent:render()
+    LogService:Log("Rendering pickaxe selection GUI")
+    local Show = self.state.Show
+    local Ore = self.state.Ore
+    local OreName = self.state.OreName
+    local TimeToMine = self.state.TimeToMine
+    local MiningProgress = self.state.MiningProgress
+
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
     }, {
-        Container = self.state.Show and Roact.createElement("Frame", {
+        Container = Show and Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.244, 0.128);
             Position = UDim2.fromScale(0.5, 0.717);
             AnchorPoint = Vector2.new(0.5, 0);
@@ -90,7 +106,7 @@ function PickaxeSelectionComponent:render()
                 BackgroundTransparency = 1;
                 BorderSizePixel = 0;
 
-                Text = self.state.OreName or "No ore name?";
+                Text = OreName or "No ore name?";
                 TextScaled = true;
                 TextStrokeTransparency = 0;
                 TextColor3 = PlayerFolder.PickaxeSelection.Value:FindFirstChildWhichIsA("SelectionBox").Color3;
@@ -103,7 +119,7 @@ function PickaxeSelectionComponent:render()
                 BackgroundTransparency = 1;
                 BorderSizePixel = 0;
 
-                Text = self.state.TimeToMine or "No ttm string?";
+                Text = TimeToMine or "No ttm string?";
                 TextScaled = true;
                 TextStrokeTransparency = 0;
                 TextColor3 = PlayerFolder.PickaxeSelection.Value:FindFirstChildWhichIsA("SelectionBox").Color3;
@@ -117,7 +133,7 @@ function PickaxeSelectionComponent:render()
                 BorderSizePixel = 0;
             }, {
                 Gradient = Roact.createElement("UIGradient", {
-                    Color = self.state.Ore:GetAttribute("MiningBarGradient");
+                    Color = Ore:GetAttribute("MiningBarGradient");
                 }, {});
 
                 Stroke = Roact.createElement("UIStroke", {
@@ -127,7 +143,7 @@ function PickaxeSelectionComponent:render()
                 }, {});
 
                 Bar = Roact.createElement("Frame", {
-                    Size = UDim2.fromScale(self.state.MiningProgress, 1);
+                    Size = UDim2.fromScale(MiningProgress, 1);
                     Position = Core.UI.Position.TopRight;
                     AnchorPoint = Core.UI.AnchorPoint.TopRight;
 
