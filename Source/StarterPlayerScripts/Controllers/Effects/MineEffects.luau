@@ -6,12 +6,15 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local MineEffects = Knit.CreateController { Name = "MineEffects" }
 
+local PlayerDisplayService
+local LightingController
+local PickaxeService
+local AudioEngine
 local MineService
 local LogService
-local LightingController
-local PlayerDisplayService
 
 local PreviousLayer = ""
+local Animation
 
 function MineEffects:Layer(LayerName :string)
     LogService:Log("Appling layer effects for: "..LayerName)
@@ -29,19 +32,33 @@ function MineEffects:Layer(LayerName :string)
     end
 end
 
+
+
+-- [[ KNIT ]] --
+
+function MineEffects:KnitInit()
+    local AnimationID = "rbxassetid://16827661763"
+    Animation = Instance.new("Animation")
+    Animation.AnimationId = AnimationID
+    Animation.Parent = script
+end
+
 function MineEffects:KnitStart()
-    LogService = Knit.GetService("LogService")
-    LightingController = Knit.GetController("LightingController")
-    MineService = Knit.GetService("MineService")
-    PlayerDisplayService = Knit.GetService("PlayerDisplayService")
+    AudioEngine                  = Knit.GetController("AudioEngine")
+    LightingController           = Knit.GetController("LightingController")
+    LogService                   = Knit.GetService("LogService")
+    MineService                  = Knit.GetService("MineService")
+    PlayerDisplayService         = Knit.GetService("PlayerDisplayService")
+    PickaxeService               = Knit.GetService("PickaxeService")
 
     RunService:BindToRenderStep("CharacterPositionInfo", Enum.RenderPriority.Input.Value + 1, function()
         local Character = Knit.Player.Character
         if not Character or not Character:FindFirstChild("HumanoidRootPart") then return end
 
-        local X = math.floor(Character:FindFirstChild("HumanoidRootPart").CFrame.Position.X)
-        local Y = math.floor(Character:FindFirstChild("HumanoidRootPart").CFrame.Position.Y)
-        local Z = math.floor(Character:FindFirstChild("HumanoidRootPart").CFrame.Position.Z)
+        local RootPart = Character:FindFirstChild("HumanoidRootPart")
+        local X = math.floor(RootPart.CFrame.Position.X)
+        local Y = math.floor(RootPart.CFrame.Position.Y)
+        local Z = math.floor(RootPart.CFrame.Position.Z)
         local Position = Vector3.new(X, Y, Z)
 
         MineService:GetLayerConfig(Position.Y):andThen(function(Config :Configuration)
@@ -59,6 +76,43 @@ function MineEffects:KnitStart()
     PlayerDisplayService.GiveHeadlight:Connect(function(Character)
         local Light = Core.Assets.Misc.HeadLight:Clone()
         Light.Parent = Character:WaitForChild("Head")
+    end)
+
+    local Player = Knit.Player
+    local Character = Player.Character or Player.CharacterAdded:Wait()
+    local Humanoid = Character:WaitForChild("Humanoid")
+    -- This is deprecated and should probably be changed
+    -- but i cba rn :)
+    local AnimationTrack = Humanoid:LoadAnimation(Animation)
+
+    AnimationTrack:GetMarkerReachedSignal("HitSound"):Connect(function()
+        local Block = ReplicatedStorage.Player.PickaxeSelection.Value
+        PickaxeService.PlayHitSound:Fire(Block)
+    end)
+
+    ReplicatedStorage.Player.PickaxeActive:GetPropertyChangedSignal("Value"):Connect(function()
+        local Mining = ReplicatedStorage.Player.PickaxeActive.Value
+        local Pickaxe = Character:FindFirstChildWhichIsA("Tool")
+        if Pickaxe:HasTag("Pickaxe") then
+            AnimationTrack:AdjustSpeed((Pickaxe:GetAttribute("Delay") / 2) or 1)
+        end
+
+        if Mining then
+            AnimationTrack:Play(0.1, 1)
+        else
+            AnimationTrack:Stop(0.1)
+            task.wait(3)
+        end
+    end)
+
+    PickaxeService.PlayHitSound:Connect(function(Block)
+        local HitSoundConfig = AudioEngine:CreateFromSound(Block:FindFirstChild("HitSound") or Core.Assets.Sounds.HitSound, true, Block.Position) -- We play at position because the block my be destroyed while sound is playing
+        AudioEngine:PlaySound(HitSoundConfig)
+    end)
+
+    PickaxeService.PlayBreakSound:Connect(function(Block)
+        local BreakSoundConfig = AudioEngine:CreateFromSound(Block:FindFirstChild("BreakSound") or Core.Assets.Sounds.BreakSound, true, Block.Position) -- We play at position because the block my be destroyed while sound is playing
+        AudioEngine:PlaySound(BreakSoundConfig)
     end)
 end
 

@@ -15,7 +15,8 @@ AudioEngine.Sounds = {}
 function AudioEngine:_ConstructObject(SoundObject :Core.Sound)
     local Location = GLOBALSTORAGEFOLDER
     local TopLevelParent
-    local AudioID = Sounds + 1
+    Sounds += 1
+    local AudioID = Sounds
 
     if SoundObject.Config.Positional then
         local Attachment = Instance.new("Attachment")
@@ -46,13 +47,23 @@ function AudioEngine:_ConstructObject(SoundObject :Core.Sound)
     Sound.Name = `AE_{AudioID}_{SoundObject.SoundID}`
     Sound.SoundId = SoundObject.SoundID
     Sound.Looped = SoundObject.Looped or false
-    Sound.Volume = SoundObject.Config.Volume
+    Sound.Volume = SoundObject.Config.Volume or 1
+    Sound.PlaybackSpeed = SoundObject.Config.Speed or 1
 
     Sound.RollOffMode = SoundObject.Config.RollOffMode or Enum.RollOffMode.Inverse
     Sound.RollOffMinDistance = SoundObject.Config.RollOffDistanceBegin or 100
     Sound.RollOffMaxDistance = SoundObject.Config.RollOffMaxDistance or 120
 
     Sound.Parent = Location
+    if Location == GLOBALSTORAGEFOLDER then
+        self.Sounds[AudioID] = Sound
+    else
+        self.Sounds[AudioID] = TopLevelParent
+    end
+
+    Sound.Ended:Connect(function()
+        self:StopSound(AudioID)
+    end)
 
     if SoundObject.Config.Pitch ~= 1 and SoundObject.Config.Pitch ~= nil then
         local PitchShifter = Instance.new("PitchShiftSoundEffect")
@@ -98,6 +109,30 @@ function AudioEngine:CreateBlankConfig() :Core.SoundConfig
 end
 
 --[=[
+Returns a sound type to use for playsound
+Note: This function doesnt change anything about the sound passed
+]=]
+function AudioEngine:CreateFromSound(Sound :Sound, Positional :boolean?, PositionToPlay :Vector3|BasePart|nil)
+    local NewSound = self:CreateBlankSound()
+    NewSound.SoundID = Sound.SoundId
+
+    local SoundConfig = self:CreateBlankConfig()
+    SoundConfig.Looped = Sound.Looped
+    SoundConfig.Positional = Positional or false
+    SoundConfig.PositionToPlay = PositionToPlay
+    SoundConfig.Speed = Sound.PlaybackSpeed
+    SoundConfig.Pitch = 1
+
+    if Sound:FindFirstChildWhichIsA("PitchShiftSoundEffect") then
+        SoundConfig.Pitch = Sound:FindFirstChildWhichIsA("PitchShiftSoundEffect").Octave
+    end
+
+    NewSound.Config = SoundConfig
+
+    return NewSound
+end
+
+--[=[
 Play a sound!
 returns the AudioEngine ID of the sound
 ]=]
@@ -109,10 +144,8 @@ function AudioEngine:PlaySound(SoundObject :Core.Sound) :number
     assert(type(SoundObject.Config) == "table", "Sound object config must be a table")
     assert(SoundObject.Config.ClassName == "SoundObjConfig", "Invalid sound config passed")
 
-    local Parent, Sound, ID = self:_ConstructObject(SoundObject)
+    local _, Sound, ID = self:_ConstructObject(SoundObject)
     self:_ConnectEvents(Sound, SoundObject)
-    Sounds += 1
-    self.Sounds[ID] = Parent
 
     Sound:Play()
 
@@ -125,7 +158,7 @@ Takes in the AudioEngine ID of the sound
 ]=]
 function AudioEngine:StopSound(ID :number)
     assert(type(ID) == "number", "SoundID must be a sound")
-    if self.Sounds[ID] == nil then return end
+    if self.Sounds[ID] == nil then return warn("No sound with ID: "..tostring(ID)) end
 
     self.Sounds[ID]:Destroy()
 end
@@ -138,32 +171,6 @@ function AudioEngine:KnitInit()
     POSITIONALSTORAGEFOLDER = Instance.new("Folder")
     POSITIONALSTORAGEFOLDER.Name = "AudioEngine"
     POSITIONALSTORAGEFOLDER.Parent = workspace
-end
-
-function AudioEngine:KnitStart()
-    -- TESTING ------------------------------------------------------
-    local TestConfig = self:CreateBlankConfig()
-    TestConfig.Positional = true
-    TestConfig.PositionToPlay = Vector3.new(0, 0, 0)
-    TestConfig.Volume = 1
-
-    local TestSound = self:CreateBlankSound()
-    TestSound.SoundID = "rbxassetid://7098934716" -- Random sound off toolbox
-    TestSound.Looped = false
-    TestSound.Config = TestConfig
-
-    TestSound.OnFinish = function()
-        print("Finished")
-    end
-
-    TestSound.OnLoop = function(TimesLooped :number)
-        print("Times looped:", TimesLooped)
-    end
-
-    --self:PlaySound(TestSound)
-    TestSound.Config.Pitch = 2
-    --self:PlaySound(TestSound)
-    -----------------------------------------------------------------
 end
 
 return AudioEngine

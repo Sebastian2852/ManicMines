@@ -23,7 +23,6 @@ local CurrentOutline = nil
 local Selection = nil
 
 local Player = Knit.Player
-local TycoonSelection :Frame = Player.PlayerGui:WaitForChild("HUD").TycoonSelection
 
 -- [[ PUBLIC ]]--
 

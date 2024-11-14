@@ -361,6 +361,10 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
         LoadingService:EndLoading(Player)
     end)
 
+    DataFolder.Pickaxes.Equipped:GetPropertyChangedSignal("Value"):Connect(function()
+        PickaxeService:GivePickaxeToPlayer(Player)
+    end)
+
     DataFolder.DataLoaded.Value = true
     Maid:DoCleaning()
 end
