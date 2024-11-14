@@ -16,6 +16,9 @@ UI.Theme = {
     TextColor3 = Color3.fromRGB(255, 255, 255);
     TextColorDisabled = Color3.fromRGB(100, 100, 100);
     TextFont = Font.fromEnum(Enum.Font.Highway);
+
+    CloseButtonColor = Color3.fromRGB(231, 96, 93);
+    PrimaryButtonColor = Color3.fromRGB(43, 142, 235);
 }
 
 UI.Images = {
