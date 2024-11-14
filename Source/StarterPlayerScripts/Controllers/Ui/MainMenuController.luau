@@ -125,6 +125,8 @@ end
 function MainMenuController:DisableAllUI()
     LogService:Log("Disabling all UI")
     MainScreenGui.Enabled = true
+    --PlayerGUI.HUD.Enabled = false
+    --PlayerGUI.Inventory.Enabled = false
 end
 
 function MainMenuController:EnableAllUI()
@@ -132,6 +134,8 @@ function MainMenuController:EnableAllUI()
     MainScreenGui:Destroy()
     Blur:Destroy()
     LogService:Log("Destroyed main menu and blur")
+    --PlayerGUI.HUD.Enabled = true
+    --PlayerGUI.Inventory.Enabled = true
 end
 
 function MainMenuController:CreateSlotFrame(SlotInfo)
