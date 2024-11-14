@@ -7,12 +7,13 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local StorageController = Knit.CreateController { Name = "StorageController" }
 
 local StorageComponent = Roact.Component:extend("StorageComponent")
-local LogService
 local TycoonUpgradeService
+local DataService
+local LogService
 
 function StorageComponent:init()
     self:setState({
-        Enabled = true
+        Enabled = false;
     })
 
     TycoonUpgradeService.OpenStorage:Connect(function()
@@ -22,12 +23,15 @@ end
 
 function StorageComponent:Enable()
     self:setState({
-        Enabled = true
+        Enabled = true;
     })
 end
 
 function StorageComponent:render()
-    return Roact.createElement("ScreenGui", {}, {
+    LogService:Log("Rendering storage component")
+    return Roact.createElement("ScreenGui", {
+        ResetOnSpawn = false;
+    }, {
         Main = self.state.Enabled and Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.5, 0.5);
             Position = Core.UI.Position.Center;
@@ -152,12 +156,15 @@ function StorageComponent:render()
 end
 
 function StorageController:KnitStart()
-    LogService = Knit.GetService("LogService")
     TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")
+    DataService = Knit.GetService("DataService")
+    LogService = Knit.GetService("LogService")
 
-    local App = Roact.createElement(StorageComponent)
-    Roact.mount(App, Knit.Player.PlayerGui, "Storage")
-    LogService:Log("Mounted storage GUI component")
+    DataService.DataLoaded:Connect(function()
+        local App = Roact.createElement(StorageComponent)
+        Roact.mount(App, Knit.Player.PlayerGui, "Storage")
+        LogService:Log("Mounted storage component")
+    end)
 end
 
 return StorageController

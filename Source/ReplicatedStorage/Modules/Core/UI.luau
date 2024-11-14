@@ -5,18 +5,31 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UI = {}
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
-local EnumList = require(ReplicatedStorage.Packages.EnumList)
+local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local OreListClass = require(ReplicatedStorage.Game.Modules.Classes.OreList)
 
 UI.Theme = {
-    BackgroundColor = Color3.new(0, 0, 0);
-    BackgroundColorTransparency = 0.5;
+    BackgroundColorLight = Color3.fromRGB(75, 75, 75);
+    BackgroundColorPrimary = Color3.fromRGB(50, 50, 50);
+    BackgroundColorDark = Color3.fromRGB(25, 25, 25);
 
-    TextColor3 = Color3.new(1, 1, 1);
+    TextColor3 = Color3.fromRGB(255, 255, 255);
+    TextColorDisabled = Color3.fromRGB(100, 100, 100);
     TextFont = Font.fromEnum(Enum.Font.Highway);
-    TextStrokeTransparency = 0;
 
-    TextColorDisabled = Color3.new(0.278431, 0.278431, 0.278431);
+    CloseButtonColor = Color3.fromRGB(231, 96, 93);
+    OpenButtonColor = Color3.fromRGB(93, 231, 137);
+    PrimaryButtonColor = Color3.fromRGB(43, 142, 235);
+}
+
+UI.Images = {
+    Missing = "http://www.roblox.com/asset/?id=925810526";
+    GoldCoins = "";
+    LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one
+
+    SettingsButton = "rbxassetid://129623448532589";
+    CheckBoxChecked = "rbxassetid://4458804262";
+    CheckBoxUnchecked = "rbxassetid://4458801905";
 }
 
 --[=[
@@ -32,6 +45,8 @@ UI.AnchorPoint = {
     Center          = Vector2.new(0.5, 0.5);
     TopCenter       = Vector2.new(0.5, 0);
     BottomCenter    = Vector2.new(0.5, 1);
+    LeftCenter      = Vector2.new(0, 0.5);
+    RightCenter     = Vector2.new(1, 0.5);
 }
 
 --[=[
@@ -47,6 +62,8 @@ UI.Position = {
     Center          = UDim2.fromScale(0.5, 0.5);
     TopCenter       = UDim2.fromScale(0.5, 0);
     BottomCenter    = UDim2.fromScale(0.5, 1);
+    LeftCenter      = UDim2.fromScale(0, 0.5);
+    RightCenter     = UDim2.fromScale(1, 0.5);
 }
 
 --[=[
@@ -70,15 +87,10 @@ UI.Color = {
     Lime       = Color3.fromRGB(50, 205, 50);
 }
 
-UI.OreFrameStyle = EnumList.new("OreFrameStyle", {
-    "PcInventory";
-    "Normal";
-})
-
 --[=[
 Create a single ore frame from an ore list. This only creates a frame for the first thing in the ore list
 ]=]
-function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Position :UDim2) -- Maybe add an "include gold" param
+function UI:CreateOreFrame(OreList :OreListClass.OreList, Style :Enums.Enum, Size :UDim2, Position :UDim2) -- Maybe add an "include gold" param
     for OreName :string, OreData in pairs(OreList:LoopList()) do
         if OreData.Amount == 0 then continue end
         if OreName == "GoldCoins" then
@@ -86,12 +98,7 @@ function UI:CreateOreFrame(OreList, Style :EnumList.EnumItem, Size :UDim2, Posit
             continue
         end
 
-        if not UI.OreFrameStyle:BelongsTo(Style) then
-            warn("Invalid ore frame style passed: "..tostring(Style))
-            return {}
-        end
-
-        if Style.Value == 1 then
+        if Style == Enums.OreFrameStyle.PC then
             return Roact.createElement("Frame", {
                 Size = Size;
                 Position = Position;
@@ -279,7 +286,7 @@ end
 --[=[
 Returns a table of Ore frames as components in a table.
 ]=]
-function UI:CreateOreFrames(OreList, Style :EnumList.EnumItem, Size :UDim2) :{Roact.Component}
+function UI:CreateOreFrames(OreList, Style :Enums.Enum, Size :UDim2) :{Roact.Component}
     if not OreListClass.IsOreList(OreList) then
         warn("Invalid ore list passed:", OreList)
         return {}

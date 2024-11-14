@@ -201,6 +201,7 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
         end
 
         Health -= Damage
+        
         ObjectToMine:SetAttribute("Health", Health)
         self.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / MaxHealth)) * 100), (Health / MaxHealth))
 

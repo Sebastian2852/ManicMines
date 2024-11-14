@@ -4,6 +4,19 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(game.ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
+local DataService = Knit.CreateService {
+    Name = "DataService",
+    Client = {
+        DataLoaded = Knit.CreateSignal();
+    },
+}
+
+local PickaxeService
+local LogService
+local TycoonService
+local PlayerDisplayService
+local LoadingService
+
 local RootDataFolder :Folder = game.ReplicatedStorage.PlayerData
 local TemplateDataFolder :Core.DataFolder = RootDataFolder:FindFirstChild("Template")
 
@@ -11,15 +24,7 @@ local OresFolder :Folder = ReplicatedStorage.Assets.Ores
 local PickaxesFolder :Folder = ReplicatedStorage.Assets.Pickaxe.Pickaxes
 local TycoonUpgradesFolder :Folder = ReplicatedStorage.Assets.Tycoon.Upgrades
 
-local PickaxeService
-local LogService
-local TycoonService
-local PlayerDisplayService
 
-local DataService = Knit.CreateService {
-    Name = "DataService",
-    Client = {},
-}
 
 --[[ PRIVATE ]]--
 
@@ -222,6 +227,9 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     LogService:Assert(DataFolder, "Tried loading data with No data folder")
     LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
+    LoadingService:StartLoading(Player)
+    LoadingService:UpdateActionText(Player, "Loading data")
+
     local Maid = Core.Maid.new()
     local OreDataData = Core.Data.Data.New("Ore", {})
     local PlayerData = Core.Data.Data.New("PlayerData", {})
@@ -327,12 +335,30 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     end
 
     LogService:Log("["..Player.Name.."]", "Player data loaded")
-    PlayerDisplayService:GivePlayerOverheadGUI(Player)
-    PickaxeService:GivePickaxeToPlayer(Player)
-    TycoonService:CreateTycoonForPlayer(Player)
-    Player.CharacterAdded:Connect(function()
+    task.spawn(function()
+        task.wait(1)
+
+        LoadingService:UpdateActionText(Player, "Loading GUI")
+        self.Client.DataLoaded:Fire(Player, DataFolder)
         PlayerDisplayService:GivePlayerOverheadGUI(Player)
+        task.wait(1)
+
+        LoadingService:UpdateActionText(Player, "Giving tools")
         PickaxeService:GivePickaxeToPlayer(Player)
+        task.wait(1)
+
+        LoadingService:UpdateActionText(Player, "Creating tycoon")
+        TycoonService:CreateTycoonForPlayer(Player)
+        task.wait(1)
+
+        LoadingService:UpdateActionText(Player, "Connecting events")
+        Player.CharacterAdded:Connect(function()
+            PlayerDisplayService:GivePlayerOverheadGUI(Player)
+            PickaxeService:GivePickaxeToPlayer(Player)
+        end)
+
+        task.wait(1)
+        LoadingService:EndLoading(Player)
     end)
 
     DataFolder.Pickaxes.Equipped:GetPropertyChangedSignal("Value"):Connect(function()
@@ -479,6 +505,8 @@ function DataService:NewSlot(Player :Player, SlotNumber :number, SlotSettings :C
     PlayerData.Tycoon.TycoonName.Value = SlotSettings.Name
 
     self.Players[Player.UserId] = AsDataStore
+    LoadingService:StartLoading(Player)
+    LoadingService:UpdateActionText(Player, "Creating slot")
     DataService:SavePlayerData(Player)
     DataService:LoadPlayerData(Player, AsDataStore)
 end
@@ -574,6 +602,7 @@ function DataService:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
     TycoonService = Knit.GetService("TycoonService")
     PlayerDisplayService = Knit.GetService("PlayerDisplayService")
+    LoadingService = Knit.GetService("LoadingService")
 
     game.Players.PlayerAdded:Connect(function(Player)
         self:CreateDataFolderForPlayer(Player)

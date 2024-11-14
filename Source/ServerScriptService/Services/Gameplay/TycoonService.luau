@@ -107,7 +107,7 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
 
     AddUpgradeModels(DataFolder, NewTycoon)
     if Player.Character then
-        TeleportService:TeleportPlayerToTycoon(Player, NewTycoon)
+        TeleportService:TeleportPlayerToTycoon(Player, NewTycoon, false)
     end
 
 
@@ -131,7 +131,7 @@ end
 Tell the server to upgrade a given upgrade.
 ]=]
 function TycoonService.Client:Upgrade(Player :Player, UpgradeName :string)
-    if not CanBeUpgraded(Player, UpgradeName) then return end
+    if not CanBeUpgraded(Player, UpgradeName) then return false end
 
     local PlayerData :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
     local Tycoon = self.Server:GetPlayerTycoon(Player)
@@ -139,11 +139,12 @@ function TycoonService.Client:Upgrade(Player :Player, UpgradeName :string)
     local DataValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
     if not DataValue then
         LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName)
-        return
+        return false
     end
 
     DataValue.Value += 1
     AddUpgradeModels(PlayerData, Tycoon)
+    return true
 end
 
 function TycoonService.Client:SetUpgradeValue(Setter :Player, Player :Player, UpgradeName :string, Value :number)
