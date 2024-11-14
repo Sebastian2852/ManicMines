@@ -13,6 +13,7 @@ until script.Parent:IsA("Tool")
 
 local Tool :Tool = script.Parent
 local PickaxeService = Knit.GetService("PickaxeService")
+local Workspace = game:GetService("Workspace")
 
 local PlayerFolder = game.ReplicatedStorage.Player
 local PlayerDataFolder = game.ReplicatedStorage.PlayerData:WaitForChild(Player.UserId)
@@ -43,12 +44,14 @@ local function Activate()
         Active = true
         PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
         while Active do
+            PlayerFolder.PickaxeActive.Value = Active
             PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
             if PlayerFolder.PickaxeSelection.Value == nil then
                 break
             end
             task.wait(0.1)
         end
+        PlayerFolder.PickaxeActive.Value = false
     end
 end
 
@@ -59,8 +62,8 @@ local function Deactivate()
 end
 
 local function AddOutline(Object :BasePart)
-    if Outline ~= nil then 
-        Outline:Destroy() 
+    if Outline ~= nil then
+        Outline:Destroy()
     end
 
     if not Object:GetAttribute("CanMine") then return end
@@ -72,7 +75,7 @@ local function AddOutline(Object :BasePart)
     New.Parent = Object
     New.Color3 = Object:GetAttribute("SelectionColor")
 
-    if PlayerDataFolder.Inventory["InventoryItemCount"].Value + Object:GetAttribute("AmountDroppedWhenMined") > PlayerDataFolder.Inventory["InventoryCap"].Value then 
+    if PlayerDataFolder.Inventory["InventoryItemCount"].Value + Object:GetAttribute("AmountDroppedWhenMined") > PlayerDataFolder.Inventory["InventoryCap"].Value then
         New.Color3 = Color3.new(1, 0, 0)
     end
 
@@ -91,7 +94,7 @@ end
 
 local function CanReach(OreBlock :BasePart)
     local Distance = (Player.Character.PrimaryPart.Position - OreBlock.Position).Magnitude
-    local Range = Tool:GetAttribute("MiningRange")
+    local Range = Tool:GetAttribute("Range")
 
     if Distance > Range then
         return false
@@ -143,11 +146,11 @@ local function GetOreFromRayCast(X, Y)
     local CameraRay = Camera:ScreenPointToRay(X, Y)
 
     local RaycastParamaters = RaycastParams.new()
-    RaycastParamaters.FilterDescendantsInstances = {workspace.Game.Players:GetDescendants()}
+    RaycastParamaters.FilterDescendantsInstances = {workspace.Game.Players:GetDescendants(), Workspace:WaitForChild("AudioEngine"):GetDescendants()}
     RaycastParamaters.FilterType = Enum.RaycastFilterType.Exclude
 
     local RayCastResult = workspace:Raycast(CameraRay.Origin, CameraRay.Direction * 100, RaycastParamaters)
-    local Ore = nil
+    local Ore :BasePart = nil
 
     if RayCastResult then
         Ore = RayCastResult.Instance
@@ -155,7 +158,7 @@ local function GetOreFromRayCast(X, Y)
 
     if Ore == nil then return nil end
     if not CanReach(Ore) then return nil end
-    if Ore.Parent ~= game.Workspace.Game.Mine then return nil end
+    if not Ore:IsDescendantOf(workspace.Game.Mine) then return nil end
 
     return Ore
 end

@@ -10,7 +10,7 @@ local PlayerFolder = ReplicatedStorage.Player
 
 local PickaxeService
 
-local MiningSelection = Player.PlayerGui.HUD.MiningSelection
+local MiningSelection = Player.PlayerGui:WaitForChild("HUD").MiningSelection
 
 -- [[ PUBLIC ]] --
 
