@@ -38,7 +38,6 @@ function TycoonSelectionController:Deselect()
     if Selection ~= nil then
         Selection = nil
     end
-    TycoonSelection.Visible = false
     CurrentlySelecting = false
 end
 
@@ -55,7 +54,6 @@ function TycoonSelectionController:SelectHitbox(Hitbox)
         self:Deselect()
     end
 
-    TycoonSelection.Visible = true
     local New = SelectionOutline:Clone()
     New.Parent = Hitbox
     New.Adornee = Hitbox
