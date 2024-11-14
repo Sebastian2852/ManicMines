@@ -94,7 +94,7 @@ function MineEffects:KnitStart()
         local Mining = ReplicatedStorage.Player.PickaxeActive.Value
         PickaxeService:GetPickaxe():andThen(function(Pickaxe :Tool)
             AnimationTrack:AdjustSpeed((Pickaxe:GetAttribute("Delay") / 2) or 1)
-    
+
             if Mining then
                 AnimationTrack:Play(0.1, 1)
             else
