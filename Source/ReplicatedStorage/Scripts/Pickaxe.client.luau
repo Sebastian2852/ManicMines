@@ -91,7 +91,7 @@ end
 
 local function CanReach(OreBlock :BasePart)
     local Distance = (Player.Character.PrimaryPart.Position - OreBlock.Position).Magnitude
-    local Range = Tool:GetAttribute("MiningRange")
+    local Range = Tool:GetAttribute("Range")
 
     if Distance > Range then
         return false

@@ -28,8 +28,8 @@ Calculates the time to mine based on the health passed
 function PickaxeService:CalculateTimeToMine(Player :Player, Health :number) :number
     local Pickaxe :Instance = PickaxeService:GetPlayerPickaxe(Player)
 
-    local HitsNeeded = math.ceil(Health / Pickaxe:GetAttribute("HitDamage"))
-    local TimePerHit = Pickaxe:GetAttribute("MiningCooldown")
+    local HitsNeeded = math.ceil(Health / Pickaxe:GetAttribute("Damage"))
+    local TimePerHit = Pickaxe:GetAttribute("Delay")
     local TotalTime = HitsNeeded * TimePerHit
     return Core.Util:RoundToxDP(TotalTime, 1)
 end
@@ -44,7 +44,7 @@ function PickaxeService:VerifyIfCanMine(Player :Player, Character :Model, Object
 
     local Distance :number = (Character.PrimaryPart.Position - ObjectToMine.Position).Magnitude
 
-    if Distance > Pickaxe:GetAttribute("MiningRange") then return false end
+    if Distance > Pickaxe:GetAttribute("Range") then return false end
     if not ObjectToMine:GetAttribute("CanMine") then return false end
 
     return true
@@ -191,7 +191,7 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
             break
         end
 
-        Health -= Pickaxe:GetAttribute("HitDamage")
+        Health -= Pickaxe:GetAttribute("Damage")
         ObjectToMine:SetAttribute("Health", Health)
         PickaxeService.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / ObjectToMine:GetAttribute("MaxHealth"))) * 100), (Health / ObjectToMine:GetAttribute("MaxHealth")))
 
@@ -199,11 +199,11 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
             PickaxeService:StopMining(Player)
             MineService:BlockMined(ObjectToMine)
             PlayerStatsService:MinedOre(Player, OreList)
-            task.wait(Pickaxe:GetAttribute("MiningCooldown") / 2)
+            task.wait(Pickaxe:GetAttribute("Delay") / 2)
             break
         end
 
-        task.wait(Pickaxe:GetAttribute("MiningCooldown"))
+        task.wait(Pickaxe:GetAttribute("Delay"))
     end
 
     OreList:Destroy()
