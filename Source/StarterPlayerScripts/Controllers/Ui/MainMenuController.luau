@@ -26,7 +26,6 @@ function MainMenuComponent:CreateUsedSlotFrame(Slot :Core.SlotInfo)
     local TimeText = Core.Util:TimeAgo(TimeDifferent)
 
     local ShowSlotDelete = self.state.CurrentDeletingSlot == Slot.SlotID
-    LogService:Log("ShowSlot"..tostring(Slot.SlotID).."Delete: "..tostring(ShowSlotDelete))
 
     return Roact.createElement("Frame", {
         Size = UDim2.fromScale(1, 0.3);
