@@ -10,7 +10,7 @@ To setup the coding environment start by cloning the repo using the command:
 ```git clone https://github.com/Sebastian2852/ManicMines```  
 This will automatically download the latest version of the game *(Note that this downloads the latest DEV version meaning it may contain code not actually in prod).*  
 
-*Note: You can add `-b [BRANCH NAME]` to clone a branch. e.g. ``git clone -b Dev https://github.com/Sebastian2852/ManicMines```*  
+*Note: You can add `-b [BRANCH NAME]` to clone a branch. e.g. ```git clone -b Dev https://github.com/Sebastian2852/ManicMines```*  
 
 Then install all the packages by running  
 `wally install`  
