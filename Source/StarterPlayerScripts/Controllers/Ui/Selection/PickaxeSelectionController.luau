@@ -10,6 +10,7 @@ local PickaxeSelectionController = Knit.CreateController { Name = "PickaxeSelect
 local PlayerFolder = ReplicatedStorage.Player
 
 local PickaxeService
+local DataService
 local LogService
 
 -- [[ GUI ]] --
@@ -142,11 +143,14 @@ end
 
 function PickaxeSelectionController:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
+    DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
 
-    local App = Roact.createElement(PickaxeSelectionComponent)
-    Roact.mount(App, Knit.Player.PlayerGui, "PickaxeSelection")
-    LogService:Log("Mounted pickaxe selection GUI")
+    DataService.DataLoaded:Connect(function()
+        local App = Roact.createElement(PickaxeSelectionComponent)
+        Roact.mount(App, Knit.Player.PlayerGui, "PickaxeSelection")
+        LogService:Log("Mounted pickaxe selection GUI")
+    end)
 end
 
 return PickaxeSelectionController

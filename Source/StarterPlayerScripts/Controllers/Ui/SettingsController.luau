@@ -264,7 +264,7 @@ function SettingsController:KnitStart()
         Update()
 
         local App = Roact.createElement(SettingsComponent)
-        Roact.mount(App, Knit.Player.PlayerGui, "HUD")
+        Roact.mount(App, Knit.Player.PlayerGui, "Settings")
         LogService:Log("Mounted settings component")
     end)
 end

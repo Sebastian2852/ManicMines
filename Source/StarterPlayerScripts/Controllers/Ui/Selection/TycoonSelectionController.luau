@@ -313,6 +313,12 @@ function TycoonSelectionController:KnitStart()
     LogService      = Knit.GetService("LogService")
     DataService     = Knit.GetService("DataService")
 
+    DataService.DataLoaded:Connect(function()
+        local App = Roact.createElement(TycoonSelectionComponent)
+        Roact.mount(App, Player.PlayerGui, "TycoonSelection")
+        LogService:Log("Mounted tycoon selection GUI")
+    end)
+
     DataService:GetPlayerDataFolder():andThen(function(Data)
         DataFolder = Data
     end)
@@ -323,10 +329,6 @@ function TycoonSelectionController:KnitStart()
             self:SelectHitbox(Hitbox)
         end)
     end)
-
-    local App = Roact.createElement(TycoonSelectionComponent)
-    Roact.mount(App, Player.PlayerGui, "TycoonSelection")
-    LogService:Log("Mounted tycoon selection GUI")
 end
 
 return TycoonSelectionController
