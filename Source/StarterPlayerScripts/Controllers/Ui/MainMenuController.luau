@@ -93,7 +93,7 @@ function MainMenuComponent:CreateUsedSlotFrame(Slot :Core.SlotInfo)
 
                     YesButton = Roact.createElement("TextButton", {
                         Size = UDim2.fromScale(0.4, 0.35);
-                        BackgroundColor3 = Core.UI.Color.Red;
+                        BackgroundColor3 = Core.UI.Theme.OpenButtonColor;
                         LayoutOrder = 2;
 
                         Text = "Yes";
@@ -122,7 +122,7 @@ function MainMenuComponent:CreateUsedSlotFrame(Slot :Core.SlotInfo)
 
                     NoButton = Roact.createElement("TextButton", {
                         Size = UDim2.fromScale(0.4, 0.35);
-                        BackgroundColor3 = Core.UI.Color.Green;
+                        BackgroundColor3 = Core.UI.Theme.CloseButtonColor;
                         LayoutOrder = 1;
 
                         Text = "No";
@@ -181,7 +181,7 @@ function MainMenuComponent:CreateUsedSlotFrame(Slot :Core.SlotInfo)
 
                 PlayButton = Roact.createElement("TextButton", {
                     Size = UDim2.fromScale(0.4, 0.35);
-                    BackgroundColor3 = Core.UI.Color.Green;
+                    BackgroundColor3 = Core.UI.Theme.OpenButtonColor;
                     LayoutOrder = 1;
 
                     Text = "Play";
@@ -202,7 +202,7 @@ function MainMenuComponent:CreateUsedSlotFrame(Slot :Core.SlotInfo)
 
                 DeleteButton = Roact.createElement("TextButton", {
                     Size = UDim2.fromScale(0.4, 0.35);
-                    BackgroundColor3 = Core.UI.Color.Red;
+                    BackgroundColor3 = Core.UI.Theme.CloseButtonColor;
                     LayoutOrder = 2;
 
                     Text = "Delete";
@@ -300,7 +300,7 @@ function MainMenuComponent:CreateUnUsedSlotFrame(Slot :Core.SlotInfo)
 
             CreateButton = Roact.createElement("TextButton", {
                 Size = UDim2.fromScale(0.4, 0.35);
-                BackgroundColor3 = Core.UI.Color.Green;
+                BackgroundColor3 = Core.UI.Theme.OpenButtonColor;
                 LayoutOrder = 1;
 
                 Text = "Create";
@@ -690,7 +690,7 @@ function MainMenuComponent:render()
 
                 CreateButton = Roact.createElement("TextButton", {
                     Size = UDim2.fromScale(0.4, 0.35);
-                    BackgroundColor3 = Core.UI.Color.Green;
+                    BackgroundColor3 = Core.UI.Theme.OpenButtonColor;
                     LayoutOrder = 2;
 
                     Text = "Create";
@@ -715,7 +715,7 @@ function MainMenuComponent:render()
 
                 CancelButton = Roact.createElement("TextButton", {
                     Size = UDim2.fromScale(0.4, 0.35);
-                    BackgroundColor3 = Core.UI.Color.Red;
+                    BackgroundColor3 = Core.UI.Theme.CloseButtonColor;
                     LayoutOrder = 1;
 
                     Text = "Cancel";
