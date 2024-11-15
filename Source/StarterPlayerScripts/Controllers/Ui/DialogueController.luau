@@ -1,5 +1,6 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
@@ -9,6 +10,10 @@ local DialogueController = Knit.CreateController { Name = "DialogueController" }
 
 local DialogueService
 local LogService
+local CharacterController
+
+local Camera = workspace.CurrentCamera
+local OriginalCameraCFrame :CFrame
 
 -- [[ TYPES ]] --
 
@@ -65,6 +70,27 @@ function DialogueController:EnablePrompts()
     end)
 end
 
+--[=[
+Tweens the camera to the given part
+]=]
+function DialogueController:MoveToCameraToPart(Part :BasePart)
+    Camera.CameraType = Enum.CameraType.Scriptable
+    OriginalCameraCFrame = Camera.CFrame
+    local CameraTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out, 0, false, 0)
+    local CameraTween = TweenService:Create(Camera, CameraTweenInfo, {CFrame = Part.CFrame})
+    CameraTween:Play()
+end
+
+--[=[
+Resets the camera back to the player
+]=]
+function DialogueController:ResetCamera()
+    local CameraTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out, 0, false, 0)
+    local CameraTween = TweenService:Create(Camera, CameraTweenInfo, {CFrame = OriginalCameraCFrame or CFrame.new(0, 0, 0)})
+    CameraTween:Play()
+    CameraTween.Completed:Wait()
+    Camera.CameraType = Enum.CameraType.Custom
+end
 
 
 -- [[ GUI ]] --
@@ -234,8 +260,14 @@ end
 function DialogueController:KnitStart()
     DialogueService = Knit.GetService("DialogueService")
     LogService = Knit.GetService("LogService")
+    CharacterController = Knit.GetController("CharacterController")
 
-    DialogueService.StartDialogue:Connect(function(DialogueInfo :InfoModule)
+    DialogueService.StartDialogue:Connect(function(DialogueInfo :InfoModule, CamPart :BasePart)
+        if CamPart == nil then
+            LogService:Warn("No camera part for NPC")
+            return
+        end
+
         if DialogueInfo == nil then
             LogService:Warn("Invalid dialogue module, nil")
             return
@@ -247,6 +279,8 @@ function DialogueController:KnitStart()
         end
 
         self:DisablePrompts()
+        self:MoveToCameraToPart(CamPart)
+        CharacterController:DisableMovement()
 
         local App = Roact.createElement(DialogueComponent, {
             NpcName = DialogueInfo.NpcName;
@@ -268,8 +302,10 @@ function DialogueController:KnitStart()
         EndDialogueEvent.Event:Once(function()
             Roact.unmount(GUI)
             Update:Disconnect()
-            self:EnablePrompts()
             LogService:Log("Unmounted dialogue GUI")
+            self:EnablePrompts()
+            self:ResetCamera()
+            CharacterController:EnableMovment()
         end)
     end)
 

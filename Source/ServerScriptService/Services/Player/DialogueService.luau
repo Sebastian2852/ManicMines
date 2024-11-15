@@ -70,7 +70,7 @@ function DialogueService:KnitStart()
         ProximityPrompt.Parent = Npc
 
         ProximityPrompt.Triggered:Connect(function(Player)
-            self.Client.StartDialogue:Fire(Player, Info)
+            self.Client.StartDialogue:Fire(Player, Info, Module:FindFirstChildWhichIsA("BasePart"))
         end)
 
         LogService:Log("Created proximity prompt for: "..Info.NpcName)
