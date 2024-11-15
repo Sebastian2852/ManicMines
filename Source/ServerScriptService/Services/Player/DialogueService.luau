@@ -13,13 +13,15 @@ local LogService
 
 type DialogueChoice = {
     Text :string;
+    Index :number;
+    CanLeave :boolean;
+    LeaveText :string?;
     Choices :{[string] :DialogChoice};
 }
 
 type InfoModule = {
     NpcName :string;
     InteractMessage :string;
-
     Dialogue :DialogueChoice;
 }
 
