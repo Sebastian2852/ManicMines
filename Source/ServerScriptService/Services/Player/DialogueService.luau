@@ -27,20 +27,16 @@ type InfoModule = {
 
 -- [[ PUBLUC ]] --
 
-DialogueService.NpcTag = "Dialogue/Prompt/NPC"
 DialogueService.ProximityPromptTag = "Dialogue/Prompt/Generated"
 DialogueService.ModuleTag = "Dialogue/Module/Config"
 
-function DialogueService:ConnectNpcsWithModules(Npcs :{Model}, Modules :{ModuleScript})
+function DialogueService:ConnectNpcsWithModules(Modules :{ModuleScript})
     local New = {}
 
-    for _, Npc in pairs(Npcs) do
-        for _, Module in pairs(Modules) do
-            if Module:IsDescendantOf(Npc) then
-                New[Npc] = Module
-                break
-            end
-        end
+    for _, Module in pairs(Modules) do
+        local Npc = Module.Parent
+        New[Npc] = Module
+        break
     end
 
     return New
@@ -48,8 +44,8 @@ end
 
 -- [[ CLIENT ]] --
 
-function DialogueService.Client:GetTags() :(string, string, string)
-    return self.Server.NpcTag, self.Server.ProximityPromptTag, self.Server.ModuleTag
+function DialogueService.Client:GetTags() :(string, string)
+    return self.Server.ProximityPromptTag, self.Server.ModuleTag
 end
 
 -- [[ KNIT ]] --
@@ -57,11 +53,10 @@ end
 function DialogueService:KnitStart()
     LogService = Knit.GetService("LogService")
 
-    local NPCs = CollectionService:GetTagged(self.NpcTag)
     local Modules = CollectionService:GetTagged(self.ModuleTag)
 
     LogService:Log("Sorting NPCs with their modules")
-    local NpcsSorted = self:ConnectNpcsWithModules(NPCs, Modules)
+    local NpcsSorted = self:ConnectNpcsWithModules(Modules)
 
     LogService:Log("Creating proximity prompts")
     for Npc, Module in pairs(NpcsSorted) do

@@ -27,6 +27,8 @@ type InfoModule = {
     Dialogue :DialogueChoice;
 }
 
+
+
 -- [[ PRIVATE ]] --
 
 local function TogglePrompts(New :boolean, Tag :string)
@@ -41,13 +43,15 @@ local function TogglePrompts(New :boolean, Tag :string)
     end
 end
 
+
+
 -- [[ PUBLIC ]] --
 
 --[=[
 Disable all dialogue related prompts
 ]=]
 function DialogueController:DisablePrompts()
-    DialogueService:GetTags():andThen(function(_, PromptTag :string, _)
+    DialogueService:GetTags():andThen(function(PromptTag :string, _)
         TogglePrompts(false, PromptTag)
     end)
 end
@@ -56,7 +60,7 @@ end
 Enable all dialogue related prompts
 ]=]
 function DialogueController:EnablePrompts()
-    DialogueService:GetTags():andThen(function(_, PromptTag :string, _)
+    DialogueService:GetTags():andThen(function(PromptTag :string, _)
         TogglePrompts(true, PromptTag)
     end)
 end
@@ -222,6 +226,8 @@ function DialogueComponent:render()
         })
     })
 end
+
+
 
 -- [[ KNIT ]] --
 
