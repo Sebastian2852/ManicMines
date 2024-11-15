@@ -341,15 +341,15 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
         LoadingService:UpdateActionText(Player, "Loading GUI")
         self.Client.DataLoaded:Fire(Player, DataFolder)
         PlayerDisplayService:GivePlayerOverheadGUI(Player)
-        task.wait(1)
+        --task.wait(1)
 
         LoadingService:UpdateActionText(Player, "Giving tools")
         PickaxeService:GivePickaxeToPlayer(Player)
-        task.wait(1)
+        --task.wait(1)
 
         LoadingService:UpdateActionText(Player, "Creating tycoon")
         TycoonService:CreateTycoonForPlayer(Player)
-        task.wait(1)
+        --task.wait(1)
 
         LoadingService:UpdateActionText(Player, "Connecting events")
         Player.CharacterAdded:Connect(function()
@@ -357,7 +357,7 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
             PickaxeService:GivePickaxeToPlayer(Player)
         end)
 
-        task.wait(1)
+        --task.wait(1)
         LoadingService:EndLoading(Player)
     end)
 

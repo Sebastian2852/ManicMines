@@ -13,7 +13,7 @@ local LogService
 
 type DialogueChoice = {
     Text :string;
-    Choices :{[string] :DialogChoice}
+    Choices :{[string] :DialogChoice};
 }
 
 type InfoModule = {

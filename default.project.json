@@ -165,6 +165,12 @@
           "$path": "Source/StarterPlayerScripts"
         }
       }
+    },
+
+    "ServerStorage": {
+      "Resources":{
+        "$path": "Resources"
+      }
     }
   }
 }
