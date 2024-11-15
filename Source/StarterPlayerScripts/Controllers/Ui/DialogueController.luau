@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -25,6 +26,42 @@ type InfoModule = {
 
     Dialogue :DialogueChoice;
 }
+
+-- [[ PRIVATE ]] --
+
+local function TogglePrompts(New :boolean, Tag :string)
+    for _, Prompt :ProximityPrompt in pairs(CollectionService:GetTagged(Tag)) do
+        if not Prompt:IsA("ProximityPrompt") then
+            Prompt:RemoveTag(Tag)
+            LogService:Warn("Invalid object with prompt tag: "..Prompt:GetFullName())
+            continue
+        end
+
+        Prompt.Enabled = New
+    end
+end
+
+-- [[ PUBLIC ]] --
+
+--[=[
+Disable all dialogue related prompts
+]=]
+function DialogueController:DisablePrompts()
+    DialogueService:GetTags():andThen(function(_, PromptTag :string, _)
+        TogglePrompts(false, PromptTag)
+    end)
+end
+
+--[=[
+Enable all dialogue related prompts
+]=]
+function DialogueController:EnablePrompts()
+    DialogueService:GetTags():andThen(function(_, PromptTag :string, _)
+        TogglePrompts(true, PromptTag)
+    end)
+end
+
+
 
 -- [[ GUI ]] --
 
@@ -192,7 +229,7 @@ function DialogueController:KnitStart()
     DialogueService = Knit.GetService("DialogueService")
     LogService = Knit.GetService("LogService")
 
-    DialogueService.StartDialogue:Connect(function(ProximityPrompt :ProximityPrompt, DialogueInfo :InfoModule)
+    DialogueService.StartDialogue:Connect(function(DialogueInfo :InfoModule)
         if DialogueInfo == nil then
             LogService:Warn("Invalid dialogue module, nil")
             return
@@ -203,7 +240,7 @@ function DialogueController:KnitStart()
             return
         end
 
-        ProximityPrompt.Enabled = false
+        self:DisablePrompts()
 
         local App = Roact.createElement(DialogueComponent, {
             NpcName = DialogueInfo.NpcName;
@@ -225,7 +262,7 @@ function DialogueController:KnitStart()
         EndDialogueEvent.Event:Once(function()
             Roact.unmount(GUI)
             Update:Disconnect()
-            ProximityPrompt.Enabled = true
+            self:EnablePrompts()
             LogService:Log("Unmounted dialogue GUI")
         end)
     end)

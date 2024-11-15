@@ -28,7 +28,8 @@ type InfoModule = {
 -- [[ PUBLUC ]] --
 
 DialogueService.NpcTag = "Dialogue/Prompt/NPC"
-DialogueService.ModuleTag = "Dialogue/Module"
+DialogueService.ProximityPromptTag = "Dialogue/Prompt/Generated"
+DialogueService.ModuleTag = "Dialogue/Module/Config"
 
 function DialogueService:ConnectNpcsWithModules(Npcs :{Model}, Modules :{ModuleScript})
     local New = {}
@@ -45,7 +46,11 @@ function DialogueService:ConnectNpcsWithModules(Npcs :{Model}, Modules :{ModuleS
     return New
 end
 
+-- [[ CLIENT ]] --
 
+function DialogueService.Client:GetTags() :(string, string, string)
+    return self.Server.NpcTag, self.Server.ProximityPromptTag, self.Server.ModuleTag
+end
 
 -- [[ KNIT ]] --
 
@@ -66,10 +71,11 @@ function DialogueService:KnitStart()
         ProximityPrompt.Name = "DialogueInteraction"
         ProximityPrompt.ObjectText = Info.NpcName
         ProximityPrompt.ActionText = Info.InteractMessage
+        ProximityPrompt:AddTag(self.ProximityPromptTag)
         ProximityPrompt.Parent = Npc
 
         ProximityPrompt.Triggered:Connect(function(Player)
-            self.Client.StartDialogue:Fire(Player, ProximityPrompt, Info)
+            self.Client.StartDialogue:Fire(Player, Info)
         end)
 
         LogService:Log("Created proximity prompt for: "..Info.NpcName)
