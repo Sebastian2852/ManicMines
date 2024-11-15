@@ -1,3 +1,11 @@
+--[=[
+Steps to get an NPC to talk:
+- Duplicate this module
+- Place it inside your NPC
+- Make a camera part (where the camera will be while talking to the NPC) and put it inside the module
+- Add a "Dialogue/Module/Config" tag to the module
+]=]
+
 return {
 	NpcName = "Test"; -- The name of the NPC
 	InteractMessage = "Talk"; -- The interaction text that appears on the proximity prompt
