@@ -12,6 +12,7 @@ local ForgeController = Knit.CreateController { Name = "ForgeController" }
 
 local DataService
 local ForgeService
+local CharacterController
 local DataFolder :Core.DataFolder
 
 -- [[ PUBLIC ]] --
@@ -383,6 +384,7 @@ end
 function ForgeController:KnitStart()
     DataService = Knit.GetService("DataService")
     ForgeService = Knit.GetService("ForgeService")
+    CharacterController = Knit.GetController("CharacterController")
 
     local PromptTag = ""
 
@@ -400,6 +402,7 @@ function ForgeController:KnitStart()
     ForgeService.OpenForge:Connect(function()
         local Prompts = CollectionService:GetTagged(PromptTag)
         self:TogglePrompts(Prompts, false)
+        CharacterController:DisableMovement()
         GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")
     end)
 
@@ -407,6 +410,7 @@ function ForgeController:KnitStart()
         Roact.unmount(GUI)
         local Prompts = CollectionService:GetTagged(PromptTag)
         self:TogglePrompts(Prompts, true)
+        CharacterController:EnableMovement()
     end)
 end
 
