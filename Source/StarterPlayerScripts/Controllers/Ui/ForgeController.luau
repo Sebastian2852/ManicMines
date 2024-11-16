@@ -221,9 +221,9 @@ function ForgeComponent:RenderWithInfo()
                     Layout = Roact.createElement("UIListLayout", {
                         SortOrder = Enum.SortOrder.Name;
                     }, {});
-                    Delay = CreatOreLikeFrame(Core.UI.Images.Missing, "Delay", tostring(Delay), ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
-                    Power = CreatOreLikeFrame(Core.UI.Images.Missing, "Power", tostring(Power), ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
-                    Range = CreatOreLikeFrame(Core.UI.Images.Missing, "Range", tostring(Range), ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
+                    Delay = CreatOreLikeFrame(Core.UI.Images.Delay, "Delay", tostring(Delay), ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
+                    Power = CreatOreLikeFrame(Core.UI.Images.Power, "Power", tostring(Power), ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
+                    Range = CreatOreLikeFrame(Core.UI.Images.Range, "Range", tostring(Range), ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
                 });
 
                 Requirments = Roact.createElement("ScrollingFrame", {

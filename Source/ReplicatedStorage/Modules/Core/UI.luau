@@ -23,14 +23,23 @@ UI.Theme = {
 }
 
 UI.Images = {
+    -- General
     Missing = "http://www.roblox.com/asset/?id=925810526";
-    Lock = "http://www.roblox.com/asset/?id=3046652070"; -- TOOD: Find a better lock image
     GoldCoins = "";
+
+    -- Loading screen
     LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one
 
+    -- Settings
     SettingsButton = "rbxassetid://129623448532589";
     CheckBoxChecked = "rbxassetid://4458804262";
     CheckBoxUnchecked = "rbxassetid://4458801905";
+
+    -- Forge
+    Lock = "http://www.roblox.com/asset/?id=3046652070"; -- TOOD: Find a better lock image
+    Delay = "rbxassetid://128100976009074";
+    Range = "rbxassetid://129170502469860";
+    Power = "rbxassetid://88283392867459";
 }
 
 --[=[
