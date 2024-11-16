@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
@@ -38,9 +37,10 @@ end
 
 local ForgeComponent = Roact.Component:extend("Forge")
 
+local CloseUI = Instance.new("BindableEvent")
+
 function ForgeComponent:init()
     self:setState({
-        Show = true;
         PickaxeSelected = false;
         SelectedConfig = nil;
     })
@@ -134,9 +134,7 @@ function ForgeComponent:RenderFullSelector()
                 FontFace = Core.UI.Theme.TextFont;
 
                 [Roact.Event.MouseButton1Click] = function()
-                    self:setState({
-                        Show = false;
-                    })
+                    CloseUI:Fire()
                 end;
             }, {
                 Corners = Roact.createElement("UICorner", {
@@ -219,9 +217,7 @@ function ForgeComponent:RenderWithInfo()
                 FontFace = Core.UI.Theme.TextFont;
 
                 [Roact.Event.MouseButton1Click] = function()
-                    self:setState({
-                        Show = false;
-                    })
+                    CloseUI:Fire()
                 end;
             }, {
                 Corners = Roact.createElement("UICorner", {
@@ -379,17 +375,11 @@ function ForgeController:KnitStart()
     DataService.DataLoaded:Connect(function(PlayerDataFolder :Core.DataFolder)
         DataFolder = PlayerDataFolder
 
-        local Mounted = false
-        UserInputService.InputBegan:Connect(function(Input, Processed)
-            if Processed then return end
-            if Mounted then return end
-            if Input.KeyCode ~= Enum.KeyCode.Z then return end
-            Mounted = true
+        local App = Roact.createElement(ForgeComponent, {Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren()})
+        local GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")
 
-            local App = Roact.createElement(ForgeComponent, {
-                Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren()
-            })
-            Roact.mount(App, Knit.Player.PlayerGui, "Forge")
+        CloseUI.Event:Once(function()
+            Roact.unmount(GUI)
         end)
     end)
 end
