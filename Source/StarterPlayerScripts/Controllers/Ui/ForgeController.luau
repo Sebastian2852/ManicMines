@@ -43,6 +43,40 @@ local function CreatePickaxeButtons(Pickaxes :{Configuration}, Component :Roact.
     return Buttons
 end
 
+local function CreatePickaxeCosts(Pickaxe :Configuration)
+    local CostFrames = {}
+
+    local Upgrades = Pickaxe:FindFirstChild("Upgrades")
+    local Costs = Pickaxe:FindFirstChild("Ores")
+
+    if Upgrades then
+        for _, Upgrade in pairs(Upgrades:GetChildren()) do
+            local UpgradeName = Upgrade.Name
+            local UpgradeIcon = Upgrade:GetAttribute("Icon")
+            local UpgradeColor = Upgrade:GetAttribute("UpgradeNameColor")
+            local LevelNeeded = Upgrade.Value
+
+            CostFrames[UpgradeName] = CreatOreLikeFrame(UpgradeIcon, UpgradeName, LevelNeeded, UpgradeColor, UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0))
+        end
+    end
+
+    if Costs then
+        for _, Ore in pairs(Costs:GetChildren()) do
+            local RealOre = Core.Util:GetOreByName(Ore.Name)
+            if not RealOre then continue end
+
+            local OreName = RealOre:GetAttribute("DisplayName")
+            local Icon = RealOre:GetAttribute("EmblemImageID")
+            local Color = RealOre:GetAttribute("InventoryBackgroundColor")
+            local AmountNeeded = Ore.Value
+
+            CostFrames[OreName] = CreatOreLikeFrame(Icon, OreName, AmountNeeded, Color, UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0))
+        end
+    end
+
+    return CostFrames
+end
+
 function ForgeComponent:RenderFullSelector()
     local PickaxeButtons = CreatePickaxeButtons(self.props.Pickaxes, self)
     PickaxeButtons["Layout"] = Roact.createElement("UIListLayout", {
@@ -107,6 +141,9 @@ function ForgeComponent:RenderWithInfo()
 
     local SelectedConfig :Configuration = self.state.SelectedConfig
     local Pickaxe :Tool = SelectedConfig:FindFirstChildWhichIsA("Tool")
+
+    local CostFrames = CreatePickaxeCosts(SelectedConfig)
+    CostFrames["Layout"] = Roact.createElement("UIListLayout", {}, {})
 
     local Name :string = SelectedConfig:GetAttribute("Name")
     local Description :string = SelectedConfig:GetAttribute("Description")
@@ -237,18 +274,7 @@ function ForgeComponent:RenderWithInfo()
                     ScrollBarThickness = 5;
                     ScrollBarImageColor3 = Core.UI.Color.White;
                     ScrollingDirection = Enum.ScrollingDirection.Y;
-                }, {
-                    Roact.createElement("UIListLayout", {
-                        SortOrder = Enum.SortOrder.LayoutOrder;
-                    }, {});
-
-                    CreatOreLikeFrame(Core.UI.Images.Missing, "Test", 15, ColorSequence.new(Color3.fromRGB(255, 0, 0)), UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0));
-                    CreatOreLikeFrame(Core.UI.Images.Missing, "Test1", 15, ColorSequence.new(Color3.fromRGB(255, 0, 0)), UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0));
-                    CreatOreLikeFrame(Core.UI.Images.Missing, "Test2", 15, ColorSequence.new(Color3.fromRGB(255, 0, 0)), UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0));
-                    CreatOreLikeFrame(Core.UI.Images.Missing, "Test3", 15, ColorSequence.new(Color3.fromRGB(255, 0, 0)), UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0));
-                    CreatOreLikeFrame(Core.UI.Images.Missing, "Test4", 15, ColorSequence.new(Color3.fromRGB(255, 0, 0)), UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0));
-                    CreatOreLikeFrame(Core.UI.Images.Missing, "Test5", 15, ColorSequence.new(Color3.fromRGB(255, 0, 0)), UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0));
-                });
+                }, CostFrames );
 
                 Action = Roact.createElement("TextButton", {
                     Size = UDim2.fromScale(0.8, 0.1);

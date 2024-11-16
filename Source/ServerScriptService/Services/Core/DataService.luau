@@ -353,7 +353,7 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
             PlayerDisplayService:GivePlayerOverheadGUI(Player)
             PickaxeService:GivePickaxeToPlayer(Player)
         end)
-        
+
         task.wait(1)
         LoadingService:EndLoading(Player)
     end)
