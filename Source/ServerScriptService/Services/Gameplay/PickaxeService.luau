@@ -279,6 +279,16 @@ function PickaxeService:EquipPickaxe(Player :Player, Pickaxe :Configuration) :bo
     return true
 end
 
+--[=[
+Returns the config of the currently equipped pickaxe for the given player
+]=]
+function PickaxeService:GetEquippedPickaxeConfig(Player :Player) :Configuration
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    local Equipped = DataFolder.Pickaxes.Equipped
+    local Config = Core.Assets.Pickaxe.Pickaxes:FindFirstChild(Equipped.Value)
+    return Config
+end
+
 
 
 --[[ CLIENT ]]--

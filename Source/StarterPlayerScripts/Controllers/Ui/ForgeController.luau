@@ -58,6 +58,7 @@ function ForgeComponent:init()
     self:setState({
         PickaxeSelected = false;
         SelectedConfig = nil;
+        Equipped = self.props.Equipped;
     })
 end
 
@@ -205,6 +206,21 @@ function ForgeComponent:RenderWithInfo()
 
     local SelectedConfig :Configuration = self.state.SelectedConfig
     local Pickaxe :Tool = SelectedConfig:FindFirstChildWhichIsA("Tool")
+    local Equipped = SelectedConfig == self.state.Equipped
+    local Owned = self.state.Owned
+    local ActionText
+    local ActionColor
+
+    if Equipped then
+        ActionText = "Equipped"
+        ActionColor = Core.UI.Theme.BackgroundColorLight;
+    elseif not Equipped and Owned then
+        ActionText = "Equip"
+        ActionColor = Core.UI.Theme.PrimaryButtonColor
+    else
+        ActionText = "Buy"
+        ActionColor = Core.UI.Theme.OpenButtonColor
+    end
 
     local CostFrames = CreatePickaxeCosts(SelectedConfig)
     CostFrames["Layout"] = Roact.createElement("UIListLayout", {}, {})
@@ -364,16 +380,19 @@ function ForgeComponent:RenderWithInfo()
                     Size = UDim2.fromScale(0.8, 0.1);
                     Position = UDim2.fromScale(0.5, 0.95);
                     AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
-                    BackgroundColor3 = self.state.Owned and Core.UI.Theme.PrimaryButtonColor or Core.UI.Theme.OpenButtonColor;
+                    BackgroundColor3 = ActionColor;
                     LayoutOrder = 5;
 
-                    Text = self.state.Owned and "Equip" or "Buy";
+                    Text = ActionText;
                     TextScaled = true;
                     FontFace = Core.UI.Theme.TextFont;
                     TextColor3 = Core.UI.Theme.TextColor3;
 
                     [Roact.Event.MouseButton1Click] = self.state.Owned and function ()
                         PickaxeService:EquipPickaxe(SelectedConfig)
+                        self:setState({
+                            Equipped = SelectedConfig;
+                        })
                     end or function()
                         print("Buy")
                     end;
@@ -410,7 +429,7 @@ function ForgeController:KnitStart()
         Prompts = CollectionService:GetTagged(Tag)
     end)
 
-    local App = Roact.createElement(ForgeComponent, {Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren()})
+    local App
     local GUI
 
     DataService.DataLoaded:Connect(function(PlayerDataFolder :Core.DataFolder)
@@ -427,7 +446,8 @@ function ForgeController:KnitStart()
         end
     end)
 
-    ForgeService.OpenForge:Connect(function()
+    ForgeService.OpenForge:Connect(function(EquippedPickaxe)
+        App = Roact.createElement(ForgeComponent, {Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren(), Equipped = EquippedPickaxe})
         self:TogglePrompts(Prompts, false)
         CharacterController:DisableMovement()
         GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")

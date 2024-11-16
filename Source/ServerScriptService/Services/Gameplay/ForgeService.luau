@@ -10,6 +10,8 @@ local ForgeService = Knit.CreateService {
     },
 }
 
+local PickaxeService
+
 -- [[ PUBLIC ]] --
 
 ForgeService.OpenForgePromptTag = "Forge/Prompt/Open"
@@ -19,7 +21,7 @@ ForgeService.GeneratedPromptTag = "Forge/Prompt/Generated"
 Opens the forge GUI for the given player
 ]=]
 function ForgeService:OpenForgeForPlayer(Player :Player)
-    self.Client.OpenForge:Fire(Player)
+    self.Client.OpenForge:Fire(Player, PickaxeService:GetEquippedPickaxeConfig(Player))
 end
 
 --[=[
@@ -55,6 +57,8 @@ end
 -- [[ KNIT ]] --
 
 function ForgeService:KnitStart()
+    PickaxeService = Knit.GetService("PickaxeService")
+
     local OpenForgeParts :{BasePart} = CollectionService:GetTagged(self.OpenForgePromptTag)
 
     for _, Part in pairs(OpenForgeParts) do
