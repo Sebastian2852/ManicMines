@@ -10,6 +10,9 @@ local CreatOreLikeFrame = require(ReplicatedStorage.Game.GUI.Components.General.
 
 local ForgeController = Knit.CreateController { Name = "ForgeController" }
 
+local DataService
+local DataFolder :Core.DataFolder
+
 -- [[ GUI ]] --
 
 local ForgeComponent = Roact.Component:extend("Forge")
@@ -21,7 +24,36 @@ function ForgeComponent:init()
     })
 end
 
+local function CreatePickaxeButtons(Pickaxes :{Configuration}, Component :Roact.Component)
+    local Buttons = {}
+
+    for _, Pickaxe :Configuration in ipairs(Pickaxes) do
+        local Owned = DataFolder.Pickaxes.Owned:FindFirstChild(Pickaxe.Name).Value
+
+        local NewButton = CreateForgeButton(Pickaxe, Owned, false, function()
+            Component:setState({
+                PickaxeSelected = true;
+                SelectedConfig = Pickaxe;
+            })
+        end)
+
+        Buttons[Pickaxe.Name] = NewButton
+    end
+
+    return Buttons
+end
+
 function ForgeComponent:RenderFullSelector()
+    local PickaxeButtons = CreatePickaxeButtons(self.props.Pickaxes, self)
+    PickaxeButtons["Layout"] = Roact.createElement("UIListLayout", {
+        Padding = UDim.new(0.05);
+        SortOrder = Enum.SortOrder.LayoutOrder;
+        FillDirection = Enum.FillDirection.Horizontal;
+        Wraps = true;
+        HorizontalFlex = Enum.UIFlexAlignment.SpaceEvenly;
+        VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly;
+    }, {})
+
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
     }, {
@@ -57,43 +89,22 @@ function ForgeComponent:RenderFullSelector()
                 ScrollBarThickness = 5;
                 VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left;
                 VerticalScrollBarInset = Enum.ScrollBarInset.Always;
-            }, {
-                Layout = Roact.createElement("UIListLayout", {
-                    Padding = UDim.new(0.05);
-                    SortOrder = Enum.SortOrder.LayoutOrder;
-                    FillDirection = Enum.FillDirection.Horizontal;
-                    Wraps = true;
-
-                    HorizontalFlex = Enum.UIFlexAlignment.SpaceEvenly;
-                    VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly;
-                }, {});
-
-                Test = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], true, false, function()
-                    self:setState({
-                        PickaxeSelected = true;
-                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
-                    })
-                end);
-
-                Test2 = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], false, false, function()
-                    self:setState({
-                        PickaxeSelected = true;
-                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
-                    })
-                end);
-
-                Test3 = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], false, true, function()
-                    self:setState({
-                        PickaxeSelected = true;
-                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
-                    })
-                end);
-            });
+            }, PickaxeButtons );
         })
     })
 end
 
 function ForgeComponent:RenderWithInfo()
+    local PickaxeButtons = CreatePickaxeButtons(self.props.Pickaxes, self)
+    PickaxeButtons["Layout"] = Roact.createElement("UIListLayout", {
+        Padding = UDim.new(0.05);
+        SortOrder = Enum.SortOrder.LayoutOrder;
+        FillDirection = Enum.FillDirection.Horizontal;
+        Wraps = true;
+        HorizontalFlex = Enum.UIFlexAlignment.SpaceEvenly;
+        VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly;
+    }, {})
+
     local SelectedConfig :Configuration = self.state.SelectedConfig
     local Pickaxe :Tool = SelectedConfig:FindFirstChildWhichIsA("Tool")
 
@@ -138,38 +149,7 @@ function ForgeComponent:RenderWithInfo()
                 ScrollBarThickness = 5;
                 VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left;
                 VerticalScrollBarInset = Enum.ScrollBarInset.Always;
-            }, {
-                Layout = Roact.createElement("UIListLayout", {
-                    Padding = UDim.new(0.05);
-                    SortOrder = Enum.SortOrder.LayoutOrder;
-                    FillDirection = Enum.FillDirection.Horizontal;
-                    Wraps = true;
-
-                    HorizontalFlex = Enum.UIFlexAlignment.SpaceEvenly;
-                    VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly;
-                }, {});
-
-                Test = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], true, false, function()
-                    self:setState({
-                        PickaxeSelected = true;
-                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
-                    })
-                end);
-
-                Test2 = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], false, false, function()
-                    self:setState({
-                        PickaxeSelected = true;
-                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
-                    })
-                end);
-
-                Test3 = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], false, true, function()
-                    self:setState({
-                        PickaxeSelected = true;
-                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
-                    })
-                end);
-            });
+            }, PickaxeButtons );
 
             Info = Roact.createElement("Frame", {
                 Size = UDim2.fromScale(0.4, 1);
@@ -301,17 +281,23 @@ end
 -- [[ KNIT ]] --
 
 function ForgeController:KnitStart()
-    local Mounted = false
-    UserInputService.InputBegan:Connect(function(Input, Processed)
-        if Processed then return end
-        if Mounted then return end
-        if Input.KeyCode ~= Enum.KeyCode.Z then return end
-        Mounted = true
+    DataService = Knit.GetService("DataService")
 
-        local App = Roact.createElement(ForgeComponent, {
-            Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren()
-        })
-        Roact.mount(App, Knit.Player.PlayerGui, "Forge")
+    DataService.DataLoaded:Connect(function(PlayerDataFolder :Core.DataFolder)
+        DataFolder = PlayerDataFolder
+
+        local Mounted = false
+        UserInputService.InputBegan:Connect(function(Input, Processed)
+            if Processed then return end
+            if Mounted then return end
+            if Input.KeyCode ~= Enum.KeyCode.Z then return end
+            Mounted = true
+
+            local App = Roact.createElement(ForgeComponent, {
+                Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren()
+            })
+            Roact.mount(App, Knit.Player.PlayerGui, "Forge")
+        end)
     end)
 end
 
