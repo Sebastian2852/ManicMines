@@ -149,6 +149,9 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
     NewPickaxe:AddTag("Pickaxe")
 end
 
+--[=[
+Makes the given player start mining the given block
+]=]
 function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
     if ObjectToMine == nil then return end
 
@@ -201,7 +204,6 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
         end
 
         Health -= Damage
-        
         ObjectToMine:SetAttribute("Health", Health)
         self.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / MaxHealth)) * 100), (Health / MaxHealth))
 
@@ -220,6 +222,9 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
     OreList:Destroy()
 end
 
+--[=[
+Makes the player stop mining the given block
+]=]
 function PickaxeService:StopMining(Player :Player)
     return Promise.new(function(Resolve, Reject)
         if not self.Mining[Player.UserId] then
@@ -253,6 +258,27 @@ function PickaxeService:StopMining(Player :Player)
     end)
 end
 
+--[=[
+returns true/false if the player owns the given pickaxe
+]=]
+function PickaxeService:DoesPlayerOwnPickaxe(Player :Player, Pickaxe :Configuration) :boolean
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    local DataValue = DataFolder.Pickaxes.Owned:FindFirstChild(Pickaxe.Name)
+    if not DataValue then return false end
+    return DataValue.Value
+end
+
+--[=[
+Attempts to equip the given pickaxe for the given player. Returns true/false if it was actually equipped
+]=]
+function PickaxeService:EquipPickaxe(Player :Player, Pickaxe :Configuration) :boolean
+    if not self:DoesPlayerOwnPickaxe(Player, Pickaxe) then return false end
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    DataFolder.Pickaxes.Equipped.Value = tonumber(Pickaxe.Name)
+    self:GivePickaxeToPlayer(Player)
+    return true
+end
+
 
 
 --[[ CLIENT ]]--
@@ -283,6 +309,13 @@ returns the time it will take to mine a block with the given health
 ]=]
 function PickaxeService.Client:CalculateTimeToMine(Player :Player, Health :number)
     return self.Server:CalculateTimeToMine(Player, Health)
+end
+
+--[=[
+Equips the given pickaxe. Returns true false if it was actually equipped
+]=]
+function PickaxeService.Client:EquipPickaxe(Player :Player, Pickaxe :Configuration)
+    return self.Server:EquipPickaxe(Player, Pickaxe)
 end
 
 

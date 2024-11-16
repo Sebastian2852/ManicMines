@@ -13,6 +13,7 @@ local ForgeController = Knit.CreateController { Name = "ForgeController" }
 local DataService
 local ForgeService
 local LogService
+local PickaxeService
 local CharacterController
 local DataFolder :Core.DataFolder
 
@@ -69,6 +70,7 @@ local function CreatePickaxeButtons(Pickaxes :{Configuration}, Component :Roact.
         local NewButton = CreateForgeButton(Pickaxe, Owned, Locked, function()
             Component:setState({
                 PickaxeSelected = true;
+                Owned = Owned;
                 SelectedConfig = Pickaxe;
             })
         end)
@@ -361,13 +363,19 @@ function ForgeComponent:RenderWithInfo()
                     Size = UDim2.fromScale(0.8, 0.1);
                     Position = UDim2.fromScale(0.5, 0.95);
                     AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
-                    BackgroundColor3 = Core.UI.Theme.PrimaryButtonColor;
+                    BackgroundColor3 = self.state.Owned and Core.UI.Theme.PrimaryButtonColor or Core.UI.Theme.OpenButtonColor;
                     LayoutOrder = 5;
 
-                    Text = "Equip";
+                    Text = self.state.Owned and "Equip" or "Buy";
                     TextScaled = true;
                     FontFace = Core.UI.Theme.TextFont;
                     TextColor3 = Core.UI.Theme.TextColor3;
+
+                    [Roact.Event.MouseButton1Click] = self.state.Owned and function ()
+                        PickaxeService:EquipPickaxe(SelectedConfig)
+                    end or function()
+                        print("Buy")
+                    end;
                 }, {
                     Corners = Roact.createElement("UICorner", {
                         CornerRadius = UDim.new(0.1, 0)
@@ -392,6 +400,7 @@ function ForgeController:KnitStart()
     DataService = Knit.GetService("DataService")
     ForgeService = Knit.GetService("ForgeService")
     LogService = Knit.GetService("LogService")
+    PickaxeService = Knit.GetService("PickaxeService")
     CharacterController = Knit.GetController("CharacterController")
 
     local Prompts = {}
