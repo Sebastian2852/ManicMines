@@ -75,7 +75,7 @@ function Component:render()
             ZIndex = 10;
 
             Image = Core.UI.Images.Lock;
-            ImageTransparency = 0.1;
+            ImageTransparency = 0.5;
         }, {});
     })
 end
