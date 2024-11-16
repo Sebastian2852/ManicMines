@@ -36,7 +36,6 @@ function DialogueService:ConnectNpcsWithModules(Modules :{ModuleScript})
     for _, Module in pairs(Modules) do
         local Npc = Module.Parent
         New[Npc] = Module
-        break
     end
 
     return New
@@ -58,7 +57,7 @@ function DialogueService:KnitStart()
     LogService:Log("Sorting NPCs with their modules")
     local NpcsSorted = self:ConnectNpcsWithModules(Modules)
 
-    LogService:Log("Creating proximity prompts")
+    LogService:Log("Creating proximity prompts", NpcsSorted)
     for Npc, Module in pairs(NpcsSorted) do
         local Info :InfoModule = require(Module)
 
@@ -67,6 +66,7 @@ function DialogueService:KnitStart()
         ProximityPrompt.ObjectText = Info.NpcName
         ProximityPrompt.ActionText = Info.InteractMessage
         ProximityPrompt:AddTag(self.ProximityPromptTag)
+        ProximityPrompt.RequiresLineOfSight = false
         ProximityPrompt.Parent = Npc
 
         ProximityPrompt.Triggered:Connect(function(Player)

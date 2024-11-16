@@ -207,6 +207,7 @@ function DialogueComponent:render()
                 BorderSizePixel = 0;
 
                 Text = NpcName;
+                RichText = true;
                 TextScaled = true;
                 TextXAlignment = Enum.TextXAlignment.Left;
                 TextColor3 = Core.UI.Theme.TextColor3;
@@ -220,6 +221,7 @@ function DialogueComponent:render()
                 BorderSizePixel = 0;
 
                 Text = Dialogue;
+                RichText = true;
                 TextScaled = true;
                 TextXAlignment = Enum.TextXAlignment.Left;
                 TextYAlignment = Enum.TextYAlignment.Top;
