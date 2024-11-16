@@ -64,8 +64,6 @@ function Component:render()
 end
 
 return function (PickaxeConfig :boolean, Owned :boolean, OnClick :() -> ())
-    local Pickaxe :Tool = PickaxeConfig:FindFirstChildWhichIsA("Tool")
-
     local Icon :string = PickaxeConfig:GetAttribute("Icon")
     local Gradient :ColorSequence = PickaxeConfig:GetAttribute("ButtonGradient")
     local Name :string = PickaxeConfig:GetAttribute("Name")
