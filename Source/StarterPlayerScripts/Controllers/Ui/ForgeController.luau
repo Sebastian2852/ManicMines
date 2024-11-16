@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -31,6 +32,15 @@ function ForgeController:IsPickaxeLocked(Pickaxe :Configuration) :boolean
     end
 
     return true
+end
+
+--[=[
+Toggles all the prompts "enabled" property to "new" param
+]=]
+function ForgeController:TogglePrompts(Prompts :{ProximityPrompt}, New :boolean)
+    for _, Prompt in pairs(Prompts) do
+        Prompt.Enabled = New
+    end
 end
 
 
@@ -115,7 +125,7 @@ function ForgeComponent:RenderFullSelector()
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
     }, {
-        Main = self.state.Show and Roact.createElement("Frame", {
+        Main = Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.5, 0.5);
             Position = Core.UI.Position.Center;
             AnchorPoint = Core.UI.AnchorPoint.Center;
@@ -198,7 +208,7 @@ function ForgeComponent:RenderWithInfo()
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
     }, {
-        Main = self.state.Show and Roact.createElement("Frame", {
+        Main = Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.5, 0.5);
             Position = Core.UI.Position.Center;
             AnchorPoint = Core.UI.AnchorPoint.Center;
@@ -374,6 +384,12 @@ function ForgeController:KnitStart()
     DataService = Knit.GetService("DataService")
     ForgeService = Knit.GetService("ForgeService")
 
+    local PromptTag = ""
+
+    ForgeService:GetPromptTag():andThen(function(Tag)
+        PromptTag = Tag
+    end)
+
     local App = Roact.createElement(ForgeComponent, {Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren()})
     local GUI
 
@@ -382,11 +398,15 @@ function ForgeController:KnitStart()
     end)
 
     ForgeService.OpenForge:Connect(function()
+        local Prompts = CollectionService:GetTagged(PromptTag)
+        self:TogglePrompts(Prompts, false)
         GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")
     end)
 
-    CloseUI.Event:Once(function()
+    CloseUI.Event:Connect(function()
         Roact.unmount(GUI)
+        local Prompts = CollectionService:GetTagged(PromptTag)
+        self:TogglePrompts(Prompts, true)
     end)
 end
 
