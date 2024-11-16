@@ -74,6 +74,7 @@ local function CreatePickaxeButtons(Pickaxes :{Configuration}, Component :Roact.
         end)
 
         Buttons[Pickaxe.Name] = NewButton
+        LogService:Log("Created button for pickaxe: "..Pickaxe.Name)
     end
 
     return Buttons
@@ -86,6 +87,7 @@ local function CreatePickaxeCosts(Pickaxe :Configuration)
     local Costs = Pickaxe:FindFirstChild("Ores")
 
     if Upgrades then
+        LogService:Log("Creating tycoon upgrade frames for pickaxe: "..Pickaxe.Name)
         for _, Upgrade in pairs(Upgrades:GetChildren()) do
             local UpgradeName = Upgrade.Name
             local UpgradeIcon = Upgrade:GetAttribute("Icon")
@@ -93,10 +95,12 @@ local function CreatePickaxeCosts(Pickaxe :Configuration)
             local LevelNeeded = Upgrade.Value
 
             CostFrames[UpgradeName] = CreatOreLikeFrame(UpgradeIcon, UpgradeName, LevelNeeded, UpgradeColor, UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0))
+            LogService:Log("    - Created tycoon upgrade need: "..UpgradeName.." level "..tostring(LevelNeeded))
         end
     end
 
     if Costs then
+        LogService:Log("Creating cost frames for pickaxe: "..Pickaxe.Name)
         for _, Ore in pairs(Costs:GetChildren()) do
             local RealOre = Core.Util:GetOreByName(Ore.Name)
             if not RealOre then continue end
@@ -107,6 +111,7 @@ local function CreatePickaxeCosts(Pickaxe :Configuration)
             local AmountNeeded = Ore.Value
 
             CostFrames[OreName] = CreatOreLikeFrame(Icon, OreName, AmountNeeded, Color, UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0))
+            LogService:Log("    - Created ore cost: "..tostring(AmountNeeded).." "..OreName)
         end
     end
 
@@ -374,6 +379,7 @@ function ForgeComponent:RenderWithInfo()
 end
 
 function ForgeComponent:render()
+    LogService:Log("Rendering Forge GUI")
     local PickaxeSelected = self.state.PickaxeSelected
     return PickaxeSelected and self:RenderWithInfo() or self:RenderFullSelector()
 end
@@ -405,10 +411,12 @@ function ForgeController:KnitStart()
         self:TogglePrompts(Prompts, false)
         CharacterController:DisableMovement()
         GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")
+        LogService:Log("Mounted Forge GUI")
     end)
 
     CloseUI.Event:Connect(function()
         Roact.unmount(GUI)
+        LogService:Log("Unmounted Forge GUI")
         self:TogglePrompts(Prompts, true)
         CharacterController:EnableMovement()
     end)
