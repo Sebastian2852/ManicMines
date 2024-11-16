@@ -10,6 +10,7 @@ local CreatOreLikeFrame = require(ReplicatedStorage.Game.GUI.Components.General.
 local ForgeController = Knit.CreateController { Name = "ForgeController" }
 
 local DataService
+local ForgeService
 local DataFolder :Core.DataFolder
 
 -- [[ PUBLIC ]] --
@@ -371,16 +372,21 @@ end
 
 function ForgeController:KnitStart()
     DataService = Knit.GetService("DataService")
+    ForgeService = Knit.GetService("ForgeService")
+
+    local App = Roact.createElement(ForgeComponent, {Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren()})
+    local GUI
 
     DataService.DataLoaded:Connect(function(PlayerDataFolder :Core.DataFolder)
         DataFolder = PlayerDataFolder
+    end)
 
-        local App = Roact.createElement(ForgeComponent, {Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren()})
-        local GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")
+    ForgeService.OpenForge:Connect(function()
+        GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")
+    end)
 
-        CloseUI.Event:Once(function()
-            Roact.unmount(GUI)
-        end)
+    CloseUI.Event:Once(function()
+        Roact.unmount(GUI)
     end)
 end
 
