@@ -94,10 +94,14 @@ function ForgeComponent:RenderFullSelector()
 end
 
 function ForgeComponent:RenderWithInfo()
-    local SelectedConfig = self.state.SelectedConfig
+    local SelectedConfig :Configuration = self.state.SelectedConfig
+    local Pickaxe :Tool = SelectedConfig:FindFirstChildWhichIsA("Tool")
 
     local Name :string = SelectedConfig:GetAttribute("Name")
     local Description :string = SelectedConfig:GetAttribute("Description")
+    local Delay = Pickaxe:GetAttribute("Delay")
+    local Power = Pickaxe:GetAttribute("Damage")
+    local Range = Pickaxe:GetAttribute("Range")
 
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
@@ -237,9 +241,9 @@ function ForgeComponent:RenderWithInfo()
                     Layout = Roact.createElement("UIListLayout", {
                         SortOrder = Enum.SortOrder.Name;
                     }, {});
-                    Range = CreatOreLikeFrame(Core.UI.Images.Missing, "Range", 5, ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
-                    Power = CreatOreLikeFrame(Core.UI.Images.Missing, "Power", 2, ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
-                    Delay = CreatOreLikeFrame(Core.UI.Images.Missing, "Delay", 9, ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
+                    Delay = CreatOreLikeFrame(Core.UI.Images.Missing, "Delay", tostring(Delay), ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
+                    Power = CreatOreLikeFrame(Core.UI.Images.Missing, "Power", tostring(Power), ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
+                    Range = CreatOreLikeFrame(Core.UI.Images.Missing, "Range", tostring(Range), ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
                 });
 
                 Requirments = Roact.createElement("ScrollingFrame", {
