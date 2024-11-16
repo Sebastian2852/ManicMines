@@ -40,6 +40,7 @@ local ForgeComponent = Roact.Component:extend("Forge")
 
 function ForgeComponent:init()
     self:setState({
+        Show = true;
         PickaxeSelected = false;
         SelectedConfig = nil;
     })
@@ -113,7 +114,7 @@ function ForgeComponent:RenderFullSelector()
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
     }, {
-        Main = Roact.createElement("Frame", {
+        Main = self.state.Show and Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.5, 0.5);
             Position = Core.UI.Position.Center;
             AnchorPoint = Core.UI.AnchorPoint.Center;
@@ -121,6 +122,28 @@ function ForgeComponent:RenderFullSelector()
             BackgroundColor3 = Core.UI.Theme.BackgroundColorPrimary;
             BorderSizePixel = 0;
         }, {
+            CloseButton = Roact.createElement("TextButton", {
+                Size = UDim2.fromScale(0.138, 0.06);
+                Position = UDim2.fromScale(0, -0.07);
+                BackgroundColor3 = Core.UI.Theme.CloseButtonColor;
+                BorderSizePixel = 0;
+
+                Text = "Close";
+                TextScaled = true;
+                TextColor3 = Core.UI.Color.White;
+                FontFace = Core.UI.Theme.TextFont;
+
+                [Roact.Event.MouseButton1Click] = function()
+                    self:setState({
+                        Show = false;
+                    })
+                end;
+            }, {
+                Corners = Roact.createElement("UICorner", {
+                    CornerRadius = UDim.new(0.2, 0)
+                }, {})
+            });
+
             Title = Roact.createElement("TextLabel", {
                 Size = UDim2.fromScale(1, 0.1);
                 BackgroundTransparency = 1;
@@ -176,7 +199,7 @@ function ForgeComponent:RenderWithInfo()
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
     }, {
-        Main = Roact.createElement("Frame", {
+        Main = self.state.Show and Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.5, 0.5);
             Position = Core.UI.Position.Center;
             AnchorPoint = Core.UI.AnchorPoint.Center;
@@ -184,6 +207,28 @@ function ForgeComponent:RenderWithInfo()
             BackgroundColor3 = Core.UI.Theme.BackgroundColorPrimary;
             BorderSizePixel = 0;
         }, {
+            CloseButton = Roact.createElement("TextButton", {
+                Size = UDim2.fromScale(0.138, 0.06);
+                Position = UDim2.fromScale(0, -0.07);
+                BackgroundColor3 = Core.UI.Theme.CloseButtonColor;
+                BorderSizePixel = 0;
+
+                Text = "Close";
+                TextScaled = true;
+                TextColor3 = Core.UI.Color.White;
+                FontFace = Core.UI.Theme.TextFont;
+
+                [Roact.Event.MouseButton1Click] = function()
+                    self:setState({
+                        Show = false;
+                    })
+                end;
+            }, {
+                Corners = Roact.createElement("UICorner", {
+                    CornerRadius = UDim.new(0.2, 0)
+                }, {})
+            });
+
             Title = Roact.createElement("TextLabel", {
                 Size = UDim2.fromScale(1, 0.1);
                 BackgroundTransparency = 1;
