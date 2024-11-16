@@ -13,6 +13,27 @@ local ForgeController = Knit.CreateController { Name = "ForgeController" }
 local DataService
 local DataFolder :Core.DataFolder
 
+-- [[ PUBLIC ]] --
+
+--[=[
+Returns a boolean based on if the passed pickaxe should be locked or unlocked
+]=]
+function ForgeController:IsPickaxeLocked(Pickaxe :Configuration) :boolean
+    local MainUpgrade = Pickaxe:GetAttribute("MainUpgrade")
+    local LevelValue = Pickaxe.Upgrades:FindFirstChild(MainUpgrade)
+    local NeededLevel = LevelValue.Value
+
+    local DataValue = DataFolder.Tycoon.Upgrades:FindFirstChild(MainUpgrade)
+    local CurrentLevel = DataValue.Value
+
+    if CurrentLevel >= NeededLevel then
+        return false
+    end
+
+    return true
+end
+
+
 -- [[ GUI ]] --
 
 local ForgeComponent = Roact.Component:extend("Forge")
@@ -29,8 +50,9 @@ local function CreatePickaxeButtons(Pickaxes :{Configuration}, Component :Roact.
 
     for _, Pickaxe :Configuration in ipairs(Pickaxes) do
         local Owned = DataFolder.Pickaxes.Owned:FindFirstChild(Pickaxe.Name).Value
+        local Locked = ForgeController:IsPickaxeLocked(Pickaxe)
 
-        local NewButton = CreateForgeButton(Pickaxe, Owned, false, function()
+        local NewButton = CreateForgeButton(Pickaxe, Owned, Locked, function()
             Component:setState({
                 PickaxeSelected = true;
                 SelectedConfig = Pickaxe;

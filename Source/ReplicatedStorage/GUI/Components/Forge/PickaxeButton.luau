@@ -85,6 +85,10 @@ return function(PickaxeConfig :boolean, Owned :boolean, Locked :boolean, OnClick
     local Gradient :ColorSequence = PickaxeConfig:GetAttribute("ButtonGradient")
     local Name :string = PickaxeConfig:GetAttribute("Name")
 
+    if Owned and Locked then
+        Locked = false
+    end
+
     local Button = Roact.createElement(Component, {
         Name = Name;
         Icon = Icon;
