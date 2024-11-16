@@ -33,10 +33,11 @@ function Component:render()
 
             Image = self.props.Icon;
             ScaleType = Enum.ScaleType.Fit;
+            ImageColor3 = self.props.Owned and Core.UI.Color.White or Core.UI.Color.Black;
         }, {});
 
         Gradient = Roact.createElement("UIGradient", {
-            Color = self.props.Gradient;
+            Color = self.props.Owned and self.props.Gradient or ColorSequence.new(Core.UI.Theme.BackgroundColorDark);
         }, {});
 
         Corners = Roact.createElement("UICorner", {
@@ -74,6 +75,7 @@ return function (PickaxeConfig :boolean, Owned :boolean, OnClick :() -> ())
         Icon = Icon;
         Gradient = Gradient;
         PickaxeConfig = PickaxeConfig;
+        Owned = Owned;
         OnClick = OnClick;
     })
     return Button

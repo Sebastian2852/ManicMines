@@ -71,6 +71,12 @@ function ForgeComponent:RenderFullSelector()
                         PickaxeSelected = true;
                     })
                 end);
+
+                Test2 = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], false, function()
+                    self:setState({
+                        PickaxeSelected = true;
+                    })
+                end);
             });
         })
     })
