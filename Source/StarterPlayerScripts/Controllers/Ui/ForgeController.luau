@@ -68,14 +68,21 @@ function ForgeComponent:RenderFullSelector()
                     VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly;
                 }, {});
 
-                Test = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], true, function()
+                Test = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], true, false, function()
                     self:setState({
                         PickaxeSelected = true;
                         SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
                     })
                 end);
 
-                Test2 = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], false, function()
+                Test2 = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], false, false, function()
+                    self:setState({
+                        PickaxeSelected = true;
+                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
+                    })
+                end);
+
+                Test3 = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], false, true, function()
                     self:setState({
                         PickaxeSelected = true;
                         SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
@@ -138,10 +145,24 @@ function ForgeComponent:RenderWithInfo()
                     VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly;
                 }, {});
 
-                Test = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], true, function()
+                Test = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], true, false, function()
                     self:setState({
                         PickaxeSelected = true;
-                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"]
+                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
+                    })
+                end);
+
+                Test2 = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], false, false, function()
+                    self:setState({
+                        PickaxeSelected = true;
+                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
+                    })
+                end);
+
+                Test3 = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], false, true, function()
+                    self:setState({
+                        PickaxeSelected = true;
+                        SelectedConfig = Core.Assets.Pickaxe.Pickaxes["0"];
                     })
                 end);
             });

@@ -53,7 +53,7 @@ function Component:render()
             DominantAxis = Enum.DominantAxis.Width;
         }, {});
 
-        Button = Roact.createElement("TextButton", {
+        Button = not self.props.Locked and Roact.createElement("TextButton", {
             Size = UDim2.fromScale(1, 1);
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
@@ -64,11 +64,23 @@ function Component:render()
             [Roact.Event.MouseButton1Click] = self.props.OnClick and self.props.OnClick or function()
                 warn("Missing on click function for pickaxe: "..self.props.PickaxeConfig.Name)
             end;
-        }, {})
+        }, {});
+
+        Lock = self.props.Locked and Roact.createElement("ImageLabel", {
+            Size = UDim2.fromScale(0.85, 0.85);
+            Position = Core.UI.Position.Center;
+            AnchorPoint = Core.UI.AnchorPoint.Center;
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+            ZIndex = 10;
+
+            Image = Core.UI.Images.Lock;
+            ImageTransparency = 0.1;
+        }, {});
     })
 end
 
-return function (PickaxeConfig :boolean, Owned :boolean, OnClick :() -> ())
+return function(PickaxeConfig :boolean, Owned :boolean, Locked :boolean, OnClick :() -> ())
     local Icon :string = PickaxeConfig:GetAttribute("Icon")
     local Gradient :ColorSequence = PickaxeConfig:GetAttribute("ButtonGradient")
     local Name :string = PickaxeConfig:GetAttribute("Name")
@@ -79,6 +91,7 @@ return function (PickaxeConfig :boolean, Owned :boolean, OnClick :() -> ())
         Gradient = Gradient;
         PickaxeConfig = PickaxeConfig;
         Owned = Owned;
+        Locked = Locked;
         OnClick = OnClick;
     })
     return Button
