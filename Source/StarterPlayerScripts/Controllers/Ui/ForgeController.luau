@@ -5,6 +5,8 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
+local CreateForgeButton = require(ReplicatedStorage.Game.GUI.Components.Forge.PickaxeButton)
+
 local ForgeController = Knit.CreateController { Name = "ForgeController" }
 
 -- [[ GUI ]] --
@@ -14,73 +16,6 @@ local ForgeComponent = Roact.Component:extend("Forge")
 function ForgeComponent:init()
     self:setState({
         PickaxeSelected = false;
-    })
-end
-
-function ForgeComponent:CreatePickaxeButton(PickaxeConfig :Configuration, Owned :boolean)
-    local Pickaxe :Tool = PickaxeConfig:FindFirstChildWhichIsA("Tool")
-
-    local Icon :string = PickaxeConfig:GetAttribute("Icon")
-    local Gradient :ColorSequence = PickaxeConfig:GetAttribute("ButtonGradient")
-    local Name :string = PickaxeConfig:GetAttribute("Name")
-
-    return Roact.createElement("Frame", {
-        Size = UDim2.fromScale(0.15, 0.35);
-        BackgroundColor3 = Core.UI.Color.White;
-        BorderSizePixel = 0;
-        LayoutOrder = tonumber(PickaxeConfig.Name)
-    }, {
-        Name = Roact.createElement("TextLabel", {
-            Size = UDim2.fromScale(1, 0.15);
-            BorderSizePixel = 0;
-            BackgroundTransparency = 1;
-
-            Text = "<u>"..Name.."</u>";
-            TextScaled = true;
-            RichText = true;
-            TextXAlignment = Enum.TextXAlignment.Left;
-            TextColor3 = Core.UI.Theme.TextColor3;
-            FontFace = Core.UI.Theme.TextFont;
-        }, {});
-
-        Icon = Roact.createElement("ImageLabel", {
-            Size = UDim2.fromScale(0.9, 0.85);
-            Position = UDim2.fromScale(0.5, 0.55);
-            AnchorPoint = Core.UI.AnchorPoint.Center;
-            BackgroundTransparency = 1;
-            BorderSizePixel = 0;
-
-            Image = Icon;
-            ScaleType = Enum.ScaleType.Fit;
-        }, {});
-
-        Gradient = Roact.createElement("UIGradient", {
-            Color = Gradient;
-        }, {});
-
-        Corners = Roact.createElement("UICorner", {
-            CornerRadius = UDim.new(0.1, 0)
-        }, {});
-
-        AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
-            AspectRatio = 0.984;
-            AspectType = Enum.AspectType.FitWithinMaxSize;
-            DominantAxis = Enum.DominantAxis.Width;
-        }, {});
-
-        Button = Roact.createElement("TextButton", {
-            Size = UDim2.fromScale(1, 1);
-            BackgroundTransparency = 1;
-            BorderSizePixel = 0;
-            Text = "";
-
-            [Roact.Event.MouseButton1Click] = function()
-                print("Open info for pickaxe")
-                self:setState({
-                    PickaxeSelected = true;
-                })
-            end;
-        }, {})
     })
 end
 
@@ -131,10 +66,11 @@ function ForgeComponent:RenderFullSelector()
                     VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly;
                 }, {});
 
-                Test = self:CreatePickaxeButton(Core.Assets.Pickaxe.Pickaxes["0"], true);
-                Test2 = self:CreatePickaxeButton(Core.Assets.Pickaxe.Pickaxes["0"], true);
-                Test3 = self:CreatePickaxeButton(Core.Assets.Pickaxe.Pickaxes["0"], true);
-                Test4 = self:CreatePickaxeButton(Core.Assets.Pickaxe.Pickaxes["0"], true);
+                Test = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], true, function()
+                    self:setState({
+                        PickaxeSelected = true;
+                    })
+                end);
             });
         })
     })
@@ -187,10 +123,11 @@ function ForgeComponent:RenderWithInfo()
                     VerticalFlex = Enum.UIFlexAlignment.SpaceEvenly;
                 }, {});
 
-                Test = self:CreatePickaxeButton(Core.Assets.Pickaxe.Pickaxes["0"], true);
-                Test2 = self:CreatePickaxeButton(Core.Assets.Pickaxe.Pickaxes["0"], true);
-                Test3 = self:CreatePickaxeButton(Core.Assets.Pickaxe.Pickaxes["0"], true);
-                Test4 = self:CreatePickaxeButton(Core.Assets.Pickaxe.Pickaxes["0"], true);
+                Test = CreateForgeButton(Core.Assets.Pickaxe.Pickaxes["0"], true, function()
+                    self:setState({
+                        PickaxeSelected = true;
+                    })
+                end);
             });
 
             Info = Roact.createElement("Frame", {
