@@ -36,7 +36,7 @@ UI.Images = {
     CheckBoxUnchecked = "rbxassetid://4458801905";
 
     -- Forge
-    Lock = "http://www.roblox.com/asset/?id=3046652070"; -- TOOD: Find a better lock image
+    Lock = "rbxassetid://94150221512506";
     Delay = "rbxassetid://128100976009074";
     Range = "rbxassetid://129170502469860";
     Power = "rbxassetid://88283392867459";

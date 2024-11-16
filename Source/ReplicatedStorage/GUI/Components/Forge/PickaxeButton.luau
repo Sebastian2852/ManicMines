@@ -4,14 +4,31 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local Component = Roact.Component:extend("ForgeButton")
 
+local function CreateOutline(Owned :boolean, Locked :boolean)
+    local Color = Core.UI.Color.Red
+
+    if Owned then
+        Color = Core.UI.Theme.OpenButtonColor
+    elseif not Owned and not Locked then
+        Color = Core.UI.Theme.PrimaryButtonColor
+    end
+
+    return Roact.createElement("UIStroke", {
+        Thickness = 3;
+        Color = Color;
+    }, {})
+end
+
 function Component:render()
+    local ShouldShowName = self.props.Owned or (not self.props.Owned and not self.props.Locked)
+
     return Roact.createElement("Frame", {
         Size = UDim2.fromScale(0.15, 0.35);
         BackgroundColor3 = Core.UI.Color.White;
         BorderSizePixel = 0;
         LayoutOrder = tonumber(self.props.PickaxeConfig.Name)
     }, {
-        Name = self.props.Owned and Roact.createElement("TextLabel", {
+        Name = ShouldShowName and Roact.createElement("TextLabel", {
             Size = UDim2.fromScale(1, 0.15);
             BorderSizePixel = 0;
             BackgroundTransparency = 1;
@@ -36,7 +53,7 @@ function Component:render()
 
             Image = self.props.Icon;
             ScaleType = Enum.ScaleType.Fit;
-            ImageColor3 = self.props.Owned and Core.UI.Color.White or Core.UI.Color.Black;
+            ImageColor3 = not self.props.Locked and Core.UI.Color.White or Core.UI.Color.Black;
         }, {});
 
         Gradient = Roact.createElement("UIGradient", {
@@ -77,6 +94,8 @@ function Component:render()
             Image = Core.UI.Images.Lock;
             ImageTransparency = 0.5;
         }, {});
+
+        Outline = CreateOutline(self.props.Owned, self.props.Locked)
     })
 end
 
