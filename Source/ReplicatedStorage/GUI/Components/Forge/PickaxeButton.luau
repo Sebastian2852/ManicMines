@@ -11,25 +11,28 @@ function Component:render()
         BorderSizePixel = 0;
         LayoutOrder = tonumber(self.props.PickaxeConfig.Name)
     }, {
-        Name = Roact.createElement("TextLabel", {
+        Name = self.props.Owned and Roact.createElement("TextLabel", {
             Size = UDim2.fromScale(1, 0.15);
             BorderSizePixel = 0;
             BackgroundTransparency = 1;
+            ZIndex = 3;
 
             Text = "<u>"..self.props.Name.."</u>";
             TextScaled = true;
             RichText = true;
+            TextStrokeTransparency = 0;
             TextXAlignment = Enum.TextXAlignment.Left;
             TextColor3 = Core.UI.Theme.TextColor3;
             FontFace = Core.UI.Theme.TextFont;
         }, {});
 
         Icon = Roact.createElement("ImageLabel", {
-            Size = UDim2.fromScale(0.9, 0.85);
-            Position = UDim2.fromScale(0.5, 0.55);
+            Size = UDim2.fromScale(1, 1);
+            Position = UDim2.fromScale(0.5, 0.5);
             AnchorPoint = Core.UI.AnchorPoint.Center;
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
+            ZIndex = 2;
 
             Image = self.props.Icon;
             ScaleType = Enum.ScaleType.Fit;
@@ -54,6 +57,8 @@ function Component:render()
             Size = UDim2.fromScale(1, 1);
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
+            ZIndex = 10;
+
             Text = "";
 
             [Roact.Event.MouseButton1Click] = self.props.OnClick and self.props.OnClick or function()
