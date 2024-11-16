@@ -152,10 +152,6 @@ function ForgeComponent:RenderWithInfo()
                 BackgroundColor3 = Core.UI.Theme.BackgroundColorDark;
                 BorderSizePixel = 0;
             }, {
-                Layout = Roact.createElement("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder;
-                }, {});
-
                 Deselect = Roact.createElement("TextButton", {
                     Size = UDim2.fromScale(1, 0.05);
                     BackgroundTransparency = 1;
@@ -211,10 +207,24 @@ function ForgeComponent:RenderWithInfo()
                     }, {})
                 });
 
-                Requirments = Roact.createElement("ScrollingFrame", {
-                    Size = UDim2.fromScale(1, 0.5);
-                    Position = UDim2.fromScale(0, 0.26);
+                Stats = Roact.createElement("Frame", {
+                    Size = UDim2.fromScale(1, 0.3);
+                    Position = UDim2.fromScale(0, 0.25);
+                    BackgroundTransparency = 1;
                     LayoutOrder = 4;
+                }, {
+                    Layout = Roact.createElement("UIListLayout", {
+                        SortOrder = Enum.SortOrder.Name;
+                    }, {});
+                    Range = CreatOreLikeFrame(Core.UI.Images.Missing, "Range", 5, ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
+                    Power = CreatOreLikeFrame(Core.UI.Images.Missing, "Power", 2, ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
+                    Delay = CreatOreLikeFrame(Core.UI.Images.Missing, "Delay", 9, ColorSequence.new(Color3.fromRGB(0, 0, 0)), UDim2.fromScale(1, 0.3), UDim2.fromScale(0, 0));
+                });
+
+                Requirments = Roact.createElement("ScrollingFrame", {
+                    Size = UDim2.fromScale(1, 0.25);
+                    Position = UDim2.fromScale(0, 0.55);
+                    LayoutOrder = 5;
                     BackgroundTransparency = 1;
                     BorderSizePixel = 0;
 
@@ -233,6 +243,23 @@ function ForgeComponent:RenderWithInfo()
                     CreatOreLikeFrame(Core.UI.Images.Missing, "Test3", 15, ColorSequence.new(Color3.fromRGB(255, 0, 0)), UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0));
                     CreatOreLikeFrame(Core.UI.Images.Missing, "Test4", 15, ColorSequence.new(Color3.fromRGB(255, 0, 0)), UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0));
                     CreatOreLikeFrame(Core.UI.Images.Missing, "Test5", 15, ColorSequence.new(Color3.fromRGB(255, 0, 0)), UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0));
+                });
+
+                Action = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(0.8, 0.1);
+                    Position = UDim2.fromScale(0.5, 0.95);
+                    AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
+                    BackgroundColor3 = Core.UI.Theme.PrimaryButtonColor;
+                    LayoutOrder = 5;
+
+                    Text = "Equip";
+                    TextScaled = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+                }, {
+                    Corners = Roact.createElement("UICorner", {
+                        CornerRadius = UDim.new(0.1, 0)
+                    }, {});
                 })
             })
         })
