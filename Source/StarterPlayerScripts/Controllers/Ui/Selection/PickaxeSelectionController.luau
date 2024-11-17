@@ -52,9 +52,12 @@ function PickaxeSelectionComponent:init()
     PlayerFolder.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
         local ObjectToMine = PlayerFolder.PickaxeSelection.Value
         if ObjectToMine == nil then
-            self:setState({
-                Show = false;
-            })
+            task.spawn(function()
+                task.wait(0.1)
+                self:setState({
+                    Show = false;
+                })
+            end)
             return
         end
 

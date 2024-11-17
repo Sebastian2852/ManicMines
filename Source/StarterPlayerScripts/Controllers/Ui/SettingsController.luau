@@ -163,7 +163,9 @@ end
 
 function SettingsComponent:render()
     LogService:Log("Rendering settings GUI")
-    return Roact.createElement("ScreenGui", {}, {
+    return Roact.createElement("ScreenGui", {
+        ResetOnSpawn = false;
+    }, {
         ToggleButton = Roact.createElement("ImageButton", {
             Size = UDim2.fromScale(0.04, 0.08);
             Position = UDim2.fromScale(0.01, 0.98);
