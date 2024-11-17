@@ -350,11 +350,64 @@ end
 
 --[[ KNIT ]]--
 
+function PickaxeService:KnitInit()
+    LogService = Knit.GetService("LogService")
+
+    LogService:Log("Setting up pickaxes")
+    for _, PickaxeConfig :Configuration in pairs(Core.Assets.Pickaxe.Pickaxes:GetChildren()) do
+        LogService:Log("Setting up pickaxe: "..PickaxeConfig:GetFullName())
+        local PickaxeTool = PickaxeConfig:FindFirstChildWhichIsA("Tool")
+        if not PickaxeTool then
+            LogService:Warn("Pickaxe config has no pickaxe tool: "..PickaxeConfig:GetFullName())
+            continue
+        end
+
+        LogService:Log("    - Setting up pickaxe: "..PickaxeTool:GetFullName())
+        local Handle = PickaxeTool:FindFirstChild("Handle")
+        if not Handle then
+            LogService:Warn("Pickaxe tool has no handle?: "..PickaxeTool:GetFullName())
+            continue
+        end
+
+        for _, Weld :Weld in pairs(PickaxeTool:GetDescendants()) do
+            if Weld:IsA("Weld") then
+                LogService:Log("    - Destroyed weld: "..Weld:GetFullName())
+                Weld:Destroy()
+            end
+
+            if Weld:IsA("WeldConstraint") then
+                LogService:Log("    - Destroyed weld: "..Weld:GetFullName())
+                Weld:Destroy()
+            end
+        end
+
+        for _, Part :BasePart in pairs(PickaxeTool:GetDescendants()) do
+            if Part.Name == "Handle" then continue end
+            if not Part:IsA("BasePart") then continue end
+
+            local Weld = Instance.new("WeldConstraint")
+            Weld.Name = Part.Name.." -> "..Handle.Name
+            Weld.Part0 = Part
+            Weld.Part1 = Handle
+            Weld.Parent = Handle
+            LogService:Log("    - Welded pickaxe parts:", Part.Name.." -> "..Handle.Name)
+        end
+
+        for _, Part :BasePart in pairs(PickaxeTool:GetDescendants()) do
+            if Part.Name == "Handle" then continue end
+            if not Part:IsA("BasePart") then continue end
+
+            Part.Anchored = false
+            Part.CanCollide = false
+            LogService:Log("    - Setup pickaxe part: "..Part.Name)
+        end
+    end
+end
+
 function PickaxeService:KnitStart()
     DataService = Knit.GetService("DataService")
     MineService = Knit.GetService("MineService")
     PlayerStatsService = Knit.GetService("PlayerStatsService")
-    LogService = Knit.GetService("LogService")
 
     game.Players.PlayerAdded:Connect(function(Player)
         self.Mining[Player.UserId] = {Mining = false, Object = nil, Cooldown = false}
