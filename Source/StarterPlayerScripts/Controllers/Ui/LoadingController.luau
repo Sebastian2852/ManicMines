@@ -48,8 +48,6 @@ function LoadingScreen:init()
         self:setState({
             Visible = true;
         })
-        task.wait(0.1)
-        self:Fade(1, 0)
         self:Fade(0, 0.5)
         StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
     end)
@@ -85,13 +83,11 @@ function LoadingScreen:Fade(Goal :number, Time :number)
         if Object:IsA("UIGradient") then continue end
 
         if HasProp(Object, "TextTransparency") then
-            if Object.TextTransparency == Goal then continue end
             table.insert(Tweens, TweenService:Create(Object, TweenInfo.new(Time), {TextTransparency = Goal}))
             continue
         end
 
         if HasProp(Object, "ImageTransparency") then
-            if Object.ImageTransparency == Goal then continue end
             table.insert(Tweens, TweenService:Create(Object, TweenInfo.new(Time), {ImageTransparency = Goal}))
             continue
         end
