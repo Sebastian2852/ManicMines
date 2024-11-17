@@ -93,6 +93,7 @@
           "Level":{"$className":"IntValue"},
           "Gold":{"$className":"IntValue"},
           "XP":{"$className":"IntValue"},
+          "TycoonName":{"$className":"StringValue"},
 
           "DataLoaded":{"$className":"BoolValue"},
           "InMine":{"$className":"BoolValue"},
@@ -114,8 +115,7 @@
 
           "Tycoon":{
             "$className":"Folder",
-            "Upgrades":{"$className":"Folder"},
-            "TycoonName":{"$className":"StringValue"}
+            "Upgrades":{"$className":"Folder"}
           },
 
           "Stats":{

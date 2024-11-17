@@ -1,6 +1,5 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
@@ -445,16 +444,6 @@ function ForgeController:KnitStart()
 
     DataService.DataLoaded:Connect(function(PlayerDataFolder :Core.DataFolder)
         DataFolder = PlayerDataFolder
-    end)
-
-    UserInputService.InputBegan:Connect(function(Input, Processed)
-        if Processed then return end
-        if Input.KeyCode == Enum.KeyCode.Z then
-            self:TogglePrompts(Prompts, false)
-            CharacterController:DisableMovement()
-            GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")
-            LogService:Log("Mounted Forge GUI (Keybind)")
-        end
     end)
 
     ForgeService.OpenForge:Connect(function(EquippedPickaxe)
