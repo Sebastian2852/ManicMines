@@ -129,15 +129,34 @@ local function IsSlotValid(Slot :DataStore) :boolean
     return false
 end
 
---[=[
-Checks wether a data table is valid
-]=]
-local function IsRawDataValid(Data :{any}) :boolean
-    if Data == nil then
-        return false
+local function GetPathFromRoot(Root: Folder, Value: Instance): string
+    local Path = {}
+
+    while Value do
+        table.insert(Path, 1, Value.Name)
+        if Value == Root then
+            return table.concat(Path, ".")
+        end
+        Value = Value.Parent
     end
-    return true
+
+    return nil
 end
+
+local function GetInstanceFromPath(Root: Instance, Path: string): Instance
+    local segments = string.split(Path, ".")
+
+    local currentInstance = Root
+    for _, segment in ipairs(segments) do
+        if not currentInstance then
+            return nil -- Path is invalid
+        end
+        currentInstance = currentInstance:FindFirstChild(segment)
+    end
+
+    return currentInstance
+end
+
 
 
 --[[ PUBLIC ]]--
@@ -155,73 +174,35 @@ function DataService:SavePlayerData(Player :Player)
     LogService:Assert(DataFolder, "Tried saving data with No data folder")
     LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
-    local Maid = Core.Maid.new()
     local SaveData = Core.Data.SaveData.New(Player.UserId)
-    Maid:GiveTask(SaveData)
 
-    LogService:Log("["..Player.Name.."]", "Packaging ore data")
-    local RawOreData = {}
+    local GeneralData = {}
+    GeneralData["LastPlayed"] = os.time();
+    LogService:Log("Saved general data: LastPlayed ~ "..tostring(os.time()))
+    for _, Value :ValueBase in pairs(DataFolder:GetChildren()) do
+        if not Value:IsA("ValueBase") then continue end
+        GeneralData[Value.Name] = Value.Value
+        LogService:Log("Saved general data: "..Value.Name.." - "..tostring(Value.Value))
+    end
+    local General = Core.Data.Data.New("General", GeneralData)
+    SaveData:AddData(General)
 
-    for _, Ore :IntValue in pairs(DataFolder.Inventory.Ores:GetChildren()) do
-        RawOreData[Ore.Name] = {}
-        RawOreData[Ore.Name].InventoryAmount = Ore.Value
-        RawOreData[Ore.Name].StorageAmount = 0
-        RawOreData[Ore.Name].TimesMined = 0
+    for _, Folder :Folder in pairs(DataFolder:GetChildren()) do
+        if not Folder:IsA("Folder") then continue end
+        local Data = {}
+
+        for _, Value :ValueBase in pairs(Folder:GetDescendants()) do
+            if not Value:IsA("ValueBase") then continue end
+            local Key = GetPathFromRoot(Folder, Value)
+            Data[Key] = Value.Value
+            LogService:Log("Saved data: "..Key.." - "..tostring(Value.Value))
+        end
+
+        local DataToAdd = Core.Data.Data.New(Folder.Name, Data)
+        SaveData:AddData(DataToAdd)
     end
 
-    for _, Ore :IntValue in pairs(DataFolder.Storage.Ores:GetChildren()) do
-        RawOreData[Ore.Name].StorageAmount = Ore.Value
-    end
-
-    for _, Ore :IntValue in pairs(DataFolder.TimesMined:GetChildren()) do
-        RawOreData[Ore.Name].TimesMined = Ore.Value
-    end
-    local OreData = Core.Data.Data.New("Ore", RawOreData)
-    Maid:GiveTask(OreData)
-
-
-
-    LogService:Log("["..Player.Name.."]", "Packaging player data")
-    local RawPlayerData = {}
-    RawPlayerData.XP = DataFolder.XP.Value
-    RawPlayerData.Level = DataFolder.Level.Value
-    RawPlayerData.Gold = DataFolder.Gold.Value
-    RawPlayerData.LastPlayed = os.time()
-
-    RawPlayerData.Settings = {}
-    for _, Setting :ValueBase in pairs(DataFolder.Settings:GetChildren()) do
-        RawPlayerData.Settings[Setting.Name] = Setting.Value
-    end
-    local PlayerData = Core.Data.Data.New("PlayerData", RawPlayerData)
-
-    RawPlayerData.EquippedPickaxe = DataFolder.Pickaxes.Equipped.Value
-    RawPlayerData.Pickaxes = {}
-    for _, Pickaxe :BoolValue in pairs(DataFolder.Pickaxes.Owned:GetChildren()) do
-        RawPlayerData.Pickaxes[Pickaxe.Name] = Pickaxe.Value
-    end
-    Maid:GiveTask(PlayerData)
-
-
-
-    LogService:Log("["..Player.Name.."]", "Packaging tycoon data")
-    local RawTycoonData = {}
-    RawTycoonData.Name = DataFolder.Tycoon.TycoonName.Value
-    RawTycoonData.Upgrades = {}
-    for _, Upgrade in pairs(DataFolder.Tycoon.Upgrades:GetChildren()) do
-        RawTycoonData.Upgrades[Upgrade.Name] = Upgrade.Value
-    end
-    local TycoonData = Core.Data.Data.New("Tycoon", RawTycoonData)
-    Maid:GiveTask(TycoonData)
-
-
-
-    SaveData:AddData(OreData)
-    SaveData:AddData(PlayerData)
-    SaveData:AddData(TycoonData)
     SaveData:Save(Slot)
-
-    Maid:DoCleaning()
-    LogService:Log("["..Player.Name.."]", "Saved player data!")
 end
 
 --[=[
@@ -238,124 +219,47 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     LoadingService:StartLoading(Player)
     LoadingService:UpdateActionText(Player, "Loading data")
 
-    local Maid = Core.Maid.new()
-    local OreDataData = Core.Data.Data.New("Ore", {})
-    local PlayerData = Core.Data.Data.New("PlayerData", {})
-    local TycoonData = Core.Data.Data.New("Tycoon", {})
-
-    Maid:GiveTask(OreDataData)
-    Maid:GiveTask(PlayerData)
-    Maid:GiveTask(TycoonData)
-
     local SaveData = Core.Data.SaveData.New(Player.UserId)
-    Maid:GiveTask(SaveData)
-    SaveData:AddData(OreDataData)
-    SaveData:AddData(PlayerData)
-    SaveData:AddData(TycoonData)
+    SaveData:AddData(Core.Data.Data.New("General", {}))
+
+    for _, Folder :Folder in pairs(DataFolder:GetChildren()) do
+        if not Folder:IsA("Folder") then continue end
+        local DataToAdd = Core.Data.Data.New(Folder.Name, {})
+        SaveData:AddData(DataToAdd)
+    end
+
     SaveData:Load(Slot)
-    LogService:Log("["..Player.Name.."]", "Loaded data from data store")
 
-    local RawOreData      = SaveData:GetDataByName("Ore")
-    local RawPlayerData   = SaveData:GetDataByName("PlayerData")
-    local RawTycoonData   = SaveData:GetDataByName("Tycoon")
-
-    LogService:Log("["..Player.Name.."]", "Loading player data")
-    if IsRawDataValid(RawPlayerData) then
-        DataFolder.XP.Value = RawPlayerData.XP
-        DataFolder.Level.Value = RawPlayerData.Level
-        DataFolder.Gold.Value = RawPlayerData.Gold
-
-        if not RawPlayerData.Settings then
-            LogService:Warn("Appling default settings; cannot find saved settings!")
-            for SettingName, SettingValue in pairs(Core.GameConfig.DefaultSettings) do
-                local SettingDataValue = DataFolder.Settings:FindFirstChild(SettingName)
-                if not SettingDataValue then
-                    LogService:Warn("Cannot find setting `"..tostring(SettingName).."`; Ignoring")
-                    continue
-                end
-                SettingDataValue.Value = SettingValue
-            end
-        else
-            for SettingName, SettingValue in pairs(RawPlayerData.Settings) do
-                local SettingDataValue = DataFolder.Settings:FindFirstChild(SettingName)
-                if not SettingDataValue then
-                    LogService:Warn("Cannot find setting `"..tostring(SettingName).."`; discarding data")
-                    continue
-                end
-                SettingDataValue.Value = SettingValue
+    local General = SaveData:GetDataByName("General")
+    if type(General) == "table" then
+        for ValueName :string, Data :any in pairs(General) do
+            local Value = DataFolder:FindFirstChild(ValueName)
+            if Value then
+                Value.Value = Data
+                LogService:Log("Loaded general data: "..ValueName.." - "..tostring(Data))
+            else
+                LogService:Warn("Couldnt find value for: "..ValueName.."; discarding data")
             end
         end
-
-        DataFolder.Pickaxes.Equipped.Value = RawPlayerData.EquippedPickaxe or 0
-        LogService:Log("Loaded equipped pickaxe")
-        for PickaxeName, Owned in pairs(RawPlayerData.Pickaxes) do
-            local Value = DataFolder.Pickaxes.Owned:FindFirstChild(PickaxeName)
-            if not Value then
-                LogService:Warn("Cannot find pickaxe `"..tostring(Value.Name).."`; discarding data")
-                continue
-            end
-
-            Value.Value = Owned
-            LogService:Log("Loaded data for Pickaxe: "..PickaxeName)
-        end
-        LogService:Log("["..Player.Name.."]", "Loaded player data")
     else
-        return
+        LogService:Warn("No general data")
     end
 
-    LogService:Log("["..Player.Name.."]", "Loading tycoon data")
-    if IsRawDataValid(RawTycoonData) then
-        DataFolder.Tycoon.TycoonName.Value = RawTycoonData.Name
+    for _, Folder :Folder in pairs(DataFolder:GetChildren()) do
+        if not Folder:IsA("Folder") then continue end
+        local Data = SaveData:GetDataByName(Folder.Name)
 
-        LogService:Log("["..Player.Name.."]", "Loading tycoon data (upgrades)")
-        for UpgradeName, UpgradeValue in pairs(RawTycoonData.Upgrades) do
-            local Value = DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName)
-            if not Value then
-                LogService:Warn("["..Player.Name.."]", "Cannot find data value for "..UpgradeName.."; discarding data")
-                continue
-            end
-            Value.Value = UpgradeValue
-        end
-        LogService:Log("["..Player.Name.."]", "Loaded tycoon data")
-    else
-        return
-    end
-
-    LogService:Log("["..Player.Name.."]", "Loading ore data")
-    if IsRawDataValid(RawOreData) then
-        for OreName, OreData in pairs(RawOreData) do
-            local InventoryAmount = OreData["InventoryAmount"]
-            local StorageAmount = OreData["StorageAmount"]
-            local TimesMined = OreData["TimesMined"]
-
-            local InventoryOre = DataFolder.Inventory.Ores:FindFirstChild(OreName)
-            local StorageOre = DataFolder.Storage.Ores:FindFirstChild(OreName)
-            local TimesMinedOre = DataFolder.TimesMined:FindFirstChild(OreName)
-
-            if InventoryOre then
-                InventoryOre.Value = InventoryAmount
+        for Path :string, Value :any in pairs(Data) do
+            local Instance = GetInstanceFromPath(DataFolder, Path)
+            if Instance then
+                Instance.Value = Value
+                LogService:Log("Loaded data: "..Path.." - "..tostring(Value))
             else
-                LogService:Warn("["..Player.Name.."]", "Discarding data for ore", OreName, "; No longer exists")
-            end
-
-            if StorageOre then
-                StorageOre.Value = StorageAmount
-            else
-                LogService:Warn("["..Player.Name.."]", "Discarding data for ore", OreName, "; No longer exists")
-            end
-
-            if TimesMinedOre then
-                TimesMinedOre.Value = TimesMined
-            else
-                LogService:Warn("["..Player.Name.."]", "Discarding data for ore", OreName, "; No longer exists")
+                LogService:Warn("Couldnt find value for: "..Path.."; discarding data")
             end
         end
-        LogService:Log("["..Player.Name.."]", "Loaded ore data")
-    else
-        return
     end
 
-    LogService:Log("["..Player.Name.."]", "Player data loaded")
     task.spawn(function()
         task.wait(1)
 
@@ -384,7 +288,6 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
     end)
 
     DataFolder.DataLoaded.Value = true
-    Maid:DoCleaning()
 end
 
 --[=[
@@ -445,35 +348,21 @@ function DataService:GetSlotInfo(Player :Player, Slot :DataStore) :Core.SlotInfo
         SlotID = self:SlotDataStoreToNumber(Slot);
         Used = false;
     }
-    local Maid = Core.Maid.new()
 
-    local PlayerData = Core.Data.Data.New("PlayerData", {})
-    local TycoonData = Core.Data.Data.New("Tycoon", {})
     local SaveData = Core.Data.SaveData.New(Player.UserId)
-    Maid:GiveTask(PlayerData)
-    Maid:GiveTask(TycoonData)
-    Maid:GiveTask(SaveData)
-
-    SaveData:AddData(PlayerData)
-    SaveData:AddData(TycoonData)
+    local Data = Core.Data.Data.New("General", {})
+    SaveData:AddData(Data)
     SaveData:Load(Slot)
+    local General = SaveData:GetDataByName("General")
 
-    local RawPlayerData = SaveData:GetDataByName("PlayerData")
-    local RawTycoonData = SaveData:GetDataByName("Tycoon")
-    Maid:DoCleaning()
+    print(Info.SlotID, General)
 
-    if RawPlayerData == nil or RawTycoonData == nil then
-        return Info
+    if type(General) == "table" and General.LastPlayed ~= nil and General.LastPlayed ~= 0 then
+        Info.Used = true
+        Info.TycoonName = General.TycoonName
+        Info.Gold = General.Gold
+        Info.LastPlayed = General.LastPlayed
     end
-
-    if RawTycoonData.Name == nil then
-        return Info
-    end
-
-    Info.Used = true
-    Info.TycoonName = RawTycoonData.Name
-    Info.Gold = RawPlayerData.Gold
-    Info.LastPlayed = RawPlayerData.LastPlayed
 
     return Info
 end
@@ -520,7 +409,7 @@ function DataService:NewSlot(Player :Player, SlotNumber :number, SlotSettings :C
     if not IsSlotValid(AsDataStore) then return end
 
     local PlayerData = DataService:GetPlayerDataFolder(Player)
-    PlayerData.Tycoon.TycoonName.Value = SlotSettings.Name
+    PlayerData.TycoonName.Value = SlotSettings.Name
 
     self.Players[Player.UserId] = AsDataStore
     LoadingService:StartLoading(Player)
