@@ -121,6 +121,12 @@ local function ConvertYLevelToDepth(WorldY :number) :number
     return math.floor((Top - WorldY) / CellSize)
 end
 
+local function ConvertDepthToYLevel(Depth :number) :number
+    local Top = TopLayerY
+    local CellSize = Core.GameConfig.Mine.BlockSize.Y
+    return Top - (Depth * CellSize)
+end
+
 local function SetupStoneBlock(StoneBlock :BasePart)
     local NormalStone = Core.Assets.Stone
     local Attribs = StoneBlock:GetAttributes()
@@ -375,6 +381,112 @@ function MineService:GenerateTopLayer()
 end
 
 --[=[
+Generate a 3x3 room for people to teleport into to. Returns the position where players
+can be teleported to
+]=]
+function MineService:GenerateRoomAtDepth(Depth :number) :Vector3
+    local YLevel = ConvertDepthToYLevel(Depth)
+    local RandomXZ = NumberGenerator:NextInteger(-100, 100)
+    local CenterPos = Vector3.new(RandomXZ, YLevel, RandomXZ)
+
+    local YSize = Core.GameConfig.Mine.BlockSize.Y
+
+    local AirPositions :{Vector3} = {
+        Vector3.new(0, YSize, 0);
+        Vector3.new(0, -YSize, 0);
+
+        Vector3.new(YSize, 0, 0);
+        Vector3.new(-YSize, 0, 0);
+
+        Vector3.new(0, 0, YSize);
+        Vector3.new(0, 0, -YSize);
+    }
+
+    local CenterOffset = YSize * 2
+
+    local Offsets = {
+        --Floor
+        Vector3.new(0, -CenterOffset, 0);
+        Vector3.new(YSize, -CenterOffset, 0);
+        Vector3.new(-YSize, -CenterOffset, 0);
+        Vector3.new(0, -CenterOffset, YSize);
+        Vector3.new(0, -CenterOffset, -YSize);
+        Vector3.new(YSize, -CenterOffset, YSize);
+        Vector3.new(-YSize, -CenterOffset, YSize);
+        Vector3.new(YSize, -CenterOffset, -YSize);
+        Vector3.new(-YSize, -CenterOffset, -YSize);
+
+        --Roof
+        Vector3.new(0, CenterOffset, 0);
+        Vector3.new(YSize, CenterOffset, 0);
+        Vector3.new(-YSize, CenterOffset, 0);
+        Vector3.new(0, CenterOffset, YSize);
+        Vector3.new(0, CenterOffset, -YSize);
+        Vector3.new(YSize, CenterOffset, YSize);
+        Vector3.new(-YSize, CenterOffset, YSize);
+        Vector3.new(YSize, CenterOffset, -YSize);
+        Vector3.new(-YSize, CenterOffset, -YSize);
+
+        --Wall
+        Vector3.new(CenterOffset, 0, 0);
+        Vector3.new(CenterOffset, YSize, 0);
+        Vector3.new(CenterOffset, -YSize, 0);
+        Vector3.new(CenterOffset, 0, YSize);
+        Vector3.new(CenterOffset, 0, -YSize);
+        Vector3.new(CenterOffset, YSize, YSize);
+        Vector3.new(CenterOffset, -YSize, YSize);
+        Vector3.new(CenterOffset, YSize, -YSize);
+        Vector3.new(CenterOffset, -YSize, -YSize);
+
+        --Wall
+        Vector3.new(-CenterOffset, 0, 0);
+        Vector3.new(-CenterOffset, YSize, 0);
+        Vector3.new(-CenterOffset, -YSize, 0);
+        Vector3.new(-CenterOffset, 0, YSize);
+        Vector3.new(-CenterOffset, 0, -YSize);
+        Vector3.new(-CenterOffset, YSize, YSize);
+        Vector3.new(-CenterOffset, -YSize, YSize);
+        Vector3.new(-CenterOffset, YSize, -YSize);
+        Vector3.new(-CenterOffset, -YSize, -YSize);
+
+        --Wall
+        Vector3.new(0, 0, CenterOffset);
+        Vector3.new(0, YSize, CenterOffset);
+        Vector3.new(0, -YSize, CenterOffset);
+        Vector3.new(YSize, 0, CenterOffset);
+        Vector3.new(-YSize, 0, CenterOffset);
+        Vector3.new(YSize, YSize, CenterOffset);
+        Vector3.new(-YSize, YSize, CenterOffset);
+        Vector3.new(YSize, -YSize, CenterOffset);
+        Vector3.new(-YSize, -YSize, CenterOffset);
+    
+        --Wall
+        Vector3.new(0, 0, -CenterOffset);
+        Vector3.new(0, YSize, -CenterOffset);
+        Vector3.new(0, -YSize, -CenterOffset);
+        Vector3.new(YSize, 0, -CenterOffset);
+        Vector3.new(-YSize, 0, -CenterOffset);
+        Vector3.new(YSize, YSize, -CenterOffset);
+        Vector3.new(-YSize, YSize, -CenterOffset);
+        Vector3.new(YSize, -YSize, -CenterOffset);
+        Vector3.new(-YSize, -YSize, -CenterOffset);
+    }
+
+
+    for _, Offset in pairs(AirPositions) do
+        local NewPos = CenterPos + Offset
+        UsedPositions[KeyPosition(NewPos)] = true
+    end
+
+    for _, Offset in pairs(Offsets) do
+        local NewPos = CenterPos + Offset
+        self:GenerateBlockAtPosition(NewPos)
+    end
+
+    return CenterPos
+end
+
+--[=[
 Generates blocks around a block that was mined aswell as destroying the block
 ]=]
 function MineService:BlockMined(Block :BasePart)
@@ -470,7 +582,5 @@ function MineService:KnitStart()
         workspace:FindFirstChild("Baseplate"):Destroy()
     end
 end
-
-
 
 return MineService
