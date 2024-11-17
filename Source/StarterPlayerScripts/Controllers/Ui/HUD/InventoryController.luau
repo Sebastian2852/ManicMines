@@ -40,6 +40,12 @@ function InventoryComponent:init()
         OreList = {};
         Capacity = 0;
         Amount = 0;
+
+        Xp = 0;
+        XpNeeded = 0;
+        LevelName = "no level";
+        LevelNameColor = Core.UI.Color.White;
+        LevelBarColor = ColorSequence.new(Core.UI.Color.White);
     })
 
     for _, OreDataValue :IntValue in pairs(DataFolder:WaitForChild("Inventory"):WaitForChild("Ores"):GetChildren()) do
@@ -48,7 +54,12 @@ function InventoryComponent:init()
         end)
     end
 
+    DataFolder.XP:GetPropertyChangedSignal("Value"):Connect(function()
+        self:UpdateLevel()
+    end)
+
     self:UpdateInventory(DataFolder.Inventory.InventoryItemCount.Value, DataFolder.Inventory.InventoryCap.Value, CreateInventoryOreList())
+    self:UpdateLevel()
 
     DeviceController.DeviceChanged:Connect(function(NewDeviceType :Enums.Enum)
         if NewDeviceType == Enums.DeviceType.PC then
@@ -84,6 +95,28 @@ function InventoryComponent:init()
     end
 end
 
+function InventoryComponent:UpdateLevel()
+    local NewXP = DataFolder.XP.Value
+    local CurrentLevel = DataFolder.Level.Value
+
+    local CurrentLevelConfig = Core.Assets.Levels:FindFirstChild(tostring(CurrentLevel))
+    local NextLevelConfig = Core.Assets.Levels:FindFirstChild(tostring(CurrentLevel + 1))
+
+    local XpNeeded = 0
+
+    if NextLevelConfig then
+        XpNeeded = NextLevelConfig:GetAttribute("XpNeeded")
+    end
+
+    self:setState({
+        Xp = NewXP;
+        XpNeeded = XpNeeded;
+        LevelName = CurrentLevelConfig:GetAttribute("LevelName");
+        LevelNameColor = CurrentLevelConfig:GetAttribute("LevelColor");
+        LevelBarColor = CurrentLevelConfig:GetAttribute("LevelXpBarColor");
+    })
+end
+
 --[=[
 IDEA:
 On mobile the inventory is hidden by default, when the use wants to see the inventroy they press a button and the invetory opens
@@ -106,6 +139,15 @@ function InventoryComponent:render()
     local Green = 1 - Time
     local Blue = 1 - Time
     local Color = Color3.new(Red, Green, Blue)
+
+    local Xp = self.state.Xp
+    local XpNeeded = self.state.XpNeeded
+    local LevelName = self.state.LevelName
+
+    local LevelColor = self.state.LevelNameColor
+    local XpBarColor = self.state.LevelBarColor
+
+    local LevelProgress = math.clamp(Xp / XpNeeded, 0, 1);
 
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false
@@ -145,12 +187,12 @@ function InventoryComponent:render()
                     }, {});
 
                     Bar = Roact.createElement("Frame", {
-                        Size = UDim2.fromScale(0.5, 1);
+                        Size = UDim2.fromScale(LevelProgress, 1);
                         BorderSizePixel = 0;
                         BackgroundColor3 = Core.UI.Color.White;
                     }, {
                         Gradient = Roact.createElement("UIGradient", {
-                            Color = ColorSequence.new(Core.UI.Color.White);
+                            Color = XpBarColor;
                         }, {})
                     })
                 });
@@ -162,7 +204,7 @@ function InventoryComponent:render()
                     BackgroundTransparency = 1;
                     BorderSizePixel = 0;
 
-                    Text = "0 / 0";
+                    Text = XpNeeded ~= nil and tostring(Xp).." / "..tostring(XpNeeded) or tostring(Xp);
                     TextScaled = true;
                     TextStrokeTransparency = 0;
                     TextXAlignment = Enum.TextXAlignment.Right;
@@ -177,11 +219,11 @@ function InventoryComponent:render()
                     BackgroundTransparency = 1;
                     BorderSizePixel = 0;
 
-                    Text = "Advanced";
+                    Text = LevelName;
                     TextScaled = true;
                     TextStrokeTransparency = 0;
                     TextXAlignment = Enum.TextXAlignment.Right;
-                    TextColor3 = Core.UI.Theme.TextColor3;
+                    TextColor3 = LevelColor;
                     FontFace = Core.UI.Theme.TextFont;
                 }, {});
             });
