@@ -193,6 +193,12 @@ function DataService:SavePlayerData(Player :Player)
         RawPlayerData.Settings[Setting.Name] = Setting.Value
     end
     local PlayerData = Core.Data.Data.New("PlayerData", RawPlayerData)
+
+    RawPlayerData.EquippedPickaxe = DataFolder.Pickaxes.Equipped.Value
+    RawPlayerData.Pickaxes = {}
+    for _, Pickaxe :BoolValue in pairs(DataFolder.Pickaxes.Owned:GetChildren()) do
+        RawPlayerData.Pickaxes[Pickaxe.Name] = Pickaxe.Value
+    end
     Maid:GiveTask(PlayerData)
 
 
@@ -278,6 +284,19 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
                 end
                 SettingDataValue.Value = SettingValue
             end
+        end
+
+        DataFolder.Pickaxes.Equipped.Value = RawPlayerData.EquippedPickaxe or 0
+        LogService:Log("Loaded equipped pickaxe")
+        for PickaxeName, Owned in pairs(RawPlayerData.Pickaxes) do
+            local Value = DataFolder.Pickaxes.Owned:FindFirstChild(PickaxeName)
+            if not Value then
+                LogService:Warn("Cannot find pickaxe `"..tostring(Value.Name).."`; discarding data")
+                continue
+            end
+
+            Value.Value = Owned
+            LogService:Log("Loaded data for Pickaxe: "..PickaxeName)
         end
         LogService:Log("["..Player.Name.."]", "Loaded player data")
     else
