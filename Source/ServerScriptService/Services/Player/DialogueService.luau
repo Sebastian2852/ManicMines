@@ -73,6 +73,7 @@ function DialogueService:KnitStart()
 
         ProximityPrompt.Triggered:Connect(function(Player)
             UIService:HideInventory(Player)
+            UIService:HideHUDButtons(Player)
             self.Client.StartDialogue:Fire(Player, Info, Module:FindFirstChildWhichIsA("BasePart"))
         end)
 
