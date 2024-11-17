@@ -19,6 +19,13 @@ local Player = Knit.Player
 
 local LoadingScreen = Roact.Component:extend("LoadingScreen")
 
+local LOADING_WHEEL_TRANSPARENCY_SEQUENCE = NumberSequence.new({
+    NumberSequenceKeypoint.new(0, 1, 0);
+    NumberSequenceKeypoint.new(0.5, 1, 0);
+    NumberSequenceKeypoint.new(0.501, 0, 0);
+    NumberSequenceKeypoint.new(1, 0, 0);
+})
+
 function LoadingScreen:init()
     self:setState({
         Rotation = 0;
@@ -142,12 +149,7 @@ function LoadingScreen:render()
                     AspectRatio = Roact.createElement("UIAspectRatioConstraint", {}, {});
                     Gradient = Roact.createElement("UIGradient", {
                         Rotation = self.state.Rotation;
-                        Transparency = NumberSequence.new({
-                            NumberSequenceKeypoint.new(0, 1, 0);
-                            NumberSequenceKeypoint.new(0.5, 1, 0);
-                            NumberSequenceKeypoint.new(0.501, 0, 0);
-                            NumberSequenceKeypoint.new(1, 0, 0);
-                        });
+                        Transparency = LOADING_WHEEL_TRANSPARENCY_SEQUENCE;
                     }, {})
                 });
 
