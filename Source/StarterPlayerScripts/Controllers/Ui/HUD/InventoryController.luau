@@ -9,6 +9,7 @@ local InventoryController = Knit.CreateController { Name = "InventoryController"
 
 local LogService
 local DataService
+local UIService
 local DeviceController
 local DataFolder :Core.DataFolder
 
@@ -33,6 +34,7 @@ local InventoryComponent = Core.Roact.Component:extend("InventoryComponent")
 
 function InventoryComponent:init()
     self:setState({
+        Hidden = false;
         StyleToUse = Enums.OreFrameStyle.Normal;
         OreList = {};
         Capacity = 0;
@@ -59,6 +61,12 @@ function InventoryComponent:init()
                 return PreviousState
             end)
         end
+    end)
+
+    UIService.Inventory:Connect(function(New :boolean)
+        self:setState({
+            Hidden = not New;
+        })
     end)
 
     local DeviceType = DeviceController:GetDeviceType()
@@ -100,7 +108,7 @@ function InventoryComponent:render()
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false
     }, {
-        Container = Roact.createElement("Frame", {
+        Container = not self.state.Hidden and Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.22, 0.6);
             Position = Core.UI.Position.BottomRight;
             AnchorPoint = Core.UI.AnchorPoint.BottomRight;
@@ -191,6 +199,7 @@ function InventoryController:KnitStart()
     DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
     DeviceController = Knit.GetController("DeviceController")
+    UIService = Knit.GetService("UIService")
 
     DataService.DataLoaded:Connect(function(LoadedDataFolder :Core.DataFolder)
         DataFolder = LoadedDataFolder
