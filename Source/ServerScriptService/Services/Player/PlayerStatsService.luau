@@ -25,6 +25,20 @@ end
 -- [[ PUBLIC ]]--
 
 --[=[
+Calculate and set the given data folder's inventory item count value to the correct amount
+]=]
+function PlayerStatsService:CalculateInventoryCapacity(DataFolder :Core.DataFolder)
+    local Total = 0
+
+    for _, Ore :IntValue in pairs(DataFolder.Inventory.Ores:GetChildren()) do
+        if Ore.Value <= 0 then continue end
+        Total += Ore.Value
+    end
+
+    DataFolder.Inventory.InventoryItemCount.Value = Total
+end
+
+--[=[
 Give a player a certain amount of levels
 ]=]
 function PlayerStatsService:AwardLevel(Player :Player, Amount :number)
@@ -77,6 +91,7 @@ function PlayerStatsService:GiveOres(Player :Player, OreList)
         DataValue.Value += Data.Amount
         LogService:Log("Gave "..Player.Name.." "..Data.Amount.." "..Data.DisplayName)
     end
+    self:CalculateInventoryCapacity(DataFolder)
 end
 
 --[=[
@@ -106,6 +121,7 @@ function PlayerStatsService:TakeOres(Player :Player, OreList)
         DataValue.Value = NewAmount
         LogService:Log("removed "..Player.Name.." "..Data.Amount.." "..Data.DisplayName)
     end
+    self:CalculateInventoryCapacity(DataFolder)
 end
 
 --[=[

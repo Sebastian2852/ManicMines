@@ -260,6 +260,8 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
         end
     end
 
+
+    PlayerStatsService:CalculateInventoryCapacity(DataFolder)
     task.spawn(function()
         task.wait(1)
 

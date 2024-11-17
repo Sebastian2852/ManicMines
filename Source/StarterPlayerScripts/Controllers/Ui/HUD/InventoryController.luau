@@ -41,11 +41,11 @@ function InventoryComponent:init()
 
     for _, OreDataValue :IntValue in pairs(DataFolder:WaitForChild("Inventory"):WaitForChild("Ores"):GetChildren()) do
         OreDataValue:GetPropertyChangedSignal("Value"):Connect(function()
-            self:UpdateInventory(0, 0, CreateInventoryOreList())
+            self:UpdateInventory(DataFolder.Inventory.InventoryItemCount.Value, DataFolder.Inventory.InventoryCap.Value, CreateInventoryOreList())
         end)
     end
 
-    self:UpdateInventory(0, 0, CreateInventoryOreList())
+    self:UpdateInventory(DataFolder.Inventory.InventoryItemCount.Value, DataFolder.Inventory.InventoryCap.Value, CreateInventoryOreList())
 
     DeviceController.DeviceChanged:Connect(function(NewDeviceType :Enums.Enum)
         if NewDeviceType == Enums.DeviceType.PC then
@@ -85,6 +85,9 @@ function InventoryComponent:render()
     LogService:Log("Rendering inventory")
     local Components = Core.UI:CreateOreFrames(self.state.OreList, self.state.StyleToUse, UDim2.fromScale(1, 0.1))
     Components["Layout"] = Core.Roact.createElement("UIListLayout", {}, {})
+
+    local Amount = self.state.Amount
+    local Capacity = self.state.Capacity
 
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false
@@ -146,7 +149,7 @@ function InventoryComponent:render()
                     AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
                     BackgroundTransparency = 1;
 
-                    Text = "0 / 70";
+                    Text = tostring(Amount).." / "..tostring(Capacity);
                     TextScaled = true;
                     TextStrokeTransparency = 0;
                     TextYAlignment = Enum.TextYAlignment.Bottom;
