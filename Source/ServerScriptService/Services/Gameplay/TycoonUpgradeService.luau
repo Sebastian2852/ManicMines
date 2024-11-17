@@ -54,7 +54,7 @@ Add a GUI to a hitbox with the given level config
 ]=]
 function TycoonUpgradeService:AddUIToHitbox(Hitbox :BasePart, LevelConfig :Configuration)
     return Promise.new(function(Resolve)
-        local FoundGui = Hitbox:FindFirstAncestorWhichIsA("BillboardGui")
+        local FoundGui = Hitbox:FindFirstChildWhichIsA("BillboardGui")
         if FoundGui then
             FoundGui:Destroy()
         end
@@ -118,7 +118,7 @@ Adds a click detector for selecting to the hitbox
 ]=]
 function TycoonUpgradeService:AddClickDetectorToHitbox(HitBox :BasePart)
     return Promise.new(function(Resolve)
-        local ClickDetector = HitBox:FindFirstAncestorWhichIsA("ClickDetector")
+        local ClickDetector = HitBox:FindFirstChildWhichIsA("ClickDetector")
         if ClickDetector then
             ClickDetector:Destroy()
         end
@@ -173,7 +173,7 @@ function TycoonUpgradeService:AddFunctionality(Hitbox :BasePart, SetupModule :Up
         end
         local OwnerData :Core.DataFolder = DataService:GetPlayerDataFolder(TycoonOwner)
 
-        local ActionText, ObjectText = SetupModule.CreatePrompt(OwnerData.Tycoon.TycoonName.Value, tonumber(LevelConfig.Name), self:GetUpgradeMaxLevel(LevelConfig.Parent))
+        local ActionText, ObjectText = SetupModule.CreatePrompt(OwnerData.TycoonName.Value, tonumber(LevelConfig.Name), self:GetUpgradeMaxLevel(LevelConfig.Parent))
 
         local NewPrompt = Instance.new("ProximityPrompt")
         NewPrompt.Name = "Interact"
