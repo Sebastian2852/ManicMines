@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
+local TweenService = game:GetService("TweenService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
@@ -17,6 +18,13 @@ local Player = Knit.Player
 -- [[ GUI ]] --
 
 local LoadingScreen = Roact.Component:extend("LoadingScreen")
+
+local LOADING_WHEEL_TRANSPARENCY_SEQUENCE = NumberSequence.new({
+    NumberSequenceKeypoint.new(0, 1, 0);
+    NumberSequenceKeypoint.new(0.5, 1, 0);
+    NumberSequenceKeypoint.new(0.501, 0, 0);
+    NumberSequenceKeypoint.new(1, 0, 0);
+})
 
 function LoadingScreen:init()
     self:setState({
@@ -47,10 +55,12 @@ function LoadingScreen:init()
         self:setState({
             Visible = true;
         })
+        self:Fade(0, 0.5)
         StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
     end)
 
     LoadingService.LoadingEnded:Connect(function()
+        self:Fade(1, 0.5)
         self:setState({
             Visible = false;
             ActionText = "";
@@ -59,7 +69,47 @@ function LoadingScreen:init()
     end)
 end
 
+function LoadingScreen:Fade(Goal :number, Time :number)
+    local Frame :Frame = self.FrameRef:getValue()
+    if not Frame then return end
+
+    local function HasProp(Object :Instance, Property :string) :boolean
+        local Success = pcall(function()
+            local Temp = Object[Property]
+            return Temp
+        end)
+        return Success
+    end
+
+    local Tweens = {}
+
+    table.insert(Tweens, TweenService:Create(Frame, TweenInfo.new(Time), {Transparency = Goal}))
+
+    for _, Object :GuiBase in pairs(Frame:GetDescendants()) do
+        if Object:IsA("UILayout") then continue end
+        if Object:IsA("UIGradient") then continue end
+
+        if HasProp(Object, "TextTransparency") then
+            table.insert(Tweens, TweenService:Create(Object, TweenInfo.new(Time), {TextTransparency = Goal}))
+            continue
+        end
+
+        if HasProp(Object, "ImageTransparency") then
+            table.insert(Tweens, TweenService:Create(Object, TweenInfo.new(Time), {ImageTransparency = Goal}))
+            continue
+        end
+    end
+
+    for _, Tween in pairs(Tweens) do
+        Tween:Play()
+    end
+
+    task.wait(Time)
+end
+
 function LoadingScreen:render()
+    self.FrameRef = Roact.createRef()
+
     return Roact.createElement("ScreenGui", {
         IgnoreGuiInset = true;
         ClipToDeviceSafeArea = false;
@@ -70,6 +120,9 @@ function LoadingScreen:render()
             Size = UDim2.fromScale(1, 1);
             BackgroundColor3 = Core.UI.Theme.BackgroundColorDark;
             BorderSizePixel = 0;
+            BackgroundTransparency = 1;
+
+            [Roact.Ref] = self.FrameRef
         }, {
             Details = Roact.createElement("Frame", {
                 Size = UDim2.fromScale(0.375, 0.15);
@@ -96,12 +149,7 @@ function LoadingScreen:render()
                     AspectRatio = Roact.createElement("UIAspectRatioConstraint", {}, {});
                     Gradient = Roact.createElement("UIGradient", {
                         Rotation = self.state.Rotation;
-                        Transparency = NumberSequence.new({
-                            NumberSequenceKeypoint.new(0, 1, 0);
-                            NumberSequenceKeypoint.new(0.5, 1, 0);
-                            NumberSequenceKeypoint.new(0.501, 0, 0);
-                            NumberSequenceKeypoint.new(1, 0, 0);
-                        });
+                        Transparency = LOADING_WHEEL_TRANSPARENCY_SEQUENCE;
                     }, {})
                 });
 
