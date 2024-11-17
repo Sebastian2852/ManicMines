@@ -127,13 +127,22 @@ end
 --[=[
 Gives the player ores and adds 1 to its times mined value
 ]=]
-function PlayerStatsService:MinedOre(Player :Player, OreList)
-    local DataFolder = DataService:GetPlayerDataFolder(Player)
+function PlayerStatsService:MinedOre(Player :Player, OreList :Core.OreList)
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
 
-    for OreName, _ in pairs(OreList:LoopList()) do
+    for OreName, OreData in pairs(OreList:LoopList()) do
+        if OreName == "GoldCoins" then continue end
+        if not OreData.RealOre then continue end
+
         local DataValue = FindTimesMinedValueByName(OreName, DataFolder)
         DataValue.Value += 1
         LogService:Log("Increased "..Player.Name.."'s "..OreName.." times mined value")
+
+        local Xp = OreData.RealOre:GetAttribute("XP")
+        if Xp == nil then
+            LogService:Warn("No xp value?")
+        end
+        self:AwardXP(Player, Xp)
     end
 
     self:GiveOres(Player, OreList)
