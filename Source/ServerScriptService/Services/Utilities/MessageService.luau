@@ -1,18 +1,23 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local TextChatService = game:GetService("TextChatService")
 
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local MessageService = Knit.CreateService {
     Name = "MessageService",
     Client = {
-        SendMessage = Knit.CreateSignal()
+        SendMessage = Knit.CreateSignal();
+        EnableChannels = Knit.CreateSignal();
     },
 }
 
 local LogService
+local AdminService
 
 --[[ PUBLIC ]]--
+
+MessageService.AdminChannel = nil
 
 --[=[
 Sends a chat message to a player
@@ -36,8 +41,15 @@ end
 
 --[[ KNIT ]]--
 
+function MessageService:KnitInit()
+    self.AdminChannel = Instance.new("TextChannel")
+    self.AdminChannel.Name = "Admin"
+    self.AdminChannel.Parent = TextChatService
+end
+
 function MessageService:KnitStart()
     LogService = Knit.GetService("LogService")
+    AdminService = Knit.GetService("AdminService")
 
     game.Players.PlayerAdded:Connect(function(Player)
         local Message :Core.ChatMessage = {
@@ -48,6 +60,11 @@ function MessageService:KnitStart()
         for _, v in pairs(game.Players:GetPlayers()) do
             if Player.UserId == v.UserId then continue end
             MessageService:SendMessageToPlayer(Message, v)
+        end
+
+        if AdminService:IsPlayerAdmin(Player) then
+            self.AdminChannel:AddUserAsync(Player.UserId)
+            self.Client.EnableChannels:Fire(Player)
         end
     end)
 
