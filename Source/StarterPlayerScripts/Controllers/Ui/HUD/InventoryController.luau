@@ -124,12 +124,67 @@ function InventoryComponent:render()
             }, {});
 
             LevelContainer = Roact.createElement("Frame", {
-                Size = UDim2.fromScale(0.75, 0.2);
+                Size = UDim2.fromScale(0.6, 0.2);
                 Position = Core.UI.Position.TopRight;
                 AnchorPoint = Core.UI.AnchorPoint.TopRight;
 
                 BackgroundTransparency = 1;
-            }, {});
+            }, {
+                ProgressBar = Roact.createElement("Frame", {
+                    Size = UDim2.fromScale(1, 0.1);
+                    Position = UDim2.fromScale(0.5, 0.95);
+                    BorderSizePixel = 0;
+                    AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
+                    BackgroundColor3 = Core.UI.Theme.BackgroundColorDark;
+                }, {
+                    Stroke = Roact.createElement("UIStroke", {
+                        ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+                        LineJoinMode = Enum.LineJoinMode.Round;
+                        Color = Core.UI.Color.Black;
+                        Thickness = 2;
+                    }, {});
+
+                    Bar = Roact.createElement("Frame", {
+                        Size = UDim2.fromScale(0.5, 1);
+                        BorderSizePixel = 0;
+                        BackgroundColor3 = Core.UI.Color.White;
+                    }, {
+                        Gradient = Roact.createElement("UIGradient", {
+                            Color = ColorSequence.new(Core.UI.Color.White);
+                        }, {})
+                    })
+                });
+
+                Xp = Roact.createElement("TextLabel", {
+                    Size = UDim2.fromScale(1, 0.15);
+                    Position = UDim2.fromScale(0.5, 0.83);
+                    AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
+                    BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
+
+                    Text = "0 / 0";
+                    TextScaled = true;
+                    TextStrokeTransparency = 0;
+                    TextXAlignment = Enum.TextXAlignment.Right;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+                    FontFace = Core.UI.Theme.TextFont;
+                }, {});
+
+                Level = Roact.createElement("TextLabel", {
+                    Size = UDim2.fromScale(1, 0.25);
+                    Position = UDim2.fromScale(0.5, 0.65);
+                    AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
+                    BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
+
+                    Text = "Advanced";
+                    TextScaled = true;
+                    TextStrokeTransparency = 0;
+                    TextXAlignment = Enum.TextXAlignment.Right;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+                    FontFace = Core.UI.Theme.TextFont;
+                }, {});
+            });
 
             InventoryContainer = Roact.createElement("Frame", {
                 Size = UDim2.fromScale(1, 0.8);
