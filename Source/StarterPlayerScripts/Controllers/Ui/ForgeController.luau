@@ -394,7 +394,18 @@ function ForgeComponent:RenderWithInfo()
                             Equipped = SelectedConfig;
                         })
                     end or function()
-                        print("Buy")
+                        local CurrentEquipped = self.state.Equipped
+                        self:setState({
+                            Equipped = SelectedConfig;
+                        })
+
+                        PickaxeService:BuyPickaxe(SelectedConfig):andThen(function(Success :boolean)
+                            if not Success then
+                                self:setState({
+                                    Equipped = CurrentEquipped
+                                })
+                            end
+                        end)
                     end;
                 }, {
                     Corners = Roact.createElement("UICorner", {

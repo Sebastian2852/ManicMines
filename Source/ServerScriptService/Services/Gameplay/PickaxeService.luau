@@ -328,6 +328,24 @@ function PickaxeService.Client:EquipPickaxe(Player :Player, Pickaxe :Configurati
     return self.Server:EquipPickaxe(Player, Pickaxe)
 end
 
+--[=[
+Attempts to buy the given pickaxe config
+]=]
+function PickaxeService.Client:BuyPickaxe(Player :Player, PickaxeConfig :Configuration)
+    local Costs = PickaxeConfig:FindFirstChild("Costs")
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+
+    local Success = not Costs
+    if Costs then
+        Success = DataService:HandleCosts(Player, Costs)
+    end
+
+    if Success then
+        DataFolder.Pickaxes.Owned:FindFirstChild(PickaxeConfig.Name).Value = true
+        self.Server:EquipPickaxe(Player, PickaxeConfig)
+    end
+    return Success
+end
 
 
 --[[ KNIT ]]--
