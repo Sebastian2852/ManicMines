@@ -149,6 +149,9 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
     NewPickaxe:AddTag("Pickaxe")
 end
 
+--[=[
+Makes the given player start mining the given block
+]=]
 function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
     if ObjectToMine == nil then return end
 
@@ -201,7 +204,6 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
         end
 
         Health -= Damage
-        
         ObjectToMine:SetAttribute("Health", Health)
         self.Client.UpdateMiningSelection:Fire(Player, ObjectToMine.Name, self:CalculateTimeToMine(Player, Health), math.ceil((1 - (Health / MaxHealth)) * 100), (Health / MaxHealth))
 
@@ -220,6 +222,9 @@ function PickaxeService:StartMining(Player :Player, ObjectToMine :BasePart)
     OreList:Destroy()
 end
 
+--[=[
+Makes the player stop mining the given block
+]=]
 function PickaxeService:StopMining(Player :Player)
     return Promise.new(function(Resolve, Reject)
         if not self.Mining[Player.UserId] then
@@ -251,6 +256,37 @@ function PickaxeService:StopMining(Player :Player)
 
         Resolve()
     end)
+end
+
+--[=[
+returns true/false if the player owns the given pickaxe
+]=]
+function PickaxeService:DoesPlayerOwnPickaxe(Player :Player, Pickaxe :Configuration) :boolean
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    local DataValue = DataFolder.Pickaxes.Owned:FindFirstChild(Pickaxe.Name)
+    if not DataValue then return false end
+    return DataValue.Value
+end
+
+--[=[
+Attempts to equip the given pickaxe for the given player. Returns true/false if it was actually equipped
+]=]
+function PickaxeService:EquipPickaxe(Player :Player, Pickaxe :Configuration) :boolean
+    if not self:DoesPlayerOwnPickaxe(Player, Pickaxe) then return false end
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    DataFolder.Pickaxes.Equipped.Value = tonumber(Pickaxe.Name)
+    self:GivePickaxeToPlayer(Player)
+    return true
+end
+
+--[=[
+Returns the config of the currently equipped pickaxe for the given player
+]=]
+function PickaxeService:GetEquippedPickaxeConfig(Player :Player) :Configuration
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    local Equipped = DataFolder.Pickaxes.Equipped
+    local Config = Core.Assets.Pickaxe.Pickaxes:FindFirstChild(Equipped.Value)
+    return Config
 end
 
 
@@ -285,6 +321,31 @@ function PickaxeService.Client:CalculateTimeToMine(Player :Player, Health :numbe
     return self.Server:CalculateTimeToMine(Player, Health)
 end
 
+--[=[
+Equips the given pickaxe. Returns true false if it was actually equipped
+]=]
+function PickaxeService.Client:EquipPickaxe(Player :Player, Pickaxe :Configuration)
+    return self.Server:EquipPickaxe(Player, Pickaxe)
+end
+
+--[=[
+Attempts to buy the given pickaxe config
+]=]
+function PickaxeService.Client:BuyPickaxe(Player :Player, PickaxeConfig :Configuration)
+    local Costs = PickaxeConfig:FindFirstChild("Costs")
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+
+    local Success = not Costs
+    if Costs then
+        Success = DataService:HandleCosts(Player, Costs)
+    end
+
+    if Success then
+        DataFolder.Pickaxes.Owned:FindFirstChild(PickaxeConfig.Name).Value = true
+        self.Server:EquipPickaxe(Player, PickaxeConfig)
+    end
+    return Success
+end
 
 
 --[[ KNIT ]]--

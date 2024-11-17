@@ -20,5 +20,11 @@ Enums.OreFrameStyle = {
     PC = CreateEnumValue();
 }
 
+Enums.CostInclude = {
+    Inventory = CreateEnumValue();
+    Storage = CreateEnumValue();
+    Both = CreateEnumValue();
+}
+
 table.freeze(Enums)
 return Enums
