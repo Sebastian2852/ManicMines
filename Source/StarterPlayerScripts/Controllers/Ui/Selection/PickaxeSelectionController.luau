@@ -9,7 +9,6 @@ local PickaxeSelectionController = Knit.CreateController { Name = "PickaxeSelect
 local PlayerFolder = ReplicatedStorage.Player
 
 local PickaxeService
-local DataService
 local LogService
 
 -- [[ PRIVATE ]] --
@@ -29,58 +28,41 @@ end
 local PickaxeSelectionComponent = Roact.Component:extend("PickaxeSelection")
 
 function PickaxeSelectionComponent:init()
+    local PropsOre = self.props.Ore
+    local PropsOreName = self.props.Name
+    local PropsTimeToMine = self.props.TimeToMine.."s - "..self.props.PercentageMined.."%"
+    local PropsProgress = self.props.MiningProgress
+
     self:setState({
-        Show = false;
-        OreName = "No ore name?";
-        TimeToMine = "No ttm string?";
-        MiningProgress = 0;
+        Ore = PropsOre;
+        OreName = PropsOreName;
+        TimeToMine = PropsTimeToMine;
+        MiningProgress = PropsProgress;
     })
 
-    PickaxeService.UpdateMiningSelection:Connect(function(OreName :string, TimeToMine :number, Percentage :number, MiningProgress :number)
+    self.UpdateConnection = PickaxeService.UpdateMiningSelection:Connect(function(OreName :string, TimeToMine :number, Percentage :number, MiningProgress :number)
         local RealOre = Core.Util:GetOreByName(OreName)
         if not RealOre then return end
 
         self:setState({
-            Show = true;
             Ore = RealOre;
             OreName = RealOre:GetAttribute("DisplayName");
             TimeToMine = TimeToMine.."s - "..Percentage.."%";
             MiningProgress = MiningProgress;
         })
     end)
+end
 
-    PlayerFolder.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
-        local ObjectToMine = PlayerFolder.PickaxeSelection.Value
-        if ObjectToMine == nil then
-            task.spawn(function()
-                task.wait(0.1)
-                self:setState({
-                    Show = false;
-                })
-            end)
-            return
-        end
+function PickaxeSelectionComponent:willUnmount()
+    local UpdateConnection = self.UpdateConnection ::RBXScriptConnection
 
-        local DisplayName = ObjectToMine:GetAttribute("DisplayName")
-        local Health = ObjectToMine:GetAttribute("Health")
-        local MaxHealth = ObjectToMine:GetAttribute("MaxHealth")
-        local PercentageMined = math.ceil((1 - (Health / MaxHealth)) * 100)
-        local MiningProgress = (Health / MaxHealth)
-        local TimeToMine = CalculateTimeToMine(Health)
-
-        self:setState({
-            Show = true;
-            Ore = ObjectToMine;
-            OreName = DisplayName;
-            TimeToMine = TimeToMine.."s - "..PercentageMined.."%";
-            MiningProgress = MiningProgress;
-        })
-    end)
+    if UpdateConnection then
+        UpdateConnection:Disconnect()
+    end
 end
 
 function PickaxeSelectionComponent:render()
     LogService:Log("Rendering pickaxe selection GUI")
-    local Show = self.state.Show
     local Ore = self.state.Ore
     local OreName = self.state.OreName
     local TimeToMine = self.state.TimeToMine
@@ -89,7 +71,7 @@ function PickaxeSelectionComponent:render()
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
     }, {
-        Container = Show and Roact.createElement("Frame", {
+        Container = Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.244, 0.128);
             Position = UDim2.fromScale(0.5, 0.717);
             AnchorPoint = Vector2.new(0.5, 0);
@@ -162,12 +144,36 @@ end
 
 function PickaxeSelectionController:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
-    DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
 
-    DataService.DataLoaded:Connect(function()
-        local App = Roact.createElement(PickaxeSelectionComponent)
-        Roact.mount(App, Knit.Player.PlayerGui, "PickaxeSelection")
+    local App
+    local GUI
+
+    PlayerFolder.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
+        if GUI then
+            Roact.unmount(GUI)
+        end
+
+        local ObjectToMine = PlayerFolder.PickaxeSelection.Value
+        if ObjectToMine == nil then return end
+
+        local DisplayName = ObjectToMine:GetAttribute("DisplayName")
+        local Health = ObjectToMine:GetAttribute("Health")
+        local MaxHealth = ObjectToMine:GetAttribute("MaxHealth")
+        local PercentageMined = math.ceil((1 - (Health / MaxHealth)) * 100)
+        local MiningProgress = (Health / MaxHealth)
+        local TimeToMine = CalculateTimeToMine(Health)
+
+        App = Roact.createElement(PickaxeSelectionComponent, {
+            Name = DisplayName;
+            Health = Health;
+            MaxHealth = MaxHealth;
+            PercentageMined = PercentageMined;
+            MiningProgress = MiningProgress;
+            TimeToMine = TimeToMine;
+            Ore = ObjectToMine
+        })
+        GUI = Roact.mount(App, Knit.Player.PlayerGui, "PickaxeSelection")
         LogService:Log("Mounted pickaxe selection GUI")
     end)
 end

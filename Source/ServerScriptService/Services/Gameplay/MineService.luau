@@ -10,13 +10,6 @@ local NumberGenerator = Random.new()
 local TeleportService
 local LogService
 
---[=[
-IDEA:
-
-When a block is starting to be mined then the mine automatically generates the blocks around it so its ready for when the block is broken,
-This will hopefully elimate the 1 frame time-frame where you can see the sky when mining
-]=]
-
 local MineService = Knit.CreateService {
     Name = "MineService",
     Client = {},
@@ -182,10 +175,11 @@ function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
 
         local SpawningRange = Ore:GetAttribute("SpawningRange")
 
+        local Depth = ConvertYLevelToDepth(YLevel)
         local MinY = SpawningRange.Min * Core.GameConfig.Mine.BlockSize.Y
         local MaxY = SpawningRange.Max * Core.GameConfig.Mine.BlockSize.Y
 
-        if MinY <= math.abs(YLevel) and MaxY - 1 >= math.abs(YLevel) then
+        if MinY <= Depth and MaxY - 1 >= Depth then
             table.insert(SpawnableOres, Ore)
         end
     end
