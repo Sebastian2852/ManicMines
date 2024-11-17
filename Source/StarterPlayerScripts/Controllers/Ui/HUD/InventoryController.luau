@@ -35,6 +35,7 @@ local InventoryComponent = Core.Roact.Component:extend("InventoryComponent")
 function InventoryComponent:init()
     self:setState({
         Hidden = false;
+        Collapsed = false;
         StyleToUse = Enums.OreFrameStyle.Normal;
         OreList = {};
         Capacity = 0;
@@ -96,6 +97,7 @@ function InventoryComponent:render()
 
     local Amount = self.state.Amount
     local Capacity = self.state.Capacity
+    local Collapsed = self.state.Collapsed
 
     local FullPercentToGoRed = 0.85
     local Time = math.clamp((Amount / Capacity - FullPercentToGoRed) / (1 - FullPercentToGoRed), 0, 1)
@@ -131,7 +133,7 @@ function InventoryComponent:render()
 
             InventoryContainer = Roact.createElement("Frame", {
                 Size = UDim2.fromScale(1, 0.8);
-                Position = Core.UI.Position.BottomRight;
+                Position = Collapsed and UDim2.fromScale(1.6, 1) or Core.UI.Position.BottomRight;
                 AnchorPoint = Core.UI.AnchorPoint.BottomRight;
 
                 BackgroundTransparency = 1;
@@ -159,11 +161,38 @@ function InventoryComponent:render()
                     }, Components)
                 });
 
+                CollapseButton = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(0.1, 0.1);
+                    Position = UDim2.fromScale(0.4, 0.9);
+                    AnchorPoint = Core.UI.AnchorPoint.BottomRight;
+                    SizeConstraint = Enum.SizeConstraint.RelativeXX;
+                    BackgroundColor3 = Collapsed and Core.UI.Theme.OpenButtonColor or Core.UI.Theme.CloseButtonColor;
+                    BorderSizePixel = 0;
+
+                    Text = Collapsed and "<" or ">";
+                    TextScaled = true;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+                    FontFace = Core.UI.Theme.TextFont;
+
+                    [Roact.Event.MouseButton1Click] = function()
+                        self:setState(function(CurrentState)
+                            return {
+                                Collapsed = not CurrentState.Collapsed
+                            }
+                        end)
+                    end;
+                }, {
+                    Corners = Roact.createElement("UICorner", {
+                        CornerRadius = UDim.new(1, 0)
+                    }, {});
+                });
+
                 Capacity = Roact.createElement("TextLabel", {
                     Size = UDim2.fromScale(0.4, 0.1);
                     Position = Core.UI.Position.Bottomleft;
                     AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
                     BackgroundTransparency = 1;
+                    BorderSizePixel = 0;
 
                     Text = tostring(Amount).." / "..tostring(Capacity);
                     TextScaled = true;
