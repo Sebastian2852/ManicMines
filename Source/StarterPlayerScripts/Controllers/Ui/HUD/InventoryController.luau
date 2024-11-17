@@ -138,7 +138,22 @@ function InventoryComponent:render()
                         ScrollingDirection = Enum.ScrollingDirection.Y;
                         CanvasSize = UDim2.fromScale(1, 1);
                     }, Components)
-                })
+                });
+
+                Capacity = Roact.createElement("TextLabel", {
+                    Size = UDim2.fromScale(0.4, 0.1);
+                    Position = Core.UI.Position.Bottomleft;
+                    AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
+                    BackgroundTransparency = 1;
+
+                    Text = "0 / 70";
+                    TextScaled = true;
+                    TextStrokeTransparency = 0;
+                    TextYAlignment = Enum.TextYAlignment.Bottom;
+                    TextXAlignment = Enum.TextXAlignment.Right;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+                    FontFace = Core.UI.Theme.TextFont;
+                }, {})
             })
         })
     })
