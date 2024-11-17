@@ -89,6 +89,14 @@ function InventoryComponent:render()
     local Amount = self.state.Amount
     local Capacity = self.state.Capacity
 
+    local FullPercentToGoRed = 0.85
+    local Time = math.clamp((Amount / Capacity - FullPercentToGoRed) / (1 - FullPercentToGoRed), 0, 1)
+
+    local Red = 1
+    local Green = 1 - Time
+    local Blue = 1 - Time
+    local Color = Color3.new(Red, Green, Blue)
+
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false
     }, {
@@ -154,7 +162,7 @@ function InventoryComponent:render()
                     TextStrokeTransparency = 0;
                     TextYAlignment = Enum.TextYAlignment.Bottom;
                     TextXAlignment = Enum.TextXAlignment.Right;
-                    TextColor3 = Core.UI.Theme.TextColor3;
+                    TextColor3 = Color;
                     FontFace = Core.UI.Theme.TextFont;
                 }, {})
             })
