@@ -574,14 +574,29 @@ function DataService:KnitStart()
     PlayerStatsService = Knit.GetService("PlayerStatsService")
     LoadingService = Knit.GetService("LoadingService")
 
+    local PlayersLeft = 0
+    local CloseEvent = Instance.new("BindableEvent")
+
     game.Players.PlayerAdded:Connect(function(Player)
+        PlayersLeft += 1
         self:CreateDataFolderForPlayer(Player)
     end)
 
     game.Players.PlayerRemoving:Connect(function(Player)
+        PlayersLeft -= 1
         self:SavePlayerData(Player)
         self:DeleteDataFolder(Player)
         self.Players[Player.UserId] = nil
+        CloseEvent:Fire()
+    end)
+
+    game:BindToClose(function(CloseReason :Enum.CloseReason)
+        LogService:Warn("Closing server, Reason: "..CloseReason.Name)
+        LogService:Log("Waiting for data to be saved")
+        while PlayersLeft > 0 do
+            CloseEvent.Event:Wait()
+        end
+        LogService:Log("Data saved; closing server")
     end)
 end
 
