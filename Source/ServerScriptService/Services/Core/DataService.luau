@@ -1,8 +1,9 @@
 local DataStoreService = game:GetService("DataStoreService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Knit = require(game.ReplicatedStorage.Packages.Knit)
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 
 local DataService = Knit.CreateService {
     Name = "DataService",
@@ -15,9 +16,10 @@ local PickaxeService
 local LogService
 local TycoonService
 local PlayerDisplayService
+local PlayerStatsService
 local LoadingService
 
-local RootDataFolder :Folder = game.ReplicatedStorage.PlayerData
+local RootDataFolder :Folder = ReplicatedStorage.PlayerData
 local TemplateDataFolder :Core.DataFolder = RootDataFolder:FindFirstChild("Template")
 
 local OresFolder :Folder = ReplicatedStorage.Assets.Ores
@@ -536,9 +538,71 @@ function DataService:DeleteSlot(Player :Player, SlotNumber :number)
     LogService:Log("Deleted slot "..tostring(SlotNumber).." for "..Player.Name)
 end
 
+--[=[
+Returns true/false depending on if the given player can afford the given orelist
+]=]
+function DataService:CanAfford(Player :Player, OreList :Core.OreList, Includes :Enums.Enum) :boolean
+    local DataFolder = self:GetPlayerDataFolder(Player)
+
+    local CheckInventory = false
+    local CheckStorage = false
+
+    if Includes == Enums.CostInclude.Both then
+        CheckInventory = true
+        CheckStorage = true
+    elseif Enums.CostInclude.Inventory then
+        CheckInventory = true
+    elseif Enums.CostInclude.Storage then
+        CheckStorage = true
+    end
+
+    for OreName :string, OreData :Core.OreListItem in pairs(OreList:LoopList()) do
+        if OreName == "GoldCoins" then
+            local PlayerGold = DataFolder.Gold.Value or 0
+            if PlayerGold < OreData.Amount then
+                return false
+            end
+            continue
+        end
+
+        local PlayerAmount = 0
+
+        if CheckInventory then
+            local InventoryValue = DataFolder.Inventory.Ores:FindFirstChild(OreName)
+            PlayerAmount += InventoryValue.Value or 0
+        end
+
+        if CheckStorage then
+            local StorageValue = DataFolder.Storage.Ores:FindFirstChild(OreName)
+            PlayerAmount += StorageValue.Value or 0
+        end
+
+        if PlayerAmount < OreData.Amount then
+            return false
+        end
+    end
+
+    return true
+end
+
+--[=[
+Handles the given costs for the given player. Returns true/false for success
+]=]
+function DataService:HandleCosts(Player :Player, CostList :Core.OreList) :boolean
+    if not self:CanAfford(Player, CostList, Enums.CostInclude.Inventory) then return false end
+    PlayerStatsService:TakeOres(Player, CostList)
+end
 
 
 --[[ CLIENT ]]--
+
+function DataService.Client:CanAfford(Player, CostList)
+    return self.Server:CanAfford(Player, CostList)
+end
+
+function DataService.Client:HandleCosts(Player, CostList)
+    return self.Server:HandleCosts(Player, CostList)
+end
 
 function DataService.Client:GetSlotsInfo(Player :Player)
     local Info = {}
@@ -599,6 +663,7 @@ function DataService:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
     TycoonService = Knit.GetService("TycoonService")
     PlayerDisplayService = Knit.GetService("PlayerDisplayService")
+    PlayerStatsService = Knit.GetService("PlayerStatsService")
     LoadingService = Knit.GetService("LoadingService")
 
     game.Players.PlayerAdded:Connect(function(Player)
