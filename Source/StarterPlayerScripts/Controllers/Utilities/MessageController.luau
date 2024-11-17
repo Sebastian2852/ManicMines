@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextChatService = game:GetService("TextChatService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
@@ -31,8 +32,8 @@ function MessageController:KnitInit()
     LogService = Knit.GetService("LogService")
 
     TextChannel = Instance.new("TextChannel")
-    TextChannel.Name = "MM_SystemMessages"
-    TextChannel.Parent = game.TextChatService
+    TextChannel.Name = "SystemMessages"
+    TextChannel.Parent = TextChatService
     LogService:Log("Created text channel")
 end
 
@@ -45,6 +46,10 @@ function MessageController:KnitStart()
         LogService:Log("    - Prefix:", MessageInfo.Prefix)
 
         SendChatMessage(MessageInfo)
+    end)
+
+    MessageService.EnableChannels:Connect(function()
+        TextChatService:WaitForChild("ChannelTabsConfiguration").Enabled = true
     end)
 
     task.wait(1)
