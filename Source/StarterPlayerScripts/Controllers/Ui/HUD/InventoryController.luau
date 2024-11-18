@@ -149,6 +149,8 @@ function InventoryComponent:render()
 
     local LevelProgress = math.clamp(Xp / XpNeeded, 0, 1);
 
+    local CapacityText = tostring(Amount).." / "..tostring(Capacity)
+
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false
     }, {
@@ -291,7 +293,7 @@ function InventoryComponent:render()
                     BackgroundTransparency = 1;
                     BorderSizePixel = 0;
 
-                    Text = tostring(Amount).." / "..tostring(Capacity);
+                    Text = CapacityText;
                     TextScaled = true;
                     TextStrokeTransparency = 0;
                     TextYAlignment = Enum.TextYAlignment.Bottom;
