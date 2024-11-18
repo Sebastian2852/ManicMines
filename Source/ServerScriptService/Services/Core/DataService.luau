@@ -357,8 +357,6 @@ function DataService:GetSlotInfo(Player :Player, Slot :DataStore) :Core.SlotInfo
     SaveData:Load(Slot)
     local General = SaveData:GetDataByName("General")
 
-    print(Info.SlotID, General)
-
     if type(General) == "table" and General.LastPlayed ~= nil and General.LastPlayed ~= 0 then
         Info.Used = true
         Info.TycoonName = General.TycoonName
