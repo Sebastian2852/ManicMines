@@ -260,6 +260,8 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
         end
     end
 
+
+    PlayerStatsService:CalculateInventoryCapacity(DataFolder)
     task.spawn(function()
         task.wait(1)
 
@@ -354,8 +356,6 @@ function DataService:GetSlotInfo(Player :Player, Slot :DataStore) :Core.SlotInfo
     SaveData:AddData(Data)
     SaveData:Load(Slot)
     local General = SaveData:GetDataByName("General")
-
-    print(Info.SlotID, General)
 
     if type(General) == "table" and General.LastPlayed ~= nil and General.LastPlayed ~= 0 then
         Info.Used = true

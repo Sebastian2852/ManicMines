@@ -9,6 +9,7 @@ local GeneralController = Knit.CreateController { Name = "GeneralController" }
 
 local TeleportService
 local DataService
+local UIService
 local LogService
 
 local DataFolder :Core.DataFolder
@@ -16,6 +17,10 @@ local DataFolder :Core.DataFolder
 local GeneralComponent = Roact.Component:extend("General")
 
 function GeneralComponent:init()
+    self:setState({
+        Hidden = false;
+    })
+
     DataFolder.Gold:GetPropertyChangedSignal("Value"):Connect(function()
         self:setState({
             Gold = tostring(DataFolder.Gold.Value)
@@ -25,6 +30,12 @@ function GeneralComponent:init()
     self:setState({
         Gold = tostring(DataFolder.Gold.Value)
     })
+
+    UIService.HUDButtons:Connect(function(New :boolean)
+        self:setState({
+            Hidden = not New;
+        })
+    end)
 end
 
 function GeneralComponent:render()
@@ -67,7 +78,7 @@ function GeneralComponent:render()
             }, {})
         });
 
-        SurfaceButton = Roact.createElement("ImageButton", {
+        SurfaceButton = not self.state.Hidden and Roact.createElement("ImageButton", {
             Size = UDim2.fromScale(0.04, 0.08);
             Position = UDim2.fromScale(0.06, 0.98);
             AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
@@ -92,6 +103,7 @@ function GeneralController:KnitStart()
     TeleportService = Knit.GetService("TeleportService")
     DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
+    UIService = Knit.GetService("UIService")
 
     DataService.DataLoaded:Connect(function(LoadedDataFolder :Core.DataFolder)
         DataFolder = LoadedDataFolder

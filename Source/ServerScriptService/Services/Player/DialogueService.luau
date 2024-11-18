@@ -10,6 +10,7 @@ local DialogueService = Knit.CreateService {
 }
 
 local LogService
+local UIService
 
 type DialogueChoice = {
     Text :string;
@@ -51,6 +52,7 @@ end
 
 function DialogueService:KnitStart()
     LogService = Knit.GetService("LogService")
+    UIService = Knit.GetService("UIService")
 
     local Modules = CollectionService:GetTagged(self.ModuleTag)
 
@@ -70,6 +72,8 @@ function DialogueService:KnitStart()
         ProximityPrompt.Parent = Npc
 
         ProximityPrompt.Triggered:Connect(function(Player)
+            UIService:HideInventory(Player)
+            UIService:HideHUDButtons(Player)
             self.Client.StartDialogue:Fire(Player, Info, Module:FindFirstChildWhichIsA("BasePart"))
         end)
 

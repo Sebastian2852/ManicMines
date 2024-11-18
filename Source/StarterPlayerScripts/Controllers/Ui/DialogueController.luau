@@ -10,6 +10,7 @@ local DialogueController = Knit.CreateController { Name = "DialogueController" }
 
 local DialogueService
 local LogService
+local UIService
 local CharacterController
 
 local Camera = workspace.CurrentCamera
@@ -262,6 +263,7 @@ end
 function DialogueController:KnitStart()
     DialogueService = Knit.GetService("DialogueService")
     LogService = Knit.GetService("LogService")
+    UIService = Knit.GetService("UIService")
     CharacterController = Knit.GetController("CharacterController")
 
     DialogueService.StartDialogue:Connect(function(DialogueInfo :InfoModule, CamPart :BasePart)
@@ -305,6 +307,8 @@ function DialogueController:KnitStart()
             Roact.unmount(GUI)
             Update:Disconnect()
             LogService:Log("Unmounted dialogue GUI")
+            UIService:ToggleInventory(true)
+            UIService:ToggleHUDButtons(true)
             self:ResetCamera()
             CharacterController:EnableMovement()
             self:EnablePrompts()

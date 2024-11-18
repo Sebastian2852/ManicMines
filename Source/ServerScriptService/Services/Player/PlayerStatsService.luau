@@ -25,6 +25,20 @@ end
 -- [[ PUBLIC ]]--
 
 --[=[
+Calculate and set the given data folder's inventory item count value to the correct amount
+]=]
+function PlayerStatsService:CalculateInventoryCapacity(DataFolder :Core.DataFolder)
+    local Total = 0
+
+    for _, Ore :IntValue in pairs(DataFolder.Inventory.Ores:GetChildren()) do
+        if Ore.Value <= 0 then continue end
+        Total += Ore.Value
+    end
+
+    DataFolder.Inventory.InventoryItemCount.Value = Total
+end
+
+--[=[
 Give a player a certain amount of levels
 ]=]
 function PlayerStatsService:AwardLevel(Player :Player, Amount :number)
@@ -77,6 +91,7 @@ function PlayerStatsService:GiveOres(Player :Player, OreList)
         DataValue.Value += Data.Amount
         LogService:Log("Gave "..Player.Name.." "..Data.Amount.." "..Data.DisplayName)
     end
+    self:CalculateInventoryCapacity(DataFolder)
 end
 
 --[=[
@@ -106,18 +121,28 @@ function PlayerStatsService:TakeOres(Player :Player, OreList)
         DataValue.Value = NewAmount
         LogService:Log("removed "..Player.Name.." "..Data.Amount.." "..Data.DisplayName)
     end
+    self:CalculateInventoryCapacity(DataFolder)
 end
 
 --[=[
 Gives the player ores and adds 1 to its times mined value
 ]=]
-function PlayerStatsService:MinedOre(Player :Player, OreList)
-    local DataFolder = DataService:GetPlayerDataFolder(Player)
+function PlayerStatsService:MinedOre(Player :Player, OreList :Core.OreList)
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
 
-    for OreName, _ in pairs(OreList:LoopList()) do
+    for OreName, OreData in pairs(OreList:LoopList()) do
+        if OreName == "GoldCoins" then continue end
+        if not OreData.RealOre then continue end
+
         local DataValue = FindTimesMinedValueByName(OreName, DataFolder)
         DataValue.Value += 1
         LogService:Log("Increased "..Player.Name.."'s "..OreName.." times mined value")
+
+        local Xp = OreData.RealOre:GetAttribute("XP")
+        if Xp == nil then
+            LogService:Warn("No xp value?")
+        end
+        self:AwardXP(Player, Xp)
     end
 
     self:GiveOres(Player, OreList)

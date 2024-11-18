@@ -9,6 +9,7 @@ local SettingsController = Knit.CreateController { Name = "PlayerSettingsControl
 local LogService
 local SettingsService
 local DataService
+local UIService
 
 local Settings :Core.Settings = {}
 
@@ -156,9 +157,16 @@ end
 
 function SettingsComponent:init()
     self:setState({
+        Hidden = false;
         IsSettingsVisible = false;
         Settings = Settings;
     })
+
+    UIService.HUDButtons:Connect(function(New :boolean)
+        self:setState({
+            Hidden = not New;
+        })
+    end)
 end
 
 function SettingsComponent:render()
@@ -166,7 +174,7 @@ function SettingsComponent:render()
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
     }, {
-        ToggleButton = Roact.createElement("ImageButton", {
+        ToggleButton = not self.state.Hidden and Roact.createElement("ImageButton", {
             Size = UDim2.fromScale(0.04, 0.08);
             Position = UDim2.fromScale(0.01, 0.98);
             AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
@@ -252,6 +260,7 @@ function SettingsController:KnitStart()
     LogService = Knit.GetService("LogService")
     SettingsService = Knit.GetService("SettingsService")
     DataService = Knit.GetService("DataService")
+    UIService = Knit.GetService("UIService")
 
     DataService.DataLoaded:Connect(function(DataFolder :Core.DataFolder)
         for _, SettingValue :ValueBase in pairs(DataFolder.Settings:GetChildren()) do
