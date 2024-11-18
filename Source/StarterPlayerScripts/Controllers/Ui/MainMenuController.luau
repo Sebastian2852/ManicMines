@@ -436,7 +436,7 @@ function MainMenuComponent:render()
             });
 
             Buttons = Roact.createElement("Frame", {
-                Size = UDim2.fromScale(0.5, 0.4);
+                Size = UDim2.fromScale(0.15, 0.4);
                 Position = UDim2.fromScale(0.05, 0.5);
                 AnchorPoint = Core.UI.AnchorPoint.TopLeft;
 
