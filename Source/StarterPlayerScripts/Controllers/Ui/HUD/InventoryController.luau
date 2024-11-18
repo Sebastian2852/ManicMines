@@ -167,7 +167,7 @@ function InventoryComponent:render()
 
             LevelContainer = Roact.createElement("Frame", {
                 Size = UDim2.fromScale(0.6, 0.2);
-                Position = Collapsed and UDim2.fromScale(1, 0.75) or Core.UI.Position.TopRight;
+                Position = Collapsed and UDim2.fromScale(1, 0.7) or Core.UI.Position.TopRight;
                 AnchorPoint = Core.UI.AnchorPoint.TopRight;
 
                 BackgroundTransparency = 1;
@@ -213,7 +213,7 @@ function InventoryComponent:render()
                 }, {});
 
                 Level = Roact.createElement("TextLabel", {
-                    Size = UDim2.fromScale(1, 0.25);
+                    Size = UDim2.fromScale(1, 0.35);
                     Position = UDim2.fromScale(0.5, 0.65);
                     AnchorPoint = Core.UI.AnchorPoint.BottomCenter;
                     BackgroundTransparency = 1;
@@ -260,7 +260,7 @@ function InventoryComponent:render()
 
                 CollapseButton = Roact.createElement("TextButton", {
                     Size = UDim2.fromScale(0.1, 0.1);
-                    Position = Collapsed and UDim2.fromScale(0.4, 0.75) or UDim2.fromScale(0.4, 0.9);
+                    Position = Collapsed and UDim2.fromScale(0.4, 0.7) or UDim2.fromScale(0.4, 0.9);
                     AnchorPoint = Core.UI.AnchorPoint.BottomRight;
                     SizeConstraint = Enum.SizeConstraint.RelativeXX;
                     BackgroundColor3 = Collapsed and Core.UI.Theme.OpenButtonColor or Core.UI.Theme.CloseButtonColor;
