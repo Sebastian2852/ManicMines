@@ -6,8 +6,10 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local MusicController = Knit.CreateController { Name = "MusicController" }
 
 local LogService
+local DataService
 local AudioEngine
 
+local DataFolder
 local ActiveSong
 local HadSongs = false
 local CurrentConfig = nil
@@ -39,6 +41,7 @@ end
 Plays the music for the given LayerConfig
 ]=]
 function MusicController:PlayMusicForLayer(LayerConfig :Configuration)
+    if not DataFolder then return end
     self:StopActiveMusic()
     self:ClearQueue()
 
@@ -53,7 +56,8 @@ function MusicController:PlayMusicForLayer(LayerConfig :Configuration)
     HadSongs = true
 
     for _, Song in pairs(Songs) do
-        local Sound = AudioEngine:CreateFromSound(Song, false, nil)
+        local Sound = AudioEngine:CreateFromSound(Song, false, nil) :: Core.Sound
+        Sound.Config.Volume = DataFolder.Settings.MusicVolume.Value or 1
         SongQueue:Enqueue(Sound)
     end
 
@@ -92,6 +96,11 @@ end
 function MusicController:KnitStart()
     AudioEngine = Knit.GetController("AudioEngine")
     LogService = Knit.GetService("LogService")
+    DataService = Knit.GetService("DataService")
+
+    DataService.DataLoaded:Connect(function(Data :Core.DataFolder)
+        DataFolder = Data
+    end)
 end
 
 
