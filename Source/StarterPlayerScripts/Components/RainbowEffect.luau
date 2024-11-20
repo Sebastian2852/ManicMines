@@ -36,6 +36,14 @@ local function CreatePropertyTableForTween(Object :Instance, NewColor :Color3) :
     end
 end
 
+local function GetColorOfInstance(Object :Instance) :Color3
+    if Object:IsA("Decal") then
+        return Object.Color3
+    elseif Object:IsA("Light") or Object:IsA("BasePart") then
+        return Object.Color
+    end
+end
+
 
 
 -- [[ COMPONENT ]] --
@@ -62,11 +70,13 @@ local RainbowEffectComponent = Component.new({
 
 function RainbowEffectComponent:Construct()
     self.Thread = nil
+    self.OriginalColor = Color3.new(1, 1, 1)
 end
 
 function RainbowEffectComponent:Start()
     local ComponentInstance = self.Instance ::Instance
-    warn(ComponentInstance)
+
+    self.OriginalColor = GetColorOfInstance(ComponentInstance)
 
     local Thread = task.spawn(function()
         while true do
@@ -79,6 +89,21 @@ function RainbowEffectComponent:Start()
     end)
 
     self.Thread = Thread
+end
+
+function RainbowEffectComponent:Stop()
+    local Thread = self.Thread
+    local ComponentInstance = self.Instance
+    local OriginalColor = self.OriginalColor
+
+    if Thread then
+        task.cancel(Thread)
+    end
+
+    if ComponentInstance then
+        local Tween = TweenService:Create(ComponentInstance, TweeningInfo, CreatePropertyTableForTween(ComponentInstance, OriginalColor))
+        Tween:Play()
+    end
 end
 
 return RainbowEffectComponent
