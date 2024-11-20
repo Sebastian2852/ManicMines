@@ -1,8 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Enums = require(ReplicatedStorage.Game.Modules.Enums)
+
+local CreateBasicListLayout = require(ReplicatedStorage.Game.GUI.Components.General.BasicListLayout)
+local CreateOreFrame = require(ReplicatedStorage.Game.GUI.Components.Storage.StorageOreFrame)
 
 local StorageController = Knit.CreateController { Name = "StorageController" }
 
@@ -112,7 +116,11 @@ function StorageComponent:render()
                         ScrollBarThickness = 5;
                         VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left;
                         ScrollBarImageColor3 = Core.UI.Color.White;
-                    }, {})
+                    }, {
+                        CreateBasicListLayout(Enums.UiListType.ByName);
+                        CreateOreFrame("Stone", 50);
+                        CreateOreFrame("Copper", 25);
+                    })
                 });
 
                 Storage = Roact.createElement("Frame", {
@@ -147,7 +155,11 @@ function StorageComponent:render()
                         ScrollBarThickness = 5;
                         VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right;
                         ScrollBarImageColor3 = Core.UI.Color.White;
-                    }, {})
+                    }, {
+                        CreateBasicListLayout(Enums.UiListType.ByName);
+                        CreateOreFrame("Copper", 25);
+                        CreateOreFrame("Stone", 50);
+                    })
                 })
             })
         })

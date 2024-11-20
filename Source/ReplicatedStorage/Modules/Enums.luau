@@ -26,5 +26,10 @@ Enums.CostInclude = {
     Both = CreateEnumValue();
 }
 
+Enums.UiListType = {
+    ByName = CreateEnumValue();
+    ByLayoutOrder = CreateEnumValue();
+}
+
 table.freeze(Enums)
 return Enums
