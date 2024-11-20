@@ -81,6 +81,10 @@ function MusicController:PlayNextSong()
 
     self:StopActiveMusic()
     local Song = SongQueue:Dequeue()
+    if not Song then
+        self:PlayMusicForLayer(CurrentConfig)
+        return
+    end
 
     Song.OnFinish = function()
         LogService:Log("Song finished")
