@@ -1,6 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Component = require(ReplicatedStorage.Packages.Component)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 
 
@@ -61,6 +64,9 @@ function Extensions.ShouldConstruct(ComponentClass)
     return Valid
 end
 
+local DataService
+local DataFolder :Core.DataFolder
+
 -- Main component stuff
 local RainbowEffectComponent = Component.new({
     Tag = "Component/Effect/Rainbow";
@@ -69,17 +75,43 @@ local RainbowEffectComponent = Component.new({
 })
 
 function RainbowEffectComponent:Construct()
+    DataService = Knit.GetService("DataService")
+
     self.Thread = nil
     self.OriginalColor = Color3.new(1, 1, 1)
+    self.Active = DataFolder ~= nil and DataFolder.Settings.RainbowEffect.Value or false
+
+    DataService.DataLoaded:Connect(function(NewDataFolder :Core.DataFolder)
+        DataFolder = NewDataFolder
+
+        DataFolder.Settings.RainbowEffect:GetPropertyChangedSignal("Value"):Connect(function()
+            self:SetActive(DataFolder.Settings.RainbowEffect.Value)
+        end)
+
+        self:SetActive(DataFolder.Settings.RainbowEffect.Value)
+    end)
 end
 
 function RainbowEffectComponent:Start()
-    local ComponentInstance = self.Instance ::Instance
+    local ComponentInstance = self.Instance :: Instance
 
     self.OriginalColor = GetColorOfInstance(ComponentInstance)
 
+    local DoneTween = false
+
     local Thread = task.spawn(function()
         while true do
+            if not self.Active then
+                if not DoneTween then
+                    DoneTween = true
+                    local Tween = TweenService:Create(ComponentInstance, TweeningInfo, CreatePropertyTableForTween(ComponentInstance, self.OriginalColor))
+                    Tween:Play()
+                end
+                task.wait(0.1)
+                continue
+            end
+            DoneTween = false
+
             for _, Color :Color3 in ipairs(Colors) do
                 local Tween = TweenService:Create(ComponentInstance, TweeningInfo, CreatePropertyTableForTween(ComponentInstance, Color))
                 Tween:Play()
@@ -89,6 +121,10 @@ function RainbowEffectComponent:Start()
     end)
 
     self.Thread = Thread
+end
+
+function RainbowEffectComponent:SetActive(Active :boolean)
+    self.Active = Active
 end
 
 function RainbowEffectComponent:Stop()
