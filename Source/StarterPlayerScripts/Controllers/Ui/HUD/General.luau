@@ -61,7 +61,7 @@ function GeneralComponent:render()
                 BackgroundTransparency = 1;
                 BorderSizePixel = 0;
 
-                Image = Core.UI.Images.Missing;
+                Image = Core.UI.Images.GoldCoins;
                 ScaleType = Enum.ScaleType.Fit;
             }, {});
 

@@ -7,6 +7,7 @@ local SettingsService = Knit.CreateService {
     Name = "SettingsService",
     Client = {
         UpdateSettings = Knit.CreateSignal();
+        SettingsChanged = Knit.CreateSignal();
     },
 }
 
@@ -34,6 +35,7 @@ end
 function SettingsService:ResetPlayerSettings(Player :Player)
     LogService:Log("Resetting player's settings to default")
     UpdateSettings(Player, Core.GameConfig.DefaultSettings)
+    self.Client.SettingsChanged:Fire(Player)
 end
 
 
@@ -41,6 +43,7 @@ end
 
 function SettingsService.Client:PushSettings(Player :Player, NewSettings :Core.Settings)
     UpdateSettings(Player, NewSettings)
+    self.SettingsChanged:Fire(Player)
 end
 
 

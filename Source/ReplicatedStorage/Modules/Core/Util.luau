@@ -184,4 +184,17 @@ function Util:ApplyPropertiesFromTableAsync<T>(Object :T, Properties :{[string] 
     end)
 end
 
+--[=[
+Randomise the passed table. Time complexity O(n)
+]=]
+function Util:RandomiseTable(Table :{any}) :{any}
+    local NumberGenerator = Random.new()
+    for i = #Table, 2, -1 do
+        local RandomNumber = NumberGenerator:NextInteger(1, i)
+        Table[i], Table[RandomNumber] = Table[RandomNumber], Table[i]
+    end
+
+    return Table
+end
+
 return Util

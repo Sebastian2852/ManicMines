@@ -8,6 +8,7 @@ local MineEffects = Knit.CreateController { Name = "MineEffects" }
 
 local PlayerDisplayService
 local LightingController
+local MusicController
 local PickaxeService
 local AudioEngine
 local MineService
@@ -15,6 +16,10 @@ local LogService
 
 local PreviousLayer = ""
 local Animation
+
+
+
+-- [[ PUBLIC ]] --
 
 function MineEffects:Layer(LayerName :string)
     LogService:Log("Appling layer effects for: "..LayerName)
@@ -24,8 +29,9 @@ function MineEffects:Layer(LayerName :string)
     end
 
     local LayerConfig :Configuration = Core.Assets.Layers:FindFirstChild(LayerName)
-    local LightingConfig = LayerConfig:FindFirstChild("Lighting")
+    MusicController:PlayMusicForLayer(LayerConfig)
 
+    local LightingConfig = LayerConfig:FindFirstChild("Lighting")
     if LightingConfig then
         LogService:Log("Appling lighting effects")
         LightingController:CreateFromConfig(LightingConfig)
@@ -46,6 +52,7 @@ end
 function MineEffects:KnitStart()
     AudioEngine                  = Knit.GetController("AudioEngine")
     LightingController           = Knit.GetController("LightingController")
+    MusicController              = Knit.GetController("MusicController")
     LogService                   = Knit.GetService("LogService")
     MineService                  = Knit.GetService("MineService")
     PlayerDisplayService         = Knit.GetService("PlayerDisplayService")

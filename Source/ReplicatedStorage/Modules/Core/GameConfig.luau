@@ -21,10 +21,11 @@ or when the reset their settings to default.
 Config.DefaultSettings = {
     GlobalShadows = true;
     RainbowEffect = true;
+    MusicVolume = 0.5;
 }
 
 Config.MainMenu = {
-    Version = "1.3";
+    Version = "1.0.0";
     --[=[
     All the credits for the game; main menu will automatically fill out the credits gui with these names. DO NOT EDIT YET!!
     ]=]

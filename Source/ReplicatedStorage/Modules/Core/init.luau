@@ -66,6 +66,7 @@ Used for setting tables, contains every setting.
 export type Settings = {
     GlobalShadows :boolean;
     RainbowEffect :boolean;
+    MusicVolume :number;
 }
 
 --[=[

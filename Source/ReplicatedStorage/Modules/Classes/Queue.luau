@@ -12,6 +12,14 @@ function Queue.new()
 end
 
 --[=[
+Clear the queue
+]=]
+function Queue:Clear()
+    self._Size = 0
+    self._Queue = {}
+end
+
+--[=[
 Add something to the queue
 ]=]
 function Queue:Enqueue(Object :any)

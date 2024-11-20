@@ -4,6 +4,12 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
+local CreateSettingsHeader = require(ReplicatedStorage.Game.GUI.Components.Settings.SettingsHeader)
+local CreateSettingSubtitle = require(ReplicatedStorage.Game.GUI.Components.Settings.SettingSubtitle)
+
+local CreateCheckbox = require(ReplicatedStorage.Game.GUI.Components.Settings.Checkbox)
+local CreateNumberInput = require(ReplicatedStorage.Game.GUI.Components.Settings.NumberInput)
+
 local SettingsController = Knit.CreateController { Name = "PlayerSettingsController" }
 
 local LogService
@@ -43,74 +49,12 @@ local Objects = 0
 
 function SettingsComponent:SettingsHeader(HeadingText :string)
     Objects += 1;
-    return Roact.createElement("TextLabel", {
-        Size = UDim2.fromScale(0.9, 0.135);
-        Position = UDim2.fromScale(0.5, 0);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-        LayoutOrder = Objects;
-
-        Text = HeadingText;
-        TextScaled = true;
-
-        FontFace = Core.UI.Theme.TextFont;
-        TextColor3 = Core.UI.Theme.TextColor3;
-    }, {})
+    return CreateSettingsHeader(HeadingText, Objects)
 end
 
 function SettingsComponent:SettingsSubtitle(SubtitleText :string)
     Objects += 1;
-    return Roact.createElement("TextLabel", {
-        Size = UDim2.fromScale(0.9, 0.1);
-        Position = UDim2.fromScale(0.5, 0);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-        LayoutOrder = Objects;
-
-        Text = SubtitleText;
-        TextScaled = true;
-        RichText = true;
-
-        FontFace = Core.UI.Theme.TextFont;
-        TextColor3 = Core.UI.Theme.TextColorDisabled;
-        TextYAlignment = Enum.TextYAlignment.Top;
-    }, {})
-end
-
-function SettingsComponent:Checkbox(SettingName :string)
-    local Value = Settings[SettingName]
-    if Value == nil then
-        LogService:Warn("Invalid setting name!")
-        return
-    end
-
-    local ImageId = Core.UI.Images.CheckBoxUnchecked;
-    if Value == true then
-        ImageId = Core.UI.Images.CheckBoxChecked;
-    end
-    return Roact.createElement("ImageButton", {
-        Size = UDim2.fromScale(0.7, 0.7);
-        Position = UDim2.fromScale(0.9, 0.5);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-        SizeConstraint = Enum.SizeConstraint.RelativeYY;
-
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-
-        Image = ImageId;
-
-        [Roact.Event.MouseButton1Click] = function()
-            Settings[SettingName] = not Settings[SettingName]
-            local NewSettings = self.state.Settings
-            NewSettings[SettingName] = Settings[SettingName]
-            self:setState({Settings = NewSettings})
-            PushToServer()
-        end
-    }, {})
+    return CreateSettingSubtitle(SubtitleText, Objects)
 end
 
 function SettingsComponent:BooleanToggle(SettingName :string, DisplayName :string, Description :string)
@@ -131,6 +75,7 @@ function SettingsComponent:BooleanToggle(SettingName :string, DisplayName :strin
 
             Text = DisplayName;
             TextScaled = true;
+            RichText = true;
             TextXAlignment = Enum.TextXAlignment.Left;
 
             FontFace = Core.UI.Theme.TextFont;
@@ -145,13 +90,58 @@ function SettingsComponent:BooleanToggle(SettingName :string, DisplayName :strin
 
             Text = Description;
             TextScaled = true;
+            RichText = true;
             TextXAlignment = Enum.TextXAlignment.Left;
 
             FontFace = Core.UI.Theme.TextFont;
             TextColor3 = Core.UI.Theme.TextColorDisabled;
         }, {}),
 
-        Toggle = self:Checkbox(SettingName)
+        Toggle = CreateCheckbox(self, PushToServer, SettingName, Settings)
+    })
+end
+
+function SettingsComponent:NumberInput(SettingName :string, DisplayName :string, Description :string, MinValue :number, MaxValue :number)
+    Objects += 1
+    return Roact.createElement("Frame", {
+        Size = UDim2.fromScale(0.9, 0.15);
+        Position = UDim2.fromScale(0.5, 0);
+        AnchorPoint = Vector2.new(0.5, 0.5);
+
+        BackgroundTransparency = 1;
+        BorderSizePixel = 0;
+        LayoutOrder = Objects;
+    }, {
+        NameLabel = Roact.createElement("TextLabel", {
+            Size = UDim2.fromScale(0.9, 0.6);
+
+            BackgroundTransparency = 1;
+
+            Text = DisplayName;
+            TextScaled = true;
+            RichText = true;
+            TextXAlignment = Enum.TextXAlignment.Left;
+
+            FontFace = Core.UI.Theme.TextFont;
+            TextColor3 = Core.UI.Theme.TextColor3;
+        }, {}),
+
+        DescriptionLabel = Roact.createElement("TextLabel", {
+            Size = UDim2.fromScale(0.9, 0.4);
+            Position = UDim2.fromScale(0, 0.6);
+
+            BackgroundTransparency = 1;
+
+            Text = Description;
+            TextScaled = true;
+            RichText = true;
+            TextXAlignment = Enum.TextXAlignment.Left;
+
+            FontFace = Core.UI.Theme.TextFont;
+            TextColor3 = Core.UI.Theme.TextColorDisabled;
+        }, {}),
+
+        Input = CreateNumberInput(self, PushToServer, SettingName, Settings, MinValue, MaxValue);
     })
 end
 
@@ -244,6 +234,8 @@ function SettingsComponent:render()
 
                 ExperimentalHeader = self:SettingsHeader("Experimental");
                 ExperimentalWarning = self:SettingsSubtitle("⚠️ THESE SETTINGS ARE EXPERIMENTAL AND <font color='#fc9905'>CAN CAUSE ERRORS OR DATA LOSS</font>; USE AT YOUR OWN RISK ⚠️");
+
+                MusicVolume = self:NumberInput("MusicVolume", "Music Volume", "Set the volume of music globally. <font color='#fc9905'>This is WIP and may not work!</font>", 0, 1)
 
                 -- No settings here yet but there will be one for the custom map streamer thingy
                 -- because I already know its going to cause a lot of issues
