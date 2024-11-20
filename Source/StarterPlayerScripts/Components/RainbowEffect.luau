@@ -2,6 +2,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local Component = require(ReplicatedStorage.Packages.Component)
 
+
+
+-- [[ CONFIG ]] --
+
 local ValidTypes = {
     "BasePart";
     "Decal";
@@ -20,6 +24,23 @@ local Colors = {
 
 local TweeningInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
 
+
+
+-- [[ FUNCTIONS ]] --
+
+local function CreatePropertyTableForTween(Object :Instance, NewColor :Color3) : {[string] :Color3}
+    if Object:IsA("Decal") then
+        return {Color3 = NewColor}
+    elseif Object:IsA("Light") or Object:IsA("BasePart") then
+        return {Color = NewColor}
+    end
+end
+
+
+
+-- [[ COMPONENT ]] --
+
+-- Extention functions
 local Extensions = {}
 function Extensions.ShouldConstruct(ComponentClass)
     local ComponentInstance = ComponentClass.Instance
@@ -32,19 +53,12 @@ function Extensions.ShouldConstruct(ComponentClass)
     return Valid
 end
 
+-- Main component stuff
 local RainbowEffectComponent = Component.new({
     Tag = "Component/Effect/Rainbow";
     Ancestors = { workspace };
     Extensions = Extensions;
 })
-
-local function CreatePropertyTableForTween(Object :Instance, NewColor :Color3) : {[string] :Color3}
-    if Object:IsA("Decal") then
-        return {Color3 = NewColor}
-    elseif Object:IsA("Light") or Object:IsA("BasePart") then
-        return {Color = NewColor}
-    end
-end
 
 function RainbowEffectComponent:Construct()
     self.Thread = nil
