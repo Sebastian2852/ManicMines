@@ -13,7 +13,7 @@ local LogService
 
 function StorageComponent:init()
     self:setState({
-        Enabled = false;
+        Enabled = true;
     })
 
     TycoonUpgradeService.OpenStorage:Connect(function()
@@ -36,9 +36,8 @@ function StorageComponent:render()
             Size = UDim2.fromScale(0.5, 0.5);
             Position = Core.UI.Position.Center;
             AnchorPoint = Core.UI.AnchorPoint.Center;
-
-            BackgroundColor3 = Core.UI.Theme.BackgroundColor;
-            BackgroundTransparency = Core.UI.Theme.BackgroundColorTransparency;
+            BorderSizePixel = 0;
+            BackgroundColor3 = Core.UI.Theme.BackgroundColorPrimary;
         }, {
             Title = Roact.createElement("TextLabel", {
                 Size = UDim2.fromScale(1, 0.1);
@@ -48,32 +47,32 @@ function StorageComponent:render()
                 Text = "Storage";
                 TextScaled = true;
                 BackgroundTransparency = 1;
-                TextStrokeTransparency = 0;
-
                 FontFace = Core.UI.Theme.TextFont;
                 TextColor3 = Core.UI.Theme.TextColor3;
             }, {});
 
             CloseButton = Roact.createElement("TextButton", {
-                Size = UDim2.fromScale(0.035, 0.035);
-                SizeConstraint = Enum.SizeConstraint.RelativeXX;
-                Position = UDim2.fromScale(0, -0.1);
-                AnchorPoint = Core.UI.AnchorPoint.TopLeft;
-
-                Text = "X";
-                TextScaled = true;
+                Size = UDim2.fromScale(0.138, 0.06);
+                Position = UDim2.fromScale(0, -0.07);
+                BackgroundColor3 = Core.UI.Theme.CloseButtonColor;
                 BorderSizePixel = 0;
+                Modal = true;
+
+                Text = "Close";
+                TextScaled = true;
+                TextColor3 = Core.UI.Color.White;
                 FontFace = Core.UI.Theme.TextFont;
 
-                BackgroundColor3 = Core.UI.Color.Red;
-                TextColor3 = Core.UI.Color.White;
-
-                [Core.Roact.Event.Activated] = function()
+                [Roact.Event.MouseButton1Click] = function()
                     self:setState({
                         Enabled = false
                     })
-                end
-            }, {});
+                end;
+            }, {
+                Corners = Roact.createElement("UICorner", {
+                    CornerRadius = UDim.new(0.2, 0)
+                }, {})
+            });
 
             Main = Roact.createElement("Frame", {
                 Size = UDim2.fromScale(1, 0.9);
