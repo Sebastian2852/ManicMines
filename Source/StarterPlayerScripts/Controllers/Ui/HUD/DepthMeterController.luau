@@ -19,7 +19,7 @@ function DepthMeterComponent:init()
 
     RunService:BindToRenderStep("CharacterPosition", Enum.RenderPriority.Input.Value, function()
         local Character = Player.Character
-        if not Character or ReplicatedStorage.Player.Depth.Value <= 0 then
+        if not Character or not Character.PrimaryPart or ReplicatedStorage.Player.Depth.Value <= 0 then
             self:setState({
                 Position = Vector3.zero;
                 Show = false;
