@@ -11,6 +11,7 @@ local POSITIONALSTORAGEFOLDER -- Used for sounds that play at a vector without a
 
 local Sounds = 0
 AudioEngine.Sounds = {}
+AudioEngine.Objects = {}
 
 function AudioEngine:_ConstructObject(SoundObject :Core.Sound)
     local Location = GLOBALSTORAGEFOLDER
@@ -148,8 +149,18 @@ function AudioEngine:PlaySound(SoundObject :Core.Sound) :number
     self:_ConnectEvents(Sound, SoundObject)
 
     Sound:Play()
+    self.Objects[ID] = Sound
 
     return ID
+end
+
+--[=[
+Get the sound object of the given ID
+]=]
+function AudioEngine:GetSoundObject(ID :number) :Sound
+    assert(type(ID) == "number", "SoundID must be a sound")
+    if self.Objects[ID] == nil then return warn("No sound with ID: "..tostring(ID)) end
+    return self.Objects[ID]
 end
 
 --[=[
@@ -161,6 +172,7 @@ function AudioEngine:StopSound(ID :number)
     if self.Sounds[ID] == nil then return warn("No sound with ID: "..tostring(ID)) end
 
     self.Sounds[ID]:Destroy()
+    self.Objects[ID] = nil
 end
 
 function AudioEngine:KnitInit()

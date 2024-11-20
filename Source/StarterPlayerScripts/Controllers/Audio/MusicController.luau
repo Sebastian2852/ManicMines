@@ -8,6 +8,7 @@ local MusicController = Knit.CreateController { Name = "MusicController" }
 local LogService
 local DataService
 local AudioEngine
+local SettingsService
 
 local DataFolder
 local ActiveSong
@@ -97,9 +98,22 @@ function MusicController:KnitStart()
     AudioEngine = Knit.GetController("AudioEngine")
     LogService = Knit.GetService("LogService")
     DataService = Knit.GetService("DataService")
+    SettingsService = Knit.GetService("SettingsService")
 
     DataService.DataLoaded:Connect(function(Data :Core.DataFolder)
         DataFolder = Data
+    end)
+
+    SettingsService.SettingsChanged:Connect(function()
+        LogService:Log("Settings updated, updating sound volume")
+        local CurrentSound = AudioEngine:GetSoundObject(ActiveSong) :: Sound
+        if not CurrentSound then
+            LogService:Warn("No current sound")
+            return
+        end
+
+        CurrentSound.Volume = DataFolder.Settings.MusicVolume.Value
+        LogService:Log("Updated volume of current song")
     end)
 end
 
