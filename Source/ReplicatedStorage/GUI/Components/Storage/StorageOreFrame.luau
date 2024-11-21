@@ -15,8 +15,9 @@ function InventoryOreFrame:render()
     local Name = Ore:GetAttribute("DisplayName")
 
     return Roact.createElement("Frame", {
-        Size = UDim2.fromScale(1, 0.05);
+        Size = UDim2.fromScale(1, 0.07);
         AnchorPoint = Vector2.new(0.5, 0.5);
+
         BackgroundTransparency = 0.5;
         BorderSizePixel = 0;
     }, {
@@ -25,16 +26,17 @@ function InventoryOreFrame:render()
         }, {});
 
         Layout = Roact.createElement("UIListLayout", {
-            Padding = UDim.new(0.01, 0);
             FillDirection = Enum.FillDirection.Horizontal;
             SortOrder = Enum.SortOrder.LayoutOrder;
+            Wraps = false;
+            Padding = UDim.new(0.01, 0);
 
             HorizontalAlignment = Enum.HorizontalAlignment.Left;
-            ItemLineAlignment = Enum.ItemLineAlignment.Automatic;
             VerticalAlignment = Enum.VerticalAlignment.Center;
+            ItemLineAlignment = Enum.ItemLineAlignment.Center;
 
-            HorizontalFlex = Enum.UIFlexAlignment.Fill;
             VerticalFlex = Enum.UIFlexAlignment.None;
+            HorizontalFlex = Enum.UIFlexAlignment.Fill;
         }, {});
 
         OreImage = Roact.createElement("ImageLabel", {
@@ -53,49 +55,49 @@ function InventoryOreFrame:render()
         });
 
         Details = Roact.createElement("Frame", {
-            BackgroundTransparency = 1;
             Size = UDim2.fromScale(1, 1);
+            BackgroundTransparency = 1;
             LayoutOrder = 2;
         }, {
             Layout = Roact.createElement("UIListLayout", {
-                Padding = UDim.new(0, 0);
-                FillDirection = Enum.FillDirection.Horizontal;
                 SortOrder = Enum.SortOrder.LayoutOrder;
+                Wraps = false;
+                FillDirection = Enum.FillDirection.Vertical;
 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center;
+                HorizontalFlex = Enum.UIFlexAlignment.None;
+                VerticalFlex = Enum.UIFlexAlignment.None;
+
+                HorizontalAlignment = Enum.HorizontalAlignment.Left;
                 ItemLineAlignment = Enum.ItemLineAlignment.Automatic;
-                VerticalAlignment = Enum.VerticalAlignment.Center;
-
-                HorizontalFlex = Enum.UIFlexAlignment.Fill;
-                VerticalFlex = Enum.UIFlexAlignment.Fill;
+                VerticalAlignment = Enum.VerticalAlignment.Top;
             }, {});
 
             OreName = Roact.createElement("TextLabel", {
                 BackgroundTransparency = 1;
-                Size = UDim2.fromScale(0.6, 1);
-                LayoutOrder = 1;
+                Size = UDim2.fromScale(1, 0.6);
 
-                Text = Name;
+                Text = Name or "error getting name";
                 FontFace = Core.UI.Theme.TextFont;
                 TextStrokeTransparency = 0;
                 TextScaled = true;
 
                 TextXAlignment = Enum.TextXAlignment.Left;
+                TextYAlignment = Enum.TextYAlignment.Bottom;
 
                 TextColor3 = Core.UI.Theme.TextColor3;
             }, {});
 
             OreAmount = Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(1, 0.4);
                 BackgroundTransparency = 1;
-                Size = UDim2.fromScale(0.22, 1);
-                LayoutOrder = 2;
 
-                Text = tostring(Amount);
+                Text = Amount or "error getting amount";
                 FontFace = Core.UI.Theme.TextFont;
                 TextStrokeTransparency = 0;
                 TextScaled = true;
 
-                TextXAlignment = Enum.TextXAlignment.Right;
+                TextXAlignment = Enum.TextXAlignment.Left;
+                TextYAlignment = Enum.TextYAlignment.Top;
 
                 TextColor3 = Core.UI.Theme.TextColor3;
             }, {});
@@ -115,8 +117,9 @@ function StorageOreFrame:render()
     local Name = Ore:GetAttribute("DisplayName")
 
     return Roact.createElement("Frame", {
-        Size = UDim2.fromScale(1, 0.05);
+        Size = UDim2.fromScale(1, 0.07);
         AnchorPoint = Vector2.new(0.5, 0.5);
+
         BackgroundTransparency = 0.5;
         BorderSizePixel = 0;
     }, {
@@ -125,16 +128,17 @@ function StorageOreFrame:render()
         }, {});
 
         Layout = Roact.createElement("UIListLayout", {
-            Padding = UDim.new(0.01, 0);
             FillDirection = Enum.FillDirection.Horizontal;
             SortOrder = Enum.SortOrder.LayoutOrder;
+            Wraps = false;
+            Padding = UDim.new(0.01, 0);
 
             HorizontalAlignment = Enum.HorizontalAlignment.Left;
-            ItemLineAlignment = Enum.ItemLineAlignment.Automatic;
             VerticalAlignment = Enum.VerticalAlignment.Center;
+            ItemLineAlignment = Enum.ItemLineAlignment.Center;
 
-            HorizontalFlex = Enum.UIFlexAlignment.Fill;
             VerticalFlex = Enum.UIFlexAlignment.None;
+            HorizontalFlex = Enum.UIFlexAlignment.Fill;
         }, {});
 
         OreImage = Roact.createElement("ImageLabel", {
@@ -153,49 +157,49 @@ function StorageOreFrame:render()
         });
 
         Details = Roact.createElement("Frame", {
-            BackgroundTransparency = 1;
             Size = UDim2.fromScale(1, 1);
+            BackgroundTransparency = 1;
             LayoutOrder = 1;
         }, {
             Layout = Roact.createElement("UIListLayout", {
-                Padding = UDim.new(0, 0);
-                FillDirection = Enum.FillDirection.Horizontal;
                 SortOrder = Enum.SortOrder.LayoutOrder;
+                Wraps = false;
+                FillDirection = Enum.FillDirection.Vertical;
 
-                HorizontalAlignment = Enum.HorizontalAlignment.Center;
+                HorizontalFlex = Enum.UIFlexAlignment.None;
+                VerticalFlex = Enum.UIFlexAlignment.None;
+
+                HorizontalAlignment = Enum.HorizontalAlignment.Right;
                 ItemLineAlignment = Enum.ItemLineAlignment.Automatic;
-                VerticalAlignment = Enum.VerticalAlignment.Center;
-
-                HorizontalFlex = Enum.UIFlexAlignment.Fill;
-                VerticalFlex = Enum.UIFlexAlignment.Fill;
+                VerticalAlignment = Enum.VerticalAlignment.Top;
             }, {});
 
             OreName = Roact.createElement("TextLabel", {
                 BackgroundTransparency = 1;
-                Size = UDim2.fromScale(0.6, 1);
-                LayoutOrder = 2;
+                Size = UDim2.fromScale(1, 0.6);
 
-                Text = Name;
+                Text = Name or "error getting name";
                 FontFace = Core.UI.Theme.TextFont;
                 TextStrokeTransparency = 0;
                 TextScaled = true;
 
                 TextXAlignment = Enum.TextXAlignment.Right;
+                TextYAlignment = Enum.TextYAlignment.Bottom;
 
                 TextColor3 = Core.UI.Theme.TextColor3;
             }, {});
 
             OreAmount = Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(1, 0.4);
                 BackgroundTransparency = 1;
-                Size = UDim2.fromScale(0.22, 1);
-                LayoutOrder = 1;
 
-                Text = tostring(Amount);
+                Text = Amount or "error getting amount";
                 FontFace = Core.UI.Theme.TextFont;
                 TextStrokeTransparency = 0;
                 TextScaled = true;
 
-                TextXAlignment = Enum.TextXAlignment.Left;
+                TextXAlignment = Enum.TextXAlignment.Right;
+                TextYAlignment = Enum.TextYAlignment.Top;
 
                 TextColor3 = Core.UI.Theme.TextColor3;
             }, {});
