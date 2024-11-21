@@ -43,4 +43,5 @@ end):catch(warn)
 
 Cmdr:RegisterHooksIn(script.Parent.Cmdr.Hooks)
 Cmdr:RegisterCommandsIn(script.Parent.Cmdr.Commands)
+Cmdr:RegisterTypesIn(script.Parent.Cmdr.Types)
 Cmdr:RegisterDefaultCommands({"Help", "DefaultUtil"})
