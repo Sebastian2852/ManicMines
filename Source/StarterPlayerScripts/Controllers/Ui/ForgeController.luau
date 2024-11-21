@@ -104,17 +104,17 @@ local function CreatePickaxeCosts(Pickaxe :Configuration)
 
     if Costs then
         LogService:Log("Creating cost frames for pickaxe: "..Pickaxe.Name)
-        for _, Ore in pairs(Costs:GetChildren()) do
+        for OreName, Ore in pairs(Costs:GetChildren()) do
+            if OreName == "GoldCoins" then continue end
             local RealOre = Core.Util:GetOreByName(Ore.Name)
-            if not RealOre then continue end
 
-            local OreName = RealOre:GetAttribute("DisplayName")
+            local DisplayName = RealOre:GetAttribute("DisplayName")
             local Icon = RealOre:GetAttribute("EmblemImageID")
             local Color = RealOre:GetAttribute("InventoryBackgroundColor")
             local AmountNeeded = Ore.Value
 
-            CostFrames[OreName] = CreatOreLikeFrame(Icon, OreName, AmountNeeded, Color, UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0))
-            LogService:Log("    - Created ore cost: "..tostring(AmountNeeded).." "..OreName)
+            CostFrames[OreName] = CreatOreLikeFrame(Icon, DisplayName, AmountNeeded, Color, UDim2.fromScale(1, 0.1), UDim2.fromScale(0, 0))
+            LogService:Log("    - Created ore cost: "..tostring(AmountNeeded).." "..DisplayName)
         end
     end
 

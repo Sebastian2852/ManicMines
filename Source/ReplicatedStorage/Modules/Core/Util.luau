@@ -106,7 +106,7 @@ end
 Returns the ore as a base part from the ores folder
 ]=]
 function Util:GetOreByName(OreName :string) :BasePart
-    if OreName == "Gold" then return end
+    if OreName == "GoldCoins" then return end
     if OreName == "Stone" then
         return ReplicatedStorage.Assets.Stone
     end
