@@ -17,6 +17,15 @@ local LogService
 
 local DataFolder :Core.DataFolder
 
+local function CreateOreFramesForOreList(OreList :Core.OreList, Type :Enums.Enum)
+    local Frames = {}
+    for OreName, OreData :Core.OreListItem in pairs(OreList:LoopList()) do
+        if OreName == "GoldCoins" then continue end
+        Frames[OreName] = CreateOreFrame(Type, OreName, OreData.Amount)
+    end
+    return Frames
+end
+
 local function GetInventoryAsOreList() :Core.OreList
     local OreList = Core.OreList.CreateFromFolder(DataFolder.Inventory.Ores)
     return OreList
@@ -41,10 +50,10 @@ end
 
 function StorageComponent:render()
     LogService:Log("Rendering storage component")
-    local InventoryFrames = Core.UI:CreateOreFrames(GetInventoryAsOreList(), Enums.OreFrameStyle.Normal, UDim2.fromScale(1, 0.05))
+    local InventoryFrames = CreateOreFramesForOreList(GetInventoryAsOreList(), Enums.StorageOreFrameType.Inventory) -- Core.UI:CreateOreFrames(GetInventoryAsOreList(), Enums.OreFrameStyle.Normal, UDim2.fromScale(1, 0.05))
     InventoryFrames["Layout"] = CreateBasicListLayout(Enums.UiListType.ByName)
 
-    local StorageFrames = Core.UI:CreateOreFrames(GetStorageAsOreList(), Enums.OreFrameStyle.Normal, UDim2.fromScale(1, 0.05))
+    local StorageFrames = CreateOreFramesForOreList(GetStorageAsOreList(), Enums.StorageOreFrameType.Storage) -- Core.UI:CreateOreFrames(GetStorageAsOreList(), Enums.OreFrameStyle.Normal, UDim2.fromScale(1, 0.05))
     StorageFrames["Layout"] = CreateBasicListLayout(Enums.UiListType.ByName)
 
     return Roact.createElement("ScreenGui", {
