@@ -31,5 +31,10 @@ Enums.UiListType = {
     ByLayoutOrder = CreateEnumValue();
 }
 
+Enums.StorageOreFrameType = {
+    Inventory = CreateEnumValue();
+    Storage = CreateEnumValue();
+}
+
 table.freeze(Enums)
 return Enums

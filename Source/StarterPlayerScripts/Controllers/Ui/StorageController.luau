@@ -15,24 +15,38 @@ local TycoonUpgradeService
 local DataService
 local LogService
 
+local DataFolder :Core.DataFolder
+
+local function GetInventoryAsOreList() :Core.OreList
+    local OreList = Core.OreList.CreateFromFolder(DataFolder.Inventory.Ores)
+    return OreList
+end
+
+local function GetStorageAsOreList() :Core.OreList
+    local OreList = Core.OreList.CreateFromFolder(DataFolder.Storage.Ores)
+    return OreList
+end
+
 function StorageComponent:init()
     self:setState({
         Enabled = true;
     })
 
     TycoonUpgradeService.OpenStorage:Connect(function()
-        self:Enable()
+        self:setState({
+            Enabled = true;
+        })
     end)
-end
-
-function StorageComponent:Enable()
-    self:setState({
-        Enabled = true;
-    })
 end
 
 function StorageComponent:render()
     LogService:Log("Rendering storage component")
+    local InventoryFrames = Core.UI:CreateOreFrames(GetInventoryAsOreList(), Enums.OreFrameStyle.Normal, UDim2.fromScale(1, 0.05))
+    InventoryFrames["Layout"] = CreateBasicListLayout(Enums.UiListType.ByName)
+
+    local StorageFrames = Core.UI:CreateOreFrames(GetStorageAsOreList(), Enums.OreFrameStyle.Normal, UDim2.fromScale(1, 0.05))
+    StorageFrames["Layout"] = CreateBasicListLayout(Enums.UiListType.ByName)
+
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
     }, {
@@ -116,11 +130,7 @@ function StorageComponent:render()
                         ScrollBarThickness = 5;
                         VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left;
                         ScrollBarImageColor3 = Core.UI.Color.White;
-                    }, {
-                        CreateBasicListLayout(Enums.UiListType.ByName);
-                        CreateOreFrame("Stone", 50);
-                        CreateOreFrame("Copper", 25);
-                    })
+                    }, InventoryFrames )
                 });
 
                 Storage = Roact.createElement("Frame", {
@@ -155,11 +165,7 @@ function StorageComponent:render()
                         ScrollBarThickness = 5;
                         VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right;
                         ScrollBarImageColor3 = Core.UI.Color.White;
-                    }, {
-                        CreateBasicListLayout(Enums.UiListType.ByName);
-                        CreateOreFrame("Copper", 25);
-                        CreateOreFrame("Stone", 50);
-                    })
+                    }, StorageFrames )
                 })
             })
         })
@@ -171,7 +177,8 @@ function StorageController:KnitStart()
     DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
 
-    DataService.DataLoaded:Connect(function()
+    DataService.DataLoaded:Connect(function(Data :Core.DataFolder)
+        DataFolder = Data
         local App = Roact.createElement(StorageComponent)
         Roact.mount(App, Knit.Player.PlayerGui, "Storage")
         LogService:Log("Mounted storage component")
