@@ -19,9 +19,14 @@ Get the name of the script which called a function in all caps.
 function LogService:GetNameOfFunctionCaller(UpLevel :number) :string
     local FullNameOfCaller :string = debug.info(UpLevel, "s")
     local SplitNameCaller :{string} = FullNameOfCaller:split(".")
-
     local Name :string = SplitNameCaller[#SplitNameCaller]
-    return Name:upper();
+
+    local FinalString
+    local LineText = tostring(debug.info(3, "l"))
+    local Function = debug.info(3, "n")
+    FinalString = Function.." in "..Name:upper().." at "..LineText
+
+    return FinalString;
 end
 
 --[=[
