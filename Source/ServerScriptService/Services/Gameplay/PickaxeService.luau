@@ -394,7 +394,6 @@ function PickaxeService:KnitInit()
         end
 
         for _, Part :BasePart in pairs(PickaxeTool:GetDescendants()) do
-            if Part.Name == "Handle" then continue end
             if not Part:IsA("BasePart") then continue end
 
             Part.Anchored = false
