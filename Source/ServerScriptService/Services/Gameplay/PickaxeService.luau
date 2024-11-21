@@ -332,12 +332,12 @@ end
 Attempts to buy the given pickaxe config
 ]=]
 function PickaxeService.Client:BuyPickaxe(Player :Player, PickaxeConfig :Configuration)
-    local Costs = PickaxeConfig:FindFirstChild("Costs")
+    local Costs = PickaxeConfig:FindFirstChild("Ores")
     local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
 
-    local Success = not Costs
+    local Success = Costs and false or true
     if Costs then
-        Success = DataService:HandleCosts(Player, Costs)
+        Success = DataService:HandleCosts(Player, Core.OreList.CreateFromFolder(Costs))
     end
 
     if Success then
@@ -346,6 +346,7 @@ function PickaxeService.Client:BuyPickaxe(Player :Player, PickaxeConfig :Configu
     end
     return Success
 end
+
 
 
 --[[ KNIT ]]--
