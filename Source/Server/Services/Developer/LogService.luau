@@ -1,13 +1,13 @@
-local TestService = game:GetService("TestService")
-
-local Knit = require(game.ReplicatedStorage.Packages.Knit)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local LogService = Knit.CreateService{
     Name = "LogService";
     Client = {};
 }
 
-LogService.LoggingEnabled = true
+LogService.LoggingEnabled = RunService:IsStudio()
 LogService.WarningsEnabled = true
 LogService.AssertsEnabled = true
 
@@ -36,7 +36,7 @@ function LogService:Log(Message :string, ... :string)
     if not self.LoggingEnabled then return end
     local Extras = {...}
     local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
-    print(ScriptName, Message, table.unpack(Extras))
+    print("[LOG]", ScriptName, Message, table.unpack(Extras))
 end
 
 --[=[
@@ -46,7 +46,7 @@ function LogService:Warn(Message :string, ... :string)
     if not self.WarningsEnabled then return end
     local Extras = {...}
     local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
-    warn(ScriptName, "[WARNING]", Message, table.unpack(Extras))
+    warn("[WARNING]", ScriptName, Message, table.unpack(Extras))
 end
 
 --[=[
@@ -64,28 +64,6 @@ function LogService:Error(Message :string, ... :string)
 
     error(ScriptName.." "..AssembledMessage)
 end
-
---[=[
-Print out the message passed as well as anything else passed with a space between them in blue.
-Not recommended for use since roblox adds "test service: " before the mesage for some reason.
-]=]
-function LogService:Info(Message :string, ... :string)
-    if not self.LoggingEnabled then return end
-    local Extras :{string} = {...}
-    local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
-    local FinalMessage = ScriptName.." [INFO] "..Message
-
-    for _, ExtraString in pairs(Extras) do
-        if type(ExtraString) == "string" then
-            FinalMessage = FinalMessage.." "..ExtraString
-        else
-            FinalMessage = FinalMessage.." "..tostring(ExtraString)
-        end
-    end
-
-    TestService:Message(FinalMessage)
-end
-
 
 --[=[
 If the given value is nil or false it errors with a given error message.
@@ -110,7 +88,7 @@ end
 function LogService.Client:Warn(Player :Player, Message :string, ... :string)
     if not LogService.WarningsEnabled then return end
     local Extras = {...}
-    warn("[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
+    warn("[CLIENT]", "[WARNING]", "["..Player.Name.."]", Message, table.unpack(Extras))
 end
 
 function LogService.Client:Error(_, Message :string, ... :string)
@@ -121,10 +99,6 @@ function LogService.Client:Error(_, Message :string, ... :string)
         end
     end
     error("[CLIENT] "..AssembledMessage)
-end
-
-function LogService.Client:Info(Player :Player, Message :string, ... :string)
-    self:Info("[CLIENT]", "["..Player.Name.."]", Message, ...)
 end
 
 function LogService.Client:Assert(Player :Player, Value :string, ErrorMessage :string)
