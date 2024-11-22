@@ -88,8 +88,9 @@ function OreList.CreateFromFolder(Folder :Folder) :OreList
 
     for _, Object :ValueBase in pairs(Folder:GetChildren()) do
         if not Object:IsA("ValueBase") then continue end
+        if Object.Value <= 0 then continue end
 
-        if Object.Name == "Gold" then
+        if Object.Name == "GoldCoins" then
             self:AddGold(Object.Name)
             continue
         end
@@ -186,7 +187,9 @@ end
 ]=]
 function OreList:LoopList() :{ OreListItem }
     local List = self._Ores
-    List["GoldCoins"] = {Name = "Gold", Amount = self._Gold, DisplayName = "Gold"}
+    if self._Gold > 0 then
+        List["GoldCoins"] = {Name = "Gold", Amount = self._Gold, DisplayName = "Gold"}
+    end
     return List
 end
 
