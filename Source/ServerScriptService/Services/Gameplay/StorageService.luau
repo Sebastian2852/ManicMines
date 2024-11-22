@@ -11,6 +11,11 @@ local StorageService = Knit.CreateService {
 local LogService
 local DataService
 
+-- [[ PUBLIC ]] --
+
+--[=[
+Moves the given amount of the given ore from inventory to storage for the given player
+]=]
 function StorageService:MoveOreToStorage(Player :Player, OreName :string, Amount :number) :boolean
     local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
     local OreExists = Core.Util:GetOreByName(OreName)
@@ -39,12 +44,61 @@ function StorageService:MoveOreToStorage(Player :Player, OreName :string, Amount
     return true
 end
 
+--[=[
+Moves the given amount of the given ore from storage to inventory for the given player
+]=]
+function StorageService:MoveOreToInventory(Player :Player, OreName :string, Amount :number) :boolean
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    local OreExists = Core.Util:GetOreByName(OreName)
+    if not OreExists then return false end
+
+    local InventoryDataValue = DataFolder.Inventory.Ores:FindFirstChild(OreName)
+    if not InventoryDataValue then
+        LogService:Warn("Couldnt find inventory data value for: "..tostring(OreName))
+        return false
+    end
+
+    local StorageDataValue = DataFolder.Storage.Ores:FindFirstChild(OreName)
+    if not StorageDataValue then
+        LogService:Warn("Couldnt find storage data value for: "..tostring(OreName))
+        return false
+    end
+
+    if StorageDataValue.Value < Amount then
+        LogService:Warn(Player.Name.." tried to move "..Amount.." "..OreName.." but not enough in inventory")
+        return false
+    end
+
+    LogService:Log("Moved "..Amount.." "..OreName.." for player: "..Player.Name)
+    StorageDataValue.Value -= Amount
+    InventoryDataValue.Value += Amount
+    return true
+end
+
 
 
 -- [[ CLIENT ]] --
 
 function StorageService.Client:MoveToStorage(Player :Player, OreName :string, Amount :number) :boolean
     return self.Server:MoveOreToStorage(Player, OreName, Amount)
+end
+
+function StorageService.Client:MoveAllToStorage(Player :Player)
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+
+    for _, OreValue :IntValue in pairs(DataFolder.Inventory.Ores:GetChildren()) do
+        if OreValue.Value <= 0 then continue end
+        self.Server:MoveOreToStorage(Player, OreValue.Name, OreValue.Value)
+    end
+end
+
+function StorageService.Client:MoveAllToInventory(Player :Player)
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+
+    for _, OreValue :IntValue in pairs(DataFolder.Storage.Ores:GetChildren()) do
+        if OreValue.Value <= 0 then continue end
+        self.Server:MoveOreToInventory(Player, OreValue.Name, OreValue.Value)
+    end
 end
 
 

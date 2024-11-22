@@ -6,16 +6,19 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 
 local CreateBasicListLayout = require(ReplicatedStorage.Game.GUI.Components.General.BasicListLayout)
+local CreateRoundedCorners = require(ReplicatedStorage.Game.GUI.Components.General.Corners)
 local CreateOreFrame = require(ReplicatedStorage.Game.GUI.Components.Storage.StorageOreFrame)
 
 local StorageController = Knit.CreateController { Name = "StorageController" }
 
-local StorageComponent = Roact.Component:extend("StorageComponent")
 local TycoonUpgradeService
 local DataService
+local StorageService
 local LogService
 
 local DataFolder :Core.DataFolder
+
+-- [[ PRIVATE ]] --
 
 local function CreateOreFramesForOreList(OreList :Core.OreList, Type :Enums.Enum)
     local Frames = {}
@@ -35,6 +38,12 @@ local function GetStorageAsOreList() :Core.OreList
     local OreList = Core.OreList.CreateFromFolder(DataFolder.Storage.Ores)
     return OreList
 end
+
+
+
+-- [[ GUI ]] --
+
+local StorageComponent = Roact.Component:extend("StorageComponent")
 
 function StorageComponent:init()
     self:setState({
@@ -96,13 +105,11 @@ function StorageComponent:render()
                     })
                 end;
             }, {
-                Corners = Roact.createElement("UICorner", {
-                    CornerRadius = UDim.new(0.2, 0)
-                }, {})
+                Corners = CreateRoundedCorners(0.2);
             });
 
             Main = Roact.createElement("Frame", {
-                Size = UDim2.fromScale(1, 0.9);
+                Size = UDim2.fromScale(1, 0.8);
                 Position = UDim2.fromScale(0.5, 0.1);
                 AnchorPoint = Core.UI.AnchorPoint.TopCenter;
                 BackgroundTransparency = 1;
@@ -176,14 +183,64 @@ function StorageComponent:render()
                         ScrollBarImageColor3 = Core.UI.Color.White;
                     }, StorageFrames )
                 })
-            })
+            });
+
+            Buttons = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(1, 0.1);
+                Position = UDim2.fromScale(0, 0.9);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+            }, {
+                DepositAll = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(0.2, 0.5);
+                    Position = UDim2.fromScale(0.15, 0.5);
+                    AnchorPoint = Core.UI.AnchorPoint.LeftCenter;
+                    BackgroundColor3 = Core.UI.Theme.OpenButtonColor;
+                    BorderSizePixel = 0;
+
+                    Text = "Deposit All";
+                    TextScaled = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+
+                    [Roact.Event.MouseButton1Click] = function()
+                        StorageService:MoveAllToStorage()
+                    end;
+                }, {
+                    Corners = CreateRoundedCorners(0.3);
+                });
+
+                WithdrawalAll = Roact.createElement("TextButton", {
+                    Size = UDim2.fromScale(0.2, 0.5);
+                    Position = UDim2.fromScale(0.85, 0.5);
+                    AnchorPoint = Core.UI.AnchorPoint.RightCenter;
+                    BackgroundColor3 = Core.UI.Theme.CloseButtonColor;
+                    BorderSizePixel = 0;
+
+                    Text = "Withdrawal All";
+                    TextScaled = true;
+                    FontFace = Core.UI.Theme.TextFont;
+                    TextColor3 = Core.UI.Theme.TextColor3;
+
+                    [Roact.Event.MouseButton1Click] = function()
+                        StorageService:MoveAllToInventory()
+                    end
+                }, {
+                    Corners = CreateRoundedCorners(0.3);
+                });
+            });
         })
     })
 end
 
+
+
+-- [[ KNIT ]] --
+
 function StorageController:KnitStart()
     TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")
     DataService = Knit.GetService("DataService")
+    StorageService = Knit.GetService("StorageService")
     LogService = Knit.GetService("LogService")
 
     DataService.DataLoaded:Connect(function(Data :Core.DataFolder)
