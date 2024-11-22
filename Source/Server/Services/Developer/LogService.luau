@@ -24,7 +24,7 @@ function LogService:GetNameOfFunctionCaller(UpLevel :number) :string
     local FinalString
     local LineText = tostring(debug.info(3, "l"))
     local Function = debug.info(3, "n")
-    FinalString = Function.." in "..Name:upper().." at "..LineText
+    FinalString = Function.." - "..Name..":"..LineText
 
     return FinalString;
 end
