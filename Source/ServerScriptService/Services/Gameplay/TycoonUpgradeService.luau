@@ -2,20 +2,11 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
---[=[
-THIS SYSTEM NEEDS TO BE REWORKED
-
-Currently it does everything at the start of the game. That is fine until we conisder things like other players. If you were to invite someone they could use your
-upgrades as their own, which shouldn't happen.
-
-The way it is setup right now it is impossible to do the above nor pass anything like "TycoonOwner" or "Level". So rather than doing everything at the start we should do it
-by getting the tycoon service to tell us when a new upgrade has been made and then check if anything has a matching tag then set it up right then and there.
-]=]
-
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 
 local TycoonUpgradeService = Knit.CreateService {
     Name = "TycoonUpgradeService";
@@ -34,6 +25,8 @@ type UpgradeSetupModule = {
     CreatePrompt :(TycoonName :string, Level :number, MaxLevel :number) -> (string, string);
     Triggered :(Player :Player, IsOwner :boolean) -> ();
 }
+
+-- [[ PUBLIC ]] --
 
 --[=[
 Setup a hitbox in a way so that all of the hitboxes look the same
@@ -250,6 +243,121 @@ function TycoonUpgradeService:AddUpgradeToTycoonAsync(Player :Player, UpgradeNam
         end
     end)
 end
+
+--[=[
+Returns true/false if the given upgrade name is an upgrade that actually exists
+]=]
+function TycoonUpgradeService:ValidUpgradeName(UpgradeName :string) :boolean
+    local Upgrade = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+    return Upgrade and true or false
+end
+
+--[=[
+Returns the config for the upgrade with the given name
+]=]
+function TycoonUpgradeService:GetUpgradeByName(UpgradeName :string) :Configuration|nil
+    if not self:ValidUpgradeName(UpgradeName) then return nil end
+    return Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+end
+
+--[=[
+Get the data value for the given upgrade name for the given player
+]=]
+function TycoonUpgradeService:GetUpgradeDataValue(Player :Player, UpgradeName :string) :IntValue|nil
+    if not self:ValidUpgradeName(UpgradeName) then return nil end
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+    return DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+end
+
+--[=[
+Returns true/false if the given player can upgrade the upgrade with the given name
+]=]
+function TycoonUpgradeService:CanBeUpgraded(Player :Player, UpgradeName :string)
+    local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+
+    local DataValue = DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+    if not DataValue then
+        LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName)
+        return
+    end
+
+    local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
+    if not UpgradeConfig then
+        LogService:Warn("Invalid upgrade name:", UpgradeName)
+        return
+    end
+
+    if UpgradeConfig:FindFirstChild(tostring(DataValue.Value + 1)) then return true end
+    return false
+end
+
+--[=[
+Returns true/false if the given player can afford an upgrade for the given upgrade for the given level
+]=]
+function TycoonUpgradeService:CanAffordUpgrade(Player :Player, UpgradeName :string, Level :number) :boolean
+    if not self:ValidUpgradeName(UpgradeName) then return false end
+    local UpgradeConfig = self:GetUpgradeByName(UpgradeName)
+    local LevelConfig = UpgradeConfig:FindFirstChild(tostring(Level))
+    if not LevelConfig then return false end
+
+    local OreCosts = LevelConfig:FindFirstChild("Cost")
+
+    if OreCosts then
+        local OreCostList = Core.OreList.CreateFromFolder(OreCosts)
+        local AffordCosts = DataService:CanAfford(Player, OreCostList, Enums.CostInclude.Inventory)
+        if not AffordCosts then return false end
+    end
+
+    return true
+end
+
+--[=[
+Makes the given player pay for the given upgrades level
+]=]
+function TycoonUpgradeService:PayForUpgrade(Player :Player, UpgradeName :string, Level :number) :boolean
+    if not self:ValidUpgradeName(UpgradeName) then return end
+    local UpgradeConfig = self:GetUpgradeByName(UpgradeName)
+    local LevelConfig = UpgradeConfig:FindFirstChild(tostring(Level))
+    if not LevelConfig then return end
+
+    local OreCosts = LevelConfig:FindFirstChild("Cost")
+
+    if OreCosts then
+        local OreCostList = Core.OreList.CreateFromFolder(OreCosts)
+        DataService:HandleCosts(Player, OreCostList, Enums.CostInclude.Inventory)
+    end
+end
+
+--[=[
+Upgrade the given upgrade for the given player. This also updates the tycoon model and data.
+Returns true/false based on if the upgrade was actually upgraded
+]=]
+function TycoonUpgradeService:Upgrade(Player :Player, Tycoon :Model, UpgradeName :string) :boolean
+    LogService:Log("Attempting to upgrade "..Player.Name.."'s tycoon upgrade: "..UpgradeName)
+    if not self:CanBeUpgraded(Player, UpgradeName) then
+        LogService:Warn("Failed: cannot be upgraded")
+        return false
+    end
+
+    local DataValue = self:GetUpgradeDataValue(Player, UpgradeName)
+    if not DataValue then
+        LogService:Warn("Failed: Invalid upgrade name: "..UpgradeName)
+        return false
+    end
+
+    if not self:CanAffordUpgrade(Player, UpgradeName, DataValue.Value + 1) then
+        LogService:Warn("Failed: can't afford")
+        return false
+    end
+
+    self:PayForUpgrade(Player, UpgradeName, DataValue.Value + 1)
+    DataValue.Value += 1
+
+    self:AddUpgradeToTycoonAsync(Player, UpgradeName, Tycoon)
+    return true
+end
+
+
 
 -- [[ KNIT ]] --
 

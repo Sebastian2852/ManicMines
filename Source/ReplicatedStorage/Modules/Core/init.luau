@@ -35,6 +35,7 @@ export type DataFolder = {
     XP :IntValue;
     Level :IntValue;
     Gold :IntValue;
+    TycoonName :StringValue;
 
     InMine :BoolValue;
     InTycoon :BoolValue;
