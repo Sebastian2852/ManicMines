@@ -1,12 +1,17 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
+local AddRoundedCorners = require(ReplicatedStorage.Game.GUI.Components.General.Corners)
+
 local InventoryOreFrame = Roact.Component:extend("InventoryOreFrame")
 
 function InventoryOreFrame:render()
+    local StorageService = Knit.GetService("StorageService")
+
     local Ore = self.props.Ore :: BasePart
     local Amount = self.props.Amount :: number
 
@@ -15,7 +20,7 @@ function InventoryOreFrame:render()
     local Name = Ore:GetAttribute("DisplayName")
 
     return Roact.createElement("Frame", {
-        Size = UDim2.fromScale(1, 0.07);
+        Size = UDim2.fromScale(1, 0.15);
         AnchorPoint = Vector2.new(0.5, 0.5);
 
         BackgroundTransparency = 0.5;
@@ -55,7 +60,7 @@ function InventoryOreFrame:render()
         });
 
         Details = Roact.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1);
+            Size = UDim2.fromScale(0.5, 1);
             BackgroundTransparency = 1;
             LayoutOrder = 2;
         }, {
@@ -101,6 +106,62 @@ function InventoryOreFrame:render()
 
                 TextColor3 = Core.UI.Theme.TextColor3;
             }, {});
+        });
+
+        Interaction = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.4, 1);
+            BackgroundTransparency = 1;
+            LayoutOrder = 3;
+        }, {
+            Layout = Roact.createElement("UIListLayout", {
+                Padding = UDim.new(0.05, 0);
+                SortOrder = Enum.SortOrder.LayoutOrder;
+                Wraps = false;
+                FillDirection = Enum.FillDirection.Horizontal;
+                HorizontalAlignment = Enum.HorizontalAlignment.Left;
+                VerticalAlignment = Enum.VerticalAlignment.Center;
+            }, {});
+
+            TextBox = Roact.createElement("TextBox", {
+                Size = UDim2.fromScale(0.5, 0.5);
+                BackgroundColor3 = Core.UI.Theme.BackgroundColorLight;
+                BorderSizePixel = 0;
+
+                Text = "";
+                PlaceholderText = "...";
+                FontFace = Core.UI.Theme.TextFont;
+                TextScaled = true;
+                TextXAlignment = Enum.TextXAlignment.Center;
+                TextColor3 = Core.UI.Theme.TextColor3;
+
+                [Roact.Event.FocusLost] = function(Object :TextBox)
+                    local EnteredAmount = tonumber(Object.Text)
+                    Object.Text = ""
+                    if type(EnteredAmount) ~= "number" then return end
+
+                    local RoundedAmount = math.floor(EnteredAmount)
+                    local ClamppedAmount = math.clamp(RoundedAmount, 0, Amount)
+                    StorageService:MoveToStorage(Ore.Name, ClamppedAmount)
+                end
+            }, {});
+
+            AllButton = Roact.createElement("TextButton", {
+                Size = UDim2.fromScale(0.3, 0.5);
+                BackgroundColor3 = Core.UI.Theme.OpenButtonColor;
+                BorderSizePixel = 0;
+
+                Text = "All";
+                FontFace = Core.UI.Theme.TextFont;
+                TextStrokeTransparency = 0;
+                TextScaled = true;
+                TextColor3 = Core.UI.Theme.TextColor3;
+
+                [Roact.Event.MouseButton1Click] = function()
+                    StorageService:MoveToStorage(Ore.Name, Amount)
+                end;
+            }, {
+                Corners = AddRoundedCorners(0.2);
+            });
         })
     })
 end
@@ -109,6 +170,8 @@ end
 local StorageOreFrame = Roact.Component:extend("StorageOreFrame")
 
 function StorageOreFrame:render()
+    local StorageService = Knit.GetService("StorageService")
+
     local Ore = self.props.Ore :: BasePart
     local Amount = self.props.Amount :: number
 
@@ -117,7 +180,7 @@ function StorageOreFrame:render()
     local Name = Ore:GetAttribute("DisplayName")
 
     return Roact.createElement("Frame", {
-        Size = UDim2.fromScale(1, 0.07);
+        Size = UDim2.fromScale(1, 0.15);
         AnchorPoint = Vector2.new(0.5, 0.5);
 
         BackgroundTransparency = 0.5;
@@ -144,7 +207,7 @@ function StorageOreFrame:render()
         OreImage = Roact.createElement("ImageLabel", {
             Size = UDim2.fromScale(0.1, 1);
             BackgroundTransparency = 1;
-            LayoutOrder = 2;
+            LayoutOrder = 3;
 
             Image = Icon;
             ScaleType = Enum.ScaleType.Fit;
@@ -157,9 +220,9 @@ function StorageOreFrame:render()
         });
 
         Details = Roact.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1);
+            Size = UDim2.fromScale(0.5, 1);
             BackgroundTransparency = 1;
-            LayoutOrder = 1;
+            LayoutOrder = 2;
         }, {
             Layout = Roact.createElement("UIListLayout", {
                 SortOrder = Enum.SortOrder.LayoutOrder;
@@ -203,6 +266,64 @@ function StorageOreFrame:render()
 
                 TextColor3 = Core.UI.Theme.TextColor3;
             }, {});
+        });
+
+        Interaction = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.4, 1);
+            BackgroundTransparency = 1;
+            LayoutOrder = 1;
+        }, {
+            Layout = Roact.createElement("UIListLayout", {
+                Padding = UDim.new(0.05, 0);
+                SortOrder = Enum.SortOrder.LayoutOrder;
+                Wraps = false;
+                FillDirection = Enum.FillDirection.Horizontal;
+                HorizontalAlignment = Enum.HorizontalAlignment.Right;
+                VerticalAlignment = Enum.VerticalAlignment.Center;
+            }, {});
+
+            TextBox = Roact.createElement("TextBox", {
+                Size = UDim2.fromScale(0.5, 0.5);
+                BackgroundColor3 = Core.UI.Theme.BackgroundColorLight;
+                BorderSizePixel = 0;
+                LayoutOrder = 2;
+
+                Text = "";
+                PlaceholderText = "...";
+                FontFace = Core.UI.Theme.TextFont;
+                TextScaled = true;
+                TextXAlignment = Enum.TextXAlignment.Center;
+                TextColor3 = Core.UI.Theme.TextColor3;
+
+                [Roact.Event.FocusLost] = function(Object :TextBox)
+                    local EnteredAmount = tonumber(Object.Text)
+                    Object.Text = ""
+                    if type(EnteredAmount) ~= "number" then return end
+
+                    local RoundedAmount = math.floor(EnteredAmount)
+                    local ClamppedAmount = math.clamp(RoundedAmount, 0, Amount)
+                    StorageService:MoveToInventory(Ore.Name, ClamppedAmount)
+                end
+            }, {});
+
+            AllButton = Roact.createElement("TextButton", {
+                Size = UDim2.fromScale(0.3, 0.5);
+                BackgroundColor3 = Core.UI.Theme.OpenButtonColor;
+                BorderSizePixel = 0;
+                LayoutOrder = 1;
+
+                Text = "All";
+                FontFace = Core.UI.Theme.TextFont;
+                TextStrokeTransparency = 0;
+                TextScaled = true;
+                TextColor3 = Core.UI.Theme.TextColor3;
+
+                [Roact.Event.MouseButton1Click] = function()
+                    StorageService:MoveToInventory(Ore.Name, Amount)
+                end;
+            }, {
+                Corners = AddRoundedCorners(0.2);
+            });
         })
     })
 end

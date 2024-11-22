@@ -86,8 +86,8 @@ function StorageComponent:render()
             Size = UDim2.fromScale(0.5, 0.5);
             Position = Core.UI.Position.Center;
             AnchorPoint = Core.UI.AnchorPoint.Center;
-            BorderSizePixel = 0;
             BackgroundColor3 = Core.UI.Theme.BackgroundColorPrimary;
+            BorderSizePixel = 0;
         }, {
             Title = Roact.createElement("TextLabel", {
                 Size = UDim2.fromScale(1, 0.1);
@@ -132,8 +132,8 @@ function StorageComponent:render()
                     Size = UDim2.fromScale(0.5, 1);
                     AnchorPoint = Vector2.new(0, 0.5);
                     Position = UDim2.fromScale(0, 0.5);
-
-                    BackgroundTransparency = 1;
+                    BackgroundColor3 = Core.UI.Theme.BackgroundColorDark;
+                    BackgroundTransparency = 0;
                 }, {
                     Title = Roact.createElement("TextLabel", {
                         Size = UDim2.fromScale(1, 0.1);
@@ -155,11 +155,14 @@ function StorageComponent:render()
                         Position = UDim2.fromScale(0, 1);
                         AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
 
+                        AutomaticCanvasSize = Enum.AutomaticSize.Y;
                         BackgroundTransparency = 1;
+                        ScrollBarImageTransparency = 1;
                         BorderSizePixel = 0;
-                        ScrollBarThickness = 5;
+                        ScrollBarThickness = 0;
+                        CanvasSize = UDim2.fromScale(0, 0.07);
+                        VerticalScrollBarInset = Enum.ScrollBarInset.None;
                         VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left;
-                        ScrollBarImageColor3 = Core.UI.Color.White;
                     }, InventoryFrames )
                 });
 
@@ -167,8 +170,8 @@ function StorageComponent:render()
                     Size = UDim2.fromScale(0.5, 1);
                     AnchorPoint = Vector2.new(1, 0.5);
                     Position = UDim2.fromScale(1, 0.5);
-
-                    BackgroundTransparency = 1;
+                    BackgroundColor3 = Core.UI.Theme.BackgroundColorDark;
+                    BackgroundTransparency = 0;
                 }, {
                     Title = Roact.createElement("TextLabel", {
                         Size = UDim2.fromScale(1, 0.1);
@@ -189,12 +192,16 @@ function StorageComponent:render()
                         Size = UDim2.fromScale(1, 0.9);
                         Position = UDim2.fromScale(0, 1);
                         AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
+                        BackgroundColor3 = Core.UI.Theme.BackgroundColorDark;
 
+                        AutomaticCanvasSize = Enum.AutomaticSize.Y;
                         BackgroundTransparency = 1;
+                        ScrollBarImageTransparency = 1;
                         BorderSizePixel = 0;
-                        ScrollBarThickness = 5;
+                        ScrollBarThickness = 0;
+                        CanvasSize = UDim2.fromScale(0, 0.07);
+                        VerticalScrollBarInset = Enum.ScrollBarInset.None;
                         VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right;
-                        ScrollBarImageColor3 = Core.UI.Color.White;
                     }, StorageFrames )
                 })
             });

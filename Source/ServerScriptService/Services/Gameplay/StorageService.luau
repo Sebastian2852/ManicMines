@@ -95,6 +95,10 @@ function StorageService.Client:MoveToStorage(Player :Player, OreName :string, Am
     return self.Server:MoveOreToStorage(Player, OreName, Amount)
 end
 
+function StorageService.Client:MoveToInventory(Player :Player, OreName :string, Amount :number) :boolean
+    return self.Server:MoveOreToInventory(Player, OreName, Amount)
+end
+
 function StorageService.Client:MoveAllToStorage(Player :Player)
     local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
 
