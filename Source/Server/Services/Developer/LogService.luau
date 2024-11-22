@@ -7,6 +7,8 @@ local LogService = Knit.CreateService{
     Client = {};
 }
 
+local LOG_SPACING = 40
+
 LogService.LoggingEnabled = RunService:IsStudio()
 LogService.WarningsEnabled = true
 LogService.AssertsEnabled = true
@@ -23,7 +25,16 @@ function LogService:GetNameOfFunctionCaller(UpLevel :number) :string
 
     local FinalString
     local LineText = tostring(debug.info(3, "l"))
-    local Function = debug.info(3, "n")
+    local Function = debug.info(UpLevel, "n")
+
+    local FunctionLenth = #Function
+    local MaxLength = 10
+
+    if FunctionLenth >= MaxLength then
+        Function = string.sub(Function, 1, MaxLength - 3)
+        Function = Function.."..."
+    end
+
     FinalString = Function.." - "..Name..":"..LineText
 
     return FinalString;
@@ -36,7 +47,9 @@ function LogService:Log(Message :string, ... :string)
     if not self.LoggingEnabled then return end
     local Extras = {...}
     local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
-    print("[LOG]", ScriptName, Message, table.unpack(Extras))
+
+    local SpacingToUse = LOG_SPACING - (#ScriptName + 5)
+    print("[LOG]", ScriptName, string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
 end
 
 --[=[
@@ -46,7 +59,9 @@ function LogService:Warn(Message :string, ... :string)
     if not self.WarningsEnabled then return end
     local Extras = {...}
     local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
-    warn("[WARNING]", ScriptName, Message, table.unpack(Extras))
+
+    local SpacingToUse = LOG_SPACING - (#ScriptName + 9)
+    warn("[WARNING]", ScriptName, string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
 end
 
 --[=[
@@ -82,13 +97,19 @@ end
 function LogService.Client:Log(Player :Player, Message :string, ... :string)
     if not LogService.WarningsEnabled then return end
     local Extras = {...}
-    print("[CLIENT]", "["..Player.Name.."]", Message, table.unpack(Extras))
+
+    local PlayerName = Player.Name
+    local SpacingToUse = LOG_SPACING - (#PlayerName + 9)
+    print("[CLIENT]", "["..PlayerName.."]", string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
 end
 
 function LogService.Client:Warn(Player :Player, Message :string, ... :string)
     if not LogService.WarningsEnabled then return end
     local Extras = {...}
-    warn("[CLIENT]", "[WARNING]", "["..Player.Name.."]", Message, table.unpack(Extras))
+
+    local PlayerName = Player.Name
+    local SpacingToUse = LOG_SPACING - (#PlayerName + 19)
+    warn("[CLIENT] [WARNING]", "["..PlayerName.."]", string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
 end
 
 function LogService.Client:Error(_, Message :string, ... :string)
