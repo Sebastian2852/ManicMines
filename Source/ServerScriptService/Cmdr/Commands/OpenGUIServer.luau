@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
 return function(Context, Gui :string, Player :Player?)
-
+    local StorageService = Knit.GetService("StorageService")
     local ForgeService = Knit.GetService("ForgeService")
 
     if Player == nil then
@@ -14,7 +14,8 @@ return function(Context, Gui :string, Player :Player?)
         ForgeService:OpenForgeForPlayer(Player)
         return "Opened forge for "..Player.Name
     elseif Gui == "storage" then
-        return "Opening storage from server is not yet implemented."
+        StorageService:OpenStorageForPlayer(Player)
+        return "Open storage for "..Player.Name
     end
 
     return "Couldnt find GUI with the name: "..tostring(Gui)

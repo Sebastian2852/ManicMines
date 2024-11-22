@@ -5,7 +5,10 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local StorageService = Knit.CreateService {
     Name = "StorageService";
-    Client = {};
+    Client = {
+        OpenStorage = Knit.CreateSignal();
+        Update = Knit.CreateSignal();
+    };
 }
 
 local LogService
@@ -73,6 +76,10 @@ function StorageService:MoveOreToInventory(Player :Player, OreName :string, Amou
     StorageDataValue.Value -= Amount
     InventoryDataValue.Value += Amount
     return true
+end
+
+function StorageService:OpenStorageForPlayer(Player :Player)
+    self.Client.OpenStorage:Fire(Player)
 end
 
 
