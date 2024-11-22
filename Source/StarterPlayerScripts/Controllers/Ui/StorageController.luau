@@ -55,6 +55,20 @@ function StorageComponent:init()
             Enabled = true;
         })
     end)
+
+    StorageService.OpenStorage:Connect(function()
+        self:setState({
+            Enabled = true;
+        })
+    end)
+
+    StorageService.Update:Connect(function()
+        self:setState(function(Props)
+            return {
+                ReRender = (not Props.ReRender) or false
+            }
+        end)
+    end)
 end
 
 function StorageComponent:render()

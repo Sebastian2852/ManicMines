@@ -13,6 +13,7 @@ local StorageService = Knit.CreateService {
 
 local LogService
 local DataService
+local PlayerStatsService
 
 -- [[ PUBLIC ]] --
 
@@ -44,6 +45,8 @@ function StorageService:MoveOreToStorage(Player :Player, OreName :string, Amount
     LogService:Log("Moved "..Amount.." "..OreName.." for player: "..Player.Name)
     InventoryDataValue.Value -= Amount
     StorageDataValue.Value += Amount
+    PlayerStatsService:CalculateInventoryCapacity(DataFolder)
+    self.Client.Update:Fire(Player)
     return true
 end
 
@@ -75,6 +78,8 @@ function StorageService:MoveOreToInventory(Player :Player, OreName :string, Amou
     LogService:Log("Moved "..Amount.." "..OreName.." for player: "..Player.Name)
     StorageDataValue.Value -= Amount
     InventoryDataValue.Value += Amount
+    PlayerStatsService:CalculateInventoryCapacity(DataFolder)
+    self.Client.Update:Fire(Player)
     return true
 end
 
@@ -115,6 +120,7 @@ end
 function StorageService:KnitStart()
     LogService = Knit.GetService("LogService")
     DataService = Knit.GetService("DataService")
+    PlayerStatsService = Knit.GetService("PlayerStatsService")
 end
 
 return StorageService
