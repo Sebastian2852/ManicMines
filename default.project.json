@@ -5,7 +5,7 @@
 
     "ReplicatedStorage": {
       "Game": {
-        "$path": "Source/ReplicatedStorage",
+        "$path": "Source/Shared",
         "Tests": { "$path": "Tests" }
       },
       "Packages": {
@@ -155,14 +155,14 @@
 
     "ServerScriptService": {
       "Game": {
-        "$path": "Source/ServerScriptService"
+        "$path": "Source/Server"
       }
     },
 
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "Game": {
-          "$path": "Source/StarterPlayerScripts"
+          "$path": "Source/Client"
         }
       }
     },

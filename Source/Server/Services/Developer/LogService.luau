@@ -1,13 +1,15 @@
-local TestService = game:GetService("TestService")
-
-local Knit = require(game.ReplicatedStorage.Packages.Knit)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local LogService = Knit.CreateService{
     Name = "LogService";
     Client = {};
 }
 
-LogService.LoggingEnabled = true
+local LOG_SPACING = 40
+
+LogService.LoggingEnabled = RunService:IsStudio()
 LogService.WarningsEnabled = true
 LogService.AssertsEnabled = true
 
@@ -23,8 +25,17 @@ function LogService:GetNameOfFunctionCaller(UpLevel :number) :string
 
     local FinalString
     local LineText = tostring(debug.info(3, "l"))
-    local Function = debug.info(3, "n")
-    FinalString = Function.." in "..Name:upper().." at "..LineText
+    local Function = debug.info(UpLevel, "n")
+
+    local FunctionLenth = #Function
+    local MaxLength = 10
+
+    if FunctionLenth >= MaxLength then
+        Function = string.sub(Function, 1, MaxLength - 3)
+        Function = Function.."..."
+    end
+
+    FinalString = Function.." - "..Name..":"..LineText
 
     return FinalString;
 end
@@ -36,7 +47,9 @@ function LogService:Log(Message :string, ... :string)
     if not self.LoggingEnabled then return end
     local Extras = {...}
     local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
-    print(ScriptName, Message, table.unpack(Extras))
+
+    local SpacingToUse = LOG_SPACING - (#ScriptName + 5)
+    print("[LOG]", ScriptName, string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
 end
 
 --[=[
@@ -46,7 +59,9 @@ function LogService:Warn(Message :string, ... :string)
     if not self.WarningsEnabled then return end
     local Extras = {...}
     local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
-    warn(ScriptName, "[WARNING]", Message, table.unpack(Extras))
+
+    local SpacingToUse = LOG_SPACING - (#ScriptName + 9)
+    warn("[WARNING]", ScriptName, string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
 end
 
 --[=[
@@ -66,28 +81,6 @@ function LogService:Error(Message :string, ... :string)
 end
 
 --[=[
-Print out the message passed as well as anything else passed with a space between them in blue.
-Not recommended for use since roblox adds "test service: " before the mesage for some reason.
-]=]
-function LogService:Info(Message :string, ... :string)
-    if not self.LoggingEnabled then return end
-    local Extras :{string} = {...}
-    local ScriptName = "["..self:GetNameOfFunctionCaller(3).."]"
-    local FinalMessage = ScriptName.." [INFO] "..Message
-
-    for _, ExtraString in pairs(Extras) do
-        if type(ExtraString) == "string" then
-            FinalMessage = FinalMessage.." "..ExtraString
-        else
-            FinalMessage = FinalMessage.." "..tostring(ExtraString)
-        end
-    end
-
-    TestService:Message(FinalMessage)
-end
-
-
---[=[
 If the given value is nil or false it errors with a given error message.
 ]=]
 function LogService:Assert(Value :any, ErrorMessage:string)
@@ -104,13 +97,19 @@ end
 function LogService.Client:Log(Player :Player, Message :string, ... :string)
     if not LogService.WarningsEnabled then return end
     local Extras = {...}
-    print("[CLIENT]", "["..Player.Name.."]", Message, table.unpack(Extras))
+
+    local PlayerName = Player.Name
+    local SpacingToUse = LOG_SPACING - (#PlayerName + 9)
+    print("[CLIENT]", "["..PlayerName.."]", string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
 end
 
 function LogService.Client:Warn(Player :Player, Message :string, ... :string)
     if not LogService.WarningsEnabled then return end
     local Extras = {...}
-    warn("[CLIENT]", "["..Player.Name.."]", "[WARNING]", Message, table.unpack(Extras))
+
+    local PlayerName = Player.Name
+    local SpacingToUse = LOG_SPACING - (#PlayerName + 19)
+    warn("[CLIENT] [WARNING]", "["..PlayerName.."]", string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
 end
 
 function LogService.Client:Error(_, Message :string, ... :string)
@@ -121,10 +120,6 @@ function LogService.Client:Error(_, Message :string, ... :string)
         end
     end
     error("[CLIENT] "..AssembledMessage)
-end
-
-function LogService.Client:Info(Player :Player, Message :string, ... :string)
-    self:Info("[CLIENT]", "["..Player.Name.."]", Message, ...)
 end
 
 function LogService.Client:Assert(Player :Player, Value :string, ErrorMessage :string)
