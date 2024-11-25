@@ -4,6 +4,8 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
+local CreateGradient = require(ReplicatedStorage.Game.GUI.Components.General.Gradient)
+
 local PickaxeSelectionController = Knit.CreateController { Name = "PickaxeSelectionController" }
 
 local PlayerFolder = ReplicatedStorage.Player
@@ -69,6 +71,7 @@ function PickaxeSelectionComponent:render()
     local TimeToMine = self.state.TimeToMine
     local MiningProgress = self.state.MiningProgress
     local Icon = Ore:GetAttribute("EmblemImageID")
+    local GradientColor = Ore:GetAttribute("MiningBarGradient") or ColorSequence.new(Color3.fromRGB(255, 0, 255))
 
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
@@ -107,9 +110,11 @@ function PickaxeSelectionComponent:render()
                 TextScaled = true;
                 TextStrokeTransparency = 0;
                 TextXAlignment = Enum.TextXAlignment.Left;
-                TextColor3 = PlayerFolder.PickaxeSelection.Value:FindFirstChildWhichIsA("SelectionBox").Color3;
                 FontFace = Core.UI.Theme.TextFont;
-            }, {});
+                TextColor3 = Core.UI.Color.White;
+            }, {
+                Gradient = CreateGradient(GradientColor)
+            });
 
             TimeToMine = Roact.createElement("TextLabel", {
                 Size = UDim2.fromScale(0.77, 0.222);
@@ -121,9 +126,11 @@ function PickaxeSelectionComponent:render()
                 TextScaled = true;
                 TextStrokeTransparency = 0;
                 TextXAlignment = Enum.TextXAlignment.Left;
-                TextColor3 = PlayerFolder.PickaxeSelection.Value:FindFirstChildWhichIsA("SelectionBox").Color3;
                 FontFace = Core.UI.Theme.TextFont;
-            }, {});
+                TextColor3 = Core.UI.Color.White;
+            }, {
+                Gradient = CreateGradient(GradientColor)
+            });
 
             MiningProgressBar = Roact.createElement("Frame", {
                 Size = UDim2.fromScale(0.9, 0.2);
