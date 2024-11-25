@@ -33,7 +33,7 @@ LatestPosition.Y = 0
 local function Activate()
     if not PlayerFolder.PickaxeSelection.Value then return end
 
-    if PlayerDataFolder.Inventory["InventoryItemCount"].Value + PlayerFolder.PickaxeSelection.Value:GetAttribute("AmountDroppedWhenMined") >= PlayerDataFolder.Inventory["InventoryCap"].Value then
+    if PlayerDataFolder.Inventory["InventoryItemCount"].Value + PlayerFolder.PickaxeSelection.Value:GetAttribute("AmountDroppedWhenMined") > PlayerDataFolder.Inventory["InventoryCap"].Value then
         warn("Not enough space")
         return
     end
@@ -79,7 +79,7 @@ local function AddOutline(Object :BasePart)
         New.Color3 = Color3.new(1, 0, 0)
     end
 
-    if Object:GetAttribute("BeingMined") then
+    if Object:GetAttribute("BeingMined") and Object:GetAttribute("MinedBy") ~= Knit.Player.UserId then
         New.Color3 = Color3.new(1, 0, 0)
     end
     Outline = New
