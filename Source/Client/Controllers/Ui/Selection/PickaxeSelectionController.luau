@@ -4,6 +4,8 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
+local CreateGradient = require(ReplicatedStorage.Game.GUI.Components.General.Gradient)
+
 local PickaxeSelectionController = Knit.CreateController { Name = "PickaxeSelectionController" }
 
 local PlayerFolder = ReplicatedStorage.Player
@@ -21,6 +23,7 @@ local function CalculateTimeToMine(Health)
     local TotalTime = HitsNeeded * TimePerHit
     return Core.Util:RoundToxDP(TotalTime, 1)
 end
+
 
 
 -- [[ GUI ]] --
@@ -67,6 +70,8 @@ function PickaxeSelectionComponent:render()
     local OreName = self.state.OreName
     local TimeToMine = self.state.TimeToMine
     local MiningProgress = self.state.MiningProgress
+    local Icon = Ore:GetAttribute("EmblemImageID")
+    local GradientColor = Ore:GetAttribute("MiningBarGradient") or ColorSequence.new(Color3.fromRGB(255, 0, 255))
 
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
@@ -85,31 +90,47 @@ function PickaxeSelectionComponent:render()
                 DominantAxis = Enum.DominantAxis.Width;
             }, {});
 
+            Emblem = Roact.createElement("ImageLabel", {
+                Size = UDim2.fromScale(0.1, 0.447);
+                Position = UDim2.fromScale(0.046, 0.166);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Image = Icon or Core.UI.Images.Missing;
+                ScaleType = Enum.ScaleType.Fit;
+            }, {});
+
             OreName = Roact.createElement("TextLabel", {
-                Size = UDim2.fromScale(0.871, 0.309);
-                Position = UDim2.fromScale(0.072, 0.368);
+                Size = UDim2.fromScale(0.774, 0.309);
+                Position = UDim2.fromScale(0.173, 0.378);
                 BackgroundTransparency = 1;
                 BorderSizePixel = 0;
 
                 Text = OreName or "No ore name?";
                 TextScaled = true;
                 TextStrokeTransparency = 0;
-                TextColor3 = PlayerFolder.PickaxeSelection.Value:FindFirstChildWhichIsA("SelectionBox").Color3;
+                TextXAlignment = Enum.TextXAlignment.Left;
                 FontFace = Core.UI.Theme.TextFont;
-            }, {});
+                TextColor3 = Core.UI.Color.White;
+            }, {
+                Gradient = CreateGradient(GradientColor)
+            });
 
             TimeToMine = Roact.createElement("TextLabel", {
-                Size = UDim2.fromScale(0.871, 0.222);
-                Position = UDim2.fromScale(0.073, 0.168);
+                Size = UDim2.fromScale(0.77, 0.222);
+                Position = UDim2.fromScale(0.177, 0.158);
                 BackgroundTransparency = 1;
                 BorderSizePixel = 0;
 
                 Text = TimeToMine or "No ttm string?";
                 TextScaled = true;
                 TextStrokeTransparency = 0;
-                TextColor3 = PlayerFolder.PickaxeSelection.Value:FindFirstChildWhichIsA("SelectionBox").Color3;
+                TextXAlignment = Enum.TextXAlignment.Left;
                 FontFace = Core.UI.Theme.TextFont;
-            }, {});
+                TextColor3 = Core.UI.Color.White;
+            }, {
+                Gradient = CreateGradient(GradientColor)
+            });
 
             MiningProgressBar = Roact.createElement("Frame", {
                 Size = UDim2.fromScale(0.9, 0.2);
