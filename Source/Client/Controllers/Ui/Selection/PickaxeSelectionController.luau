@@ -23,6 +23,7 @@ local function CalculateTimeToMine(Health)
 end
 
 
+
 -- [[ GUI ]] --
 
 local PickaxeSelectionComponent = Roact.Component:extend("PickaxeSelection")
@@ -67,6 +68,7 @@ function PickaxeSelectionComponent:render()
     local OreName = self.state.OreName
     local TimeToMine = self.state.TimeToMine
     local MiningProgress = self.state.MiningProgress
+    local Icon = Ore:GetAttribute("EmblemImageID")
 
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
@@ -85,28 +87,40 @@ function PickaxeSelectionComponent:render()
                 DominantAxis = Enum.DominantAxis.Width;
             }, {});
 
+            Emblem = Roact.createElement("ImageLabel", {
+                Size = UDim2.fromScale(0.1, 0.447);
+                Position = UDim2.fromScale(0.046, 0.166);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Image = Icon or Core.UI.Images.Missing;
+                ScaleType = Enum.ScaleType.Fit;
+            }, {});
+
             OreName = Roact.createElement("TextLabel", {
-                Size = UDim2.fromScale(0.871, 0.309);
-                Position = UDim2.fromScale(0.072, 0.368);
+                Size = UDim2.fromScale(0.774, 0.309);
+                Position = UDim2.fromScale(0.173, 0.378);
                 BackgroundTransparency = 1;
                 BorderSizePixel = 0;
 
                 Text = OreName or "No ore name?";
                 TextScaled = true;
                 TextStrokeTransparency = 0;
+                TextXAlignment = Enum.TextXAlignment.Left;
                 TextColor3 = PlayerFolder.PickaxeSelection.Value:FindFirstChildWhichIsA("SelectionBox").Color3;
                 FontFace = Core.UI.Theme.TextFont;
             }, {});
 
             TimeToMine = Roact.createElement("TextLabel", {
-                Size = UDim2.fromScale(0.871, 0.222);
-                Position = UDim2.fromScale(0.073, 0.168);
+                Size = UDim2.fromScale(0.77, 0.222);
+                Position = UDim2.fromScale(0.177, 0.158);
                 BackgroundTransparency = 1;
                 BorderSizePixel = 0;
 
                 Text = TimeToMine or "No ttm string?";
                 TextScaled = true;
                 TextStrokeTransparency = 0;
+                TextXAlignment = Enum.TextXAlignment.Left;
                 TextColor3 = PlayerFolder.PickaxeSelection.Value:FindFirstChildWhichIsA("SelectionBox").Color3;
                 FontFace = Core.UI.Theme.TextFont;
             }, {});
