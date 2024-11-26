@@ -9,6 +9,7 @@ local NumberGenerator = Random.new()
 
 local TeleportService
 local LogService
+local CaveService
 
 local MineService = Knit.CreateService {
     Name = "MineService",
@@ -234,7 +235,7 @@ end
 --[=[
 Generates a block at a given position, has a random chance to be an ore
 ]=]
-function MineService:GenerateBlockAtPosition(Position :Vector3)
+function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|false)
     if UsedPositions[KeyPosition(Position)] then return end
     if Position.Y > TopLayerY then return end
 
@@ -243,7 +244,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3)
     local BlockToGenerate = StoneBlock
 
     if RandomNumber == 1 then
-        local Success, Ore = self:GenerateRandomOre(Position.Y, false)
+        local Success, Ore = self:GenerateRandomOre(Position.Y, InCave)
         if Success then
             BlockToGenerate = Ore
             BlockToGenerate:AddTag("Mine/BlockType/Ore")
@@ -481,9 +482,18 @@ function MineService:GenerateRoomAtDepth(Depth :number) :Vector3
 end
 
 --[=[
+Sets a position as "air" meaning nothing can generate there
+]=]
+function MineService:AddAirPosition(Position :Vector3)
+    UsedPositions[KeyPosition(Position)] = 1
+end
+
+--[=[
 Generates blocks around a block that was mined aswell as destroying the block
 ]=]
 function MineService:BlockMined(Block :BasePart)
+    if Block == nil then return end
+
     if self.MineStats.BlocksGenerated >= Core.GameConfig.Mine.BlocksToCollapse then
         CollapseMine()
         return
@@ -506,6 +516,18 @@ function MineService:GenerateAroundBlockAsync(Block :BasePart)
             self:GenerateBlockAtPosition(Origin + Offset)
         end
 
+        Resolve()
+    end)
+end
+
+--[=[
+Generate blocks around the passed position using offsets
+]=]
+function MineService:GenerateAroundPositionAsync(Origin :Vector3, InCave :boolean|true)
+    return Promise.new(function(Resolve)
+        for _, Offset :Vector3 in pairs(BlockGenerationOffsets) do
+            self:GenerateBlockAtPosition(Origin + Offset, InCave)
+        end
         Resolve()
     end)
 end
@@ -563,6 +585,7 @@ end
 function MineService:KnitStart()
     LogService = Knit.GetService("LogService")
     TeleportService = Knit.GetService("TeleportService")
+    CaveService = Knit.GetService("CaveService")
 
     for _, Object in pairs(ReplicatedStorage.Assets.Ores:GetChildren()) do
         if not Object:IsA("BasePart") then
