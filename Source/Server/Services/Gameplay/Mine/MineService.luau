@@ -244,8 +244,9 @@ end
 Generates a block at a given position, has a random chance to be an ore. If a block info is passed then that block will be generated
 ]=]
 function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|false, BlockInfo :Core.OreListItem?, Tint :Color3?)
+    if self:IsPositionAir(Position) then return end
     Position = SnapPositionToGrid(Position)
-    if UsedPositions[KeyPosition(Position)] then return end
+
     if Position.Y > TopLayerY then return end
 
     local RandomNumber = BlockInfo == nil and NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre) or 0
@@ -281,7 +282,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|
         print(Tint)
     end
 
-    UsedPositions[KeyPosition(Position)] = 1
+    self:AddAirPosition(Position)
     MineOctree:CreateNode(Position, NewBlock)
     self.MineStats.BlocksGenerated += 1
 
@@ -374,7 +375,7 @@ function MineService:GenerateTopLayer()
 
                 table.insert(self.TopLayerPositions, Position)
                 self:GenerateBlockAtPosition(Position)
-                UsedPositions[KeyPosition(AbovePos)] = 1
+                self:AddAirPosition(AbovePos)
             end
             Resolve()
         end)
@@ -489,7 +490,7 @@ function MineService:GenerateRoomAtDepth(Depth :number) :Vector3
 
     for _, Offset in pairs(AirPositions) do
         local NewPos = CenterPos + Offset
-        UsedPositions[KeyPosition(NewPos)] = true
+        self:AddAirPosition(NewPos)
     end
 
     for _, Offset in pairs(Offsets) do
@@ -506,6 +507,14 @@ Sets a position as "air" meaning nothing can generate there
 function MineService:AddAirPosition(Position :Vector3)
     Position = SnapPositionToGrid(Position)
     UsedPositions[KeyPosition(Position)] = 1
+end
+
+--[=[
+Checks weather the position is air
+]=]
+function MineService:IsPositionAir(Position :Vector3) :boolean
+    Position = SnapPositionToGrid(Position)
+    return UsedPositions[KeyPosition(Position)] and true or false
 end
 
 --[=[
