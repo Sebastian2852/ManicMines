@@ -531,8 +531,35 @@ function MineService:AttemptToGenerateGeode(Ore :BasePart)
     local RandomNumber = NumberGenerator:NextInteger(1, GenerationChance)
     if RandomNumber ~= 1 then return end
 
-    local RandomSize = NumberGenerator:NextInteger(SizeBounds.Min, SizeBounds.Max)
-    CaveService:GenerateGeodeAsync(Ore.CFrame.Position - Vector3.new(0, 60, 0), RandomSize, Ore)
+    local Radius = NumberGenerator:NextInteger(SizeBounds.Min, SizeBounds.Max)
+
+    local Direction = NumberGenerator:NextInteger(1, 3)
+    local Negative = NumberGenerator:NextInteger(1, 2)
+
+    local Position = Ore.CFrame.Position
+    local Offset
+    local FinalPosition
+    local Distance = (Radius * 2 + 6)
+
+    if Direction == 1 then
+        Offset = Vector3.new(Distance, 0, 0)
+    elseif Direction == 2 then
+        Offset = Vector3.new(0, Distance, 0)
+    elseif Direction == 3 then
+        Offset = Vector3.new(0, 0, Direction)
+    end
+
+    if Negative then
+        FinalPosition = Position - Offset
+    else
+        FinalPosition = Position + Offset
+    end
+
+    if (FinalPosition.Y + Radius) > TopLayerY then
+        FinalPosition = FinalPosition - Vector3.new(0, Radius * 2, 0)
+    end
+
+    CaveService:GenerateGeodeAsync(FinalPosition, Radius, Ore)
 end
 
 --[=[
