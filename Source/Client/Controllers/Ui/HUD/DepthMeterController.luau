@@ -3,10 +3,13 @@ local RunService = game:GetService("RunService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
-
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
+local CreateGradient = require(ReplicatedStorage.Game.GUI.Components.General.Gradient)
+
 local DepthMeterController = Knit.CreateController { Name = "DepthMeterController" }
+
+local MineEffects
 
 local DepthMeterComponent = Roact.Component:extend("DepthMeter")
 local Player = Knit.Player
@@ -43,7 +46,31 @@ function DepthMeterComponent:GetPositionText() :string
     return X..", "..Y.."m, "..Z
 end
 
+function DepthMeterComponent:GetLayerName() :string
+    local Final = "No layer"
+
+    if MineEffects.CurrentLayer then
+        Final = MineEffects.CurrentLayer:GetAttribute("DisplayName") or "Failed to get attribute"
+    end
+
+    return Final
+end
+
+function DepthMeterComponent:GetLayerColor() :Color3
+    local Final = Color3.fromRGB(255, 0, 255)
+
+    if MineEffects.CurrentLayer then
+        Final = MineEffects.CurrentLayer:GetAttribute("Color")
+    end
+
+    return Final
+end
+
 function DepthMeterComponent:render()
+    local PositionText = self:GetPositionText()
+    local LayerName = self:GetLayerName()
+    local LayerColor = self:GetLayerColor()
+
     return Roact.createElement("ScreenGui", {
         IgnoreGuiInset = true;
         ResetOnSpawn = false;
@@ -55,18 +82,35 @@ function DepthMeterComponent:render()
 
             BackgroundTransparency = 1;
 
-            Text = self:GetPositionText();
+            Text = PositionText;
             TextStrokeTransparency = 0;
             TextScaled = true;
             TextColor3 = Core.UI.Theme.TextColor3;
             FontFace = Core.UI.Theme.TextFont;
-        }, {})
+        }, {});
+
+        Layer = self.state.Show and Roact.createElement("TextLabel", {
+            Size = UDim2.fromScale(0.3, 0.025);
+            Position = UDim2.fromScale(0.5, 0.05);
+            AnchorPoint = Core.UI.AnchorPoint.TopCenter;
+
+            BackgroundTransparency = 1;
+
+            Text = "("..LayerName..")";
+            TextStrokeTransparency = 0;
+            TextScaled = true;
+            TextColor3 = Core.UI.Color.White;
+            FontFace = Core.UI.Theme.TextFont;
+        }, {
+            CreateGradient(LayerColor, 0)
+        })
     })
 end
 
 function DepthMeterController:KnitStart()
     local LogService = Knit.GetService("LogService")
     local DataService = Knit.GetService("DataService")
+    MineEffects = Knit.GetController("MineEffects")
 
     DataService.DataLoaded:Connect(function()
         local App = Roact.createElement(DepthMeterComponent)
