@@ -18,6 +18,9 @@ local NeededAttribs = {
     SpawningCurve = "NumberSequence";
     SpawningRange = "NumberRange";
     XP = "number";
+    CanGenerateGeode = "boolean";
+    GeodeColorTint = "color3";
+    GeodeGenerationChance = "NumberRange";
 }
 
 return function()
