@@ -30,6 +30,9 @@ local function GetSphereAirPositions(Center :Vector3, Radius :number, BlockSize 
     return Positions
 end
 
+--[=[
+Generate a geode around the center with a given radius for the given ore
+]=]
 function CaveService:GenerateGeodeAsync(Center :Vector3, Radius :number, Ore :BasePart)
     LogService:Log("Generating geode")
     return Promise.new(function(Resolve)
