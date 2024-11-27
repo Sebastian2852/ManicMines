@@ -49,13 +49,30 @@ function CaveService:GenerateGeodeAsync(Center :Vector3, Radius :number, Ore :Ba
 
         LogService:Log("Generating blocks")
 
+        local Blocks :{BasePart} = {}
+        local BlockGen = {}
+
         for _, Position :Vector3 in pairs(Positions) do
-            MineService:GenerateAroundPositionAsync(Position, true, OreData, Ore:GetAttribute("GeodeColorTint"))
+            local GenPromise = MineService:GenerateAroundPositionAsync(Position, true, OreData, Ore:GetAttribute("GeodeColorTint")):andThen(function(Generated :{BasePart})
+                for _, v in pairs(Generated) do
+                    table.insert(Blocks, v)
+                end
+            end)
+            table.insert(BlockGen, GenPromise)
         end
 
-        LogService:Log("Generated geode")
+        Promise.all(BlockGen):andThen(function()
+            LogService:Log("changing brightness of lights")
+            for _, Block in pairs(Blocks) do
+                local Light = Block:FindFirstChildWhichIsA("Light")
+                if Light then
+                    Light.Brightness = Light.Brightness / 2
+                end
+            end
 
-        Resolve()
+            LogService:Log("Generated geode")
+            Resolve()
+        end)
     end)
 end
 
