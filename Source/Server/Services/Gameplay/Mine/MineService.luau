@@ -28,6 +28,9 @@ local BlockSize = Core.GameConfig.Mine.BlockSize
 local MineOctree = OctoTree.new()
 local UsedPositions = {}
 
+-- Stores blocks that are being generated before it is added to used positions
+local GenerationCache = {}
+
 local BlockGenerationOffsets = {
     -- Direct neighbors
     Vector3.new(BlockSize.X, 0, 0);
@@ -247,7 +250,10 @@ function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|
     if self:IsPositionAir(Position) then return end
     Position = SnapPositionToGrid(Position)
 
+    if GenerationCache[KeyPosition(Position)] then return end
     if Position.Y > TopLayerY then return end
+
+    GenerationCache[KeyPosition(Position)] = 1
 
     local RandomNumber = BlockInfo == nil and NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre) or 0
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
@@ -285,12 +291,13 @@ function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|
     self:AddAirPosition(Position)
     MineOctree:CreateNode(Position, NewBlock)
     self.MineStats.BlocksGenerated += 1
+    GenerationCache[KeyPosition(Position)] = nil
 
     NewBlock:SetAttribute("CanMine", true)
 
     if Position.Y >= TopLayerY and table.find(self.TopLayerPositions, Position) then
         NewBlock:SetAttribute("CanMine", true)
-        return
+        return NewBlock
     end
 
     local function DisableBlock()
@@ -308,6 +315,8 @@ function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|
     if Depth > self.LowestDepth then
         DisableBlock()
     end
+
+    return NewBlock
 end
 
 --[=[
@@ -590,12 +599,14 @@ Generate blocks around the passed part using offsets
 function MineService:GenerateAroundBlockAsync(Block :BasePart)
     return Promise.new(function(Resolve)
         local Origin = Block.Position
+        local Blocks = {}
 
         for _, Offset :Vector3 in pairs(BlockGenerationOffsets) do
-            self:GenerateBlockAtPosition(Origin + Offset)
+            local NewBlock = self:GenerateBlockAtPosition(Origin + Offset)
+            table.insert(Blocks, NewBlock)
         end
 
-        Resolve()
+        Resolve(Blocks)
     end)
 end
 
@@ -604,10 +615,12 @@ Generate blocks around the passed position using offsets
 ]=]
 function MineService:GenerateAroundPositionAsync(Origin :Vector3, InCave :boolean|true, BlockInfo :Core.OreListItem, Tint :Color3)
     return Promise.new(function(Resolve)
+        local Blocks = {}
         for _, Offset :Vector3 in pairs(BlockGenerationOffsets) do
-            self:GenerateBlockAtPosition(Origin + Offset, InCave, BlockInfo, Tint)
+            local NewBlock = self:GenerateBlockAtPosition(Origin + Offset, InCave, BlockInfo, Tint)
+            table.insert(Blocks, NewBlock)
         end
-        Resolve()
+        Resolve(Blocks)
     end)
 end
 
