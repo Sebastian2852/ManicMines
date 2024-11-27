@@ -105,6 +105,14 @@ local function CollapseMine(NewSeed :number?)
     MineSpawn.Transparency = 1
 end
 
+local function SnapPositionToGrid(Position :Vector3) :Vector3
+    return Vector3.new(
+        math.round(Position.X / BlockSize.X) * BlockSize.X,
+        math.round(Position.Y / BlockSize.Y) * BlockSize.Y,
+        math.round(Position.Z / BlockSize.Z) * BlockSize.Z
+    )
+end
+
 local function KeyPosition(Vector :Vector3) :string
     return Vector.X..";"..Core.Util:RoundToxDP(Vector.Y, 3)..";"..Vector.Z
 end
@@ -233,17 +241,18 @@ function MineService:GenerateRandomOre(YLevel :number, Cave :boolean) :BasePart
 end
 
 --[=[
-Generates a block at a given position, has a random chance to be an ore
+Generates a block at a given position, has a random chance to be an ore. If a block info is passed then that block will be generated
 ]=]
-function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|false)
+function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|false, BlockInfo :Core.OreListItem?, Tint :Color3?)
+    Position = SnapPositionToGrid(Position)
     if UsedPositions[KeyPosition(Position)] then return end
     if Position.Y > TopLayerY then return end
 
-    local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
+    local RandomNumber = BlockInfo == nil and NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre) or 0
     local StoneBlock = self:YLevelToLayer(Position.Y).Stone
     local BlockToGenerate = StoneBlock
 
-    if RandomNumber == 1 then
+    if RandomNumber == 1 and BlockInfo == nil then
         local Success, Ore = self:GenerateRandomOre(Position.Y, InCave)
         if Success then
             BlockToGenerate = Ore
@@ -255,12 +264,22 @@ function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|
         end
     end
 
+    if BlockInfo then
+        BlockToGenerate = BlockInfo.RealOre
+        BlockToGenerate:SetAttribute("Health", BlockToGenerate:GetAttribute("MaxHealth"))
+    end
+
     SetupStoneBlock(StoneBlock)
     local NewBlock :BasePart = BlockToGenerate:Clone()
     NewBlock.Parent = workspace.Game.Mine
     NewBlock.Position = Position
-    NewBlock.BrickColor = StoneBlock.BrickColor
+    NewBlock.Color = StoneBlock.Color
     NewBlock.Size = Core.GameConfig.Mine.BlockSize
+
+    if Tint then
+        NewBlock.Color = Core.Util:TintColor(NewBlock.Color, Tint)
+        print(Tint)
+    end
 
     UsedPositions[KeyPosition(Position)] = 1
     MineOctree:CreateNode(Position, NewBlock)
@@ -454,7 +473,7 @@ function MineService:GenerateRoomAtDepth(Depth :number) :Vector3
         Vector3.new(-YSize, YSize, CenterOffset);
         Vector3.new(YSize, -YSize, CenterOffset);
         Vector3.new(-YSize, -YSize, CenterOffset);
-    
+
         --Wall
         Vector3.new(0, 0, -CenterOffset);
         Vector3.new(0, YSize, -CenterOffset);
@@ -489,6 +508,24 @@ function MineService:AddAirPosition(Position :Vector3)
 end
 
 --[=[
+Attempts to generate a geode from a mined block. "Attempts" because an ore can not generate geode
+or the random chance can not work out you know
+]=]
+function MineService:AttemptToGenerateGeode(Ore :BasePart)
+    local CanGenerate = Ore:GetAttribute("CanGenerateGeode") :: boolean
+    local GenerationChance = Ore:GetAttribute("GeodeGenerationChance") :: number
+    local SizeBounds = Ore:GetAttribute("GeodeRadiusSize") :: NumberRange
+
+    if not CanGenerate then return end
+
+    local RandomNumber = NumberGenerator:NextInteger(1, GenerationChance)
+    if RandomNumber ~= 1 then return end
+
+    local RandomSize = NumberGenerator:NextInteger(SizeBounds.Min, SizeBounds.Max)
+    CaveService:GenerateGeodeAsync(Ore.CFrame.Position - Vector3.new(0, 60, 0), RandomSize, Ore)
+end
+
+--[=[
 Generates blocks around a block that was mined aswell as destroying the block
 ]=]
 function MineService:BlockMined(Block :BasePart)
@@ -501,7 +538,12 @@ function MineService:BlockMined(Block :BasePart)
 
     self:GenerateAroundBlockAsync(Block)
     local Node = MineOctree:FindFirstNode(Block)
-    MineOctree:RemoveNode(Node)
+
+    if Node then
+        MineOctree:RemoveNode(Node)
+    end
+
+    self:AttemptToGenerateGeode(Block)
     Block:Destroy()
 end
 
@@ -523,10 +565,10 @@ end
 --[=[
 Generate blocks around the passed position using offsets
 ]=]
-function MineService:GenerateAroundPositionAsync(Origin :Vector3, InCave :boolean|true)
+function MineService:GenerateAroundPositionAsync(Origin :Vector3, InCave :boolean|true, BlockInfo :Core.OreListItem, Tint :Color3)
     return Promise.new(function(Resolve)
         for _, Offset :Vector3 in pairs(BlockGenerationOffsets) do
-            self:GenerateBlockAtPosition(Origin + Offset, InCave)
+            self:GenerateBlockAtPosition(Origin + Offset, InCave, BlockInfo, Tint)
         end
         Resolve()
     end)

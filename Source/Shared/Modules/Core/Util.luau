@@ -197,4 +197,15 @@ function Util:RandomiseTable(Table :{any}) :{any}
     return Table
 end
 
+--[=[
+Tints the passed color by the tint color
+]=]
+function Util:TintColor(Color :Color3, Tint :Color3) :Color3
+    return Color3.new(
+        Color.R * Tint.R,
+        Color.G * Tint.G,
+        Color.B * Tint.B
+    )
+end
+
 return Util
