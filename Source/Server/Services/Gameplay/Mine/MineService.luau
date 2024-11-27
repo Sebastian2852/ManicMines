@@ -504,6 +504,7 @@ end
 Sets a position as "air" meaning nothing can generate there
 ]=]
 function MineService:AddAirPosition(Position :Vector3)
+    Position = SnapPositionToGrid(Position)
     UsedPositions[KeyPosition(Position)] = 1
 end
 
