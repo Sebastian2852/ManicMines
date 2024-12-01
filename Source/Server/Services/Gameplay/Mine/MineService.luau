@@ -108,14 +108,6 @@ local function CollapseMine(NewSeed :number?)
     MineSpawn.Transparency = 1
 end
 
-local function SnapPositionToGrid(Position :Vector3) :Vector3
-    return Vector3.new(
-        math.round(Position.X / BlockSize.X) * BlockSize.X,
-        math.round(Position.Y / BlockSize.Y) * BlockSize.Y,
-        math.round(Position.Z / BlockSize.Z) * BlockSize.Z
-    )
-end
-
 local function KeyPosition(Vector :Vector3) :string
     return Vector.X..";"..Core.Util:RoundToxDP(Vector.Y, 3)..";"..Vector.Z
 end
@@ -157,6 +149,14 @@ end
 
 
 -- [[ PUBLIC ]] --
+
+function MineService:SnapPositionToGrid(Position :Vector3) :Vector3
+    return Vector3.new(
+        math.round(Position.X / BlockSize.X) * BlockSize.X,
+        math.round(Position.Y / BlockSize.Y) * BlockSize.Y,
+        math.round(Position.Z / BlockSize.Z) * BlockSize.Z
+    )
+end
 
 --[=[
 Convert any Y level number into a layer config. If no valid layer config is found then the default
@@ -248,7 +248,7 @@ Generates a block at a given position, has a random chance to be an ore. If a bl
 ]=]
 function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|false, BlockInfo :Core.OreListItem?, Tint :Color3?)
     if self:IsPositionAir(Position) then return end
-    Position = SnapPositionToGrid(Position)
+    Position = self:SnapPositionToGrid(Position)
 
     if GenerationCache[KeyPosition(Position)] then return end
     if Position.Y > TopLayerY then return end
@@ -514,7 +514,7 @@ end
 Sets a position as "air" meaning nothing can generate there
 ]=]
 function MineService:AddAirPosition(Position :Vector3)
-    Position = SnapPositionToGrid(Position)
+    Position = self:SnapPositionToGrid(Position)
     UsedPositions[KeyPosition(Position)] = 1
 end
 
@@ -522,7 +522,7 @@ end
 Checks weather the position is air
 ]=]
 function MineService:IsPositionAir(Position :Vector3) :boolean
-    Position = SnapPositionToGrid(Position)
+    Position = self:SnapPositionToGrid(Position)
     return UsedPositions[KeyPosition(Position)] and true or false
 end
 
@@ -690,6 +690,10 @@ function MineService:KnitStart()
     if workspace:FindFirstChild("Baseplate") then
         workspace:FindFirstChild("Baseplate"):Destroy()
     end
+
+    task.wait(5)
+
+    CaveService:GenerateCaveAsync(Vector3.new(0, -100, 0), 100)
 end
 
 return MineService
