@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 
 local CaveService = Knit.CreateService {
     Name = "CaveService",
@@ -69,6 +69,7 @@ local function CreateDebugPoint(Position :Vector3, Color :Color3)
         DebugPart.CanCollide = false
         DebugPart.Anchored = true
         DebugPart.Parent = DebugFolder
+        Resolve()
     end)
 end
 
@@ -122,11 +123,14 @@ function CaveService:GenerateGeodeAsync(Center :Vector3, Radius :number, Ore :Ba
 end
 
 function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
+    local Timer = Profiler.Timer.new("Cave gen")
+
     local SizeVector = Vector3.new(Size, Size, Size)
     CreateDebugBoundingBox(Center, SizeVector)
     CreateDebugPoint(Center, Color3.fromRGB(255, 0, 255))
-
     local Air = {}
+    local Blocks = 0
+    local Airs = 0
 
     Size = Size / 2
     for X = -Size, Size, BlockSize.X do
@@ -135,20 +139,26 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
                 local Offset = Vector3.new(X, Y, Z)
                 local Position = Center + Offset
                 local Noise = math.noise(X / 28, Y / 16, Z / 28)
+
                 if Noise < 0.001 then
                     MineService:GenerateBlockAtPosition(Position, true, nil, nil)
-                    continue
+                    Blocks += 1
                 end
+
                 MineService:AddAirPosition(Position)
                 table.insert(Air, Position)
-                RunService.Heartbeat:Wait()
+                Airs += 1
             end
         end
     end
 
     for _, AirPosition :Vector3 in pairs(Air) do
-        MineService:GenerateAroundPositionAsync(AirPosition, true, nil, nil)
+        MineService:GenerateAroundPositionAsync(AirPosition, true, nil, nil):await()
     end
+
+    Timer:Stop()
+    print("Air positions:", Airs)
+    print("Blocks:", Blocks)
 end
 
 -- [[ KNIT ]] --

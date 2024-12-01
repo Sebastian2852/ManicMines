@@ -1,4 +1,4 @@
-local ReplicatedStorage = game.ReplicatedStorage
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -250,7 +250,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|
     if self:IsPositionAir(Position) then return end
     Position = self:SnapPositionToGrid(Position)
 
-    if GenerationCache[KeyPosition(Position)] then return end
+    if GenerationCache[KeyPosition(Position)] == 1 then return end
     if Position.Y > TopLayerY then return end
 
     GenerationCache[KeyPosition(Position)] = 1
@@ -514,6 +514,7 @@ end
 Sets a position as "air" meaning nothing can generate there
 ]=]
 function MineService:AddAirPosition(Position :Vector3)
+    if self:IsPositionAir(Position) then return end
     Position = self:SnapPositionToGrid(Position)
     UsedPositions[KeyPosition(Position)] = 1
 end
@@ -617,7 +618,9 @@ function MineService:GenerateAroundPositionAsync(Origin :Vector3, InCave :boolea
     return Promise.new(function(Resolve)
         local Blocks = {}
         for _, Offset :Vector3 in pairs(BlockGenerationOffsets) do
-            local NewBlock = self:GenerateBlockAtPosition(Origin + Offset, InCave, BlockInfo, Tint)
+            local Position = Origin + Offset
+            local NewBlock = self:GenerateBlockAtPosition(Position, InCave, BlockInfo, Tint)
+            self:AddAirPosition(Position)
             table.insert(Blocks, NewBlock)
         end
         Resolve(Blocks)
