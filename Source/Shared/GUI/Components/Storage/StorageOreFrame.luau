@@ -5,7 +5,7 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local AddRoundedCorners = require(ReplicatedStorage.Game.GUI.Components.General.Corners)
+local AddRoundedCorners = require(ReplicatedStorage.Game.GUI.Elements.Corners)
 
 local InventoryOreFrame = Roact.Component:extend("InventoryOreFrame")
 
