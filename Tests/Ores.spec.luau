@@ -19,23 +19,19 @@ local NeededAttribs = {
     SpawningRange = "NumberRange";
     XP = "number";
     CanGenerateGeode = "boolean";
-    GeodeColorTint = "color3";
-    GeodeGenerationChance = "NumberRange";
+    GeodeColorTint = "Color3";
+    GeodeGenerationChance = "number";
 }
 
 return function()
     describe("Ores are setup correctly", function()
         for _, Ore in pairs(ReplicatedStorage.Assets.Ores:GetChildren()) do
             it(Ore.Name, function()
-                local Ok = true
                 for Key, Value in pairs(NeededAttribs) do
-                    if typeof(Ore:GetAttribute(Key)) ~= Value then
-                        warn(Key.." was wrong for ore: "..Ore.Name)
-                        Ok = false
-                        break
-                    end
+                    expect(Ore).to.be.ok()
+                    expect(Ore:GetAttribute(Key)).to.be.ok()
+                    expect(typeof(Ore:GetAttribute(Key))).to.be.equal(Value)
                 end
-                expect(Ok).to.equal(true)
             end)
         end
     end)
