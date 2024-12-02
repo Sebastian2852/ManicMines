@@ -123,42 +123,57 @@ function CaveService:GenerateGeodeAsync(Center :Vector3, Radius :number, Ore :Ba
 end
 
 function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
-    local Timer = Profiler.Timer.new("Cave gen")
+    return Promise.new(function(Resolve)
+        local Timer = Profiler.Timer.new("Cave gen")
+        local SizeVector = Vector3.new(Size, Size, Size)
 
-    local SizeVector = Vector3.new(Size, Size, Size)
-    CreateDebugBoundingBox(Center, SizeVector)
-    CreateDebugPoint(Center, Color3.fromRGB(255, 0, 255))
-    local Air = {}
-    local Blocks = 0
-    local Airs = 0
+        CreateDebugBoundingBox(Center, SizeVector)
+        CreateDebugPoint(Center, Color3.fromRGB(255, 0, 255))
 
-    Size = Size / 2
-    for X = -Size, Size, BlockSize.X do
-        for Y = -Size, Size, BlockSize.Y do
-            for Z = -Size, Size, BlockSize.Z do
-                local Offset = Vector3.new(X, Y, Z)
-                local Position = Center + Offset
-                local Noise = math.noise(X / 28, Y / 16, Z / 28)
+        local Air = table.create(Size^3 / (BlockSize.X * BlockSize.Y * BlockSize.Z))
+        local Blocks = 0
+        local Airs = 0
 
-                if Noise < 0.001 then
-                    MineService:GenerateBlockAtPosition(Position, true, nil, nil)
-                    Blocks += 1
+        local Gens = {}
+
+        Size = Size / 2
+        local function GenZ(X, Y)
+            return Promise.new(function(ResolveGen)
+                for Z = -Size, Size, BlockSize.Z do
+                    local Offset = Vector3.new(X, Y, Z)
+                    local Position = Center + Offset
+                    local Noise = math.noise(X / 28, Y / 16, Z / 28)
+
+                    if Noise < 0.001 then
+                        MineService:GenerateBlockAtPosition(Position, true, nil, nil)
+                        Blocks += 1
+                    end
+
+                    MineService:AddAirPosition(Position)
+                    table.insert(Air, Position)
+                    Airs += 1
                 end
+                ResolveGen()
+            end)
+        end
 
-                MineService:AddAirPosition(Position)
-                table.insert(Air, Position)
-                Airs += 1
+        for X = -Size, Size, BlockSize.X do
+            for Y = -Size, Size, BlockSize.Y do
+                table.insert(Gens, GenZ(X, Y))
             end
         end
-    end
 
-    for _, AirPosition :Vector3 in pairs(Air) do
-        MineService:GenerateAroundPositionAsync(AirPosition, true, nil, nil):await()
-    end
+        Promise.all(Gens):await()
 
-    Timer:Stop()
-    print("Air positions:", Airs)
-    print("Blocks:", Blocks)
+        for _, AirPosition :Vector3 in pairs(Air) do
+            MineService:GenerateAroundPositionAsync(AirPosition, true, nil, nil)
+        end
+
+        Timer:Stop()
+        print("Air positions:", Airs)
+        print("Blocks:", Blocks)
+        Resolve()
+    end)
 end
 
 -- [[ KNIT ]] --
