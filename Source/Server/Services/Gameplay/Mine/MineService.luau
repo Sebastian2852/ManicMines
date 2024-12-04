@@ -23,6 +23,7 @@ local OresFolder = game.ReplicatedStorage.Assets.Ores
 local TopLayerY = 0
 local TopLayerCanGenerate = true
 local Collapsing = false
+local TotalOreWeight
 
 local BlockSize = Core.GameConfig.Mine.BlockSize
 local MineOctree = OctoTree.new()
@@ -146,6 +147,18 @@ local function GetProbabilityForOreUsingCurve(Rarity :number, Curve :NumberSeque
     return Rarity - (Rarity / RawProbability)
 end
 
+local function GetTotalWeightOfOres()
+    local Ores = Core.Assets.Ores:GetChildren()
+    local Weight = 0
+
+    for _, Ore :BasePart in pairs(Ores) do
+        local Rarity = Ore:GetAttribute("Rarity")
+        Weight += Rarity
+    end
+
+    return Weight
+end
+
 
 
 -- [[ PUBLIC ]] --
@@ -205,7 +218,6 @@ THIS RETURN THE PART; DOES NOT PUT IT IN THE MINE
 ]=]
 function MineService:GenerateRandomOre(YLevel :number, Cave :boolean) :BasePart
     local SpawnableOres = self:GetSpawnableOres(YLevel, Cave)
-    local GeneratedBlock = nil
 
     if #SpawnableOres == 0 then
         LogService:Warn("No possible ores that can spawn!")
@@ -214,24 +226,26 @@ function MineService:GenerateRandomOre(YLevel :number, Cave :boolean) :BasePart
 
     local NormalizedY = math.clamp((YLevel - TopLayerY) / (self.LowestDepth - TopLayerY), 0, 1)
 
-    for _, PossibleOre :BasePart in pairs(SpawnableOres) do
-        local Rarity = PossibleOre:GetAttribute("Rarity")
-        local CaveMultiplier = PossibleOre:GetAttribute("CaveMultiplier")
-        local Multiplier = 1 + (CaveMultiplier / 100)
-        local AdjustedRarity = Cave and math.max(1, Rarity * Multiplier) or Rarity
-        local Number = NumberGenerator:NextInteger(1, AdjustedRarity)
+    local RandomWeight = NumberGenerator:NextInteger(1, TotalOreWeight)
+    local CurrentWeight = 0
+    local GeneratedBlock = nil
 
-        if Number == 1 then
-            if PossibleOre:GetAttribute("SpawningCurve") then
-                local Curve :NumberSequence = PossibleOre:GetAttribute("SpawningCurve")
-                local Probability = GetProbabilityForOreUsingCurve(AdjustedRarity, Curve, NormalizedY)
+    for _, Ore :BasePart in pairs(OresFolder:GetChildren()) do
+        local OreWeight = Ore:GetAttribute("Rarity")
+        CurrentWeight += OreWeight
+        if RandomWeight <= CurrentWeight then
+            if Ore:GetAttribute("SpawningCurve") then
+                local Curve :NumberSequence = Ore:GetAttribute("SpawningCurve")
+                local Probability = GetProbabilityForOreUsingCurve(OreWeight, Curve, NormalizedY)
                 local RandomNumber = NumberGenerator:NextInteger(1, Probability)
 
-                if RandomNumber == Probability then
-                    GeneratedBlock = PossibleOre
+                if RandomNumber == 1 then
+                    GeneratedBlock = Ore
+                    break
                 end
             else
-                GeneratedBlock = PossibleOre
+                GeneratedBlock = Ore
+                break
             end
         end
     end
@@ -268,6 +282,7 @@ function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|
         else
             BlockToGenerate = StoneBlock
             BlockToGenerate:AddTag("Mine/BlockType/Stone")
+            BlockToGenerate:AddTag("Mine/BlockType/OreFail")
         end
     end
 
@@ -675,6 +690,7 @@ function MineService:KnitInit()
     end
 
     self.LowestDepth = LowestDepth
+    TotalOreWeight = GetTotalWeightOfOres()
 end
 
 function MineService:KnitStart()
