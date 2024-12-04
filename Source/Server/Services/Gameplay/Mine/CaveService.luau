@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -125,18 +126,19 @@ end
 function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
     return Promise.new(function(Resolve)
         local Timer = Profiler.Timer.new("Cave gen")
+
         local SizeVector = Vector3.new(Size, Size, Size)
+        Size = Size / 2
 
         CreateDebugBoundingBox(Center, SizeVector)
         CreateDebugPoint(Center, Color3.fromRGB(255, 0, 255))
 
-        local Air = table.create(Size^3 / (BlockSize.X * BlockSize.Y * BlockSize.Z))
         local Blocks = 0
         local Airs = 0
 
-        local Gens = {}
+        local BlockGenTimer = Profiler.Timer.new("Block gen")
 
-        Size = Size / 2
+        local Gens = {}
         local function GenZ(X, Y)
             return Promise.new(function(ResolveGen)
                 for Z = -Size, Size, BlockSize.Z do
@@ -150,7 +152,7 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
                     end
 
                     MineService:AddAirPosition(Position)
-                    table.insert(Air, Position)
+                    RunService.Heartbeat:Wait()
                     Airs += 1
                 end
                 ResolveGen()
@@ -164,10 +166,7 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
         end
 
         Promise.all(Gens):await()
-
-        for _, AirPosition :Vector3 in pairs(Air) do
-            MineService:GenerateAroundPositionAsync(AirPosition, true, nil, nil)
-        end
+        BlockGenTimer:Stop()
 
         Timer:Stop()
         print("Air positions:", Airs)

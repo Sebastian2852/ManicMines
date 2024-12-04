@@ -696,7 +696,7 @@ function MineService:KnitStart()
 
     task.wait(5)
 
-    CaveService:GenerateCaveAsync(Vector3.new(0, -100, 0), 100)
+    CaveService:GenerateCaveAsync(Vector3.new(0, -1800, 0), 200)
 end
 
 return MineService
