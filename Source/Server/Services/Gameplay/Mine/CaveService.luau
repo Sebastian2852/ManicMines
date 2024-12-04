@@ -14,8 +14,6 @@ local CaveService = Knit.CreateService {
 local MineService
 local LogService
 
-local DebugFolder
-
 local BlockSize = Core.GameConfig.Mine.BlockSize
 
 -- [[ PRIVATE ]] --
@@ -36,42 +34,6 @@ local function GetSphereAirPositions(Center :Vector3, Radius :number) :{Vector3}
     end
 
     return Positions
-end
-
-local function CreateDebugBoundingBox(CenterPosition :Vector3, Size :Vector3)
-    return Promise.new(function(Resolve)
-        local DebugPart = Instance.new("Part")
-        DebugPart.Size = Size
-        DebugPart.CFrame = CFrame.new(CenterPosition)
-        DebugPart.Transparency = 1
-        DebugPart.CanCollide = false
-        DebugPart.Anchored = true
-        DebugPart.Parent = DebugFolder
-
-        local SelectionBox = Instance.new("SelectionBox")
-        SelectionBox.Adornee = DebugPart
-        SelectionBox.Parent = DebugPart
-        SelectionBox.Color3 = Core.UI.Color.Red
-        SelectionBox.SurfaceTransparency = 1
-        SelectionBox.LineThickness = 0.05
-        Resolve()
-    end)
-end
-
-local function CreateDebugPoint(Position :Vector3, Color :Color3)
-    return Promise.new(function(Resolve)
-        local DebugPart = Instance.new("Part")
-        DebugPart.CFrame = CFrame.new(Position)
-        DebugPart.Color = Color
-        DebugPart.Size = Vector3.new(0.5, 0.5, 0.5)
-        DebugPart.Material = Enum.Material.Neon
-        DebugPart.Shape = Enum.PartType.Ball
-        DebugPart.Transparency = 0
-        DebugPart.CanCollide = false
-        DebugPart.Anchored = true
-        DebugPart.Parent = DebugFolder
-        Resolve()
-    end)
 end
 
 
@@ -123,6 +85,9 @@ function CaveService:GenerateGeodeAsync(Center :Vector3, Radius :number, Ore :Ba
     end)
 end
 
+--[=[
+Generate a random cave at a given position with a given size
+]=]
 function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
     return Promise.new(function(Resolve)
         local Timer = Profiler.Timer.new("Cave gen")
@@ -130,8 +95,8 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
         local SizeVector = Vector3.new(Size, Size, Size)
         Size = Size / 2
 
-        CreateDebugBoundingBox(Center, SizeVector)
-        CreateDebugPoint(Center, Color3.fromRGB(255, 0, 255))
+        Core.Util:CreateDebugBoundingBox(Center, SizeVector)
+        Core.Util:CreateDebugPoint(Center, Color3.fromRGB(255, 0, 255))
 
         local Blocks = 0
         local Airs = 0
@@ -175,14 +140,9 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
     end)
 end
 
--- [[ KNIT ]] --
 
-function CaveService:KnitInit()
-    local CreatedDebugFolder = Instance.new("Folder")
-    CreatedDebugFolder.Name = "Cave-Debug"
-    CreatedDebugFolder.Parent = workspace
-    DebugFolder = CreatedDebugFolder
-end
+
+-- [[ KNIT ]] --
 
 function CaveService:KnitStart()
     MineService = Knit.GetService("MineService")
