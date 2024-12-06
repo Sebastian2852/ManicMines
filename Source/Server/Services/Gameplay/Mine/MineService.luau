@@ -23,7 +23,6 @@ local OresFolder = game.ReplicatedStorage.Assets.Ores
 local TopLayerY = 0
 local TopLayerCanGenerate = true
 local Collapsing = false
-local TotalOreWeight
 
 local BlockSize = Core.GameConfig.Mine.BlockSize
 local MineOctree = OctoTree.new()
@@ -147,8 +146,11 @@ local function GetProbabilityForOreUsingCurve(Rarity :number, Curve :NumberSeque
     return Rarity - (Rarity / RawProbability)
 end
 
-local function GetTotalWeightOfOres()
-    local Ores = Core.Assets.Ores:GetChildren()
+local function GetTotalWeightOfOres(Ores :{BasePart}?)
+    if Ores == nil then
+        Ores = Core.Assets.Ores:GetChildren()
+    end
+
     local Weight = 0
 
     for _, Ore :BasePart in pairs(Ores) do
@@ -204,7 +206,7 @@ function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
         local MinY = SpawningRange.Min * Core.GameConfig.Mine.BlockSize.Y
         local MaxY = SpawningRange.Max * Core.GameConfig.Mine.BlockSize.Y
 
-        if MinY <= Depth and MaxY - 1 >= Depth then
+        if MinY <= Depth and Depth <= MaxY then
             table.insert(SpawnableOres, Ore)
         end
     end
@@ -226,11 +228,12 @@ function MineService:GenerateRandomOre(YLevel :number, Cave :boolean) :BasePart
 
     local NormalizedY = math.clamp((YLevel - TopLayerY) / (self.LowestDepth - TopLayerY), 0, 1)
 
+    local TotalOreWeight = GetTotalWeightOfOres(SpawnableOres)
     local RandomWeight = NumberGenerator:NextInteger(1, TotalOreWeight)
     local CurrentWeight = 0
     local GeneratedBlock = nil
 
-    for _, Ore :BasePart in pairs(OresFolder:GetChildren()) do
+    for _, Ore :BasePart in pairs(SpawnableOres) do
         local OreWeight = Ore:GetAttribute("Rarity")
         CurrentWeight += OreWeight
         if RandomWeight <= CurrentWeight then
@@ -690,7 +693,6 @@ function MineService:KnitInit()
     end
 
     self.LowestDepth = LowestDepth
-    TotalOreWeight = GetTotalWeightOfOres()
 end
 
 function MineService:KnitStart()
