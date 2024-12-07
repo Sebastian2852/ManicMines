@@ -89,11 +89,7 @@ Generate a random cave at a given position with a given size
 ]=]
 function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
     return Promise.new(function(Resolve)
-        local SizeVector = Vector3.new(Size, Size, Size)
         Size = Size / 2
-
-        Core.Util:CreateDebugBoundingBox(Center, SizeVector)
-        Core.Util:CreateDebugPoint(Center, Color3.fromRGB(255, 0, 255))
 
         local Blocks = 0
         local Airs = 0
