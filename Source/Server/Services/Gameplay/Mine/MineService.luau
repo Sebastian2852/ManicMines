@@ -732,10 +732,6 @@ function MineService:KnitStart()
     if workspace:FindFirstChild("Baseplate") then
         workspace:FindFirstChild("Baseplate"):Destroy()
     end
-
-    task.wait(5)
-
-    CaveService:GenerateRandomCaveAsync(Vector3.new(0, -500, 0))
 end
 
 return MineService
