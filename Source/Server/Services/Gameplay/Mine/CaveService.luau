@@ -35,6 +35,21 @@ local function GetSphereAirPositions(Center :Vector3, Radius :number) :{Vector3}
     return Positions
 end
 
+local function GetToalWeightOfCaves(Caves :{Configuration}?)
+    if Caves == nil then
+        Caves = Core.Assets.Caves.Random:GetChildren()
+    end
+
+    local Weight = 0
+
+    for _, Cave :Configuration in pairs(Caves) do
+        local Rarity = Cave:GetAttribute("Rarity")
+        Weight += Rarity
+    end
+
+    return Weight
+end
+
 
 
 -- [[ PUBLIC ]] --
@@ -149,42 +164,78 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number, NoiseResol
 end
 
 --[=[
+Returns a table of configs of valid cave configs at the given depth
+]=]
+function CaveService:GetSpawnableCaves(Depth :number) :{Configuration}
+    local SpawnableCaves = {}
+
+    for _, CaveConfig :Configuration in pairs(Core.Assets.Caves.Random:GetChildren()) do
+        local SpawningRange = CaveConfig:GetAttribute("DepthRange")
+
+        local MinY = SpawningRange.Min
+        local MaxY = SpawningRange.Max
+
+        if MinY <= Depth and Depth <= MaxY then
+            table.insert(SpawnableCaves, CaveConfig)
+        end
+    end
+
+    return SpawnableCaves
+end
+
+--[=[
+Picks a random cave from the caves given based on weight
+]=]
+function CaveService:PickRandomCaveConfig(Caves :{Configuration}) :Configuration
+    local NumberGenerator :Random = MineService:GetRandomObject()
+    local TotalWeight = GetToalWeightOfCaves(Caves)
+    local RandomWeight = NumberGenerator:NextInteger(1, TotalWeight)
+    local CurrentWeight = 0
+
+    for _, Cave :Configuration in pairs(Caves) do
+        local CaveWeight = Cave:GetAttribute("Rarity")
+        CurrentWeight += CaveWeight
+        if RandomWeight <= CurrentWeight then
+            return Cave
+        end
+    end
+end
+
+--[=[
+Generates a cave from the given config at the given position
+]=]
+function CaveService:GenerateCaveFromConfigAsync(CaveConfig :Configuration, Position :Vector3)
+    LogService:Log("Generating cave from config: "..CaveConfig.Name)
+    local NumberGenerator :Random = MineService:GetRandomObject()
+
+    local SizeRange = CaveConfig:GetAttribute("Size")
+    local MinSize = SizeRange.Min
+    local MaxSize = SizeRange.Max
+    local Size = NumberGenerator:NextInteger(MinSize, MaxSize)
+
+    local NoiseResolution = CaveConfig:GetAttribute("NoiseResolution")
+    local NoiseResolutionOffset = CaveConfig:GetAttribute("NoiseResolutionOffset")
+    local NoiseThreshold = CaveConfig:GetAttribute("NoiseThreshold")
+
+    return self:GenerateCaveAsync(Position, Size, NoiseResolution, NoiseResolutionOffset, NoiseThreshold)
+end
+
+--[=[
 Generates a random cave from a random config at the given position
 ]=]
-function CaveService:GenerateRandomCaveAsync(Position :Vector3)
-    return Promise.new(function(Resolve)
-        Position = MineService:SnapPositionToGrid(Position)
-        local Depth = MineService:ConvertToDepth(Position.Y)
-        local ValidConfigs = {}
+function CaveService:GenerateRandomCave(Position :Vector3)
+    LogService:Log("Generating new cave")
+    Position = MineService:SnapPositionToGrid(Position)
 
-        for _, CaveConfig :Configuration in pairs(Core.Assets.Caves.Random:GetChildren()) do
-            local SpawningRange = CaveConfig:GetAttribute("DepthRange")
+    local Depth = MineService:ConvertToDepth(Position.Y)
+    local PossibleCaves = self:GetSpawnableCaves(Depth)
+    local RandomCave = self:PickRandomCaveConfig(PossibleCaves)
+    if not RandomCave then
+        LogService:Warn("No possible caves can spawn")
+        return
+    end
 
-            local MinY = SpawningRange.Min
-            local MaxY = SpawningRange.Max
-
-            if MinY <= Depth and Depth <= MaxY then
-                table.insert(ValidConfigs, CaveConfig)
-            end
-        end
-
-        local NumberGen :Random = MineService:GetRandomObject()
-        local RandomCave = ValidConfigs[NumberGen:NextInteger(1, #ValidConfigs)] :: Configuration
-        if not RandomCave then
-            Resolve()
-        end
-
-        local SizeRange = RandomCave:GetAttribute("Size")
-        local MinSize = SizeRange.Min
-        local MaxSize = SizeRange.Max
-        local Size = NumberGen:NextInteger(MinSize, MaxSize)
-
-        local NoiseResolution = RandomCave:GetAttribute("NoiseResolution")
-        local NoiseThreshold = RandomCave:GetAttribute("NoiseThreshold")
-
-        self:GenerateCaveAsync(Position, Size, NoiseResolution, NoiseThreshold)
-        Resolve()
-    end)
+    self:GenerateCaveFromConfigAsync(RandomCave, Position)
 end
 
 
@@ -198,22 +249,12 @@ function CaveService:KnitStart()
     task.wait(5)
 
     local Generated = 0
-    local NumberGen :Random = MineService:GetRandomObject()
 
     for _, CaveConfig :Configuration in pairs(Core.Assets.Caves.Random:GetChildren()) do
         if CaveConfig:GetAttribute("TestMode") == false then continue end
-        local SizeRange = CaveConfig:GetAttribute("Size")
-        local MinSize = math.floor(SizeRange.Min / 6) * 6
-        local MaxSize = math.floor(SizeRange.Max / 6) * 6
-        local Size = NumberGen:NextInteger(MinSize, MaxSize)
-
-        local NoiseResolution = CaveConfig:GetAttribute("NoiseResolution")
-        local NoiseResolutionOffset = CaveConfig:GetAttribute("NoiseResolutionOffset")
-        local NoiseThreshold = CaveConfig:GetAttribute("NoiseThreshold")
-
         Generated += 1
-        LogService:Log("Generateing test cave: "..CaveConfig.Name.." (Size: "..Size..")")
-        self:GenerateCaveAsync(Vector3.new(500 * Generated, -500, 0), Size, NoiseResolution, NoiseResolutionOffset, NoiseThreshold):await()
+        LogService:Log("Generateing test cave: "..CaveConfig.Name)
+        self:GenerateCaveFromConfigAsync(CaveConfig, Vector3.new(500 * Generated, -500, 0)):await()
     end
 end
 

@@ -6,6 +6,7 @@ local NeededAttribs = {
     NoiseResolutionOffset = "Vector3";
     NoiseThreshold = "number";
     Size = "NumberRange";
+    Rarity = "number";
     TestMode = "boolean";
 }
 

@@ -172,10 +172,16 @@ end
 
 -- [[ PUBLIC ]] --
 
+--[=[
+Returns a copy of the CURRENT random number generator
+]=]
 function MineService:GetRandomObject() :Random
-    return NumberGenerator
+    return NumberGenerator:Clone()
 end
 
+--[=[
+Snaps the given position to the grid
+]=]
 function MineService:SnapPositionToGrid(Position :Vector3) :Vector3
     return Vector3.new(
         math.round(Position.X / BlockSize.X) * BlockSize.X,
@@ -184,6 +190,9 @@ function MineService:SnapPositionToGrid(Position :Vector3) :Vector3
     )
 end
 
+--[=[
+Converts the World Y Level passed into a depth value
+]=]
 function MineService:ConvertToDepth(YLevel :number) :number
     return ConvertYLevelToDepth(YLevel)
 end
