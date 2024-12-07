@@ -107,8 +107,26 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
         local function GenZ(X, Y)
             return Promise.new(function(ResolveGen)
                 for Z = -Size, Size, BlockSize.Z do
+                    RunService.Heartbeat:Wait()
+
                     local Offset = Vector3.new(X, Y, Z)
                     local Position = Center + Offset
+
+                    if X == -Size or X + BlockSize.X > Size then
+                        MineService:GenerateBlockAtPosition(Position, true, nil, nil)
+                        continue
+                    end
+
+                    if Y == -Size or Y + BlockSize.Y > Size then
+                        MineService:GenerateBlockAtPosition(Position, true, nil, nil)
+                        continue
+                    end
+
+                    if Z == -Size or Z + BlockSize.Z > Size then
+                        MineService:GenerateBlockAtPosition(Position, true, nil, nil)
+                        continue
+                    end
+
                     local Noise = math.noise(X / 28, Y / 16, Z / 28)
 
                     if Noise < 0.001 then
@@ -117,7 +135,6 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
                     end
 
                     MineService:AddAirPosition(Position)
-                    RunService.Heartbeat:Wait()
                     Airs += 1
                 end
                 ResolveGen()
