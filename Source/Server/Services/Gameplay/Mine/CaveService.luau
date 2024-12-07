@@ -85,9 +85,9 @@ function CaveService:GenerateGeodeAsync(Center :Vector3, Radius :number, Ore :Ba
 end
 
 --[=[
-Generate a random cave at a given position with a given size
+Do not use this function, instead use "GenerateRandomCaveAsync"
 ]=]
-function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
+function CaveService:GenerateCaveAsync(Center :Vector3, Size :number, NoiseResolution :Vector3, NoiseThreshold :number)
     return Promise.new(function(Resolve)
         Size = Size / 2
 
@@ -118,9 +118,9 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
                         continue
                     end
 
-                    local Noise = math.noise(X / 28, Y / 16, Z / 28)
+                    local Noise = math.noise(X / NoiseResolution.X, Y / NoiseResolution.Y, Z / NoiseResolution.Z)
 
-                    if Noise < 0.001 then
+                    if Noise < NoiseThreshold then
                         MineService:GenerateBlockAtPosition(Position, true, nil, nil)
                         Blocks += 1
                     end
@@ -139,6 +139,44 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
         end
 
         Promise.all(Gens):await()
+        Resolve()
+    end)
+end
+
+--[=[
+Generates a random cave from a random config at the given position
+]=]
+function CaveService:GenerateRandomCaveAsync(Position :Vector3)
+    return Promise.new(function(Resolve)
+        local Depth = MineService:ConvertToDepth(Position.Y)
+        local ValidConfigs = {}
+
+        for _, CaveConfig :Configuration in pairs(Core.Assets.Caves.Random:GetChildren()) do
+            local SpawningRange = CaveConfig:GetAttribute("DepthRange")
+
+            local MinY = SpawningRange.Min
+            local MaxY = SpawningRange.Max
+
+            if MinY <= Depth and Depth <= MaxY then
+                table.insert(ValidConfigs, CaveConfig)
+            end
+        end
+
+        local NumberGen :Random = MineService:GetRandomObject()
+        local RandomCave = ValidConfigs[NumberGen:NextInteger(1, #ValidConfigs)] :: Configuration
+        if not RandomCave then
+            Resolve()
+        end
+
+        local SizeRange = RandomCave:GetAttribute("Size")
+        local MinSize = SizeRange.Min
+        local MaxSize = SizeRange.Max
+        local Size = NumberGen:NextInteger(MinSize, MaxSize)
+
+        local NoiseResolution = RandomCave:GetAttribute("NoiseResolution")
+        local NoiseThreshold = RandomCave:GetAttribute("NoiseThreshold")
+
+        self:GenerateCaveAsync(Position, Size, NoiseResolution, NoiseThreshold)
         Resolve()
     end)
 end

@@ -172,12 +172,20 @@ end
 
 -- [[ PUBLIC ]] --
 
+function MineService:GetRandomObject() :Random
+    return NumberGenerator
+end
+
 function MineService:SnapPositionToGrid(Position :Vector3) :Vector3
     return Vector3.new(
         math.round(Position.X / BlockSize.X) * BlockSize.X,
         math.round(Position.Y / BlockSize.Y) * BlockSize.Y,
         math.round(Position.Z / BlockSize.Z) * BlockSize.Z
     )
+end
+
+function MineService:ConvertToDepth(YLevel :number) :number
+    return ConvertYLevelToDepth(YLevel)
 end
 
 --[=[
@@ -727,7 +735,7 @@ function MineService:KnitStart()
 
     task.wait(5)
 
-    CaveService:GenerateCaveAsync(Vector3.new(0, -200, 0), 200)
+    CaveService:GenerateRandomCaveAsync(Vector3.new(0, -500, 0))
 end
 
 return MineService
