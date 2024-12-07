@@ -223,6 +223,46 @@
               "GeodeGenerationChance": {"Int64": 0}
             }
           }
+        },
+
+        "Layer":{
+          "$className":"Configuration",
+          "$properties": {
+            "Attributes":{
+              "DisplayName": {"String": ""},
+              "Depth": {"NumberRange": [0, 0]},
+              "Color": {"ColorSequence": {"keypoints": [{"time": 0.0,"color": [1.0, 1.0, 1.0]},{"time": 1.0,"color": [0.0, 0.0, 0.0]}]}}
+            }
+          }
+        },
+
+        "Level":{
+          "$className":"Configuration",
+          "$properties": {
+            "Attributes": {
+              "LevelName": {"String": ""},
+              "LevelColor": {"Color3": [1.0, 1.0, 1.0]},
+              "LevelXpBarColor": {"ColorSequence": {"keypoints": [{"time": 0.0,"color": [1.0, 1.0, 1.0]},{"time": 1.0,"color": [0.0, 0.0, 0.0]}]}},
+              "XpNeeded": {"Int64": 0}
+            }
+          }
+        },
+
+        "Pickaxe":{
+          "$className":"Configuration",
+          "Ores":{"$className":"Folder"},
+          "Upgrades":{"$className":"Folder"},
+          "Pickaxe":{"$className":"Tool"},
+          "$properties": {
+            "Attributes": {
+              "Name": {"String": ""},
+              "Description": {"String": ""},
+              "ButtonGradient": {"ColorSequence": {"keypoints": [{"time": 0.0,"color": [1.0, 1.0, 1.0]},{"time": 1.0,"color": [0.0, 0.0, 0.0]}]}},
+              "Icon": {"Content": ""},
+              "MainUpgrade": {"String": ""},
+              "OwnedByDefault": {"Bool": false}
+            }
+          }
         }
       }
     }
