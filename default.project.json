@@ -174,7 +174,56 @@
 
     "ServerStorage": {
       "Resources":{
-        "$path": "Resources"
+        "$path": "Resources",
+        "RandomCaveConfig":{
+          "$className":"Configuration",
+          "$properties": {
+            "Attributes":{
+              "DepthRange": {"NumberRange": [0, 0]},
+              "NoiseResolution": {"Vector3": [0, 0, 0]},
+              "NoiseResolutionOffset": {"Vector3": [0, 0, 0]},
+              "NoiseThreshold": {"Int32": 0},
+              "Size": {"NumberRange": [0, 0]},
+              "Rarity": {"Int32": 0},
+              "TestMode": {"Bool": false},
+              "Tint": {"Color3": [1, 1, 1]}
+            }
+          }
+        },
+        "Ore":{
+          "$className":"Part",
+          "$properties": {
+            "Size": [6, 6, 6],
+            "Attributes":{
+              "DisplayName": {"String": ""},
+              "Health": {"Int64": 0},
+              "MaxHealth": {"Int64": 0},
+              "XP": {"Int64": 0},
+              "AmountDroppedWhenMined": {"Int32": 0},
+              
+              "Rarity": {"Int64": 0},
+              "SpawningRange": {"NumberRange": [0, 0]},
+              "SpawningCurve": {"NumberSequence": {"keypoints": [{"time": 0.0,"value": 0.0,"envelope": 0.0},{"time": 1.0,"value": 0.0,"envelope": 0.0}]}},
+
+              "CoinValue": {"Int64": 0},
+              "EmblemCost": {"Int32": 0},
+              "EmblemImageID": {"String": ""},
+
+              "CaveMultiplier": {"Int32": 0},
+              "CaveOnly": {"Bool": false},
+              "NoCave": {"Bool": false},
+
+              "InventoryBackgroundColor": {"ColorSequence": {"keypoints": [{"time": 0.0,"color": [1.0, 1.0, 1.0]},{"time": 1.0,"color": [0.0, 0.0, 0.0]}]}},
+              "MiningBarGradient": {"ColorSequence": {"keypoints": [{"time": 0.0,"color": [1.0, 1.0, 1.0]},{"time": 1.0,"color": [0.0, 0.0, 0.0]}]}},
+              "SelectionColor": {"Color3": [1.0, 1.0, 1.0]},
+
+              
+              "GeodeColorTint": {"Color3": [1.0, 1.0, 1.0]},
+              "CanGenerateGeode": {"Bool": false},
+              "GeodeGenerationChance": {"Int64": 0}
+            }
+          }
+        }
       }
     }
   }
