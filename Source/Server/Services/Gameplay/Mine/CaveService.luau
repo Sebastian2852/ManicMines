@@ -4,7 +4,6 @@ local RunService = game:GetService("RunService")
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
-local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 
 local CaveService = Knit.CreateService {
     Name = "CaveService",
@@ -90,8 +89,6 @@ Generate a random cave at a given position with a given size
 ]=]
 function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
     return Promise.new(function(Resolve)
-        local Timer = Profiler.Timer.new("Cave gen")
-
         local SizeVector = Vector3.new(Size, Size, Size)
         Size = Size / 2
 
@@ -100,8 +97,6 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
 
         local Blocks = 0
         local Airs = 0
-
-        local BlockGenTimer = Profiler.Timer.new("Block gen")
 
         local Gens = {}
         local function GenZ(X, Y)
@@ -148,11 +143,6 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number)
         end
 
         Promise.all(Gens):await()
-        BlockGenTimer:Stop()
-
-        Timer:Stop()
-        print("Air positions:", Airs)
-        print("Blocks:", Blocks)
         Resolve()
     end)
 end
