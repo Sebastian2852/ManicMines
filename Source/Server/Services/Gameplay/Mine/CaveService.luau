@@ -87,9 +87,14 @@ end
 --[=[
 Do not use this function, instead use "GenerateRandomCaveAsync"
 ]=]
-function CaveService:GenerateCaveAsync(Center :Vector3, Size :number, NoiseResolution :Vector3, NoiseThreshold :number)
+function CaveService:GenerateCaveAsync(Center :Vector3, Size :number, NoiseResolution :Vector3, NoiseResolutionOffset :Vector3, NoiseThreshold :number)
     return Promise.new(function(Resolve)
+        if Size % 2 == 0 then
+            Size += 1
+        end
+
         Size = Size / 2
+        Center = MineService:SnapPositionToGrid(Center)
 
         local Blocks = 0
         local Airs = 0
@@ -118,7 +123,7 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number, NoiseResol
                         continue
                     end
 
-                    local Noise = math.noise(X / NoiseResolution.X, Y / NoiseResolution.Y, Z / NoiseResolution.Z)
+                    local Noise = math.noise(X / NoiseResolution.X + NoiseResolutionOffset.X, Y / NoiseResolution.Y + NoiseResolutionOffset.Y, Z / NoiseResolution.Z + NoiseResolutionOffset.Z)
 
                     if Noise < NoiseThreshold then
                         MineService:GenerateBlockAtPosition(Position, true, nil, nil)
@@ -148,6 +153,7 @@ Generates a random cave from a random config at the given position
 ]=]
 function CaveService:GenerateRandomCaveAsync(Position :Vector3)
     return Promise.new(function(Resolve)
+        Position = MineService:SnapPositionToGrid(Position)
         local Depth = MineService:ConvertToDepth(Position.Y)
         local ValidConfigs = {}
 
@@ -188,6 +194,27 @@ end
 function CaveService:KnitStart()
     MineService = Knit.GetService("MineService")
     LogService = Knit.GetService("LogService")
+
+    task.wait(5)
+
+    local Generated = 0
+    local NumberGen :Random = MineService:GetRandomObject()
+
+    for _, CaveConfig :Configuration in pairs(Core.Assets.Caves.Random:GetChildren()) do
+        if CaveConfig:GetAttribute("TestMode") == false then continue end
+        local SizeRange = CaveConfig:GetAttribute("Size")
+        local MinSize = math.floor(SizeRange.Min / 6) * 6
+        local MaxSize = math.floor(SizeRange.Max / 6) * 6
+        local Size = NumberGen:NextInteger(MinSize, MaxSize)
+
+        local NoiseResolution = CaveConfig:GetAttribute("NoiseResolution")
+        local NoiseResolutionOffset = CaveConfig:GetAttribute("NoiseResolutionOffset")
+        local NoiseThreshold = CaveConfig:GetAttribute("NoiseThreshold")
+
+        Generated += 1
+        LogService:Log("Generateing test cave: "..CaveConfig.Name.." (Size: "..Size..")")
+        self:GenerateCaveAsync(Vector3.new(500 * Generated, -500, 0), Size, NoiseResolution, NoiseResolutionOffset, NoiseThreshold):await()
+    end
 end
 
 return CaveService
