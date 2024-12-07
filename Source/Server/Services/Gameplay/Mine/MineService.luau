@@ -333,7 +333,6 @@ function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|
 
     if Tint then
         NewBlock.Color = Core.Util:TintColor(NewBlock.Color, Tint)
-        print(Tint)
     end
 
     self:AddAirPosition(Position)

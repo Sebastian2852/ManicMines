@@ -8,6 +8,7 @@ local NeededAttribs = {
     Size = "NumberRange";
     Rarity = "number";
     TestMode = "boolean";
+    Tint = "Color3";
 }
 
 return function()

@@ -102,7 +102,7 @@ end
 --[=[
 Do not use this function, instead use "GenerateRandomCaveAsync"
 ]=]
-function CaveService:GenerateCaveAsync(Center :Vector3, Size :number, NoiseResolution :Vector3, NoiseResolutionOffset :Vector3, NoiseThreshold :number)
+function CaveService:GenerateCaveAsync(Center :Vector3, Size :number, NoiseResolution :Vector3, NoiseResolutionOffset :Vector3, NoiseThreshold :number, Tint :Color3?)
     return Promise.new(function(Resolve)
         if Size % 2 == 0 then
             Size += 1
@@ -124,24 +124,24 @@ function CaveService:GenerateCaveAsync(Center :Vector3, Size :number, NoiseResol
                     local Position = Center + Offset
 
                     if X == -Size or X + BlockSize.X > Size then
-                        MineService:GenerateBlockAtPosition(Position, true, nil, nil)
+                        MineService:GenerateBlockAtPosition(Position, true, nil, Tint)
                         continue
                     end
 
                     if Y == -Size or Y + BlockSize.Y > Size then
-                        MineService:GenerateBlockAtPosition(Position, true, nil, nil)
+                        MineService:GenerateBlockAtPosition(Position, true, nil, Tint)
                         continue
                     end
 
                     if Z == -Size or Z + BlockSize.Z > Size then
-                        MineService:GenerateBlockAtPosition(Position, true, nil, nil)
+                        MineService:GenerateBlockAtPosition(Position, true, nil, Tint)
                         continue
                     end
 
                     local Noise = math.noise(X / NoiseResolution.X + NoiseResolutionOffset.X, Y / NoiseResolution.Y + NoiseResolutionOffset.Y, Z / NoiseResolution.Z + NoiseResolutionOffset.Z)
 
                     if Noise < NoiseThreshold then
-                        MineService:GenerateBlockAtPosition(Position, true, nil, nil)
+                        MineService:GenerateBlockAtPosition(Position, true, nil, Tint)
                         Blocks += 1
                     end
 
@@ -216,8 +216,9 @@ function CaveService:GenerateCaveFromConfigAsync(CaveConfig :Configuration, Posi
     local NoiseResolution = CaveConfig:GetAttribute("NoiseResolution")
     local NoiseResolutionOffset = CaveConfig:GetAttribute("NoiseResolutionOffset")
     local NoiseThreshold = CaveConfig:GetAttribute("NoiseThreshold")
+    local Tint = CaveConfig:GetAttribute("Tint")
 
-    return self:GenerateCaveAsync(Position, Size, NoiseResolution, NoiseResolutionOffset, NoiseThreshold)
+    return self:GenerateCaveAsync(Position, Size, NoiseResolution, NoiseResolutionOffset, NoiseThreshold, Tint)
 end
 
 --[=[
