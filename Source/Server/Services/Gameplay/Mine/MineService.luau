@@ -27,6 +27,8 @@ local Collapsing = false
 local BlockSize = Core.GameConfig.Mine.BlockSize
 local MineOctree = OctoTree.new()
 local UsedPositions = {}
+local SpawnableOresCache = {}
+local OreWeightCahce = {}
 
 -- Stores blocks that are being generated before it is added to used positions
 local GenerationCache = {}
@@ -151,6 +153,10 @@ local function GetTotalWeightOfOres(Ores :{BasePart}?)
         Ores = Core.Assets.Ores:GetChildren()
     end
 
+    if OreWeightCahce[Ores] then
+        return OreWeightCahce[Ores]
+    end
+
     local Weight = 0
 
     for _, Ore :BasePart in pairs(Ores) do
@@ -158,6 +164,7 @@ local function GetTotalWeightOfOres(Ores :{BasePart}?)
         Weight += Rarity
     end
 
+    OreWeightCahce[Ores] = Weight
     return Weight
 end
 
@@ -195,6 +202,11 @@ Gets a table of the possible ores that can spawn at a given Y level
 ]=]
 function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
     local SpawnableOres = {}
+    local Depth = ConvertYLevelToDepth(YLevel)
+
+    if SpawnableOresCache[YLevel] then
+        return SpawnableOresCache[YLevel]
+    end
 
     for _, Ore in pairs(OresFolder:GetChildren()) do
         if Ore:GetAttribute("CaveOnly") and not InCave then continue end
@@ -202,14 +214,15 @@ function MineService:GetSpawnableOres(YLevel :number, InCave :boolean)
 
         local SpawningRange = Ore:GetAttribute("SpawningRange")
 
-        local Depth = ConvertYLevelToDepth(YLevel)
-        local MinY = SpawningRange.Min * Core.GameConfig.Mine.BlockSize.Y
-        local MaxY = SpawningRange.Max * Core.GameConfig.Mine.BlockSize.Y
+        local MinY = SpawningRange.Min
+        local MaxY = SpawningRange.Max
 
         if MinY <= Depth and Depth <= MaxY then
             table.insert(SpawnableOres, Ore)
         end
     end
+
+    SpawnableOresCache[YLevel] = SpawnableOres
 
     return SpawnableOres
 end
@@ -714,7 +727,7 @@ function MineService:KnitStart()
 
     task.wait(5)
 
-    CaveService:GenerateCaveAsync(Vector3.new(0, -1800, 0), 200)
+    CaveService:GenerateCaveAsync(Vector3.new(0, -200, 0), 200)
 end
 
 return MineService
