@@ -15,11 +15,17 @@ local DataService
 local TycoonService
 local TycoonUpgradeService
 
+--[=[
+Returns the data value of the given generator
+]=]
 function TycoonGeneratorService:GetGeneratorDataValue(Player :Player, GeneratorName :string) :IntValue|nil
     local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
     return DataFolder.Tycoon.Generators:FindFirstChild(GeneratorName)
 end
 
+--[=[
+Adds the gui to the generator which also updates in realtime
+]=]
 function TycoonGeneratorService:AddGuiToGenerator(Generator :BasePart, Configuration :Configuration, DataFolder :Core.DataFolder)
     local DataValue = self:GetGeneratorDataValue(Players:GetPlayerByUserId(DataFolder.Name), Generator.Name)
 
@@ -70,6 +76,9 @@ function TycoonGeneratorService:AddGuiToGenerator(Generator :BasePart, Configura
     end)
 end
 
+--[=[
+Adds the touched event to the genertor part to give the player the stored amount
+]=]
 function TycoonGeneratorService:AddFunctionality(Generator :BasePart, Configuration :Configuration, DataFolder :Core.DataFolder)
     local GeneratorDataValue = self:GetGeneratorDataValue(Players:GetPlayerByUserId(DataFolder.Name), Generator.Name)
     local CurrencyDataValue = DataFolder:FindFirstChild(Configuration:GetAttribute("Currency"))
@@ -85,6 +94,9 @@ function TycoonGeneratorService:AddFunctionality(Generator :BasePart, Configurat
     end)
 end
 
+--[=[
+Setup the generators in the given tycoon, returns a promise
+]=]
 function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon :Model, Owner :Player)
     return Promise.new(function(Resolve)
         local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Owner)
