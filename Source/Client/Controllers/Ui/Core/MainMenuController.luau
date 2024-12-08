@@ -608,29 +608,49 @@ function MainMenuComponent:render()
                     TextXAlignment = Enum.TextXAlignment.Left;
                 }, {});
 
-                Input = Roact.createElement("TextBox", {
+                InputContainer = Roact.createElement("Frame", {
                     Size = UDim2.fromScale(0.9, 0.2);
                     Position = Core.UI.Position.Center;
                     AnchorPoint = Core.UI.AnchorPoint.Center;
                     BackgroundTransparency = 0.75;
                     BackgroundColor3 = Core.UI.Theme.BackgroundColorLight;
                     BorderSizePixel = 0;
+                }, {
+                    Input = Roact.createElement("TextBox", {
+                        Size = UDim2.fromScale(0.9, 1);
+                        Position = Core.UI.Position.LeftCenter;
+                        AnchorPoint = Core.UI.AnchorPoint.LeftCenter;
+                        BackgroundTransparency = 1;
+                        BorderSizePixel = 0;
 
-                    Text = "";
-                    PlaceholderText = "Tycoon name";
-                    TextScaled = true;
-                    FontFace = Core.UI.Theme.TextFont;
-                    TextColor3 = Core.UI.Theme.TextColor3;
+                        Text = "";
+                        PlaceholderText = "Tycoon name";
+                        TextScaled = true;
+                        FontFace = Core.UI.Theme.TextFont;
+                        TextColor3 = Core.UI.Theme.TextColor3;
 
-                    [Roact.Ref] = SlotCreationNameInputRef;
+                        [Roact.Ref] = SlotCreationNameInputRef;
 
-                    [Roact.Event.FocusLost] = function(Object :TextBox)
-                        local Text = Object.Text
-                        TextFilteringService:FilterTextFromUserToEveryone(Text):andThen(function(FilteredText)
-                            Object.Text = FilteredText
-                        end)
-                    end;
-                }, {});
+                        [Roact.Event.FocusLost] = function(Object :TextBox)
+                            local Text = Object.Text
+                            TextFilteringService:FilterTextFromUserToEveryone(Text):andThen(function(FilteredText)
+                                Object.Text = FilteredText
+                            end)
+                        end;
+                    }, {});
+
+                    RandomizeButton = Roact.createElement("ImageButton", {
+                        Size = UDim2.fromScale(1, 1);
+                        Position = Core.UI.Position.TopRight;
+                        AnchorPoint = Core.UI.AnchorPoint.TopRight;
+                        SizeConstraint = Enum.SizeConstraint.RelativeYY;
+                        BackgroundTransparency = 1;
+                        BorderSizePixel = 0;
+
+                        Image = Core.UI.Images.RandomizeButton;
+                        ScaleType = Enum.ScaleType.Fit;
+                    }, {});
+                });
             });
 
             Settings = Roact.createElement("Frame", {

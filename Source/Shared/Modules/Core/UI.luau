@@ -30,6 +30,9 @@ UI.Images = {
     -- Loading screen
     LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one
 
+    -- Main Menu
+    RandomizeButton = "rbxassetid://18330725663";
+
     -- Settings
     SettingsButton = "rbxassetid://129623448532589";
     CheckBoxChecked = "rbxassetid://4458804262";
