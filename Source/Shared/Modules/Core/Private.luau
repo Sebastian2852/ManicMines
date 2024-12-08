@@ -41,6 +41,7 @@ export type DataFolder_StatsFolder = {
 
 export type DataFolder_TycoonFolder = {
     Upgrades :Folder;
+    Generators :Folder;
 }
 ---------------------------------------------------
 

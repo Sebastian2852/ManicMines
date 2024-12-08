@@ -98,6 +98,13 @@ local function SetupTemplateDataFolder()
         UpgradeValue.Parent = TemplateDataFolder.Tycoon.Upgrades
     end
 
+    for _, TycoonGenerator in pairs(Core.Assets.Tycoon.Generators:GetChildren()) do
+        local GeneratorValue = Instance.new("IntValue")
+        GeneratorValue.Name = TycoonGenerator.Name
+        GeneratorValue.Value = 0
+        GeneratorValue.Parent = TemplateDataFolder.Tycoon.Generators
+    end
+
     for SettingName, DefaultValue in pairs(Core.GameConfig.DefaultSettings) do
         local TypeToMake = ""
 

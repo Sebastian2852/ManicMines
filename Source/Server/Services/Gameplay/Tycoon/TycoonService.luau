@@ -20,6 +20,7 @@ local DataService
 local TeleportService
 local AdminService
 local TycoonUpgradeService
+local TycoonGeneratorService
 
 local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
 
@@ -86,6 +87,8 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
     end)
 
     AddUpgradeModels(DataFolder, NewTycoon)
+    TycoonGeneratorService:AddGeneratorsToTycoonAsync(NewTycoon, Player)
+
     if Player.Character then
         TeleportService:TeleportPlayerToTycoon(Player, NewTycoon, false)
     end
@@ -171,6 +174,7 @@ function TycoonService:KnitStart()
     TeleportService        = Knit.GetService("TeleportService")
     AdminService           = Knit.GetService("AdminService")
     TycoonUpgradeService   = Knit.GetService("TycoonUpgradeService")
+    TycoonGeneratorService = Knit.GetService("TycoonGeneratorService")
 end
 
 return TycoonService
