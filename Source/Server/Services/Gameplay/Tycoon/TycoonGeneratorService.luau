@@ -70,6 +70,21 @@ function TycoonGeneratorService:AddGuiToGenerator(Generator :BasePart, Configura
     end)
 end
 
+function TycoonGeneratorService:AddFunctionality(Generator :BasePart, Configuration :Configuration, DataFolder :Core.DataFolder)
+    local GeneratorDataValue = self:GetGeneratorDataValue(Players:GetPlayerByUserId(DataFolder.Name), Generator.Name)
+    local CurrencyDataValue = DataFolder:FindFirstChild(Configuration:GetAttribute("Currency"))
+
+    Generator.Touched:Connect(function(Part :BasePart)
+        local Player = Players:GetPlayerFromCharacter(Part.Parent)
+
+        if not Player then return end
+        if TycoonService:GetPlayerTycoon(Player) ~= Generator.Parent.Parent.Parent then return end
+
+        CurrencyDataValue.Value += GeneratorDataValue.Value
+        GeneratorDataValue.Value = 0
+    end)
+end
+
 function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon :Model, Owner :Player)
     return Promise.new(function(Resolve)
         local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Owner)
@@ -80,6 +95,10 @@ function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon :Model, Owner 
 
         for _, GeneratorPart :BasePart in pairs(GeneratorsFolder:GetChildren()) do
             LogService:Log("Setting up generator: "..GeneratorPart:GetFullName())
+
+            GeneratorPart.Anchored = true
+            GeneratorPart.CanCollide = false
+
             local GeneratorConfig :Configuration = Core.Assets.Tycoon.Generators:FindFirstChild(GeneratorPart.Name)
             if not GeneratorConfig then
                 LogService:Warn("No config found for generator: "..GeneratorPart:GetFullName())
@@ -100,6 +119,7 @@ function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon :Model, Owner 
             end
 
             self:AddGuiToGenerator(GeneratorPart, GeneratorConfig, DataFolder)
+            self:AddFunctionality(GeneratorPart, GeneratorConfig, DataFolder)
 
             task.spawn(function()
                 LogService:Log("["..Owner.Name.."]", "Starting generator loop")
