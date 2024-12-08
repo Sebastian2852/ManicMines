@@ -282,6 +282,8 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
 
         LoadingService:UpdateActionText(Player, "Creating tycoon")
         TycoonService:CreateTycoonForPlayer(Player)
+        DataFolder.InTycoon.Value = true
+        DataFolder.InMine.Value = false
 
         Player.CharacterAdded:Connect(function()
             PlayerDisplayService:GivePlayerOverheadGUI(Player)
