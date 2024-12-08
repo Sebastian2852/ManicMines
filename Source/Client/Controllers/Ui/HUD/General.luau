@@ -36,6 +36,12 @@ function GeneralComponent:init()
             Hidden = not New;
         })
     end)
+
+    DataFolder.InTycoon:GetPropertyChangedSignal("Value"):Connect(function()
+        self:setState({
+            InTycoon = DataFolder.InTycoon.Value
+        })
+    end)
 end
 
 function GeneralComponent:render()
@@ -85,7 +91,7 @@ function GeneralComponent:render()
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
 
-            Image = "rbxassetid://119967532396729";
+            Image = Core.UI.Images.SurfaceButton;
 
             [Roact.Event.Activated] = function()
                 LogService:Log("Surface button pressed")
@@ -95,7 +101,26 @@ function GeneralComponent:render()
             AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
                 AspectRatio = 1;
             }, {})
-        })
+        });
+
+        TycoonButton = not self.state.Hidden and not self.state.InTycoon and Roact.createElement("ImageButton", {
+            Size = UDim2.fromScale(0.04, 0.08);
+            Position = UDim2.fromScale(0.11, 0.98);
+            AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+
+            Image = Core.UI.Images.TycoonTeleportButton;
+
+            [Roact.Event.Activated] = function()
+                LogService:Log("Surface button pressed")
+                TeleportService:TeleportToTycoon()
+            end
+        }, {
+            AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
+                AspectRatio = 1;
+            }, {})
+        });
     })
 end
 
