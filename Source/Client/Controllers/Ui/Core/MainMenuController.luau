@@ -624,10 +624,10 @@ function MainMenuComponent:render()
 
                     [Roact.Ref] = SlotCreationNameInputRef;
 
-                    [Roact.Event.FocusLost] = function()
-                        local Text = SlotCreationNameInputRef:getValue().Text
+                    [Roact.Event.FocusLost] = function(Object :TextBox)
+                        local Text = Object.Text
                         TextFilteringService:FilterTextFromUserToEveryone(Text):andThen(function(FilteredText)
-                            SlotCreationNameInputRef:getValue().Text = FilteredText
+                            Object.Text = FilteredText
                         end)
                     end;
                 }, {});
