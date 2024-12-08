@@ -49,7 +49,7 @@ function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon :Model, Owner 
             end
 
             task.spawn(function()
-                LogService:Log("Starting generator loop")
+                LogService:Log("["..Owner.Name.."]", "Starting generator loop")
                 while true do
                     if not TycoonService:GetTycoonOwner(Tycoon) then break end
 
@@ -63,11 +63,11 @@ function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon :Model, Owner 
                     if not DataValue then break end
 
                     DataValue.Value += Amount
-                    LogService:Log("Added "..tostring(Amount).." value to generator: "..DataValue.Name)
+                    LogService:Log("["..Owner.Name.."]", "Added "..tostring(Amount).." value to generator: "..DataValue.Name)
 
                     task.wait(TickRate)
                 end
-                LogService:Log("Finished generator loop")
+                LogService:Log("["..Owner.Name.."]", "Finished generator loop")
             end)
         end
     end)
