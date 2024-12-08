@@ -31,7 +31,7 @@ UI.Images = {
     LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one
 
     -- Main Menu
-    RandomizeButton = "rbxassetid://18330725663";
+    RandomizeButton = "rbxassetid://88848619964213";
 
     -- Settings
     SettingsButton = "rbxassetid://129623448532589";
