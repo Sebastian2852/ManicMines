@@ -19,10 +19,15 @@ local TycoonService
 local DataService
 local LogService
 
+type UpgradeSetupInformation = {
+    ActionText :string;
+    ObjectText :string;
+}
+
 type UpgradeSetupModule = {
     HasPrompt :boolean;
     ParentToHitbox :boolean;
-    CreatePrompt :(TycoonName :string, Level :number, MaxLevel :number) -> (string, string);
+    CreatePrompt :(TycoonName :string, Level :number, MaxLevel :number) -> UpgradeSetupInformation;
     Triggered :(Player :Player, IsOwner :boolean) -> ();
 }
 
@@ -166,12 +171,12 @@ function TycoonUpgradeService:AddFunctionality(Hitbox :BasePart, SetupModule :Up
         end
         local OwnerData :Core.DataFolder = DataService:GetPlayerDataFolder(TycoonOwner)
 
-        local ActionText, ObjectText = SetupModule.CreatePrompt(OwnerData.TycoonName.Value, tonumber(LevelConfig.Name), self:GetUpgradeMaxLevel(LevelConfig.Parent))
+        local Info :UpgradeSetupInformation = SetupModule.CreatePrompt(OwnerData.TycoonName.Value, tonumber(LevelConfig.Name), self:GetUpgradeMaxLevel(LevelConfig.Parent))
 
         local NewPrompt = Instance.new("ProximityPrompt")
         NewPrompt.Name = "Interact"
-        NewPrompt.ActionText = ActionText
-        NewPrompt.ObjectText = ObjectText
+        NewPrompt.ActionText = Info.ActionText
+        NewPrompt.ObjectText = Info.ObjectText
         NewPrompt.Parent = Hitbox
 
         NewPrompt.Triggered:Connect(function(Player)

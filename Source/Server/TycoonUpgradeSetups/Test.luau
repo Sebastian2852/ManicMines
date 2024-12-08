@@ -5,7 +5,7 @@ Test.ParentToHitbox = true
 
 function Test.CreatePrompt(TycoonName :string, Level :number, MaxLevel :number)
     print("Data recieved: \nName: "..TycoonName.."\nLevel: "..Level.."\nMaxLevel: "..MaxLevel)
-    return "Action", "Object"
+    return {ActionText = "Action", ObjectText = "Object"}
 end
 
 function Test.Triggered(Player :Player, IsOwner :boolean)
