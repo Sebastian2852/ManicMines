@@ -10,6 +10,23 @@ local DataService
 local LogService
 local TextFilteringService
 
+-- [[ PUBLIC ]] --
+
+function MainMenuController:PickRandomName() :string
+    local Name = Core.GameConfig.Tycoon.RandomName.Prefix
+
+    local Adjectives = Core.GameConfig.Tycoon.RandomName.Adjectives
+    local Nouns = Core.GameConfig.Tycoon.RandomName.Nouns
+
+    local RandomAdjective = Adjectives[math.random(1, #Adjectives)]
+    local RandomNoun = Nouns[math.random(1, #Nouns)]
+
+    Name = Name.." "..RandomAdjective.." "..RandomNoun
+    return Name
+end
+
+
+
 -- [[ GUI ]] --
 
 local MainMenuComponent = Roact.Component:extend("MainMenu")
@@ -623,7 +640,7 @@ function MainMenuComponent:render()
                         BackgroundTransparency = 1;
                         BorderSizePixel = 0;
 
-                        Text = "";
+                        Text = MainMenuController:PickRandomName();
                         PlaceholderText = "Tycoon name";
                         TextScaled = true;
                         FontFace = Core.UI.Theme.TextFont;
@@ -649,6 +666,14 @@ function MainMenuComponent:render()
 
                         Image = Core.UI.Images.RandomizeButton;
                         ScaleType = Enum.ScaleType.Fit;
+
+                        [Roact.Event.MouseButton1Click] = function()
+                            local RandomName = MainMenuController:PickRandomName()
+                            local Input = SlotCreationNameInputRef:getValue() :: TextBox
+                            if not Input then return end
+
+                            Input.Text = RandomName
+                        end;
                     }, {});
                 });
             });
@@ -758,6 +783,8 @@ function MainMenuComponent:render()
         })
     })
 end
+
+
 
 -- [[ KNIT ]] --
 
