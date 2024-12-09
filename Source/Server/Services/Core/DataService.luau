@@ -98,6 +98,13 @@ local function SetupTemplateDataFolder()
         UpgradeValue.Parent = TemplateDataFolder.Tycoon.Upgrades
     end
 
+    for _, TycoonGenerator in pairs(Core.Assets.Tycoon.Generators:GetChildren()) do
+        local GeneratorValue = Instance.new("IntValue")
+        GeneratorValue.Name = TycoonGenerator.Name
+        GeneratorValue.Value = 0
+        GeneratorValue.Parent = TemplateDataFolder.Tycoon.Generators
+    end
+
     for SettingName, DefaultValue in pairs(Core.GameConfig.DefaultSettings) do
         local TypeToMake = ""
 
@@ -275,6 +282,8 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
 
         LoadingService:UpdateActionText(Player, "Creating tycoon")
         TycoonService:CreateTycoonForPlayer(Player)
+        DataFolder.InTycoon.Value = true
+        DataFolder.InMine.Value = false
 
         Player.CharacterAdded:Connect(function()
             PlayerDisplayService:GivePlayerOverheadGUI(Player)

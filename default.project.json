@@ -52,7 +52,8 @@
               "Spawn":{"$className":"Part"}
             }
           },
-          "Upgrades":{"$className":"Folder"}
+          "Upgrades":{"$className":"Folder"},
+          "Generators":{"$className":"Folder"}
         },
         "UI":{
           "$className":"Folder",
@@ -120,7 +121,8 @@
 
           "Tycoon":{
             "$className":"Folder",
-            "Upgrades":{"$className":"Folder"}
+            "Upgrades":{"$className":"Folder"},
+            "Generators":{"$className":"Folder"}
           },
 
           "Stats":{

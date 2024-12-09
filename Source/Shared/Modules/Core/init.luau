@@ -41,6 +41,8 @@ export type DataFolder = {
     InTycoon :BoolValue;
     ServerMining :BoolValue;
     DataLoaded :BoolValue;
+
+    FindFirstChild :(DataFolder, Name :string) -> any;
 }
 
 export type SlotInfo = {

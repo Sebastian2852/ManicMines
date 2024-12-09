@@ -112,14 +112,13 @@ function TeleportService:TeleportPlayerToTycoon(Player :Player, Tycoon :Model?, 
     if Tycoon then
         local TycoonSpawn :BasePart = Tycoon.Main.Spawn
         TeleportLocation = TycoonSpawn.Position + Vector3.new(0, 5, 0)
-        DataFolder.InTycoon.Value = true
     else
         local PlayerTycoon = TycoonService:GetPlayerTycoon(Player)
         local TycoonSpawn :BasePart = PlayerTycoon.Main.Spawn
         TeleportLocation = TycoonSpawn.Position + Vector3.new(0, 5, 0)
-        DataFolder.InTycoon.Value = true
     end
 
+    DataFolder.InTycoon.Value = true
     self:TeleportPlayerToPosition(Player, TeleportLocation, WithLoadingScreen)
 end
 
@@ -127,7 +126,9 @@ end
 Teleport the given player to the surface of the mine
 ]=]
 function TeleportService:TeleportPlayerToSurface(Player :Player)
+    local DataFolder = DataService:GetPlayerDataFolder(Player)
     self:TeleportPlayerToPosition(Player, workspace.Game.Teleports.Surface.Position, true)
+    DataFolder.InTycoon.Value = false
 end
 
 -- [[ CLIENT ]] --
@@ -137,6 +138,10 @@ Teleport the current player to the surface
 ]=]
 function TeleportService.Client:TeleportToSurface(Player :Player)
     self.Server:TeleportPlayerToSurface(Player)
+end
+
+function TeleportService.Client:TeleportToTycoon(Player :Player)
+    self.Server:TeleportPlayerToTycoon(Player, nil, true)
 end
 
 
