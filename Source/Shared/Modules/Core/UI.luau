@@ -26,6 +26,7 @@ UI.Images = {
     -- General
     Missing = "http://www.roblox.com/asset/?id=925810526";
     GoldCoins = "rbxassetid://140388075517481";
+    MiningPower = "http://www.roblox.com/asset/?id=925810526";
 
     -- Loading screen
     LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one
