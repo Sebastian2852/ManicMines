@@ -16,6 +16,7 @@ local PickaxeService = Knit.CreateService {
     Name = "PickaxeService",
     Client = {
         UpdateMiningSelection = Knit.CreateSignal();
+        UpdateMiningPower = Knit.CreateSignal();
         PlayHitSound = Knit.CreateSignal();
         PlayBreakSound = Knit.CreateSignal();
     },
@@ -35,6 +36,22 @@ function PickaxeService:CalculateTimeToMine(Player :Player, Health :number) :num
     local TimePerHit = Pickaxe:GetAttribute("Delay")
     local TotalTime = HitsNeeded * TimePerHit
     return Core.Util:RoundToxDP(TotalTime, 1)
+end
+
+--[=[
+Calculates the mining power for the given player
+]=]
+function PickaxeService:CalculateMiningPower(Player :Player) :number
+    local Pickaxe = self:GetPlayerPickaxe(Player)
+    if not Pickaxe then return 0 end
+
+    local Damage = Pickaxe:GetAttribute("Damage") :: number or 0
+    local Delay = Pickaxe:GetAttribute("Delay") :: number or 0
+    local Range = Pickaxe:GetAttribute("Range") :: number or 0
+
+    local MiningPower = math.floor((Damage * Delay * Range) * 10)
+    self.Client.UpdateMiningPower:Fire(Player, MiningPower)
+    return MiningPower
 end
 
 --[=[
@@ -147,6 +164,8 @@ function PickaxeService:GivePickaxeToPlayer(Player :Player)
     NewPickaxe.Parent = Player.Backpack
     NewScript.Parent = NewPickaxe
     NewPickaxe:AddTag("Pickaxe")
+
+    self:CalculateMiningPower(Player)
 end
 
 --[=[
@@ -331,7 +350,7 @@ end
 --[=[
 Attempts to buy the given pickaxe config
 ]=]
-function PickaxeService.Client:BuyPickaxe(Player :Player, PickaxeConfig :Configuration)
+function PickaxeService.Client:BuyPickaxe(Player :Player, PickaxeConfig :Configuration) :boolean
     local Costs = PickaxeConfig:FindFirstChild("Ores")
     local DataFolder :Core.DataFolder = DataService:GetPlayerDataFolder(Player)
 
@@ -345,6 +364,10 @@ function PickaxeService.Client:BuyPickaxe(Player :Player, PickaxeConfig :Configu
         self.Server:EquipPickaxe(Player, PickaxeConfig)
     end
     return Success
+end
+
+function PickaxeService.Client:GetMiningPower(Player :Player) :number
+    return self.Server:CalculateMiningPower(Player)
 end
 
 

@@ -4,7 +4,7 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
-local CreateGradient = require(ReplicatedStorage.Game.GUI.Components.General.Gradient)
+local CreateGradient = require(ReplicatedStorage.Game.GUI.Elements.Gradient)
 
 local PickaxeSelectionController = Knit.CreateController { Name = "PickaxeSelectionController" }
 

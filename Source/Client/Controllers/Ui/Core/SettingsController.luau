@@ -232,10 +232,13 @@ function SettingsComponent:render()
                 ShadowsToggle = self:BooleanToggle("GlobalShadows", "Shadows", "Toggle all shadows");
                 RainbowToggle = self:BooleanToggle("RainbowEffect", "Rainbow effects", "Toggle all rainbow (RGB) effects and set them to white");
 
+                AudioHeader = self:SettingsHeader("Audio");
+                MusicVolume = self:NumberInput("MusicVolume", "Music Volume", "Set the global volume of music", 0, 1);
+
                 ExperimentalHeader = self:SettingsHeader("Experimental");
                 ExperimentalWarning = self:SettingsSubtitle("⚠️ THESE SETTINGS ARE EXPERIMENTAL AND <font color='#fc9905'>CAN CAUSE ERRORS OR DATA LOSS</font>; USE AT YOUR OWN RISK ⚠️");
 
-                MusicVolume = self:NumberInput("MusicVolume", "Music Volume", "Set the volume of music globally. <font color='#fc9905'>This is WIP and may not work!</font>", 0, 1)
+                InventoryShortUnits = self:BooleanToggle("InventoryShortUnits", "Inventory short units", "Should the inventory use short units (e.g. 1000 -> 1k)");
 
                 -- No settings here yet but there will be one for the custom map streamer thingy
                 -- because I already know its going to cause a lot of issues

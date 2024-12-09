@@ -28,6 +28,7 @@ UI.Images = {
     GoldCoins = "rbxassetid://140388075517481";
     TycoonTeleportButton = "rbxassetid://83761770070710";
     SurfaceButton = "rbxassetid://119967532396729";
+    MiningPower = "rbxassetid://94366503795994";
 
     -- Loading screen
     LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one

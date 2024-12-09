@@ -29,6 +29,7 @@ export type DataFolder_SettingsFolder = {
     GlobalShadows :BoolValue;
     RainbowEffect :BoolValue;
     MusicVolume :NumberValue;
+    InventoryShortUnits :BoolValue;
 }
 
 export type DataFolder_StatsFolder = {

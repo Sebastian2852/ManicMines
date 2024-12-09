@@ -70,6 +70,7 @@ export type Settings = {
     GlobalShadows :boolean;
     RainbowEffect :boolean;
     MusicVolume :number;
+    InventoryShortUnits :boolean;
 }
 
 --[=[
