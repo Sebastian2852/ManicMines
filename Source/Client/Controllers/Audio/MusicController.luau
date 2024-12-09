@@ -110,6 +110,12 @@ function MusicController:KnitStart()
 
     SettingsService.SettingsChanged:Connect(function()
         LogService:Log("Settings updated, updating sound volume")
+
+        if not ActiveSong then
+            LogService:Warn("No active song")
+            return
+        end
+
         local CurrentSound = AudioEngine:GetSoundObject(ActiveSong) :: Sound
         if not CurrentSound then
             LogService:Warn("No current sound")

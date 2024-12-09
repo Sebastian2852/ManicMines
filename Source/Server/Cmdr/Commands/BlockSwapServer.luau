@@ -11,6 +11,10 @@ return function(_, Player :Player, OreName :string)
     local MineService = Knit.GetService("MineService")
     local Ore = Core.Util:GetOreByName(OreName)
 
+    if not Ore then
+        return "Couldnt find ore"
+    end
+
     local ClosestBlock = MineService:GetClosestBlock(Character.PrimaryPart.Position, 12)
     if not ClosestBlock then
         return "Couldn't get closest block"

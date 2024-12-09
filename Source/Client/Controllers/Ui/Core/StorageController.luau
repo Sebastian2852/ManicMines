@@ -5,8 +5,8 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 
-local CreateBasicListLayout = require(ReplicatedStorage.Game.GUI.Components.General.BasicListLayout)
-local CreateRoundedCorners = require(ReplicatedStorage.Game.GUI.Components.General.Corners)
+local CreateBasicListLayout = require(ReplicatedStorage.Game.GUI.Elements.BasicListLayout)
+local CreateRoundedCorners = require(ReplicatedStorage.Game.GUI.Elements.Corners)
 local CreateOreFrame = require(ReplicatedStorage.Game.GUI.Components.Storage.StorageOreFrame)
 
 local StorageController = Knit.CreateController { Name = "StorageController" }

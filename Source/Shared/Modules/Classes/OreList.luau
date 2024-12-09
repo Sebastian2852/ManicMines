@@ -80,6 +80,20 @@ function OreList.CreateFromOre(OreName :string, Amount :number) :OreList
     return self
 end
 
+function OreList.CreateOreData(Ore :string|BasePart, Amount :number?) :OreListItem
+    if type(Ore) == "string" then
+        Ore = GetOreByName(Ore)
+    end
+
+    local OreData = {}
+    OreData.Name = Ore.Name
+    OreData.Amount = Amount or 1
+    OreData.DisplayName = Ore:GetAttribute("DisplayName")
+    OreData.Emblem = Ore:GetAttribute("EmblemImageID")
+    OreData.RealOre = Ore
+    return OreData
+end
+
 --[=[
 Create an ore list from a given folder
 ]=]

@@ -21,6 +21,8 @@ local Animation
 
 -- [[ PUBLIC ]] --
 
+MineEffects.CurrentLayer = nil
+
 function MineEffects:Layer(LayerName :string)
     LogService:Log("Appling layer effects for: "..LayerName)
     if not Core.Assets.Layers:FindFirstChild(LayerName) then
@@ -36,6 +38,8 @@ function MineEffects:Layer(LayerName :string)
         LogService:Log("Appling lighting effects")
         LightingController:CreateFromConfig(LightingConfig)
     end
+
+    self.CurrentLayer = LayerConfig
 end
 
 

@@ -8,6 +8,7 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local GeneralController = Knit.CreateController { Name = "GeneralController" }
 
 local TeleportService
+local PickaxeService
 local DataService
 local UIService
 local LogService
@@ -23,12 +24,18 @@ function GeneralComponent:init()
 
     DataFolder.Gold:GetPropertyChangedSignal("Value"):Connect(function()
         self:setState({
-            Gold = tostring(DataFolder.Gold.Value)
+            Gold = DataFolder.Gold.Value
+        })
+    end)
+
+    PickaxeService.UpdateMiningPower:Connect(function(MiningPower :number)
+        self:setState({
+            MiningPower = MiningPower;
         })
     end)
 
     self:setState({
-        Gold = tostring(DataFolder.Gold.Value)
+        Gold = DataFolder.Gold.Value
     })
 
     UIService.HUDButtons:Connect(function(New :boolean)
@@ -39,6 +46,9 @@ function GeneralComponent:init()
 end
 
 function GeneralComponent:render()
+    local Gold = tostring(self.state.Gold)
+    local MiningPower = tostring(self.state.MiningPower)
+
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
     }, {
@@ -70,7 +80,43 @@ function GeneralComponent:render()
                 BackgroundTransparency = 1;
                 BorderSizePixel = 0;
 
-                Text = " "..self.state.Gold;
+                Text = " "..Gold;
+                FontFace = Core.UI.Theme.TextFont;
+                TextColor3 = Core.UI.Theme.TextColor3;
+                TextScaled = true;
+                TextXAlignment = Enum.TextXAlignment.Left;
+            }, {})
+        });
+
+        MiningPower = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.1, 0.04);
+            Position = UDim2.fromScale(0, 0.545);
+            AnchorPoint = Core.UI.AnchorPoint.LeftCenter;
+
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+        }, {
+            Layout = Roact.createElement("UIListLayout", {
+                FillDirection = Enum.FillDirection.Horizontal;
+                HorizontalFlex = Enum.UIFlexAlignment.Fill;
+            }, {});
+
+            Icon = Roact.createElement("ImageLabel", {
+                Size = UDim2.fromScale(1, 1);
+                SizeConstraint = Enum.SizeConstraint.RelativeYY;
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Image = Core.UI.Images.MiningPower;
+                ScaleType = Enum.ScaleType.Fit;
+            }, {});
+
+            Text = Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(0.9, 1);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Text = " "..MiningPower;
                 FontFace = Core.UI.Theme.TextFont;
                 TextColor3 = Core.UI.Theme.TextColor3;
                 TextScaled = true;
@@ -101,6 +147,7 @@ end
 
 function GeneralController:KnitStart()
     TeleportService = Knit.GetService("TeleportService")
+    PickaxeService = Knit.GetService("PickaxeService")
     DataService = Knit.GetService("DataService")
     LogService = Knit.GetService("LogService")
     UIService = Knit.GetService("UIService")

@@ -29,6 +29,11 @@ Feature work, bug fixes, and improvements are created in separate branches and m
 - `Chore/`: Refactoring, documentation, or minor updates
 - `Experiment/`: Experimental features or ideas
 
+---
+
+# Systems
+## Caves
+Caves currently only support random caves that can only be guided by settings. These are all in the "Random" folder under "Assets/Caves". In the future there will be a "Structures" folder with caves that are randomly generated based on pre-built stuff.
 
 ---
 

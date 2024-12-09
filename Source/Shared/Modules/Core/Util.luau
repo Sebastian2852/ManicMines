@@ -197,4 +197,57 @@ function Util:RandomiseTable(Table :{any}) :{any}
     return Table
 end
 
+--[=[
+Tints the passed color by the tint color
+]=]
+function Util:TintColor(Color :Color3, Tint :Color3) :Color3
+    return Color3.new(
+        Color.R * Tint.R,
+        Color.G * Tint.G,
+        Color.B * Tint.B
+    )
+end
+
+--[=[
+Create a box with a given size at the given position with a certain color (if no color provided, red is used)
+]=]
+function Util:CreateDebugBoundingBox(Size :Vector3, CenterPosition :Vector3, Color :Color3?)
+    return Promise.new(function(Resolve)
+        local DebugPart = Instance.new("Part")
+        DebugPart.Size = Size
+        DebugPart.CFrame = CFrame.new(CenterPosition)
+        DebugPart.Transparency = 1
+        DebugPart.CanCollide = false
+        DebugPart.Anchored = true
+        DebugPart.Parent = workspace
+
+        local SelectionBox = Instance.new("SelectionBox")
+        SelectionBox.Adornee = DebugPart
+        SelectionBox.Parent = DebugPart
+        SelectionBox.Color3 = Color or Color3.new(1, 0, 0)
+        SelectionBox.SurfaceTransparency = 1
+        SelectionBox.LineThickness = 0.05
+        Resolve()
+    end)
+end
+
+--[=[
+Create a small sphere at the given position with a certain color (if no color provided, red is used)
+]=]
+function Util:CreateDebugPoint(Position :Vector3, Color :Color3?)
+    return Promise.new(function(Resolve)
+        local DebugPart = Instance.new("Part")
+        DebugPart.CFrame = CFrame.new(Position)
+        DebugPart.Color = Color or Color3.new(1, 0, 0)
+        DebugPart.Size = Vector3.new(0.5, 0.5, 0.5)
+        DebugPart.Material = Enum.Material.Neon
+        DebugPart.Shape = Enum.PartType.Ball
+        DebugPart.Transparency = 0
+        DebugPart.CanCollide = false
+        DebugPart.Anchored = true
+        DebugPart.Parent = workspace
+        Resolve()
+    end)
+end
+
 return Util
