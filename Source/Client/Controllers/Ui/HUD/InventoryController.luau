@@ -58,6 +58,10 @@ function InventoryComponent:init()
         self:UpdateLevel()
     end)
 
+    DataFolder.Settings.InventoryShortUnits:GetPropertyChangedSignal("Value"):Connect(function()
+        self:UpdateInventory(DataFolder.Inventory.InventoryItemCount.Value, DataFolder.Inventory.InventoryCap.Value, CreateInventoryOreList())
+    end)
+
     self:UpdateInventory(DataFolder.Inventory.InventoryItemCount.Value, DataFolder.Inventory.InventoryCap.Value, CreateInventoryOreList())
     self:UpdateLevel()
 
@@ -128,6 +132,8 @@ function InventoryComponent:render()
     local Components = Core.UI:CreateOreFrames(self.state.OreList, self.state.StyleToUse, UDim2.fromScale(1, 0.1))
     Components["Layout"] = Core.Roact.createElement("UIListLayout", {}, {})
 
+    local UseShortUnits = DataFolder.Settings.InventoryShortUnits.Value
+
     local Amount = self.state.Amount
     local Capacity = self.state.Capacity
     local Collapsed = self.state.Collapsed
@@ -146,10 +152,14 @@ function InventoryComponent:render()
 
     local LevelColor = self.state.LevelNameColor
     local XpBarColor = self.state.LevelBarColor
-
     local LevelProgress = math.clamp(Xp / XpNeeded, 0, 1);
 
     local CapacityText = tostring(Amount).." / "..tostring(Capacity)
+    local XpText = tostring(Xp).." / "..tostring(XpNeeded)
+    if UseShortUnits then
+        CapacityText = Core.Util:ConvertNumberToString(Amount).." / "..Core.Util:ConvertNumberToString(Capacity)
+        XpText = Core.Util:ConvertNumberToString(Xp).." / "..Core.Util:ConvertNumberToString(XpNeeded)
+    end
 
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false
@@ -206,7 +216,7 @@ function InventoryComponent:render()
                     BackgroundTransparency = 1;
                     BorderSizePixel = 0;
 
-                    Text = XpNeeded ~= nil and tostring(Xp).." / "..tostring(XpNeeded) or tostring(Xp);
+                    Text = XpText;
                     TextScaled = true;
                     TextStrokeTransparency = 0;
                     TextXAlignment = Enum.TextXAlignment.Right;

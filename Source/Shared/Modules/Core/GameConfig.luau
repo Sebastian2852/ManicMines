@@ -22,6 +22,7 @@ Config.DefaultSettings = {
     GlobalShadows = true;
     RainbowEffect = true;
     MusicVolume = 0.5;
+    InventoryShortUnits = false;
 }
 
 Config.MainMenu = {
