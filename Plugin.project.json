@@ -1,0 +1,13 @@
+{
+    "name": "Manic Mines Plugin",
+    "tree": {
+        "$className": "DataModel",
+
+        "ServerScriptService":{
+            "Plugin":{
+                "$path": "Plugin",
+                "External":{"$path":"Packages"}
+            }
+        }
+    }
+}
