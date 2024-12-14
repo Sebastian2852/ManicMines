@@ -86,7 +86,16 @@
         "PickaxeActive":{"$className":"BoolValue"},
         "PickaxeEquipped":{"$className":"BoolValue"},
         "PickaxeSelection":{"$className":"ObjectValue"},
-        "Depth":{"$className":"NumberValue"}
+        "Depth":{"$className":"NumberValue"},
+
+        "Debug":{
+          "$className":"Folder",
+          "DebugMode":{"$className":"BoolValue"},
+          "UI":{
+            "$className":"Folder",
+            "MountedGuis":{"$className":"IntValue"}
+          }
+        }
       },
       "PlayerData": {
         "$className": "Folder",

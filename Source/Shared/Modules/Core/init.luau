@@ -124,7 +124,6 @@ local SaveData = require(script.Parent.Classes.SaveData.SaveData)
 local Data = require(script.Parent.Classes.SaveData.Data)
 
 local Maid = require(ReplicatedStorage.Packages.maid)
-local EnumList = require(ReplicatedStorage.Packages.EnumList)
 
 export type OreList = OreList.OreList
 export type OreListItem = OreList.OreListItem
@@ -139,7 +138,6 @@ return {
     Roact = Roact;
 
     Maid = Maid;
-    EnumList = EnumList;
 
     Data = {
         SaveData = SaveData;
