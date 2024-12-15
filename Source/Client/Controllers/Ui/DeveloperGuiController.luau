@@ -219,6 +219,12 @@ function DeveloperGuiController:Statistics()
         Iris.Text({`Ores generated: {DebugFolder.Mine.OresGenerated.Value}`})
         Iris.Text({`Blocks for collapse: {Core.GameConfig.Mine.BlocksToCollapse}`})
         Iris.Text({`Blocks until collapse: {Core.GameConfig.Mine.BlocksToCollapse - DebugFolder.Mine.BlocksGenerated.Value}`})
+
+        Iris.SeparatorText({"Audio"})
+        Iris.Text({`Total sounds made: {DebugFolder.Audio.TotalSoundsMade.Value}`})
+        Iris.Text({`Total active sounds: {DebugFolder.Audio.ActiveSounds.Value}`})
+        Iris.Text({`Active global sounds: {DebugFolder.Audio.ActiveGlobalSounds.Value}`})
+        Iris.Text({`Active positional made: {DebugFolder.Audio.ActivePositionalSounds.Value}`})
     end
     Iris.End()
 end

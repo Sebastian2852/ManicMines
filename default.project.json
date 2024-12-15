@@ -95,6 +95,13 @@
             "$className":"Folder",
             "BlocksGenerated":{"$className":"IntValue"},
             "OresGenerated":{"$className":"IntValue"}
+          },
+          "Audio":{
+            "$className":"Folder",
+            "TotalSoundsMade":{"$className":"IntValue"},
+            "ActiveSounds":{"$className":"IntValue"},
+            "ActiveGlobalSounds":{"$className":"IntValue"},
+            "ActivePositionalSounds":{"$className":"IntValue"}
           }
         }
       },
