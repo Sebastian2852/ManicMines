@@ -4,14 +4,15 @@ local UserInputService = game:GetService("UserInputService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Iris = require(ReplicatedStorage.Packages.Iris)
+local ImGizmo = require(ReplicatedStorage.Packages.ImGizmo)
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local DeveloperGuiController = Knit.CreateController { Name = "DeveloperGuiController" }
 
-local AutoGenWindowOpen = Iris.State(false)
-local PerformanceWindowOpen = Iris.State(false)
+local PickaxeService
 
+local MiningRange = 0
 local Stats = {
     FPS = 0;
     Ping = 0;
@@ -84,13 +85,46 @@ function DeveloperGuiController:PerformanceWindow()
     Iris.End()
 end
 
+function DeveloperGuiController:Visuals()
+    local MiningRangeSettings = {
+        Visible = Iris.State(false);
+        AlwaysOnTop = Iris.State(true);
+        Color = Iris.State(Color3.new(1, 0, 0));
+        Transparency = Iris.State(0);
+        TextSize = Iris.State(20);
+    }
+
+    local Window = Iris.Window({"Developer Gui", false, false, false, true})
+    if Window.state.isOpened or Window.state.isUncollapsed then
+        Iris.Tree({"MiningRange"})
+        Iris.Checkbox({"Visible"}, {isChecked = MiningRangeSettings.Visible})
+        Iris.Checkbox({"AlwaysOnTop"}, {isChecked = MiningRangeSettings.AlwaysOnTop})
+        Iris.InputColor4({"Color"}, {color = MiningRangeSettings.Color, transparency = MiningRangeSettings.Transparency})
+        Iris.SliderNum({"Text Size", 1, 10, 50}, {number = MiningRangeSettings.TextSize})
+        Iris.End()
+    end
+    Iris.End()
+
+    if MiningRangeSettings.Visible:get() then
+        ImGizmo.SetStyle(MiningRangeSettings.Color:get(), MiningRangeSettings.Transparency:get(), MiningRangeSettings.AlwaysOnTop:get())
+        ImGizmo.Sphere:Draw(CFrame.new(Knit.Player.Character.PrimaryPart.CFrame.Position or Vector3.zero), MiningRange, 25, 360)
+        ImGizmo.Text:Draw(Knit.Player.Character.PrimaryPart.CFrame.Position or Vector3.zero, "Range: "..tostring(MiningRange), MiningRangeSettings.TextSize:get())
+    end
+end
+
 function DeveloperGuiController:Render()
+    local AutoGenWindowOpen = Iris.State(false)
+    local PerformanceWindowOpen = Iris.State(false)
+    local VisualsWindowOpen = Iris.State(false)
+
+
     -- Main Window
     local Window = Iris.Window({"Developer Gui", false, false, false, true})
     if Window.state.isOpened or Window.state.isUncollapsed then
         Iris.Text({"Here you are, the developer GUI. Here you can open and close many different debug windows. No, nothing here gives you admin, ores or pickaxes. This only DISPLAYS INFORMATION"})
         Iris.Checkbox({"Auto Generated Debug Window"}, {isChecked = AutoGenWindowOpen})
         Iris.Checkbox({"Performance"}, {isChecked = PerformanceWindowOpen})
+        Iris.Checkbox({"Visuals"}, {isChecked = VisualsWindowOpen})
     end
     Iris.End()
 
@@ -102,6 +136,10 @@ function DeveloperGuiController:Render()
     if PerformanceWindowOpen:get() then
         self:PerformanceWindow()
     end
+
+    if VisualsWindowOpen:get() then
+        self:Visuals()
+    end
 end
 
 
@@ -109,10 +147,13 @@ end
 -- [[ KNIT ]] --
 
 function DeveloperGuiController:KnitInit()
+    ImGizmo:Init()
     Iris.PushConfig({TextWrapped = true})
 end
 
 function DeveloperGuiController:KnitStart()
+    PickaxeService = Knit.GetService("PickaxeService")
+
     UserInputService.InputBegan:Connect(function(Input, Processed)
         if Processed then return end
         if Input.KeyCode ~= Enum.KeyCode.Z then return end
@@ -134,6 +175,14 @@ function DeveloperGuiController:KnitStart()
     local StartTime = GetTime()
     local LastTime = 0
     local GameSettings = UserSettings().GameSettings
+
+    PickaxeService.UpdateMiningPower:Connect(function()
+        PickaxeService:GetPickaxe():andThen(function(Pickaxe :Tool)
+            if not Pickaxe then return end
+
+            MiningRange = Pickaxe:GetAttribute("Range")
+        end)
+    end)
 
     Iris:Connect(function()
         if ReplicatedStorage.Player.Debug.DebugMode.Value then
