@@ -113,7 +113,6 @@ function OreFrameComponent:render()
             }, {})
         });
 
-        
         OreImage = Roact.createElement("Frame", {
             Size = UDim2.fromScale(0.8, 0.8);
             Position = UDim2.fromScale(0.15, 0.2);
