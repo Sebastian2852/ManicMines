@@ -1,4 +1,5 @@
 local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -100,7 +101,17 @@ function DeveloperGuiController:Visuals()
     local DialogueNPCs = {
         Visible = Iris.State(false);
         AlwaysOnTop = Iris.State(true);
-        Color = Iris.State(Color3.new(1, 0, 0));
+        Color = Iris.State(Color3.new(1, 0, 1));
+        Transparency = Iris.State(0);
+        TextSize = Iris.State(20);
+    }
+
+    local EspSettings = {
+        Visible = Iris.State(false);
+        AlwaysOnTop = Iris.State(true);
+        Lines = Iris.State(true);
+        ShowSelf = Iris.State(false);
+        Color = Iris.State(Color3.new(1, 1, 0));
         Transparency = Iris.State(0);
         TextSize = Iris.State(20);
     }
@@ -109,16 +120,25 @@ function DeveloperGuiController:Visuals()
     if Window.state.isOpened or Window.state.isUncollapsed then
         Iris.Tree({"MiningRange"})
         Iris.Checkbox({"Visible"}, {isChecked = MiningRangeSettings.Visible})
-        Iris.Checkbox({"AlwaysOnTop"}, {isChecked = MiningRangeSettings.AlwaysOnTop})
+        Iris.Checkbox({"Always on top"}, {isChecked = MiningRangeSettings.AlwaysOnTop})
         Iris.InputColor4({"Color"}, {color = MiningRangeSettings.Color, transparency = MiningRangeSettings.Transparency})
         Iris.SliderNum({"Text Size", 1, 10, 50}, {number = MiningRangeSettings.TextSize})
         Iris.End()
 
         Iris.Tree({"Dialogue NPCs"})
         Iris.Checkbox({"Visible"}, {isChecked = DialogueNPCs.Visible})
-        Iris.Checkbox({"AlwaysOnTop"}, {isChecked = DialogueNPCs.AlwaysOnTop})
+        Iris.Checkbox({"Always on top"}, {isChecked = DialogueNPCs.AlwaysOnTop})
         Iris.InputColor4({"Color"}, {color = DialogueNPCs.Color, transparency = DialogueNPCs.Transparency})
         Iris.SliderNum({"Text Size", 1, 10, 50}, {number = DialogueNPCs.TextSize})
+        Iris.End()
+
+        Iris.Tree({"Player ESP"})
+        Iris.Checkbox({"Visible"}, {isChecked = EspSettings.Visible})
+        Iris.Checkbox({"Show self"}, {isChecked = EspSettings.ShowSelf})
+        Iris.Checkbox({"Lines"}, {isChecked = EspSettings.Lines})
+        Iris.Checkbox({"Always on top"}, {isChecked = EspSettings.AlwaysOnTop})
+        Iris.InputColor4({"Color"}, {color = EspSettings.Color, transparency = EspSettings.Transparency})
+        Iris.SliderNum({"Text Size", 1, 10, 50}, {number = EspSettings.TextSize})
         Iris.End()
     end
     Iris.End()
@@ -137,6 +157,28 @@ function DeveloperGuiController:Visuals()
             local Position = Prompt.Parent:IsA("Model") and Prompt.Parent.PrimaryPart.CFrame.Position or Prompt.Parent.CFrame.Position
             ImGizmo.Box:Draw(CFrame.new(Position), Vector3.new(2, 5, 2), false)
             ImGizmo.Text:Draw(Position, "Dialogue NPC", DialogueNPCs.TextSize:get())
+        end
+    end
+
+    if EspSettings.Visible:get() then
+        local Characters = workspace.Game.Players:GetChildren()
+        ImGizmo.SetStyle(EspSettings.Color:get(), EspSettings.Transparency:get(), EspSettings.AlwaysOnTop:get())
+
+        for _, Character :Model in pairs(Characters) do
+            local Player = Players:GetPlayerFromCharacter(Character)
+            local Position = Character.PrimaryPart.CFrame.Position
+
+            if (Player and Player.UserId or 0 == Knit.Player.UserId) and not EspSettings.ShowSelf:get() then continue end
+            ImGizmo.Box:Draw(CFrame.new(Position - Vector3.new(0, 2.5, 0)), Vector3.new(2, 5, 2), false)
+            ImGizmo.Text:Draw(Position, Player and (Player.DisplayName.."(@"..Player.Name..")") or "NPC: "..Character.Name, EspSettings.TextSize:get())
+
+            if EspSettings.Lines:get() then
+                local PlayerPosition = Knit.Player.Character and Knit.Player.Character.PrimaryPart.CFrame.Position or Vector3.zero
+                local Direction = (Position - PlayerPosition).Unit
+                local Length = (Position - PlayerPosition).Magnitude
+                local Midpoint = (PlayerPosition + Position) / 2
+                ImGizmo.Line:Draw(CFrame.new(Midpoint, Midpoint + Direction), Length)
+            end
         end
     end
 end
