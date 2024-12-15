@@ -154,6 +154,11 @@
     },
 
     "Workspace":{
+      "$properties": {
+        "StreamingMinRadius":64,
+        "StreamingTargetRadius":350
+      },
+
       "Game":{
         "$className":"Folder",
         "Mine":{"$className":"Folder"},
