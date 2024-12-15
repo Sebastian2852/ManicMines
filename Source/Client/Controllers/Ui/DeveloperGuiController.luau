@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -11,7 +12,9 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local DeveloperGuiController = Knit.CreateController { Name = "DeveloperGuiController" }
 
 local PickaxeService
+local DialogueService
 
+local DialoguePromptTag
 local MiningRange = 0
 local Stats = {
     FPS = 0;
@@ -94,13 +97,28 @@ function DeveloperGuiController:Visuals()
         TextSize = Iris.State(20);
     }
 
-    local Window = Iris.Window({"Developer Gui", false, false, false, true})
+    local DialogueNPCs = {
+        Visible = Iris.State(false);
+        AlwaysOnTop = Iris.State(true);
+        Color = Iris.State(Color3.new(1, 0, 0));
+        Transparency = Iris.State(0);
+        TextSize = Iris.State(20);
+    }
+
+    local Window = Iris.Window({"Visuals", false, false, false, true})
     if Window.state.isOpened or Window.state.isUncollapsed then
         Iris.Tree({"MiningRange"})
         Iris.Checkbox({"Visible"}, {isChecked = MiningRangeSettings.Visible})
         Iris.Checkbox({"AlwaysOnTop"}, {isChecked = MiningRangeSettings.AlwaysOnTop})
         Iris.InputColor4({"Color"}, {color = MiningRangeSettings.Color, transparency = MiningRangeSettings.Transparency})
         Iris.SliderNum({"Text Size", 1, 10, 50}, {number = MiningRangeSettings.TextSize})
+        Iris.End()
+
+        Iris.Tree({"Dialogue NPCs"})
+        Iris.Checkbox({"Visible"}, {isChecked = DialogueNPCs.Visible})
+        Iris.Checkbox({"AlwaysOnTop"}, {isChecked = DialogueNPCs.AlwaysOnTop})
+        Iris.InputColor4({"Color"}, {color = DialogueNPCs.Color, transparency = DialogueNPCs.Transparency})
+        Iris.SliderNum({"Text Size", 1, 10, 50}, {number = DialogueNPCs.TextSize})
         Iris.End()
     end
     Iris.End()
@@ -109,6 +127,17 @@ function DeveloperGuiController:Visuals()
         ImGizmo.SetStyle(MiningRangeSettings.Color:get(), MiningRangeSettings.Transparency:get(), MiningRangeSettings.AlwaysOnTop:get())
         ImGizmo.Sphere:Draw(CFrame.new(Knit.Player.Character.PrimaryPart.CFrame.Position or Vector3.zero), MiningRange, 25, 360)
         ImGizmo.Text:Draw(Knit.Player.Character.PrimaryPart.CFrame.Position or Vector3.zero, "Range: "..tostring(MiningRange), MiningRangeSettings.TextSize:get())
+    end
+
+    if DialogueNPCs.Visible:get() then
+        local Prompts = CollectionService:GetTagged(DialoguePromptTag)
+        ImGizmo.SetStyle(DialogueNPCs.Color:get(), DialogueNPCs.Transparency:get(), DialogueNPCs.AlwaysOnTop:get())
+
+        for _, Prompt :ProximityPrompt in pairs(Prompts) do
+            local Position = Prompt.Parent:IsA("Model") and Prompt.Parent.PrimaryPart.CFrame.Position or Prompt.Parent.CFrame.Position
+            ImGizmo.Box:Draw(CFrame.new(Position), Vector3.new(2, 5, 2), false)
+            ImGizmo.Text:Draw(Position, "Dialogue NPC", DialogueNPCs.TextSize:get())
+        end
     end
 end
 
@@ -153,6 +182,7 @@ end
 
 function DeveloperGuiController:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
+    DialogueService = Knit.GetService("DialogueService")
 
     UserInputService.InputBegan:Connect(function(Input, Processed)
         if Processed then return end
@@ -175,6 +205,10 @@ function DeveloperGuiController:KnitStart()
     local StartTime = GetTime()
     local LastTime = 0
     local GameSettings = UserSettings().GameSettings
+
+    DialogueService:GetTags():andThen(function(PromptTag :string)
+        DialoguePromptTag = PromptTag
+    end)
 
     PickaxeService.UpdateMiningPower:Connect(function()
         PickaxeService:GetPickaxe():andThen(function(Pickaxe :Tool)
