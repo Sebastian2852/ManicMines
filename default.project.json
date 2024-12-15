@@ -90,11 +90,7 @@
 
         "Debug":{
           "$className":"Folder",
-          "DebugMode":{"$className":"BoolValue"},
-          "UI":{
-            "$className":"Folder",
-            "MountedGuis":{"$className":"IntValue"}
-          }
+          "DebugMode":{"$className":"BoolValue"}
         }
       },
       "PlayerData": {
