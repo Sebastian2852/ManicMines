@@ -120,23 +120,49 @@ function DeveloperGuiController:Visuals()
     if Window.state.isOpened or Window.state.isUncollapsed then
         Iris.Tree({"MiningRange"})
         Iris.Checkbox({"Visible"}, {isChecked = MiningRangeSettings.Visible})
+
+        Iris.SameLine()
+        HelpMarker("Draws debug over world geometry")
         Iris.Checkbox({"Always on top"}, {isChecked = MiningRangeSettings.AlwaysOnTop})
+        Iris.End()
+
         Iris.InputColor4({"Color"}, {color = MiningRangeSettings.Color, transparency = MiningRangeSettings.Transparency})
         Iris.SliderNum({"Text Size", 1, 10, 50}, {number = MiningRangeSettings.TextSize})
         Iris.End()
 
+
+
         Iris.Tree({"Dialogue NPCs"})
         Iris.Checkbox({"Visible"}, {isChecked = DialogueNPCs.Visible})
+
+        Iris.SameLine()
+        HelpMarker("Draws debug over world geometry")
         Iris.Checkbox({"Always on top"}, {isChecked = DialogueNPCs.AlwaysOnTop})
+        Iris.End()
+
         Iris.InputColor4({"Color"}, {color = DialogueNPCs.Color, transparency = DialogueNPCs.Transparency})
         Iris.SliderNum({"Text Size", 1, 10, 50}, {number = DialogueNPCs.TextSize})
         Iris.End()
 
+
+
         Iris.Tree({"Player ESP"})
         Iris.Checkbox({"Visible"}, {isChecked = EspSettings.Visible})
+        Iris.SameLine()
+        HelpMarker("Should you be included in the ESP")
         Iris.Checkbox({"Show self"}, {isChecked = EspSettings.ShowSelf})
+        Iris.End()
+
+        Iris.SameLine()
+        HelpMarker("Draws lines to players")
         Iris.Checkbox({"Lines"}, {isChecked = EspSettings.Lines})
+        Iris.End()
+
+        Iris.SameLine()
+        HelpMarker("Draws debug over world geometry")
         Iris.Checkbox({"Always on top"}, {isChecked = EspSettings.AlwaysOnTop})
+        Iris.End()
+
         Iris.InputColor4({"Color"}, {color = EspSettings.Color, transparency = EspSettings.Transparency})
         Iris.SliderNum({"Text Size", 1, 10, 50}, {number = EspSettings.TextSize})
         Iris.End()
