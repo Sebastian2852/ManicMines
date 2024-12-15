@@ -10,4 +10,4 @@ for _, Module :ModuleScript in pairs(PluginsModulesFolder:GetChildren()) do
     PluginInfo:CreatePluginButton(plugin, Toolbar)
 end
 
-print(`Loaded manic mines {#PluginsModulesFolder:GetChildren()} plugins`)
+print(`Loaded {#PluginsModulesFolder:GetChildren()} manic mines plugins`)
