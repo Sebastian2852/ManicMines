@@ -342,6 +342,9 @@ function MineService:GenerateBlockAtPosition(Position :Vector3, InCave :boolean|
 
     NewBlock:SetAttribute("CanMine", true)
 
+    ReplicatedStorage.Player.Debug.Mine.BlocksGenerated.Value = self.MineStats.BlocksGenerated
+    ReplicatedStorage.Player.Debug.Mine.OresGenerated.Value = self.MineStats.OresGenerated
+
     if Position.Y >= TopLayerY and table.find(self.TopLayerPositions, Position) then
         NewBlock:SetAttribute("CanMine", true)
         return NewBlock

@@ -90,7 +90,12 @@
 
         "Debug":{
           "$className":"Folder",
-          "DebugMode":{"$className":"BoolValue"}
+          "DebugMode":{"$className":"BoolValue"},
+          "Mine":{
+            "$className":"Folder",
+            "BlocksGenerated":{"$className":"IntValue"},
+            "OresGenerated":{"$className":"IntValue"}
+          }
         }
       },
       "PlayerData": {
