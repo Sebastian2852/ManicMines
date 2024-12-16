@@ -31,13 +31,6 @@ Feature work, bug fixes, and improvements are created in separate branches and m
 
 ---
 
-# Plugin
-The plugin is not a single plugin. Rather its a "suite" of plugins each serving their own purpose. Below is a list of all of them and what they do:  
-- Rarity Editor: Allows editing rarities with the old rarity system (1 in x -> weights)
-
-## To-Do
-- Ore creator: Allows to select images from disk and setting the ore settings and then it creates all the objects for you and sets all the ids and stuff
-
 # Systems
 ## Caves
 Caves currently only support random caves that can only be guided by settings. These are all in the "Random" folder under "Assets/Caves". In the future there will be a "Structures" folder with caves that are randomly generated based on pre-built stuff.
