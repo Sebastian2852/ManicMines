@@ -108,6 +108,14 @@ function DeveloperGuiController:Visuals()
         TextSize = Iris.State(20);
     }
 
+    local AudioLocations = {
+        Visible = Iris.State(false);
+        AlwaysOnTop = Iris.State(true);
+        Color = Iris.State(Color3.new(0, 1, 0));
+        Transparency = Iris.State(0);
+        TextSize = Iris.State(20);
+    }
+
     local EspSettings = {
         Visible = Iris.State(false);
         AlwaysOnTop = Iris.State(true);
@@ -144,6 +152,20 @@ function DeveloperGuiController:Visuals()
 
         Iris.InputColor4({"Color"}, {color = DialogueNPCs.Color, transparency = DialogueNPCs.Transparency})
         Iris.SliderNum({"Text Size", 1, 10, 50}, {number = DialogueNPCs.TextSize})
+        Iris.End()
+
+
+
+        Iris.Tree({"Audio"})
+        Iris.Checkbox({"Visible"}, {isChecked = AudioLocations.Visible})
+
+        Iris.SameLine()
+        HelpMarker("Draws debug over world geometry")
+        Iris.Checkbox({"Always on top"}, {isChecked = AudioLocations.AlwaysOnTop})
+        Iris.End()
+
+        Iris.InputColor4({"Color"}, {color = AudioLocations.Color, transparency = AudioLocations.Transparency})
+        Iris.SliderNum({"Text Size", 1, 10, 50}, {number = AudioLocations.TextSize})
         Iris.End()
 
 
@@ -185,6 +207,21 @@ function DeveloperGuiController:Visuals()
             local Position = Prompt.Parent:IsA("Model") and Prompt.Parent.PrimaryPart.CFrame.Position or Prompt.Parent.CFrame.Position
             ImGizmo.Box:Draw(CFrame.new(Position), Vector3.new(2, 5, 2), false)
             ImGizmo.Text:Draw(Position, "Dialogue NPC", DialogueNPCs.TextSize:get())
+        end
+    end
+
+    if AudioLocations.Visible:get() then
+        ImGizmo.SetStyle(AudioLocations.Color:get(), AudioLocations.Transparency:get(), AudioLocations.AlwaysOnTop:get())
+
+        local AudioEngineFolder = workspace:FindFirstChild("AudioEngine")
+        if AudioEngineFolder then
+            for _, Item :MeshPart in pairs(AudioEngineFolder:GetChildren()) do
+                local Audio = Item:FindFirstChildWhichIsA("Sound", true)
+                if Audio then
+                    ImGizmo.Text:Draw(Item.CFrame.Position, `Volume: {Audio.Volume} ({Audio.PlaybackLoudness})\nID: {Audio.SoundId}\nLooped: {Audio.Looped}`, AudioLocations.TextSize:get())
+                end
+                ImGizmo.Box:Draw(CFrame.new(Item.CFrame.Position), Vector3.new(1, 1, 1), false)
+            end
         end
     end
 
