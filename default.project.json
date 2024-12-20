@@ -86,7 +86,24 @@
         "PickaxeActive":{"$className":"BoolValue"},
         "PickaxeEquipped":{"$className":"BoolValue"},
         "PickaxeSelection":{"$className":"ObjectValue"},
-        "Depth":{"$className":"NumberValue"}
+        "Depth":{"$className":"NumberValue"},
+
+        "Debug":{
+          "$className":"Folder",
+          "DebugMode":{"$className":"BoolValue"},
+          "Mine":{
+            "$className":"Folder",
+            "BlocksGenerated":{"$className":"IntValue"},
+            "OresGenerated":{"$className":"IntValue"}
+          },
+          "Audio":{
+            "$className":"Folder",
+            "TotalSoundsMade":{"$className":"IntValue"},
+            "ActiveSounds":{"$className":"IntValue"},
+            "ActiveGlobalSounds":{"$className":"IntValue"},
+            "ActivePositionalSounds":{"$className":"IntValue"}
+          }
+        }
       },
       "PlayerData": {
         "$className": "Folder",
@@ -145,6 +162,11 @@
     },
 
     "Workspace":{
+      "$properties": {
+        "StreamingMinRadius":64,
+        "StreamingTargetRadius":350
+      },
+
       "Game":{
         "$className":"Folder",
         "Mine":{"$className":"Folder"},

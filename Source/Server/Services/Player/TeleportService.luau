@@ -83,6 +83,7 @@ function TeleportService:TeleportPlayerToPosition(Player :Player, Position :Vect
     end
     FadeCharacterOut(1, Character)
     task.wait(1)
+    Player:RequestStreamAroundAsync(Position, 5)
     Character:PivotTo(CFrame.new(Position))
     task.wait(1)
     FadeCharacterIn(1, Character)

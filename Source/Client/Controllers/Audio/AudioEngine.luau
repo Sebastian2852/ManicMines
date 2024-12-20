@@ -4,6 +4,8 @@ local SoundService = game:GetService("SoundService")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
+local DebugFolder = ReplicatedStorage.Player.Debug
+
 local AudioEngine = Knit.CreateController { Name = "AudioEngine" }
 
 local GLOBALSTORAGEFOLDER -- Used to hold sounds that are played globally
@@ -57,8 +59,10 @@ function AudioEngine:_ConstructObject(SoundObject :Core.Sound)
 
     Sound.Parent = Location
     if Location == GLOBALSTORAGEFOLDER then
+        DebugFolder.Audio.ActiveGlobalSounds.Value += 1
         self.Sounds[AudioID] = Sound
     else
+        DebugFolder.Audio.ActivePositionalSounds.Value += 1
         self.Sounds[AudioID] = TopLevelParent
     end
 
@@ -85,6 +89,14 @@ function AudioEngine:_ConnectEvents(Sound :Sound, SoundObject :Core.Sound)
     if SoundObject.OnFinish then
         Sound.Ended:Connect(SoundObject.OnFinish)
     end
+
+    Sound.Destroying:Connect(function()
+        if SoundObject.Config.Positional then
+            DebugFolder.Audio.ActivePositionalSounds.Value -= 1
+        else
+            DebugFolder.Audio.ActiveGlobalSounds.Value -= 1
+        end
+    end)
 end
 
 --[=[
@@ -151,6 +163,9 @@ function AudioEngine:PlaySound(SoundObject :Core.Sound) :number
     Sound:Play()
     self.Objects[ID] = Sound
 
+    DebugFolder.Audio.TotalSoundsMade.Value = Sounds
+    DebugFolder.Audio.ActiveSounds.Value += 1
+
     return ID
 end
 
@@ -173,6 +188,7 @@ function AudioEngine:StopSound(ID :number)
 
     self.Sounds[ID]:Destroy()
     self.Objects[ID] = nil
+    DebugFolder.Audio.ActiveSounds.Value -= 1
 end
 
 function AudioEngine:KnitInit()

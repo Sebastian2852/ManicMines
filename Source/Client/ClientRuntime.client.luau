@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Packages
 local Knit = require(ReplicatedStorage.Packages.Knit)
+require(ReplicatedStorage.Packages.Iris).Init()
 local Cmdr = require(ReplicatedStorage:WaitForChild("CmdrClient"))
 
 -- [[ KNIT ]] --

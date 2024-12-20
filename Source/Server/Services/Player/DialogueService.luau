@@ -42,11 +42,15 @@ function DialogueService:ConnectNpcsWithModules(Modules :{ModuleScript})
     return New
 end
 
+
+
 -- [[ CLIENT ]] --
 
 function DialogueService.Client:GetTags() :(string, string)
     return self.Server.ProximityPromptTag, self.Server.ModuleTag
 end
+
+
 
 -- [[ KNIT ]] --
 
