@@ -795,7 +795,8 @@ function MainMenuController:KnitStart()
 
     local LightingController = Knit.GetController("LightingController")
 
-    local App = Roact.createElement(MainMenuComponent)
+    local MainMenuApp = require(ReplicatedStorage.Game.GUI.MainMenu)
+    local App = Roact.createElement(MainMenuApp)
     local MainMenuTree = Roact.mount(App, Knit.Player.PlayerGui, "MainMenu")
     LogService:Log("Mounted main menu")
 
