@@ -7,6 +7,8 @@ local CreditsMenu = Roact.Component:extend("CreditsMenu")
 
 local Theme = require(script.Parent.Parent.Theme)
 
+local CloseButton = require(ReplicatedStorage.Game.GUI.Common.CloseButton)
+
 function CreditsMenu:init()
     self.Motor = Flipper.SingleMotor.new(0)
     local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
@@ -45,37 +47,18 @@ function CreditsMenu:render()
             FontFace = Theme.Font;
         }, {});
 
-        CloseButton = Roact.createElement("TextButton", {
-            Size = UDim2.fromScale(0.1, 0.1);
-            Position = UDim2.fromScale(1, 0);
-            AnchorPoint = Vector2.new(1, 1);
-            BackgroundColor3 = Theme.BackgroundColorRed;
-            BorderSizePixel = 0;
-
-            Text = "X";
-            TextScaled = true;
-            TextColor3 = Theme.TextColor;
-            FontFace = Theme.Font;
-
-            [Roact.Event.MouseButton1Click] = function()
+        CloseButton = Roact.createElement(CloseButton, {
+            OnClick = function()
                 self.Motor:setGoal(Flipper.Spring.new(0, {
                     frequency = 5,
                     dampingRatio = 1
                 }))
 
-                if self.props.OnClick then
-                    self.props.OnClick()
-                end
-            end;
-        }, {
-            Corners = Roact.createElement("UICorner", {
-                CornerRadius = UDim.new(1, 0);
-            });
+                task.wait(0.2)
 
-            AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
-                AspectRatio = 1;
-            });
-        });
+                self.props.OnClick()
+            end
+        }, {});
 
         Content = Roact.createElement("Frame", {
             Size = UDim2.fromScale(1, 0.9);
