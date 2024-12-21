@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Packages.Roact);
 
-local Theme = require(script.Parent.Parent.Theme)
+local Theme = require(script.Parent.Parent.Parent.Theme)
 
 local MenuButton = Roact.Component:extend("MenuButton")
 
@@ -10,7 +10,7 @@ function MenuButton:init()
 
     self:setState({
         Text = Text;
-        HoveredText = "<b>"..Text.."</b>";
+        HoveredText = "<b><u>"..Text.."</u></b>";
         Hovered = false;
     })
 end
@@ -23,7 +23,7 @@ function MenuButton:render()
 
     return Roact.createElement("Frame", {
         Size = UDim2.fromScale(1, 0.1);
-        BackgroundTransparency = 0.5;
+        BackgroundTransparency = 1;
         BorderSizePixel = 0;
         LayoutOrder = LayoutOrder;
     }, {

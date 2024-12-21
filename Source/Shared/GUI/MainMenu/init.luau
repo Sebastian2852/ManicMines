@@ -5,7 +5,7 @@ local Theme = require(script.Parent.Theme)
 
 local MainMenu = Roact.Component:extend("MainMenu")
 
-local MenuButton = require(script.MenuButton)
+local MenuButtons = require(script.Buttons)
 local Title = require(script.Title)
 
 function MainMenu:render()
@@ -47,7 +47,7 @@ function MainMenu:render()
                     BackgroundTransparency = 1;
                     BorderSizePixel = 0;
                 }, {
-                    Container = Roact.createElement("Frame", {
+                    TitleContainer = Roact.createElement("Frame", {
                         Size = UDim2.fromScale(0.7, 0.15);
                         Position = UDim2.fromScale(0.5, 0.17);
                         AnchorPoint = Vector2.new(0.5, 0.5);
@@ -57,28 +57,14 @@ function MainMenu:render()
                         Title = Roact.createElement(Title, {GameName = "Manic Mines", UpdateName = "Recode update"}, {});
                     });
 
-                    Buttons = Roact.createElement("Frame", {
+                    ButtonsContainer = Roact.createElement("Frame", {
                         Size = UDim2.fromScale(0.7, 0.5);
                         Position = UDim2.fromScale(0.5, 0.4);
                         AnchorPoint = Vector2.new(0.5, 0);
                         BackgroundTransparency = 1;
                         BorderSizePixel = 0;
                     }, {
-                        Layout = Roact.createElement("UIListLayout", {
-                            SortOrder = Enum.SortOrder.LayoutOrder;
-                            HorizontalAlignment = Enum.HorizontalAlignment.Center;
-                            VerticalAlignment = Enum.VerticalAlignment.Center;
-                        }, {});
-
-                        TestButton = Roact.createElement(MenuButton, {
-                            LayoutOrder = 1;
-                            Text = "Test";
-                        });
-
-                        TestButtons = Roact.createElement(MenuButton, {
-                            LayoutOrder = 2;
-                            Text = "Test2";
-                        });
+                        Buttons = Roact.createElement(MenuButtons);
                     });
                 });
             });
