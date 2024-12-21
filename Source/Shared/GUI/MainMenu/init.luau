@@ -9,11 +9,13 @@ local MainMenu = Roact.Component:extend("MainMenu")
 
 local MenuButtons = require(script.Buttons)
 local CreditsMenu = require(script.CreditsMenu)
+local SlotSelector = require(script.SlotSelector)
 local Title = require(script.Title)
 
 function MainMenu:init()
     self:setState({
         ShowCredits = false;
+        ShowPlay = false;
     })
 
     self.Motor = Flipper.SingleMotor.new(0)
@@ -32,6 +34,7 @@ end
 
 function MainMenu:render()
     local ShowCredits = self.state.ShowCredits
+    local ShowPlay = self.state.ShowPlay
 
     local Position = self.Binding:map(function(Value)
         return UDim2.fromScale(-0.3, 0):lerp(UDim2.fromScale(0, 0), Value)
@@ -106,7 +109,20 @@ function MainMenu:render()
                                 self:setState({
                                     ShowCredits = not self.state.ShowCredits;
                                 })
-                            end
+                            end;
+
+                            OnClickPlay = function()
+                                self.Motor:setGoal(Flipper.Spring.new(0, {
+                                    frequency = 5,
+                                    dampingRatio = 1
+                                }))
+
+                                task.wait(0.3)
+
+                                self:setState({
+                                    ShowPlay = not self.state.ShowPlay;
+                                })
+                            end;
                         }, {});
                     });
                 });
@@ -131,6 +147,21 @@ function MainMenu:render()
 
                         self:setState({
                             ShowCredits = false;
+                        })
+                    end;
+                });
+
+                SlotSelector = ShowPlay and Roact.createElement(SlotSelector, {
+                    OnClick = function()
+                        self.Motor:setGoal(Flipper.Spring.new(1, {
+                            frequency = 5,
+                            dampingRatio = 1
+                        }))
+
+                        task.wait(0.2)
+
+                        self:setState({
+                            ShowPlay = false;
                         })
                     end;
                 });

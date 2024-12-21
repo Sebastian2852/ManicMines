@@ -18,9 +18,12 @@ function MenuButtons:render()
             VerticalAlignment = Enum.VerticalAlignment.Center;
         }, {});
 
-        TestButton = Roact.createElement(MenuButton, {
+        PlayButton = Roact.createElement(MenuButton, {
             LayoutOrder = 1;
-            Text = "Test";
+            Text = "Play";
+            OnClick = function()
+                self.props.OnClickPlay()
+            end;
         });
 
         Credits = Roact.createElement(MenuButton, {
