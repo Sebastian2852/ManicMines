@@ -23,9 +23,12 @@ function MenuButtons:render()
             Text = "Test";
         });
 
-        TestButtons = Roact.createElement(MenuButton, {
+        Credits = Roact.createElement(MenuButton, {
             LayoutOrder = 2;
-            Text = "Test2";
+            Text = "Credits";
+            OnClick = function()
+                self.props.OnClickCredits()
+            end;
         });
     });
 end

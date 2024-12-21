@@ -1,0 +1,101 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Roact = require(ReplicatedStorage.Packages.Roact)
+local Flipper = require(ReplicatedStorage.Packages.Flipper)
+
+local CreditsMenu = Roact.Component:extend("CreditsMenu")
+
+local Theme = require(script.Parent.Parent.Theme)
+
+function CreditsMenu:init()
+    self.Motor = Flipper.SingleMotor.new(0)
+    local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
+    self.Binding = Binding
+    self.Motor:onStep(SetBinding)
+end
+
+function CreditsMenu:didMount()
+    self.Motor:setGoal(Flipper.Spring.new(1, {
+        frequency = 5,
+        dampingRatio = 1
+    }))
+end
+
+function CreditsMenu:render()
+    local Position = self.Binding:map(function(Value)
+        return UDim2.fromScale(0, -1.5):lerp(UDim2.fromScale(0, 0), Value)
+    end)
+
+    return Roact.createElement("Frame", {
+        Size = UDim2.fromScale(1, 1);
+        Position = Position;
+        BackgroundColor3 = Theme.BackgroundColor;
+        BackgroundTransparency = 0.5;
+        BorderSizePixel = 0;
+    }, {
+        Title = Roact.createElement("TextLabel", {
+            Size = UDim2.fromScale(1, 0.1);
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+
+            Text = "Credits";
+            TextScaled = true;
+            TextXAlignment = Enum.TextXAlignment.Left;
+            TextColor3 = Theme.TextColor;
+            FontFace = Theme.Font;
+        }, {});
+
+        CloseButton = Roact.createElement("TextButton", {
+            Size = UDim2.fromScale(0.1, 0.1);
+            Position = UDim2.fromScale(1, 0);
+            AnchorPoint = Vector2.new(1, 1);
+            BackgroundColor3 = Theme.BackgroundColorRed;
+            BorderSizePixel = 0;
+
+            Text = "X";
+            TextScaled = true;
+            TextColor3 = Theme.TextColor;
+            FontFace = Theme.Font;
+
+            [Roact.Event.MouseButton1Click] = function()
+                self.Motor:setGoal(Flipper.Spring.new(0, {
+                    frequency = 5,
+                    dampingRatio = 1
+                }))
+
+                if self.props.OnClick then
+                    self.props.OnClick()
+                end
+            end;
+        }, {
+            Corners = Roact.createElement("UICorner", {
+                CornerRadius = UDim.new(1, 0);
+            });
+
+            AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
+                AspectRatio = 1;
+            });
+        });
+
+        Content = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(1, 0.9);
+            Position = UDim2.fromScale(0, 0.1);
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+        }, {
+            WipLabel = Roact.createElement("TextLabel", {
+                Size = UDim2.fromScale(1, 1);
+                Position = UDim2.fromScale(0, 0);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+
+                Text = "Work in progress";
+                TextScaled = true;
+                TextColor3 = Theme.TextColor;
+                FontFace = Theme.Font;
+            }, {});
+        });
+    })
+end
+
+return CreditsMenu

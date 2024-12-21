@@ -27,10 +27,12 @@ function MenuButton:render()
     local Text = self.state.Text
     local HoveredText = self.state.HoveredText
 
+    local Size = self.Binding:map(function(Value)
+        return UDim2.fromScale(1, 0.1):lerp(UDim2.fromScale(1, 0.11), Value)
+    end)
+
     return Roact.createElement("Frame", {
-        Size = self.Binding:map(function(Value)
-            return UDim2.fromScale(1, 0.1):lerp(UDim2.fromScale(1, 0.11), Value)
-        end);
+        Size = Size;
         BackgroundTransparency = 1;
         BorderSizePixel = 0;
         LayoutOrder = LayoutOrder;
