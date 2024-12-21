@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
@@ -7,6 +8,12 @@ local UsedSlotFrame = Roact.Component:extend("UsedSlotFrame")
 
 local Theme = require(script.Parent.Parent.Parent.Theme)
 local SlotButton = require(script.Parent.SlotButton)
+
+local MainMenuController
+
+function UsedSlotFrame:init()
+    MainMenuController = Knit.GetController("MainMenuController")
+end
 
 function UsedSlotFrame:render()
     local SlotInfo :Core.SlotInfo = self.props.SlotInfo
@@ -83,7 +90,7 @@ function UsedSlotFrame:render()
                         LayoutOrder = 1;
 
                         OnClick = function()
-                            print("Play")
+                            MainMenuController:LoadSlot(SlotInfo.SlotID)
                         end;
                     }, {});
 
