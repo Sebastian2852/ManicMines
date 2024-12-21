@@ -8,22 +8,51 @@ local UsedSlotFrame = Roact.Component:extend("UsedSlotFrame")
 
 local Theme = require(script.Parent.Parent.Parent.Theme)
 local SlotButton = require(script.Parent.SlotButton)
+local DeleteSlot = require(script.DeleteSlot)
 
 local MainMenuController
 
 function UsedSlotFrame:init()
     MainMenuController = Knit.GetController("MainMenuController")
+
+    self:setState({
+        ShowDelete = false;
+    })
 end
 
 function UsedSlotFrame:render()
     local SlotInfo :Core.SlotInfo = self.props.SlotInfo
+    local OnSlotDelete = self.props.OnSlotDelete
+
     local SlotName = SlotInfo.TycoonName
+    local ShowDelete = self.state.ShowDelete
 
     return Roact.createElement("Frame", {
         Size = UDim2.fromScale(1, 0.3);
         BackgroundTransparency = 1;
         BorderSizePixel = 0;
     }, {
+        DeleteSlotContainer = ShowDelete and Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.3, 0.7);
+            Position = UDim2.fromScale(-0.2, 0.5);
+            AnchorPoint = Vector2.new(0.5, 0.5);
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+        }, {
+            DeleteSlot = Roact.createElement(DeleteSlot, {
+                SlotID = SlotInfo.SlotID;
+                OnClose = function()
+                    self:setState({
+                        ShowDelete = false;
+                    })
+                end;
+
+                OnDelete = function()
+                    OnSlotDelete()
+                end;
+            })
+        });
+
         Content = Roact.createElement("Frame", {
             Size = UDim2.fromScale(1, 1);
             BackgroundTransparency = 1;
@@ -100,7 +129,9 @@ function UsedSlotFrame:render()
                         LayoutOrder = 2;
 
                         OnClick = function()
-                            print("Delete")
+                            self:setState({
+                                ShowDelete = true;
+                            })
                         end;
                     }, {});
                 });

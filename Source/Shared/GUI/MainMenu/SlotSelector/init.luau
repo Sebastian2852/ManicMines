@@ -24,6 +24,20 @@ function SlotSelector:init()
     self.Motor:onStep(SetBinding)
 end
 
+function SlotSelector:UpdateSlots()
+    self:setState({
+        SlotInfo = nil;
+    })
+
+    task.wait(0.5)
+
+    DataService:GetSlotsInfo():andThen(function(SlotsInfo)
+        self:setState({
+            SlotInfo = SlotsInfo
+        })
+    end)
+end
+
 function SlotSelector:didMount()
     DataService:GetSlotsInfo():andThen(function(SlotsInfo)
         self:setState({
@@ -50,11 +64,14 @@ function SlotSelector:render()
         for ID :number, Slot :Core.SlotInfo in pairs(SlotInfo) do
             if Slot.Used then
                 SlotFrames[ID] = Roact.createElement(UsedSlotFrame, {
-                    SlotInfo = Slot
+                    SlotInfo = Slot;
+                    OnSlotDelete = function()
+                        self:UpdateSlots()
+                    end;
                 })
             else
                 SlotFrames[ID] = Roact.createElement(UnUsedSlotFrame, {
-                    SlotInfo = Slot
+                    SlotInfo = Slot;
                 })
             end
         end

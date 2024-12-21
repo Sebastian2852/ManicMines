@@ -29,6 +29,10 @@ function MainMenuController:PickRandomName() :string
     return Name
 end
 
+function MainMenuController:DeleteSlot(SlotNumber :number)
+    DataService:DeleteSlot(SlotNumber)
+end
+
 function MainMenuController:LoadSlot(SlotNumber :number)
     DataService:LoadData(SlotNumber)
     self:Close()
