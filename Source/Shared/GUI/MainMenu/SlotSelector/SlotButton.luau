@@ -27,7 +27,7 @@ function SlotButton:render()
     local Color = self.state.Color
 
     local Size = self.Binding:map(function(Value)
-        return UDim2.fromScale(0.3, 0.7):lerp(UDim2.fromScale(0.4, 0.85), Value)
+        return UDim2.fromScale(0.3, 0.7):lerp(UDim2.fromScale(0.35, 0.8), Value)
     end)
 
     return Roact.createElement("Frame", {
