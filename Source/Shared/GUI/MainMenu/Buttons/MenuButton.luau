@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Roact = require(ReplicatedStorage.Packages.Roact);
+local Roact = require(ReplicatedStorage.Packages.Roact)
+local Flipper = require(ReplicatedStorage.Packages.Flipper)
 
 local Theme = require(script.Parent.Parent.Parent.Theme)
 
@@ -13,6 +14,11 @@ function MenuButton:init()
         HoveredText = "<b><u>"..Text.."</u></b>";
         Hovered = false;
     })
+
+    self.Motor = Flipper.SingleMotor.new(0)
+    local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
+    self.Binding = Binding
+    self.Motor:onStep(SetBinding)
 end
 
 function MenuButton:render()
@@ -22,7 +28,9 @@ function MenuButton:render()
     local HoveredText = self.state.HoveredText
 
     return Roact.createElement("Frame", {
-        Size = UDim2.fromScale(1, 0.1);
+        Size = self.Binding:map(function(Value)
+            return UDim2.fromScale(1, 0.1):lerp(UDim2.fromScale(1, 0.11), Value)
+        end);
         BackgroundTransparency = 1;
         BorderSizePixel = 0;
         LayoutOrder = LayoutOrder;
@@ -38,12 +46,28 @@ function MenuButton:render()
                 self:setState({
                     Hovered = true;
                 })
+
+                self.Motor:setGoal(Flipper.Spring.new(1, {
+                    frequency = 5,
+                    dampingRatio = 1
+                }))
             end;
 
             [Roact.Event.MouseLeave] = function()
                 self:setState({
                     Hovered = false;
                 })
+
+                self.Motor:setGoal(Flipper.Spring.new(0, {
+                    frequency = 4,
+                    dampingRatio = 0.75
+                }))
+            end;
+
+            [Roact.Event.MouseButton1Click] = function()
+                if self.props.OnClick then
+                    self.props.OnClick()
+                end
             end;
         }, {});
 
