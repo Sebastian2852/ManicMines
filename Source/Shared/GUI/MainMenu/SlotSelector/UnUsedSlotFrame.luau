@@ -9,15 +9,15 @@ local Theme = require(script.Parent.Parent.Parent.Theme)
 function UnUsedSlotFrame:render()
     return Roact.createElement("Frame", {
         Size = UDim2.fromScale(1, 0.3);
-        BackgroundTransparency = 0.5;
+        BackgroundTransparency = 1;
         BorderSizePixel = 0;
     }, {
         Label = Roact.createElement("TextLabel", {
-            Size = UDim2.fromScale(1, 1);
+            Size = UDim2.fromScale(1, 0.5);
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
 
-            Text = "UnUsedSlotFrame";
+            Text = "Unused Slot";
             TextScaled = true;
             TextXAlignment = Enum.TextXAlignment.Center;
             TextColor3 = Theme.TextColor;
