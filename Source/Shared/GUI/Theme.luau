@@ -28,7 +28,7 @@ Theme.RawAudio = {
 
 Theme.PlaySound = function(Sound, RandomPitch :boolean?, MinPitch :number?, MaxPitch :number?)
     if RandomPitch then
-        Sound.PlaybackSpeed = math.random(MinPitch or 0.9, MaxPitch or 1.1)
+        Sound = AudioEngine:SetRandomPitch(Sound, MinPitch or 0.9, MaxPitch or 1.1)
     end
 
     return AudioEngine:PlaySound(Sound)

@@ -1,3 +1,4 @@
+local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
@@ -152,6 +153,7 @@ function AudioEngine:SetRandomPitch(Sound :Core.Sound, Min :number, Max :number)
     local NumberGenerator = Random.new()
     local Pitch = NumberGenerator:NextNumber(Min, Max)
     Sound.Config.Pitch = Pitch
+    return Sound
 end
 
 --[=[
@@ -195,7 +197,7 @@ function AudioEngine:StopSound(ID :number)
     assert(type(ID) == "number", "SoundID must be a sound")
     if self.Sounds[ID] == nil then return warn("No sound with ID: "..tostring(ID)) end
 
-    self.Sounds[ID]:Destroy()
+    Debris:AddItem(self.Sounds[ID], 1)
     self.Objects[ID] = nil
     DebugFolder.Audio.ActiveSounds.Value -= 1
 end

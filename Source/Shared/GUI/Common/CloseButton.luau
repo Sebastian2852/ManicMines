@@ -19,6 +19,8 @@ function CloseButton:render()
         FontFace = Theme.Font;
 
         [Roact.Event.MouseButton1Click] = function()
+            Theme.PlaySound(Theme.RawAudio.ButtonClick)
+
             if self.props.OnClick then
                 self.props.OnClick()
             end
