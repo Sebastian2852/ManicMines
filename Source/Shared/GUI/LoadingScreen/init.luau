@@ -9,6 +9,7 @@ local LoadingScreen = Roact.Component:extend("LoadingScreen")
 local Theme = require(script.Parent.Theme)
 local Text = require(script.Text)
 local Spinner = require(script.Spinner)
+local Background = require(script.Background)
 
 local function Lerp(Start :number, End :number, Time :number)
     return Start * (1 - Time) + End * Time
@@ -17,9 +18,18 @@ end
 function LoadingScreen:init()
     local LoadingService = Knit.GetService("LoadingService")
 
+    local PossibleImages = ReplicatedStorage.Assets.UI.LoadingScreenImages:GetChildren()
+    local ImageID = nil
+
+    if #PossibleImages >= 1 then
+        local RandomImage = PossibleImages[math.random(1, #PossibleImages)] :: Decal
+        ImageID = RandomImage.Texture
+    end
+
     self:setState({
         BigText = self.props.BigText or "";
         SmallText = self.props.SmallText or "";
+        ImageID = ImageID;
     })
 
     LoadingService.UpdateActionText:Connect(function(New)
@@ -59,6 +69,7 @@ function LoadingScreen:willUnmount()
 end
 
 function LoadingScreen:render()
+    local ImageID = self.state.ImageID
     local Transparency = self.Binding:map(function(Value)
         return Lerp(1, 0, Value)
     end)
@@ -78,12 +89,24 @@ function LoadingScreen:render()
             BorderSizePixel = 0;
             Active = true;
         }, {
+            Background = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(1, 1);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+            }, {
+                Background = Roact.createElement(Background, {
+                    Image = ImageID;
+                    Transparency = Transparency;
+                }, {});
+            });
+
             Container = Roact.createElement("Frame", {
                 Size = UDim2.fromScale(1, 0.15);
                 Position = UDim2.fromScale(1, 1);
                 AnchorPoint = Vector2.new(1, 1);
                 BackgroundTransparency = 1;
                 BorderSizePixel = 0;
+                ZIndex = 2;
             }, {
                 Layout = Roact.createElement("UIListLayout", {
                     Padding = UDim.new(0, 20);

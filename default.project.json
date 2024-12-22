@@ -61,6 +61,9 @@
             "$className":"Folder",
             "ClickSound":{"$className":"Sound"},
             "HoverSound":{"$className":"Sound"}
+          },
+          "LoadingScreenImages":{
+            "$className":"Folder"
           }
         },
 
