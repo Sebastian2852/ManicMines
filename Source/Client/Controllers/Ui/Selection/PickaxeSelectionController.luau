@@ -11,7 +11,7 @@ local PickaxeSelectionController = Knit.CreateController { Name = "PickaxeSelect
 local PlayerFolder = ReplicatedStorage.Player
 
 local PickaxeService
-local LogService
+--local LogService
 
 -- [[ PRIVATE ]] --
 
@@ -65,7 +65,7 @@ function PickaxeSelectionComponent:willUnmount()
 end
 
 function PickaxeSelectionComponent:render()
-    LogService:Log("Rendering pickaxe selection GUI")
+    --LogService:Log("Rendering pickaxe selection GUI")
     local Ore = self.state.Ore
     local OreName = self.state.OreName
     local TimeToMine = self.state.TimeToMine
@@ -165,7 +165,7 @@ end
 
 function PickaxeSelectionController:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
-    LogService = Knit.GetService("LogService")
+    --LogService = Knit.GetService("LogService")
 
     local App
     local GUI
@@ -195,7 +195,7 @@ function PickaxeSelectionController:KnitStart()
             Ore = ObjectToMine
         })
         GUI = Roact.mount(App, Knit.Player.PlayerGui, "PickaxeSelection")
-        LogService:Log("Mounted pickaxe selection GUI")
+        --LogService:Log("Mounted pickaxe selection GUI")
     end)
 end
 
