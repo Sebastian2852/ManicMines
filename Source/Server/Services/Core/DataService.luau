@@ -15,7 +15,7 @@ local DataService = Knit.CreateService {
 local PickaxeService
 local LogService
 local TycoonService
-local PlayerDisplayService
+-- local PlayerDisplayService
 local PlayerStatsService
 local LoadingService
 
@@ -274,7 +274,7 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
 
         LoadingService:UpdateActionText(Player, "Loading GUI")
         self.Client.DataLoaded:Fire(Player, DataFolder)
-        PlayerDisplayService:GivePlayerOverheadGUI(Player)
+        -- PlayerDisplayService:GivePlayerOverheadGUI(Player)
         task.wait(1)
 
         LoadingService:UpdateActionText(Player, "Giving tools")
@@ -286,7 +286,7 @@ function DataService:LoadPlayerData(Player :Player, Slot :DataStore)
         DataFolder.InMine.Value = false
 
         Player.CharacterAdded:Connect(function()
-            PlayerDisplayService:GivePlayerOverheadGUI(Player)
+            -- PlayerDisplayService:GivePlayerOverheadGUI(Player)
             PickaxeService:GivePickaxeToPlayer(Player)
         end)
 
@@ -568,7 +568,7 @@ end
 function DataService:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
     TycoonService = Knit.GetService("TycoonService")
-    PlayerDisplayService = Knit.GetService("PlayerDisplayService")
+    -- PlayerDisplayService = Knit.GetService("PlayerDisplayService")
     PlayerStatsService = Knit.GetService("PlayerStatsService")
     LoadingService = Knit.GetService("LoadingService")
 

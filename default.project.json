@@ -57,10 +57,11 @@
         },
         "UI":{
           "$className":"Folder",
-          "Billboards":{"$className":"Folder"},
-          "MainMenu":{"$className":"Folder"},
-          "Tycoon":{"$className":"Folder"},
-          "OreFrame":{"$className":"Frame"}
+          "Audio":{
+            "$className":"Folder",
+            "ClickSound":{"$className":"Sound"},
+            "HoverSound":{"$className":"Sound"}
+          }
         },
 
         "Misc":{

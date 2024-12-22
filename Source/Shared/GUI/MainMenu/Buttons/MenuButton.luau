@@ -45,6 +45,8 @@ function MenuButton:render()
             TextTransparency = 1;
 
             [Roact.Event.MouseEnter] = function()
+                Theme.PlaySound(Theme.RawAudio.ButtonHover)
+
                 self:setState({
                     Hovered = true;
                 })
