@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local CloseButton = Roact.Component:extend("CloseButton")
+local CloseButton = Roact.PureComponent:extend("CloseButton")
 
 local Theme = require(script.Parent.Parent.Theme)
 
@@ -24,6 +24,10 @@ function CloseButton:render()
             if self.props.OnClick then
                 self.props.OnClick()
             end
+        end;
+
+        [Roact.Event.MouseEnter] = function()
+            Theme.PlaySound(Theme.RawAudio.ButtonHover, true)
         end;
     }, {
         Corners = Roact.createElement("UICorner", {
