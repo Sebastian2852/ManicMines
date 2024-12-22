@@ -9,6 +9,7 @@ local UsedSlotFrame = Roact.Component:extend("UsedSlotFrame")
 local Theme = require(script.Parent.Parent.Parent.Theme)
 local SlotButton = require(script.Parent.SlotButton)
 local DeleteSlot = require(script.DeleteSlot)
+local TycoonInfo = require(script.TycoonInfo)
 
 local MainMenuController
 
@@ -142,7 +143,12 @@ function UsedSlotFrame:render()
                 BackgroundTransparency = 1;
                 BorderSizePixel = 0;
                 LayoutOrder = 2;
-            }, {});
+            }, {
+                Info = Roact.createElement(TycoonInfo, {
+                    Gold = SlotInfo.Gold;
+                    LastPlayed = SlotInfo.LastPlayed;
+                }, {})
+            });
         });
     })
 end
