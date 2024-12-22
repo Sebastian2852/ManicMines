@@ -58,7 +58,7 @@ function Background:render()
 
             Image = Image;
             ImageTransparency = Transparency;
-            ScaleType = Enum.ScaleType.Crop
+            ScaleType = Enum.ScaleType.Fit;
         }, {});
     });
 end
