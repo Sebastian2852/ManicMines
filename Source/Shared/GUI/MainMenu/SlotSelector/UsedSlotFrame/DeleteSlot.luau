@@ -1,18 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 
 local DeleteSlot = Roact.Component:extend("DeleteSlot")
 
-local MainMenuController
 
 local Theme = require(script.Parent.Parent.Parent.Parent.Theme)
 
 function DeleteSlot:init()
-    MainMenuController = Knit.GetController("MainMenuController")
-
     self.Motor = Flipper.SingleMotor.new(0)
     local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
     self.Binding = Binding
@@ -102,9 +98,7 @@ function DeleteSlot:render()
                 FontFace = Theme.Font;
 
                 [Roact.Event.MouseButton1Click] = function()
-                    MainMenuController:DeleteSlot(self.props.SlotID)
                     self.props.OnDelete()
-                    self.props.OnClose()
                 end;
             }, {
                 Corners = Roact.createElement("UICorner", {

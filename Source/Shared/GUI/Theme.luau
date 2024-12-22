@@ -1,4 +1,4 @@
-return {
+local Theme = {
     BackgroundColor = Color3.fromRGB(31, 31, 31);
     BackgroundColorRed = Color3.fromRGB(231, 96, 93);
     BackgroundColorGreen = Color3.fromRGB(93, 231, 137);
@@ -8,3 +8,12 @@ return {
     TextColor = Color3.fromRGB(255, 255, 255);
     TextDisabledColor = Color3.fromRGB(127, 127, 127);
 }
+
+Theme.Images = {
+    Missing = "http://www.roblox.com/asset/?id=925810526";
+
+    -- Main Menu
+    RandomizeButton = "rbxassetid://88848619964213";
+}
+
+return Theme

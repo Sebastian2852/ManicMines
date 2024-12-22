@@ -29,12 +29,40 @@ function MainMenuController:PickRandomName() :string
     return Name
 end
 
+function MainMenuController:FilterName(Name :string) :string
+    local Result = nil
+
+    TextFilteringService:FilterTextFromUserToEveryone(Name):andThen(function(FilterResult)
+        Result = FilterResult
+    end)
+
+    repeat
+        task.wait(0.01)
+    until Result ~= nil
+
+    return Result
+end
+
 function MainMenuController:DeleteSlot(SlotNumber :number)
-    DataService:DeleteSlot(SlotNumber)
+    DataService:DeleteSlot(SlotNumber):await()
 end
 
 function MainMenuController:LoadSlot(SlotNumber :number)
     DataService:LoadData(SlotNumber)
+    self:Close()
+end
+
+function MainMenuController:CreateSlotSettings(Name :string) :Core.SaveSlotSettings
+    local Settings :Core.SaveSlotSettings = {}
+
+    Settings.Name = Name
+    Settings.Tutorial = false
+
+    return Settings
+end
+
+function MainMenuController:CreateSlot(SlotNumber :number, SlotSettings :Core.SaveSlotSettings)
+    DataService:NewSlot(SlotNumber, SlotSettings)
     self:Close()
 end
 

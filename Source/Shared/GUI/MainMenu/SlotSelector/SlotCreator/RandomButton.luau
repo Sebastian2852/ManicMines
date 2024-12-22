@@ -2,39 +2,28 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 
-local Theme = require(script.Parent.Parent.Parent.Theme)
+local Theme = require(script.Parent.Parent.Parent.Parent.Theme)
 
-local SlotButton = Roact.Component:extend("SlotButton")
+local RandomButton = Roact.Component:extend("RandomButton")
 
-function SlotButton:init()
-    local Text = self.props.Text :: string or "unknown"
-    local BackgroundColor = self.props.Color or Color3.new(1, 0, 0)
-
-    self:setState({
-        Text = Text;
-        Color = BackgroundColor;
-    })
-
+function RandomButton:init()
     self.Motor = Flipper.SingleMotor.new(0)
     local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
     self.Binding = Binding
     self.Motor:onStep(SetBinding)
 end
 
-function SlotButton:render()
+function RandomButton:render()
     local LayoutOrder = self.props.LayoutOrder
-    local Text = self.state.Text
-    local Color = self.state.Color
 
     local Size = self.Binding:map(function(Value)
-        return UDim2.fromScale(0.3, 0.7):lerp(UDim2.fromScale(0.35, 0.8), Value)
+        return UDim2.fromScale(0.8, 0.8):lerp(UDim2.fromScale(1, 1), Value)
     end)
 
     return Roact.createElement("Frame", {
-        Size = Size;
-        BackgroundColor3 = Color;
+        Size = UDim2.fromScale(0.9, 0.9);
+        BackgroundTransparency = 1;
         BorderSizePixel = 0;
-        BackgroundTransparency = 0;
         LayoutOrder = LayoutOrder;
     }, {
         ClickArea = Roact.createElement("TextButton", {
@@ -65,21 +54,25 @@ function SlotButton:render()
             end;
         }, {});
 
-        Text = Roact.createElement("TextLabel", {
-            Size = UDim2.fromScale(1, 1);
+        Image = Roact.createElement("ImageLabel", {
+            Size = Size;
+            Position = UDim2.fromScale(0.5, 0.5);
+            AnchorPoint = Vector2.new(0.5, 0.5);
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
 
-            Text = Text;
-            TextScaled = true;
-            TextColor3 = Theme.TextColor;
-            FontFace = Theme.Font;
+            Image = Theme.Images.RandomizeButton;
+            ScaleType = Enum.ScaleType.Fit;
         }, {});
 
         Corners = Roact.createElement("UICorner", {
             CornerRadius = UDim.new(0, 4);
         }, {});
+
+        AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
+            AspectRatio = 1;
+        }, {});
     })
 end
 
-return SlotButton
+return RandomButton

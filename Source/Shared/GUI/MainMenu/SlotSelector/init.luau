@@ -12,6 +12,7 @@ local CloseButton = require(ReplicatedStorage.Game.GUI.Common.CloseButton)
 local UsedSlotFrame = require(script.UsedSlotFrame)
 local UnUsedSlotFrame = require(script.UnUsedSlotFrame)
 local LoadingSlots = require(script.LoadingSlots)
+local Creator = require(script.SlotCreator)
 
 local DataService
 
@@ -22,27 +23,56 @@ function SlotSelector:init()
     local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
     self.Binding = Binding
     self.Motor:onStep(SetBinding)
+
+    self:setState({
+        ShowCreator = false;
+        CreatorSlotID = 0;
+        SlotFrames = { Roact.createElement(LoadingSlots) };
+    })
 end
 
-function SlotSelector:UpdateSlots()
-    self:setState({
-        SlotInfo = nil;
+function SlotSelector:CreateSlotFrames(SlotInfo)
+    local SlotFrames = {}
+    SlotFrames["Layout"] = Roact.createElement("UIListLayout", {
+        SortOrder = Enum.SortOrder.Name;
     })
 
-    task.wait(0.5)
+    for ID :number, Slot :Core.SlotInfo in pairs(SlotInfo) do
+        if Slot.Used then
+            SlotFrames[ID] = Roact.createElement(UsedSlotFrame, {
+                SlotInfo = Slot;
+                OnSlotDelete = function()
+                    self:setState({
+                        SlotFrames = { Roact.createElement(LoadingSlots) }
+                    })
+                    DataService:DeleteSlot(ID):andThen(function()
+                        DataService:GetSlotsInfo():andThen(function(SlotsInfo)
+                            self:CreateSlotFrames(SlotsInfo)
+                        end)
+                    end)
+                end;
+            })
+        else
+            SlotFrames[ID] = Roact.createElement(UnUsedSlotFrame, {
+                SlotInfo = Slot;
+                OnCreate = function()
+                    self:setState({
+                        ShowCreator = true;
+                        CreatorSlotID = ID;
+                    })
+                end;
+            })
+        end
+    end
 
-    DataService:GetSlotsInfo():andThen(function(SlotsInfo)
-        self:setState({
-            SlotInfo = SlotsInfo
-        })
-    end)
+    self:setState({
+        SlotFrames = SlotFrames;
+    })
 end
 
 function SlotSelector:didMount()
     DataService:GetSlotsInfo():andThen(function(SlotsInfo)
-        self:setState({
-            SlotInfo = SlotsInfo
-        })
+        self:CreateSlotFrames(SlotsInfo)
     end)
 
     self.Motor:setGoal(Flipper.Spring.new(1, {
@@ -52,30 +82,9 @@ function SlotSelector:didMount()
 end
 
 function SlotSelector:render()
-    local SlotInfo = self.state.SlotInfo
-
-    local SlotFrames = {}
-
-    if SlotInfo then
-        SlotFrames["Layout"] = Roact.createElement("UIListLayout", {
-            SortOrder = Enum.SortOrder.Name;
-        })
-
-        for ID :number, Slot :Core.SlotInfo in pairs(SlotInfo) do
-            if Slot.Used then
-                SlotFrames[ID] = Roact.createElement(UsedSlotFrame, {
-                    SlotInfo = Slot;
-                    OnSlotDelete = function()
-                        self:UpdateSlots()
-                    end;
-                })
-            else
-                SlotFrames[ID] = Roact.createElement(UnUsedSlotFrame, {
-                    SlotInfo = Slot;
-                })
-            end
-        end
-    end
+    local SlotFrames = self.state.SlotFrames
+    local ShowCreator = self.state.ShowCreator
+    local CreatorSlotID = self.state.CreatorSlotID
 
     return Roact.createElement("Frame", {
         Size = UDim2.fromScale(1, 1);
@@ -86,7 +95,7 @@ function SlotSelector:render()
         BackgroundTransparency = 0.5;
         BorderSizePixel = 0;
     }, {
-        CloseButton = Roact.createElement(CloseButton, {
+        CloseButton = not ShowCreator and Roact.createElement(CloseButton, {
             OnClick = function()
                 self.Motor:setGoal(Flipper.Spring.new(0, {
                     frequency = 5,
@@ -99,12 +108,27 @@ function SlotSelector:render()
             end
         });
 
-        Slots = Roact.createElement("Frame", {
-            Size = UDim2.fromScale(1, 0.9);
-            Position = UDim2.fromScale(0, 0.15);
+        Container = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(1, 1);
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
-        }, SlotInfo and SlotFrames or { Roact.createElement(LoadingSlots); });
+        }, {
+            Slots = not ShowCreator and Roact.createElement("Frame", {
+                Size = UDim2.fromScale(1, 0.9);
+                Position = UDim2.fromScale(0, 0.15);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+            }, SlotFrames);
+
+            Creator = ShowCreator and Roact.createElement(Creator, {
+                SlotID = CreatorSlotID;
+                OnClose = function()
+                    self:setState({
+                        ShowCreator = false;
+                    })
+                end;
+            }, {})
+        });
     })
 end
 
