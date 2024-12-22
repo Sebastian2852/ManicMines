@@ -29,6 +29,16 @@ function LevelDisplay:init()
         self:UpdateLevel(Level.Value)
     end)
 
+    ReplicatedStorage.Player.LastBlockColor:GetPropertyChangedSignal("Value"):Connect(function()
+        local NewColor = ReplicatedStorage.Player.LastBlockColor.Value :: Color3
+
+        if NewColor == Color3.new(1, 1, 1) then return end
+
+        self:setState({
+            LastBlockColor = NewColor
+        })
+    end)
+
     self.Motor = Flipper.SingleMotor.new(0)
     local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
     self.Binding = Binding
@@ -40,8 +50,6 @@ function LevelDisplay:init()
     self.TextMotor:onStep(TextSetBinding)
 
     self:setState({
-        Xp = 0;
-        XpNeeded = 0;
         XpChange = 0;
         ShowChange = false;
     })
@@ -52,11 +60,6 @@ function LevelDisplay:UpdateXp(Xp :number)
     local LastXp = self.state.LastXp or 0
     local XpChange = Xp - LastXp
     local ShowChange = XpChange > 1
-
-    self.Motor:setGoal(Flipper.Spring.new(Xp / NeededXp, {
-        frequency = 4;
-        dampingRatio = 1;
-    }))
 
     self:setState({
         LastXp = Xp;
@@ -73,7 +76,6 @@ function LevelDisplay:UpdateXp(Xp :number)
         }))
     end
 
-
     self:setState({
         ShowChange = false;
         Xp = Xp;
@@ -83,6 +85,16 @@ function LevelDisplay:UpdateXp(Xp :number)
         task.wait(0.15)
 
         self.TextMotor:setGoal(Flipper.Spring.new(0, {
+            frequency = 4;
+            dampingRatio = 1;
+        }))
+
+        self.Motor:setGoal(Flipper.Spring.new(Xp / NeededXp, {
+            frequency = 4;
+            dampingRatio = 1;
+        }))
+    else
+        self.Motor:setGoal(Flipper.Spring.new(Xp / NeededXp, {
             frequency = 4;
             dampingRatio = 1;
         }))
@@ -125,6 +137,7 @@ function LevelDisplay:render()
     local LevelName = self.state.LevelName or "UNKOWN"
     local LevelColor = self.state.LevelColor or Color3.new(1, 0, 0)
     local BarGradient = self.state.BarGradient or ColorSequence.new(Color3.new(1, 0, 0))
+    local LastOreColor = self.state.LastBlockColor or Theme.TextColor
 
     local BarSize = self.Binding:map(function(Value)
         return UDim2.fromScale(0, 1):Lerp(UDim2.fromScale(1, 1), Value)
@@ -132,6 +145,10 @@ function LevelDisplay:render()
 
     local TextPosition = self.TextBinding:map(function(Value)
         return UDim2.fromScale(0.5, 0.5):Lerp(UDim2.fromScale(0.5, 1), Value)
+    end)
+
+    local TextColor = self.TextBinding:map(function(Value)
+        return Theme.TextColor:Lerp(LastOreColor, Value)
     end)
 
     return Roact.createElement("Frame", {
@@ -194,11 +211,12 @@ function LevelDisplay:render()
                         Text = Xp;
                         TextScaled = true;
                         TextXAlignment = Enum.TextXAlignment.Left;
-                        TextColor3 = Theme.TextColor;
+                        TextColor3 = TextColor;
                         FontFace = Theme.Font;
                     }, {
                         ShowXpChange and Roact.createElement(XpDiff, {
                             Amount = XpChange;
+                            Color = LastOreColor;
                         }, {})
                     });
                 });

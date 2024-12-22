@@ -36,6 +36,7 @@ end
 
 function XpDiff:render()
     local Amount = self.props.Amount
+    local TextColor = self.props.Color or Theme.TextColor
 
     local Position = self.Binding:map(function(Value)
         return UDim2.fromScale(0.5, 0.5):Lerp(UDim2.fromScale(0.5, -1.5), Value)
@@ -63,7 +64,7 @@ function XpDiff:render()
             TextScaled = true;
             TextXAlignment = Enum.TextXAlignment.Left;
             TextYAlignment = Enum.TextYAlignment.Bottom;
-            TextColor3 = Theme.TextColor;
+            TextColor3 = TextColor;
             FontFace = Theme.Font;
         }, {});
     });

@@ -90,6 +90,7 @@
         "PickaxeActive":{"$className":"BoolValue"},
         "PickaxeEquipped":{"$className":"BoolValue"},
         "PickaxeSelection":{"$className":"ObjectValue"},
+        "LastBlockColor":{"$className":"Color3Value"},
         "Depth":{"$className":"NumberValue"},
 
         "Debug":{

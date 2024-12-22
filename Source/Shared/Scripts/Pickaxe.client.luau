@@ -88,6 +88,7 @@ end
 local function SetTarget(Object :BasePart)
     if Object == PlayerFolder.PickaxeSelection.Value then return end
     if not Object:IsDescendantOf(workspace.Game.Mine) then return end
+    PlayerFolder.LastBlockColor.Value = Object:GetAttribute("SelectionColor")
 
     AddOutline(Object)
 end
