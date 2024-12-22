@@ -97,7 +97,12 @@ function DeleteSlot:render()
                 TextColor3 = Theme.TextColor;
                 FontFace = Theme.Font;
 
+                [Roact.Event.MouseEnter] = function()
+                    Theme.PlaySound(Theme.RawAudio.ButtonHover, true)
+                end;
+
                 [Roact.Event.MouseButton1Click] = function()
+                    Theme.PlaySound(Theme.RawAudio.ButtonClick)
                     self.props.OnDelete()
                 end;
             }, {
@@ -117,7 +122,12 @@ function DeleteSlot:render()
                 TextColor3 = Theme.TextColor;
                 FontFace = Theme.Font;
 
+                [Roact.Event.MouseEnter] = function()
+                    Theme.PlaySound(Theme.RawAudio.ButtonHover, true)
+                end;
+
                 [Roact.Event.MouseButton1Click] = function()
+                    Theme.PlaySound(Theme.RawAudio.ButtonClick)
                     self.Motor:setGoal(Flipper.Spring.new(0, {
                         frequency = 5,
                         dampingRatio = 1
