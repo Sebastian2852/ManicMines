@@ -130,11 +130,19 @@ function SlotCreator:render()
                                 SlotName = NewText
                             })
                         end;
+
+                        Text = self.state.SlotName
                     });
                 });
 
                 RandomButton = Roact.createElement(RandomButton, {
                     LayoutOrder = 2;
+                    OnClick = function()
+                        local RandomName = MainMenuController:PickRandomName()
+                        self:setState({
+                            SlotName = RandomName
+                        })
+                    end;
                 }, {});
             });
         });

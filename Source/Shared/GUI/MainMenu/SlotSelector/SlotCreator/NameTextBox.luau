@@ -35,7 +35,7 @@ function NameTextBox:render()
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
 
-            Text = "";
+            Text = self.props.Text or "";
             PlaceholderText = "Tycoon Name";
             TextScaled = true;
             ClearTextOnFocus = false;
