@@ -29,7 +29,7 @@ function LevelDisplay:init()
         self:UpdateLevel(Level.Value)
     end)
 
-    ReplicatedStorage.Player.LastBlockColor:GetPropertyChangedSignal("Value"):Connect(function()
+    self.ColorConnection = ReplicatedStorage.Player.LastBlockColor:GetPropertyChangedSignal("Value"):Connect(function()
         local NewColor = ReplicatedStorage.Player.LastBlockColor.Value :: Color3
 
         if NewColor == Color3.new(1, 1, 1) then return end
@@ -53,6 +53,20 @@ function LevelDisplay:init()
         XpChange = 0;
         ShowChange = false;
     })
+end
+
+function LevelDisplay:willUnmount()
+    if self.XpConnection then
+        self.XpConnection:Disconnect()
+    end
+
+    if self.LevelConnection then
+        self.LevelConnection:Disconnect()
+    end
+
+    if self.ColorConnection then
+        self.ColorConnection:Disconnect()
+    end
 end
 
 function LevelDisplay:UpdateXp(Xp :number)
@@ -117,16 +131,6 @@ function LevelDisplay:UpdateLevel(Level :number)
         BarGradient = BarGradient;
         XpNeeded = XpNeeded;
     })
-end
-
-function LevelDisplay:willUnmount()
-    if self.XpConnection then
-        self.XpConnection:Disconnect()
-    end
-
-    if self.LevelConnection then
-        self.LevelConnection:Disconnect()
-    end
 end
 
 function LevelDisplay:render()
