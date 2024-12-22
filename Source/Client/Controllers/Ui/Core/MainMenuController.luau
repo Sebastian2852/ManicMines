@@ -100,7 +100,7 @@ function MainMenuController:KnitStart()
     Blur.Size = 15
     Blur.Enabled = true
 
-    HotbarController:DisableHotbar()
+    HotbarController:DisableHotbar(false)
     Blur = LightingController:AddPersistentObject(Blur)
 end
 
