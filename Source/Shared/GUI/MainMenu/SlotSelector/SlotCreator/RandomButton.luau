@@ -17,7 +17,7 @@ function RandomButton:render()
     local LayoutOrder = self.props.LayoutOrder
 
     local Size = self.Binding:map(function(Value)
-        return UDim2.fromScale(0.8, 0.8):lerp(UDim2.fromScale(1, 1), Value)
+        return UDim2.fromScale(0.8, 0.8):Lerp(UDim2.fromScale(1, 1), Value)
     end)
 
     return Roact.createElement("Frame", {

@@ -20,7 +20,7 @@ end
 
 function NameTextBox:render()
     local Size = self.Binding:map(function(Value)
-        return UDim2.fromScale(1, 1):lerp(UDim2.fromScale(1, 1.1), Value)
+        return UDim2.fromScale(1, 1):Lerp(UDim2.fromScale(1, 1.1), Value)
     end)
 
     return Roact.createElement("Frame", {

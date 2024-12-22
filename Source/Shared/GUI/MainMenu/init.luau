@@ -37,7 +37,7 @@ function MainMenu:render()
     local ShowPlay = self.state.ShowPlay
 
     local Position = self.Binding:map(function(Value)
-        return UDim2.fromScale(-0.3, 0):lerp(UDim2.fromScale(0, 0), Value)
+        return UDim2.fromScale(-0.3, 0):Lerp(UDim2.fromScale(0, 0), Value)
     end)
 
     return Roact.createElement("ScreenGui", {

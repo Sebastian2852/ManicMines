@@ -28,7 +28,7 @@ function MenuButton:render()
     local HoveredText = self.state.HoveredText
 
     local Size = self.Binding:map(function(Value)
-        return UDim2.fromScale(1, 0.1):lerp(UDim2.fromScale(1, 0.11), Value)
+        return UDim2.fromScale(1, 0.1):Lerp(UDim2.fromScale(1, 0.11), Value)
     end)
 
     return Roact.createElement("Frame", {

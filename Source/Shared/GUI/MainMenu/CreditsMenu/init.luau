@@ -25,7 +25,7 @@ end
 
 function CreditsMenu:render()
     local Position = self.Binding:map(function(Value)
-        return UDim2.fromScale(0, -1.5):lerp(UDim2.fromScale(0, 0), Value)
+        return UDim2.fromScale(0, -1.5):Lerp(UDim2.fromScale(0, 0), Value)
     end)
 
     return Roact.createElement("Frame", {
