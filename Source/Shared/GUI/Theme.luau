@@ -19,6 +19,9 @@ Theme.Images = {
 
     -- Main Menu
     RandomizeButton = "rbxassetid://88848619964213";
+
+    -- Loading screen
+    LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one
 }
 
 Theme.RawAudio = {
