@@ -48,6 +48,7 @@ function Spinner:didMount()
 end
 
 function Spinner:render()
+    local Transparency = self.props.Transparency or 0
     local Rotation = self.Binding:map(function(Value)
         return self.CurrentAnimGoal == 0 and Lerp(180, -180, Value) or Lerp(-180, 180, Value)
     end)
@@ -63,6 +64,7 @@ function Spinner:render()
             BorderSizePixel = 0;
 
             Image = Theme.Images.LoadingWheel;
+            ImageTransparency = Transparency;
             ScaleType = Enum.ScaleType.Fit;
         }, {
             TransparencyGradient = Roact.createElement("UIGradient", {

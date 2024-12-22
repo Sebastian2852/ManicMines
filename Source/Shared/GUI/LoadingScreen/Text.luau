@@ -7,6 +7,7 @@ local Text = Roact.PureComponent:extend("Text")
 local Theme = require(script.Parent.Parent.Theme)
 
 function Text:render()
+    local Transparency = self.props.Transparency or 0
     local BigText = self.props.BigText
     local SmallText = self.props.SmallText
 
@@ -26,6 +27,7 @@ function Text:render()
             BorderSizePixel = 0;
 
             Text = BigText;
+            TextTransparency = Transparency;
             TextScaled = true;
             TextXAlignment = Enum.TextXAlignment.Left;
             TextColor3 = Theme.TextColor;
@@ -38,6 +40,7 @@ function Text:render()
             BorderSizePixel = 0;
 
             Text = SmallText;
+            TextTransparency = Transparency;
             TextScaled = true;
             TextXAlignment = Enum.TextXAlignment.Left;
             TextColor3 = Theme.TextColor;

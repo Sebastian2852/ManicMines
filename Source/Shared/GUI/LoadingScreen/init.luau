@@ -2,12 +2,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Flipper = require(ReplicatedStorage.Packages.Flipper)
 
 local LoadingScreen = Roact.Component:extend("LoadingScreen")
 
 local Theme = require(script.Parent.Theme)
 local Text = require(script.Text)
 local Spinner = require(script.Spinner)
+
+local function Lerp(Start :number, End :number, Time :number)
+    return Start * (1 - Time) + End * Time
+end
 
 function LoadingScreen:init()
     local LoadingService = Knit.GetService("LoadingService")
@@ -22,9 +27,42 @@ function LoadingScreen:init()
             SmallText = New;
         })
     end)
+
+    self.Motor = Flipper.SingleMotor.new(0)
+    local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
+    self.Binding = Binding
+    self.Motor:onStep(SetBinding)
+end
+
+function LoadingScreen:didMount()
+    self.Motor:setGoal(Flipper.Spring.new(1, {
+        frequency = 4,
+        dampingRatio = 1
+    }))
+end
+
+function LoadingScreen:willUnmount()
+    self.Motor:setGoal(Flipper.Spring.new(0, {
+        frequency = 5,
+        dampingRatio = 1
+    }))
+
+    local Done = false
+
+    self.Motor:onComplete(function()
+        Done = true
+    end)
+
+    repeat
+        task.wait(0.01)
+    until Done
 end
 
 function LoadingScreen:render()
+    local Transparency = self.Binding:map(function(Value)
+        return Lerp(1, 0, Value)
+    end)
+
     return Roact.createElement("ScreenGui", {
         DisplayOrder = 100;
         ResetOnSpawn = false;
@@ -36,6 +74,7 @@ function LoadingScreen:render()
         App = Roact.createElement("Frame", {
             Size = UDim2.fromScale(1, 1);
             BackgroundColor3 = Theme.BackgroundColor;
+            BackgroundTransparency = Transparency;
             BorderSizePixel = 0;
             Active = true;
         }, {
@@ -68,7 +107,9 @@ function LoadingScreen:render()
                         AspectRatio = 1;
                     }, {});
 
-                    Spinner = Roact.createElement(Spinner, {}, {});
+                    Spinner = Roact.createElement(Spinner, {
+                        Transparency = Transparency;
+                    }, {});
                 });
 
                 TextContainer = Roact.createElement("Frame", {
@@ -80,6 +121,7 @@ function LoadingScreen:render()
                     Text = Roact.createElement(Text, {
                         BigText = self.state.BigText;
                         SmallText = self.state.SmallText;
+                        Transparency = Transparency;
                     }, {});
                 });
             });
