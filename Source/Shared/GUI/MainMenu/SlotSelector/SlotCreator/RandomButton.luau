@@ -34,6 +34,8 @@ function RandomButton:render()
             TextTransparency = 1;
 
             [Roact.Event.MouseEnter] = function()
+                Theme.PlaySound(Theme.RawAudio.ButtonHover, true)
+
                 self.Motor:setGoal(Flipper.Spring.new(1, {
                     frequency = 5,
                     dampingRatio = 1
@@ -48,6 +50,8 @@ function RandomButton:render()
             end;
 
             [Roact.Event.MouseButton1Click] = function()
+                Theme.PlaySound(Theme.RawAudio.ButtonClick)
+
                 if self.props.OnClick then
                     self.props.OnClick()
                 end

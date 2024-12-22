@@ -59,7 +59,12 @@ function SlotCreator:render()
                 TextColor3 = Theme.TextColor;
                 FontFace = Theme.Font;
 
+                [Roact.Event.MouseEnter] = function()
+                    Theme.PlaySound(Theme.RawAudio.ButtonHover, true)
+                end;
+
                 [Roact.Event.MouseButton1Click] = function()
+                    Theme.PlaySound(Theme.RawAudio.ButtonClick)
                     self.props.OnClose()
                 end;
             }, {
@@ -178,7 +183,12 @@ function SlotCreator:render()
                 TextColor3 = Theme.TextColor;
                 FontFace = Theme.Font;
 
+                [Roact.Event.MouseEnter] = function()
+                    Theme.PlaySound(Theme.RawAudio.ButtonHover, true)
+                end;
+
                 [Roact.Event.MouseButton1Click] = function()
+                    Theme.PlaySound(Theme.RawAudio.ButtonClick)
                     local SlotSettings = MainMenuController:CreateSlotSettings(SlotName)
                     MainMenuController:CreateSlot(SlotID, SlotSettings)
                 end;
