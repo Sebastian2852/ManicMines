@@ -146,6 +146,15 @@ function AudioEngine:CreateFromSound(Sound :Sound, Positional :boolean?, Positio
 end
 
 --[=[
+Sets the pitch of the given sound to a ranom value between Min and Max
+]=]
+function AudioEngine:SetRandomPitch(Sound :Core.Sound, Min :number, Max :number)
+    local NumberGenerator = Random.new()
+    local Pitch = NumberGenerator:NextNumber(Min, Max)
+    Sound.Config.Pitch = Pitch
+end
+
+--[=[
 Play a sound!
 returns the AudioEngine ID of the sound
 ]=]

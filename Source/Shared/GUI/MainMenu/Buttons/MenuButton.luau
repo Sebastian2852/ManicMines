@@ -45,7 +45,7 @@ function MenuButton:render()
             TextTransparency = 1;
 
             [Roact.Event.MouseEnter] = function()
-                Theme.PlaySound(Theme.RawAudio.ButtonHover)
+                Theme.PlaySound(Theme.RawAudio.ButtonHover, true)
 
                 self:setState({
                     Hovered = true;
@@ -69,6 +69,8 @@ function MenuButton:render()
             end;
 
             [Roact.Event.MouseButton1Click] = function()
+                Theme.PlaySound(Theme.RawAudio.ButtonClick)
+
                 if self.props.OnClick then
                     self.props.OnClick()
                 end
