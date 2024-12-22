@@ -10,6 +10,7 @@ local LoadingController = Knit.CreateController {
 
 local LoadingService
 local LogService
+local HotbarController
 
 local LoadingScreen
 local Tree
@@ -19,6 +20,7 @@ local Player = Knit.Player
 
 function LoadingController:ShowGui(BigText :string?, SmallText :string?)
     UserInputService.MouseIconEnabled = false
+    HotbarController:DisableHotbar()
     local App = Roact.createElement(LoadingScreen, {
         BigText = BigText;
         SmallText = SmallText;
@@ -29,6 +31,7 @@ end
 
 function LoadingController:HideGui()
     UserInputService.MouseIconEnabled = true
+    HotbarController:EnableHotbar()
     if Tree then
         Roact.unmount(Tree)
         LogService:Log("Unmounted loading screen")
@@ -42,6 +45,7 @@ end
 function LoadingController:KnitStart()
     LoadingService = Knit.GetService("LoadingService")
     LogService = Knit.GetService("LogService")
+    HotbarController = Knit.GetController("HotbarController")
     LoadingScreen = require(ReplicatedStorage.Game.GUI.LoadingScreen)
 
     LoadingService.LoadingStarted:Connect(function()

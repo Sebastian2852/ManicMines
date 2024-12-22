@@ -9,6 +9,7 @@ local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
 local DataService
 local LogService
 local TextFilteringService
+local HotbarController
 
 local Blur
 local MainMenuTree
@@ -85,6 +86,7 @@ function MainMenuController:KnitStart()
     DataService = Knit.GetService("DataService")
     TextFilteringService = Knit.GetService("TextFilteringService")
     LogService = Knit.GetService("LogService")
+    HotbarController = Knit.GetController("HotbarController")
 
     local LightingController = Knit.GetController("LightingController")
 
@@ -98,6 +100,7 @@ function MainMenuController:KnitStart()
     Blur.Size = 15
     Blur.Enabled = true
 
+    HotbarController:DisableHotbar()
     Blur = LightingController:AddPersistentObject(Blur)
 end
 
