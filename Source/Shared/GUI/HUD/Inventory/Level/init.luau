@@ -244,6 +244,7 @@ function LevelDisplay:render()
                         LayoutOrder = 1;
 
                         Text = Xp;
+                        TextStrokeTransparency = 0;
                         TextScaled = true;
                         TextXAlignment = Enum.TextXAlignment.Left;
                         TextColor3 = TextColor;
@@ -263,6 +264,7 @@ function LevelDisplay:render()
                     LayoutOrder = 2;
 
                     Text = "/";
+                    TextStrokeTransparency = 0;
                     TextScaled = true;
                     TextXAlignment = Enum.TextXAlignment.Center;
                     TextColor3 = Theme.TextColor;
@@ -276,6 +278,7 @@ function LevelDisplay:render()
                     LayoutOrder = 3;
 
                     Text = XpNeeded;
+                    TextStrokeTransparency = 0;
                     TextScaled = true;
                     TextXAlignment = Enum.TextXAlignment.Right;
                     TextColor3 = Theme.TextColor;

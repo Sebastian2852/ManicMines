@@ -93,6 +93,7 @@ function Capacity:render()
 
             Text = Count;
             TextScaled = true;
+            TextStrokeTransparency = 0;
             TextXAlignment = Enum.TextXAlignment.Left;
             TextColor3 = Color;
             FontFace = Theme.Font;
@@ -106,6 +107,7 @@ function Capacity:render()
 
             Text = "/";
             TextScaled = true;
+            TextStrokeTransparency = 0;
             TextXAlignment = Enum.TextXAlignment.Center;
             TextColor3 = Color;
             FontFace = Theme.Font;
@@ -119,6 +121,7 @@ function Capacity:render()
 
             Text = Cap;
             TextScaled = true;
+            TextStrokeTransparency = 0;
             TextXAlignment = Enum.TextXAlignment.Right;
             TextColor3 = Color;
             FontFace = Theme.Font;

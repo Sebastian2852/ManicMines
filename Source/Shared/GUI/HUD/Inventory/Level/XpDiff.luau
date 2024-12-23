@@ -61,6 +61,7 @@ function XpDiff:render()
             BorderSizePixel = 0;
 
             Text = "+ "..Amount;
+            TextStrokeTransparency = 0;
             TextScaled = true;
             TextXAlignment = Enum.TextXAlignment.Left;
             TextYAlignment = Enum.TextYAlignment.Bottom;
