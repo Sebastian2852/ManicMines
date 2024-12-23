@@ -105,6 +105,8 @@ function Inventory:render()
             FontFace = Theme.Font;
 
             [Roact.Event.MouseButton1Click] = function()
+                Theme.PlaySound(Theme.RawAudio.ButtonClick)
+
                 if Closed then
                     self:Show()
                 else

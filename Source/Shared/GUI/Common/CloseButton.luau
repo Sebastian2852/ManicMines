@@ -25,10 +25,6 @@ function CloseButton:render()
                 self.props.OnClick()
             end
         end;
-
-        [Roact.Event.MouseEnter] = function()
-            Theme.PlaySound(Theme.RawAudio.ButtonHover, true)
-        end;
     }, {
         Corners = Roact.createElement("UICorner", {
             CornerRadius = UDim.new(0, 5);
