@@ -1,10 +1,25 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Flipper = require(ReplicatedStorage.Packages.Flipper)
 
 local Ore = Roact.Component:extend("Ore")
 
 local Theme = require(script.Parent.Parent.Parent.Parent.Theme)
+
+function Ore:init()
+    self.Motor = Flipper.SingleMotor.new(1)
+    local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
+    self.Binding = Binding
+    self.Motor:onStep(SetBinding)
+end
+
+function Ore:didMount()
+    self.Motor:setGoal(Flipper.Spring.new(0.5, {
+        frequency = 4;
+        dampingRatio = 1;
+    }))
+end
 
 function Ore:render()
     local OreName = self.props.OreName or "Unkown"
@@ -12,13 +27,19 @@ function Ore:render()
     local Emblem = self.props.Emblem or Theme.Images.Missing
     local Background = self.props.Background or ColorSequence.new(Color3.new(1, 0, 0))
 
+    local Size = self.Binding:map(function(Value)
+        return UDim2.fromScale(0, 0):Lerp(UDim2.fromScale(2, 2), Value)
+    end)
+
     return Roact.createElement("Frame", {
         Size = UDim2.fromScale(1, 1);
         BackgroundTransparency = 1;
         BorderSizePixel = 0;
     }, {
         Ore = Roact.createElement("Frame", {
-            Size = UDim2.fromScale(1, 1);
+            Size = Size;
+            Position = UDim2.fromScale(0.5, 0.5);
+            AnchorPoint = Vector2.new(0.5, 0.5);
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
         }, {

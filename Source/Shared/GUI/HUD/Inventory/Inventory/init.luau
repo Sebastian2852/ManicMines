@@ -37,31 +37,38 @@ function Inventory:render()
     }, {});
 
     for OreName :string, Amount :number in pairs(Ores) do
+        if Amount == 0 then continue end
         local RealOre = OreName ~= "Stone" and Core.Assets.Ores:FindFirstChild(OreName) :: BasePart or Core.Assets.Stone
 
         local DisplayName = RealOre:GetAttribute("DisplayName")
         local Emblem = RealOre:GetAttribute("EmblemImageID")
         local Background = RealOre:GetAttribute("InventoryBackgroundColor")
 
-        OreFames[OreName] = Roact.createElement(Ore, {
-            OreName = DisplayName;
-            Amount = Amount;
-            Emblem = Emblem;
-            Background = Background;
-        }, {});
-    end
-
-    return Roact.createElement("Frame", {
-        Size = UDim2.fromScale(1, 1);
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-    }, {
-        Container = Roact.createElement("Frame", {
+        OreFames[OreName] = Roact.createElement("Frame", {
             Size = UDim2.fromScale(1, 0.1);
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
-        }, OreFames );
-    });
+        }, {
+            Roact.createElement(Ore, {
+                OreName = DisplayName;
+                Amount = Amount;
+                Emblem = Emblem;
+                Background = Background;
+            }, {});
+        })
+    end
+
+    return Roact.createElement("ScrollingFrame", {
+        Size = UDim2.fromScale(1, 1);
+        BackgroundTransparency = 1;
+        BorderSizePixel = 0;
+
+        ScrollBarThickness = 5;
+        AutomaticCanvasSize = Enum.AutomaticSize.Y;
+        ScrollingDirection = Enum.ScrollingDirection.Y;
+        VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right;
+        VerticalScrollBarInset = Enum.ScrollBarInset.Always;
+    }, OreFames );
 end
 
 return Inventory
