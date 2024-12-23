@@ -98,10 +98,14 @@ function TycoonService:CreateTycoonForPlayer(Player :Player) :Model
     return NewTycoon
 end
 
+--[=[
+Delete a player's tycoon
+]=]
 function TycoonService:DeletePlayerTycoon(Player :Player)
     local Tycoon = self:GetPlayerTycoon(Player)
     if not Tycoon then return end
     Tycoon:Destroy()
+    LogService:Log("Delted "..Player.Name.."'s tycoon")
 end
 
 
