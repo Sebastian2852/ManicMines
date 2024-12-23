@@ -36,8 +36,8 @@ function LevelDisplay:init()
             })
         end)
 
-        self:UpdateXp(Xp.Value)
         self:UpdateLevel(Level.Value)
+        self:UpdateXp(Xp.Value)
 
         self:setState({
             ShortUnits = UseShortUnits.Value;
