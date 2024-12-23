@@ -22,6 +22,9 @@ Theme.Images = {
 
     -- Loading screen
     LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one
+
+    -- Misc
+    Gold = "rbxassetid://140388075517481";
 }
 
 Theme.RawAudio = {
