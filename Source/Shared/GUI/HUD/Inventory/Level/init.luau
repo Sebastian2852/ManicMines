@@ -10,6 +10,10 @@ local LevelDisplay = Roact.Component:extend("LevelDisplay")
 local Theme = require(script.Parent.Parent.Parent.Theme)
 local XpDiff = require(script.XpDiff)
 
+local function Lerp(Start :number, End :number, Time :number)
+    return Start * (1 - Time) + End * Time
+end
+
 function LevelDisplay:init()
     local DataService = Knit.GetService("DataService")
 
@@ -178,6 +182,10 @@ function LevelDisplay:render()
         return Theme.TextColor:Lerp(LastOreColor, Value)
     end)
 
+    local OverlayTransparency = self.TextBinding:map(function(Value)
+        return Lerp(1, 0, Value)
+    end)
+
     return Roact.createElement("Frame", {
         Size = UDim2.fromScale(1, 1);
         BackgroundTransparency = 1;
@@ -292,6 +300,14 @@ function LevelDisplay:render()
                 Outline = Roact.createElement("UIStroke", {
                     Thickness = 3;
                     Color = Color3.new(0, 0, 0);
+                }, {});
+
+                Overlay = Roact.createElement("Frame", {
+                    Size = BarSize;
+                    BackgroundTransparency = OverlayTransparency;
+                    BackgroundColor3 = LastOreColor;
+                    BorderSizePixel = 0;
+                    ZIndex = 2;
                 }, {});
 
                 Bar = Roact.createElement("Frame", {
