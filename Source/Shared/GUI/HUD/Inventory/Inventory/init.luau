@@ -41,11 +41,13 @@ function Inventory:render()
 
         local DisplayName = RealOre:GetAttribute("DisplayName")
         local Emblem = RealOre:GetAttribute("EmblemImageID")
+        local Background = RealOre:GetAttribute("InventoryBackgroundColor")
 
         OreFames[OreName] = Roact.createElement(Ore, {
             OreName = DisplayName;
             Amount = Amount;
             Emblem = Emblem;
+            Background = Background;
         }, {});
     end
 
