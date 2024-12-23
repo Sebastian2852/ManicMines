@@ -1,5 +1,7 @@
 {
   "name": "Manic Mines",
+  "globIgnorePaths": [ "**/PackageLink.model.json" ],
+
   "tree": {
     "$className": "DataModel",
 
@@ -9,7 +11,10 @@
         "Tests": { "$path": "Tests" }
       },
       "Packages": {
-        "$path": "Packages"
+        "$path": "Packages",
+        "TopbarPlus":{
+          "$path":"Submodules/TopbarPlus/src/Icon"
+        }
       },
 
       "Assets":{
