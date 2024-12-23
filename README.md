@@ -16,6 +16,22 @@ Then install all the packages by running
 `wally install`  
 in the project's **root directory**.  
 
+### Dependencies
+- Knit: Framework
+- Component: Framework
+- **(TO-BE-REMOVED)** Maid: Cleanup
+- Trove: Cleanup
+- Roact: GUI
+- Flipper: GUI Motion
+- TestEZ: Testing
+- cmdr: Command Bar
+- Promise: Async
+- octo-tree: Mine performance
+- Iris: Dev GUIs
+- ImGizmo: Dev visuals
+- NeoHotbar: Custom hotbar
+
+
 ## Branches
 - The public game is on the `Game` branch. This branch is only updated when the game releases an update.
 - The main development branch is the `Dev` branch. It contains the latest stable code being actively worked on.
