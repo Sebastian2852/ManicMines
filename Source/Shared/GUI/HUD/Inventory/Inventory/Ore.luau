@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 
-local Ore = Roact.Component:extend("Ore")
+local Ore = Roact.PureComponent:extend("Ore")
 
 local Theme = require(script.Parent.Parent.Parent.Parent.Theme)
 
