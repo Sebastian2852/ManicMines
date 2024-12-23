@@ -24,6 +24,11 @@ function Inventory:init()
                 end)
             end)
 
+            self:setState(function(PreviousState)
+                PreviousState.Ores[OreValue.Name] = OreValue.Value
+                return PreviousState
+            end)
+
             self.Trove:Add(Connection)
         end
 
