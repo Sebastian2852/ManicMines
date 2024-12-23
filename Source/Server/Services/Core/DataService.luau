@@ -585,6 +585,7 @@ function DataService:KnitStart()
         self:SavePlayerData(Player)
         self:DeleteDataFolder(Player)
         self.Players[Player.UserId] = nil
+        TycoonService:DeletePlayerTycoon(Player)
         CloseEvent:Fire()
     end)
 
