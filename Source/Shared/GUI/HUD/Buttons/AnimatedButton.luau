@@ -79,6 +79,11 @@ function AnimatedButton:render()
             end;
 
             [Roact.Event.MouseButton1Click] = function()
+                self.Motor:setGoal(Flipper.Spring.new(0.5, {
+                    frequency = 4;
+                    dampingRatio = 1;
+                }))
+
                 OnClick()
             end
         }, {});
