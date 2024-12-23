@@ -24,7 +24,7 @@ Theme.Images = {
     LoadingWheel = "http://www.roblox.com/asset/?id=5221791428"; -- TODO: Find a thinner one
 
     -- Misc
-    Gold = "rbxassetid://140388075517481";
+    Gold = "rbxassetid://92870304618730";
     TycoonTeleportButton = "rbxassetid://83761770070710";
     SurfaceButton = "rbxassetid://119967532396729";
 }
