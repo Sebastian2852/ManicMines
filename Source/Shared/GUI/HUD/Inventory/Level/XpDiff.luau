@@ -28,9 +28,8 @@ function XpDiff:didMount()
             dampingRatio = 0.5;
         }))
 
-        self.Motor:onComplete(function()
-            self.Done = true
-        end)
+        task.wait(1)
+        self.Done = true
     end)
 end
 
