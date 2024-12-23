@@ -9,6 +9,7 @@ local Inventory = require(script.Inventory)
 function HUD:render()
     return Roact.createElement("ScreenGui", {
         ResetOnSpawn = false;
+        ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
     }, {
         App = Roact.createElement("Frame", {
             Size = UDim2.fromScale(1, 1);

@@ -4,6 +4,7 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local Inventory = Roact.Component:extend("Inventory")
 
+local Theme = require(script.Parent.Parent.Theme)
 local Level = require(script.Level)
 local InventoryComponent = require(script.Inventory)
 
@@ -34,11 +35,17 @@ function Inventory:render()
 
         Container = Roact.createElement("Frame", {
             Size = UDim2.fromScale(1, 0.85);
-            BackgroundColor3 = Color3.new(1, 0, 0);
-            BackgroundTransparency = 0.5;
+            BackgroundTransparency = 1;
             BorderSizePixel = 0;
             LayoutOrder = 2;
         }, {
+            Background = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(1, 1);
+                BackgroundTransparency = 0.5;
+                BackgroundColor3 = Theme.BackgroundColor;
+                ZIndex = 0;
+            }, {});
+
             Inventory = Roact.createElement(InventoryComponent, {}, {})
         });
     });
