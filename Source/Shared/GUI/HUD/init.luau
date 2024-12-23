@@ -6,6 +6,7 @@ local HUD = Roact.Component:extend("HUD")
 
 local Inventory = require(script.Inventory)
 local Currency = require(script.Currency)
+local Buttons = require(script.Buttons)
 
 function HUD:render()
     return Roact.createElement("ScreenGui", {
@@ -39,6 +40,21 @@ function HUD:render()
                 }, {});
 
                 Currency = Roact.createElement(Currency, {}, {});
+            });
+
+            ButtonsContainer = Roact.createElement("Frame", {
+                Size = UDim2.fromScale(0.3, 0.1);
+                Position = UDim2.fromScale(0, 1);
+                AnchorPoint = Vector2.new(0, 1);
+                BackgroundTransparency = 1;
+                BorderSizePixel = 0;
+            }, {
+                Padding = Roact.createElement("UIPadding", {
+                    PaddingLeft = UDim.new(0, 15);
+                    PaddingBottom = UDim.new(0, 15);
+                }, {});
+
+                Buttons = Roact.createElement(Buttons, {}, {});
             });
         });
     });

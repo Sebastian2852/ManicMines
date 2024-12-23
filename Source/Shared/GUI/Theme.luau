@@ -25,6 +25,8 @@ Theme.Images = {
 
     -- Misc
     Gold = "rbxassetid://140388075517481";
+    TycoonTeleportButton = "rbxassetid://83761770070710";
+    SurfaceButton = "rbxassetid://119967532396729";
 }
 
 Theme.RawAudio = {
