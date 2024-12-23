@@ -7,6 +7,7 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Inventory = Roact.Component:extend("Inventory")
 
 local Ore = require(script.Ore)
+local Capacity = require(script.Capacity)
 
 function Inventory:init()
     local DataService = Knit.GetService("DataService")
@@ -58,17 +59,33 @@ function Inventory:render()
         })
     end
 
-    return Roact.createElement("ScrollingFrame", {
+    return Roact.createElement("Frame", {
         Size = UDim2.fromScale(1, 1);
         BackgroundTransparency = 1;
         BorderSizePixel = 0;
+    }, {
+        OresContainer = Roact.createElement("ScrollingFrame", {
+            Size = UDim2.fromScale(1, 1);
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
 
-        ScrollBarThickness = 5;
-        AutomaticCanvasSize = Enum.AutomaticSize.Y;
-        ScrollingDirection = Enum.ScrollingDirection.Y;
-        VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right;
-        VerticalScrollBarInset = Enum.ScrollBarInset.Always;
-    }, OreFames );
+            ScrollBarThickness = 5;
+            AutomaticCanvasSize = Enum.AutomaticSize.Y;
+            ScrollingDirection = Enum.ScrollingDirection.Y;
+            VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right;
+            VerticalScrollBarInset = Enum.ScrollBarInset.Always;
+        }, OreFames );
+
+        CapacityContainer = Roact.createElement("Frame", {
+            Size = UDim2.fromScale(0.8, 0.1);
+            Position = UDim2.new(0, -10, 1, 0);
+            AnchorPoint = Vector2.new(1, 1);
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+        }, {
+            Cap = Roact.createElement(Capacity, {}, {});
+        });
+    });
 end
 
 return Inventory
