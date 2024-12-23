@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Trove = require(ReplicatedStorage.Packages.trove)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
 local Inventory = Roact.Component:extend("Inventory")
@@ -12,15 +13,33 @@ local Capacity = require(script.Capacity)
 function Inventory:init()
     local DataService = Knit.GetService("DataService")
 
+    self.Trove = Trove.new()
+
     DataService:GetPlayerDataFolder():andThen(function(DataFolder :Core.DataFolder)
         for _, OreValue :IntValue in pairs(DataFolder.Inventory.Ores:GetChildren()) do
-            OreValue:GetPropertyChangedSignal("Value"):Connect(function()
+            local Connection = OreValue:GetPropertyChangedSignal("Value"):Connect(function()
                 self:setState(function(PreviousState)
                     PreviousState.Ores[OreValue.Name] = OreValue.Value
                     return PreviousState
                 end)
             end)
+
+            self.Trove:Add(Connection)
         end
+
+        local ShortUnits = DataFolder.Settings.InventoryShortUnits
+
+        local ShortUnitsConnection = ShortUnits:GetPropertyChangedSignal("Value"):Connect(function()
+            self:setState({
+                ShortUnits = ShortUnits.Value;
+            })
+        end)
+
+        self.Trove:Add(ShortUnitsConnection)
+
+        self:setState({
+            ShortUnits = ShortUnits.Value;
+        })
     end)
 
     self:setState({
@@ -28,8 +47,13 @@ function Inventory:init()
     })
 end
 
+function Inventory:willUnmount()
+    self.Trove:Clean()
+end
+
 function Inventory:render()
     local Ores = self.state.Ores or {}
+    local ShortUnits = self.state.ShortUnits or false
 
     local OreFames = {}
     OreFames["Layout"] = Roact.createElement("UIListLayout", {
@@ -52,7 +76,7 @@ function Inventory:render()
         }, {
             Roact.createElement(Ore, {
                 OreName = DisplayName;
-                Amount = Amount;
+                Amount = ShortUnits and Core.Util:ConvertNumberToString(Amount) or Amount;
                 Emblem = Emblem;
                 Background = Background;
             }, {});

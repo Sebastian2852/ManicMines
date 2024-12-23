@@ -15,6 +15,7 @@ function Capacity:init()
     DataService:GetPlayerDataFolder():andThen(function(DataFolder :Core.DataFolder)
         local InventoryItemCount = DataFolder.Inventory.InventoryItemCount
         local InventoryCap = DataFolder.Inventory.InventoryCap
+        local UseShortUnits = DataFolder.Settings.InventoryShortUnits
 
         self.ItemCountConnection = InventoryItemCount:GetPropertyChangedSignal("Value"):Connect(function()
             self:setState({
@@ -28,9 +29,16 @@ function Capacity:init()
             })
         end)
 
+        self.ShortUnitsConnection = UseShortUnits:GetPropertyChangedSignal("Value"):Connect(function()
+            self:setState({
+                ShortUnits = UseShortUnits.Value;
+            })
+        end)
+
         self:setState({
             ItemCount = InventoryItemCount.Value;
             Cap = InventoryCap.Value;
+            ShortUnits = UseShortUnits.Value;
         })
     end)
 
@@ -48,14 +56,24 @@ function Capacity:willUnmount()
     if self.ItemCountConnection then
         self.ItemCountConnection:Disconnect()
     end
+
+    if self.ShortUnitsConnection then
+        self.ShortUnitsConnection:Disconnect()
+    end
 end
 
 function Capacity:render()
     local Cap = self.state.Cap or 0
     local Count = self.state.ItemCount or 0
+    local ShortUnits = self.state.ShortUnits or false
 
     local Alpha = math.clamp((Count / Cap - 0.85) / (1 - 0.85), 0, 1)
     local Color = Color3.new(1, 1, 1):Lerp(Color3.new(1, 0, 0), Alpha)
+
+    if ShortUnits then
+        Cap = Core.Util:ConvertNumberToString(Cap)
+        Count = Core.Util:ConvertNumberToString(Count)
+    end
 
     return Roact.createElement("Frame", {
         Size = UDim2.fromScale(1, 1);

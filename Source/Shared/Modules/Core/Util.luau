@@ -17,14 +17,23 @@ print(Util:ConvertNumberToString(1750))
 function Util:ConvertNumberToString(Number :number) :string
     assert(type(Number) == "number", "NAN passed for 'Number'")
 
+    local function Format(Value, Suffix)
+        local Truncated = math.floor(Value * 10) / 10
+        local Formatted = tostring(Truncated)
+        if Formatted:sub(-2) == ".0" then
+            Formatted = Formatted:sub(1, -3)
+        end
+        return Formatted..Suffix
+    end
+
     if Number >= 1_000_000_000_000 then
-        return string.format("%.1fT", Number / 1_000_000_000_000)
+        return Format(Number / 1_000_000_000_000, "T")
     elseif Number >= 1_000_000_000 then
-        return string.format("%.1fB", Number / 1_000_000_000)
+        return Format(Number / 1_000_000_000, "B")
     elseif Number >= 1_000_000 then
-        return string.format("%.1fM", Number / 1_000_000)
+        return Format(Number / 1_000_000, "M")
     elseif Number >= 1_000 then
-        return string.format("%.1fK", Number / 1_000)
+        return Format(Number / 1_000, "K")
     else
         return tostring(Number)
     end

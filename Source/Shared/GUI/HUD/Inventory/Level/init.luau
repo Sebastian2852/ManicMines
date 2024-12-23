@@ -16,6 +16,7 @@ function LevelDisplay:init()
     DataService:GetPlayerDataFolder():andThen(function(DataFolder :Core.DataFolder)
         local Xp = DataFolder.XP
         local Level = DataFolder.Level
+        local UseShortUnits = DataFolder.Settings.InventoryShortUnits
 
         self.XpConnection = Xp:GetPropertyChangedSignal("Value"):Connect(function()
             self:UpdateXp(Xp.Value)
@@ -25,8 +26,18 @@ function LevelDisplay:init()
             self:UpdateLevel(Level.Value)
         end)
 
+        self.ShortUnitsConnection = UseShortUnits:GetPropertyChangedSignal("Value"):Connect(function()
+            self:setState({
+                ShortUnits = UseShortUnits.Value;
+            })
+        end)
+
         self:UpdateXp(Xp.Value)
         self:UpdateLevel(Level.Value)
+
+        self:setState({
+            ShortUnits = UseShortUnits.Value;
+        })
     end)
 
     self.ColorConnection = ReplicatedStorage.Player.LastBlockColor:GetPropertyChangedSignal("Value"):Connect(function()
@@ -66,6 +77,10 @@ function LevelDisplay:willUnmount()
 
     if self.ColorConnection then
         self.ColorConnection:Disconnect()
+    end
+
+    if self.ShortUnitsConnection then
+        self.ShortUnitsConnection:Disconnect()
     end
 end
 
@@ -142,6 +157,14 @@ function LevelDisplay:render()
     local LevelColor = self.state.LevelColor or Color3.new(1, 0, 0)
     local BarGradient = self.state.BarGradient or ColorSequence.new(Color3.new(1, 0, 0))
     local LastOreColor = self.state.LastBlockColor or Theme.TextColor
+
+    local UseShortUnits = self.state.ShortUnits or false
+
+    if UseShortUnits then
+        Xp = Core.Util:ConvertNumberToString(Xp)
+        XpNeeded = Core.Util:ConvertNumberToString(XpNeeded)
+        XpChange = Core.Util:ConvertNumberToString(XpChange)
+    end
 
     local BarSize = self.Binding:map(function(Value)
         return UDim2.fromScale(0, 1):Lerp(UDim2.fromScale(1, 1), Value)
