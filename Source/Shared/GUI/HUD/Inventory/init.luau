@@ -5,6 +5,7 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local Inventory = Roact.Component:extend("Inventory")
 
 local Level = require(script.Level)
+local InventoryComponent = require(script.Inventory)
 
 function Inventory:render()
     return Roact.createElement("Frame", {
@@ -31,13 +32,15 @@ function Inventory:render()
             Level = Roact.createElement(Level, {}, {});
         });
 
-        Main = Roact.createElement("Frame", {
+        Container = Roact.createElement("Frame", {
             Size = UDim2.fromScale(1, 0.85);
             BackgroundColor3 = Color3.new(1, 0, 0);
             BackgroundTransparency = 0.5;
             BorderSizePixel = 0;
             LayoutOrder = 2;
-        }, {});
+        }, {
+            Inventory = Roact.createElement(InventoryComponent, {}, {})
+        });
     });
 end
 
