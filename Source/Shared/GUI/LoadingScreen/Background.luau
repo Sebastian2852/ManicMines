@@ -13,7 +13,7 @@ function Background:UpdateImagePosition()
 
     local MousePosition = UserInputService:GetMouseLocation()
     local ScreenSize = workspace.CurrentCamera.ViewportSize
-    local MaxOffset = 400
+    local MaxOffset = 200
 
     local XOffset = (MousePosition.X - ScreenSize.X / 2) / ScreenSize.X * MaxOffset
     local YOffset = (MousePosition.Y - ScreenSize.Y / 2) / ScreenSize.Y * MaxOffset
@@ -58,7 +58,7 @@ function Background:render()
 
             Image = Image;
             ImageTransparency = Transparency;
-            ScaleType = Enum.ScaleType.Fit;
+            ScaleType = Enum.ScaleType.Crop;
         }, {});
     });
 end
