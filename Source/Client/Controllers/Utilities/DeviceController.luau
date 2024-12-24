@@ -41,9 +41,14 @@ end
 
 -- [[ KNIT ]] --
 
-function DeviceController:KnitStart()
+function DeviceController:KnitInit()
     local DeviceChangedEvent = Instance.new("BindableEvent")
     self.DeviceChanged = DeviceChangedEvent.Event
+    self.DeviceChangedObj = DeviceChangedEvent
+end
+
+function DeviceController:KnitStart()
+    local DeviceChangedEvent = self.DeviceChangedObj
 
     local DeviceType = self:GetDeviceType()
     DeviceChangedEvent:Fire(DeviceType)
