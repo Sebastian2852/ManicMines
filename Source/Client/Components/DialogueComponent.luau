@@ -137,7 +137,7 @@ function DialogueComponent:CreateContent()
         local LayerReplies = CreateReplies(Info.Choices, Info.CanLeave)
 
         Content[Name] = {
-            DialogueContent = {Info.Text};
+            DialogueContent = Info.Text:split("<br />");
             DialogueSounds = {};
             DialogueImage = "";
             LayerTitle = nil;
