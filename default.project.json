@@ -14,6 +14,9 @@
         "$path": "Packages",
         "TopbarPlus":{
           "$path":"Submodules/TopbarPlus/src/Icon"
+        },
+        "DialogueKit":{
+          "$path":"Submodules/DialogueKit.rbxm"
         }
       },
 
