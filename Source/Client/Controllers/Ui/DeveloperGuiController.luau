@@ -13,11 +13,10 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local DeveloperGuiController = Knit.CreateController { Name = "DeveloperGuiController" }
 
 local PickaxeService
-local DialogueService
 
 local DebugFolder = ReplicatedStorage.Player.Debug
 
-local DialoguePromptTag
+local DialoguePromptTag = "unkown"
 local MiningRange = 0
 local Stats = {
     FPS = 0;
@@ -313,7 +312,6 @@ end
 
 function DeveloperGuiController:KnitStart()
     PickaxeService = Knit.GetService("PickaxeService")
-    DialogueService = Knit.GetService("DialogueService")
 
     UserInputService.InputBegan:Connect(function(Input, Processed)
         if Processed then return end
@@ -336,10 +334,6 @@ function DeveloperGuiController:KnitStart()
     local StartTime = GetTime()
     local LastTime = 0
     local GameSettings = UserSettings().GameSettings
-
-    DialogueService:GetTags():andThen(function(PromptTag :string)
-        DialoguePromptTag = PromptTag
-    end)
 
     PickaxeService.UpdateMiningPower:Connect(function()
         PickaxeService:GetPickaxe():andThen(function(Pickaxe :Tool)
