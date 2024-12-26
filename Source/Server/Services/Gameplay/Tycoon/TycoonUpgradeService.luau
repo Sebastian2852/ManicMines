@@ -151,6 +151,13 @@ function TycoonUpgradeService:AddModelToHitbox(Hitbox :BasePart, LevelConfig :Co
         end
 
         local NewModel = Model:Clone()
+
+        local ModelHitbox = NewModel:FindFirstChild("Hitbox") :: BasePart
+        NewModel.PrimaryPart = ModelHitbox
+        ModelHitbox.CanCollide = false
+        ModelHitbox.Transparency = 1
+        ModelHitbox.Anchored = true
+
         NewModel:PivotTo(Hitbox.CFrame)
         NewModel.Parent = Hitbox
         Resolve()
