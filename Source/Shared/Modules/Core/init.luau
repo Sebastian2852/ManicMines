@@ -13,91 +13,91 @@ local Private = require(script.Private)
 Settings used for when creating a new save slot
 ]=]
 export type SaveSlotSettings = {
-    Name :string;
+	Name: string,
 
-    Tutorial :boolean;
+	Tutorial: boolean,
 }
 
 --[=[
 A data folder described in code
 ]=]
 export type DataFolder = {
-    Emblems :Folder;
-    TimesMined :Folder;
+	Emblems: Folder,
+	TimesMined: Folder,
 
-    Inventory :Private.DataFolder_InventoryFolder;
-    Storage :Private.DataFolder_StorageFolder;
-    Settings :Private.DataFolder_SettingsFolder;
-    Stats :Private.DataFolder_StatsFolder;
-    Pickaxes :Private.DataFolder_PickaxesFolder;
-    Tycoon :Private.DataFolder_TycoonFolder;
+	Inventory: Private.DataFolder_InventoryFolder,
+	Storage: Private.DataFolder_StorageFolder,
+	Settings: Private.DataFolder_SettingsFolder,
+	Stats: Private.DataFolder_StatsFolder,
+	Pickaxes: Private.DataFolder_PickaxesFolder,
+	Tycoon: Private.DataFolder_TycoonFolder,
 
-    XP :IntValue;
-    Level :IntValue;
-    Gold :IntValue;
-    TycoonName :StringValue;
+	XP: IntValue,
+	Level: IntValue,
+	Gold: IntValue,
+	TycoonName: StringValue,
 
-    InMine :BoolValue;
-    InTycoon :BoolValue;
-    ServerMining :BoolValue;
-    DataLoaded :BoolValue;
+	InMine: BoolValue,
+	InTycoon: BoolValue,
+	ServerMining: BoolValue,
+	DataLoaded: BoolValue,
 
-    FindFirstChild :(DataFolder, Name :string) -> any;
+	FindFirstChild: (DataFolder, Name: string) -> any,
 }
 
 export type SlotInfo = {
-    SlotID :number;
-    Used :boolean;
-    TycoonName :string;
-    Gold :number;
-    LastPlayed :number;
+	SlotID: number,
+	Used: boolean,
+	TycoonName: string,
+	Gold: number,
+	LastPlayed: number,
 }
 
 --[=[
 A chat message to be sent from the server to the client
 ]=]
 export type ChatMessage = {
-    Message :string;
-    Prefix :string;
-    HasPrefix :boolean;
-    MessageColor :Color3;
+	Message: string,
+	Prefix: string,
+	HasPrefix: boolean,
+	MessageColor: Color3,
 }
 
 --[=[
 Used for setting tables, contains every setting.
 ]=]
 export type Settings = {
-    GlobalShadows :boolean;
-    RainbowEffect :boolean;
-    MusicVolume :number;
-    InventoryShortUnits :boolean;
+	GlobalShadows: boolean,
+	RainbowEffect: boolean,
+	MusicVolume: number,
+	InventoryShortUnits: boolean,
 }
 
 --[=[
 Used for well admin permissions
 ]=]
 export type AdminPermissions = {
-    EditTycoonName :boolean;
-    EditTycoonUpgrades :boolean;
+	EditTycoonName: boolean,
+	EditTycoonUpgrades: boolean,
 
-    GiveOres :boolean;
-    TakeOres :boolean;
+	GiveOres: boolean,
+	TakeOres: boolean,
 }
 
 --[=[
 A config for a sound type
 ]=]
 export type SoundConfig = {
-    Positional :boolean;
-    PositionToPlay :BasePart|Vector3;
-    Looped :boolean;
-    Volume :number;
-    Pitch :number;
-    Speed :number;
+	Positional: boolean,
+	PositionToPlay: BasePart | Vector3,
+	Looped: boolean,
+	Volume: number,
+	Pitch: number,
+	Speed: number,
 
-    RollOffMode :Enum.RollOffMode;
-    RollOffDistanceBegin :number;
-    RollOffMaxDistance :number;
+	RollOffMode: Enum.RollOffMode,
+	RollOffDistanceBegin: number,
+	RollOffMaxDistance: number,
 }
 
 --[=[
@@ -105,23 +105,23 @@ A sound type for use by the AudioEngine
 Contains all the functions and more complex options
 ]=]
 export type Sound = {
-    SoundID :string;
-    Config :SoundConfig;
+	SoundID: string,
+	Config: SoundConfig,
 
-    OnFinish :() -> ();
-    OnLoop :(TimesLooped :number) -> ();
+	OnFinish: () -> (),
+	OnLoop: (TimesLooped: number) -> (),
 }
 
 local GameConfig = require(script.GameConfig)
-local Util = require(script.Util)
-local UI = require(script.UI)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local UI = require(script.UI)
+local Util = require(script.Util)
 
 local OreList = require(script.Parent.Classes.OreList)
 local Queue = require(script.Parent.Classes.Queue)
 
-local SaveData = require(script.Parent.Classes.SaveData.SaveData)
 local Data = require(script.Parent.Classes.SaveData.Data)
+local SaveData = require(script.Parent.Classes.SaveData.SaveData)
 
 local Maid = require(ReplicatedStorage.Packages.maid)
 
@@ -129,20 +129,20 @@ export type OreList = OreList.OreList
 export type OreListItem = OreList.OreListItem
 
 return {
-    GameConfig = GameConfig;
-    Util = Util;
-    OreList = OreList;
-    Queue = Queue;
+	GameConfig = GameConfig,
+	Util = Util,
+	OreList = OreList,
+	Queue = Queue,
 
-    UI = UI;
-    Roact = Roact;
+	UI = UI,
+	Roact = Roact,
 
-    Maid = Maid;
+	Maid = Maid,
 
-    Data = {
-        SaveData = SaveData;
-        Data = Data;
-    };
+	Data = {
+		SaveData = SaveData,
+		Data = Data,
+	},
 
-    Assets = ReplicatedStorage.Assets;
+	Assets = ReplicatedStorage.Assets,
 }

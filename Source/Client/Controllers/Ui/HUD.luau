@@ -6,16 +6,16 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local HUDController = Knit.CreateController { Name = "HUDController" }
 
 function HUDController:KnitStart()
-    local LogService = Knit.GetService("LogService")
-    local DataService = Knit.GetService("DataService")
+	local LogService = Knit.GetService("LogService")
+	local DataService = Knit.GetService("DataService")
 
-    local HUD = require(ReplicatedStorage.Game.GUI.HUD)
+	local HUD = require(ReplicatedStorage.Game.GUI.HUD)
 
-    DataService.DataLoaded:Connect(function()
-        local App = Roact.createElement(HUD)
-        Roact.mount(App, Knit.Player.PlayerGui, "HUD")
-        LogService:Log("Mounted HUD component")
-    end)
+	DataService.DataLoaded:Connect(function()
+		local App = Roact.createElement(HUD)
+		Roact.mount(App, Knit.Player.PlayerGui, "HUD")
+		LogService:Log("Mounted HUD component")
+	end)
 end
 
 return HUDController
