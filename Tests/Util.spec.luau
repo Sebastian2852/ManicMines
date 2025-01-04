@@ -11,22 +11,22 @@ return function()
 
         it("Converts to thousands", function()
             local Returned = Util:ConvertNumberToString(1000)
-            expect(Returned).to.equal("1.0K")
+            expect(Returned).to.equal("1K")
         end)
 
         it("Converts to millions", function()
             local Returned = Util:ConvertNumberToString(1000000)
-            expect(Returned).to.equal("1.0M")
+            expect(Returned).to.equal("1M")
         end)
 
         it("Converts to billions", function()
             local Returned = Util:ConvertNumberToString(1000000000)
-            expect(Returned).to.equal("1.0B")
+            expect(Returned).to.equal("1B")
         end)
 
         it("Converts to trillions", function()
             local Returned = Util:ConvertNumberToString(1000000000000)
-            expect(Returned).to.equal("1.0T")
+            expect(Returned).to.equal("1T")
         end)
     end)
     
