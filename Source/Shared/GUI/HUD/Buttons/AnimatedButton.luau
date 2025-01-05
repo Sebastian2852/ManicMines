@@ -62,6 +62,7 @@ function AnimatedButton:render()
 			BorderSizePixel = 0,
 			ZIndex = 3,
 
+			Text = "",
 			TextSize = 0,
 
 			[Roact.Event.MouseEnter] = function()
