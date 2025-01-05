@@ -1,0 +1,47 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Flipper = require(ReplicatedStorage.Packages.Flipper)
+local Roact = require(ReplicatedStorage.Packages.Roact)
+local Theme = require(script.Parent.Parent.Theme)
+
+local Bar = Roact.Component:extend("Bar")
+
+function Bar:init()
+	self.Motor = Flipper.SingleMotor.new(0)
+	local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
+	self.Binding = Binding
+	self.Motor:onStep(SetBinding)
+end
+
+function Bar:render()
+	return Roact.createElement("Frame", {
+		Size = UDim2.fromScale(1, 1),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+	}, {
+		Stroke = Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 0,
+			BackgroundColor3 = Theme.BackgroundColor,
+			BorderSizePixel = 0,
+		}, {
+			Corners = Roact.createElement("UICorner", {
+				CornerRadius = UDim.new(0, 4),
+			}, {}),
+
+			Stroke = Roact.createElement("UIStroke", {
+				Thickness = 3,
+				Color = Theme.BackgroundColor,
+			}, {}),
+		}),
+
+		Bar = Roact.createElement("Frame", {
+			Size = UDim2.fromScale(0.5, 1),
+			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+			BorderSizePixel = 0,
+			ZIndex = 2,
+		}, {}),
+	})
+end
+
+return Bar

@@ -202,6 +202,10 @@ function PickaxeSelectionController:KnitStart()
 		GUI = Roact.mount(App, Knit.Player.PlayerGui, "PickaxeSelection")
 		--LogService:Log("Mounted pickaxe selection GUI")
 	end)
+
+	local NewGUI = require(ReplicatedStorage.Game.GUI.PickaxeSelection)
+	local NewApp = Roact.createElement(NewGUI, { Block = ReplicatedStorage.Assets.Stone }, {})
+	Roact.mount(NewApp, Knit.Player.PlayerGui, "Pickaxe Selection")
 end
 
 return PickaxeSelectionController
