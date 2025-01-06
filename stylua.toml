@@ -2,7 +2,7 @@ syntax = "Luau"
 indent_type = "Tabs"
 quote_style = "ForceDouble"
 column_width = 120
-call_parentheses = "NoSingleTable"
+call_parentheses = "Always"
 
 [sort_requires]
 enabled = true
