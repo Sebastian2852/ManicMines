@@ -1,6 +1,5 @@
 #Folders
 Packages/
-.vscode/
 
 #Files
 /Manic Mines.rbxlx
@@ -8,4 +7,3 @@ Packages/
 /*.rbxl.lock
 
 *.lock
-Cloc.exe
