@@ -11,10 +11,10 @@ local TeleportService
 local LogService
 local CaveService
 
-local MineService = Knit.CreateService {
+local MineService = Knit.CreateService({
 	Name = "MineService",
 	Client = {},
-}
+})
 
 local MineSpawn: BasePart = workspace.Game.MineSpawn
 local OriginalMineSpawnPosition = MineSpawn.Position

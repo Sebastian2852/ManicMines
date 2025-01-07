@@ -12,7 +12,7 @@ local LogService
 local PickaxeAssetFolder = game.ReplicatedStorage.Assets.Pickaxe
 local Pickaxes = PickaxeAssetFolder.Pickaxes
 
-local PickaxeService = Knit.CreateService {
+local PickaxeService = Knit.CreateService({
 	Name = "PickaxeService",
 	Client = {
 		UpdateMiningSelection = Knit.CreateSignal(),
@@ -20,7 +20,7 @@ local PickaxeService = Knit.CreateService {
 		PlayHitSound = Knit.CreateSignal(),
 		PlayBreakSound = Knit.CreateSignal(),
 	},
-}
+})
 
 PickaxeService.Mining = {}
 
@@ -253,6 +253,7 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 		if Health <= 0 then
 			self.Client.PlayBreakSound:FireAll(ObjectToMine)
 			self:StopMining(Player)
+			task.wait(Delay)
 			MineService:BlockMined(ObjectToMine)
 			PlayerStatsService:MinedOre(Player, OreList)
 			break
@@ -271,6 +272,7 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 		if Health <= 0 then
 			self.Client.PlayBreakSound:FireAll(ObjectToMine)
 			self:StopMining(Player)
+			task.wait(Delay)
 			MineService:BlockMined(ObjectToMine)
 			PlayerStatsService:MinedOre(Player, OreList)
 			task.wait(Delay / 2)
@@ -316,7 +318,7 @@ function PickaxeService:StopMining(Player: Player)
 
 		self.Mining[Player.UserId].Cooldown = true
 
-		task.wait(Pickaxe:GetAttribute("Delay"))
+		task.wait(Pickaxe:GetAttribute("Delay") * 2)
 		self.Mining[Player.UserId].Cooldown = false
 
 		Resolve()
