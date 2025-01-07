@@ -29,10 +29,17 @@ function Bar:init()
 			UpdateBar()
 		end)
 		UpdateBar()
+
+		local BarGradient = Block:GetAttribute("MiningBarGradient")
+		self:setState({
+			BarGradient = BarGradient,
+		})
 	end)
 end
 
 function Bar:render()
+	local BarGradient = self.state.BarGradient
+
 	local BarSize = self.Binding:map(function(Value)
 		return UDim2.fromScale(0, 1):Lerp(UDim2.fromScale(1, 1), Value)
 	end)
@@ -63,7 +70,11 @@ function Bar:render()
 			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 			BorderSizePixel = 0,
 			ZIndex = 2,
-		}, {}),
+		}, {
+			Gardient = Roact.createElement("UIGradient", {
+				Color = BarGradient,
+			}, {}),
+		}),
 	})
 end
 
