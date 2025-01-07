@@ -6,7 +6,7 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local CreateGradient = require(ReplicatedStorage.Game.GUI.Elements.Gradient)
 
-local PickaxeSelectionController = Knit.CreateController { Name = "PickaxeSelectionController" }
+local PickaxeSelectionController = Knit.CreateController({ Name = "PickaxeSelectionController" })
 
 local PlayerFolder = ReplicatedStorage.Player
 
@@ -34,12 +34,12 @@ function PickaxeSelectionComponent:init()
 	local PropsTimeToMine = self.props.TimeToMine .. "s - " .. self.props.PercentageMined .. "%"
 	local PropsProgress = self.props.MiningProgress
 
-	self:setState {
+	self:setState({
 		Ore = PropsOre,
 		OreName = PropsOreName,
 		TimeToMine = PropsTimeToMine,
 		MiningProgress = PropsProgress,
-	}
+	})
 
 	self.UpdateConnection = PickaxeService.UpdateMiningSelection:Connect(
 		function(OreName: string, TimeToMine: number, Percentage: number, MiningProgress: number)
@@ -48,12 +48,12 @@ function PickaxeSelectionComponent:init()
 				return
 			end
 
-			self:setState {
+			self:setState({
 				Ore = RealOre,
 				OreName = RealOre:GetAttribute("DisplayName"),
 				TimeToMine = TimeToMine .. "s - " .. Percentage .. "%",
 				MiningProgress = MiningProgress,
-			}
+			})
 		end
 	)
 end
@@ -170,42 +170,9 @@ function PickaxeSelectionController:KnitStart()
 	PickaxeService = Knit.GetService("PickaxeService")
 	--LogService = Knit.GetService("LogService")
 
-	local App
-	local GUI
-
-	PlayerFolder.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
-		if GUI then
-			Roact.unmount(GUI)
-		end
-
-		local ObjectToMine = PlayerFolder.PickaxeSelection.Value
-		if ObjectToMine == nil then
-			return
-		end
-
-		local DisplayName = ObjectToMine:GetAttribute("DisplayName")
-		local Health = ObjectToMine:GetAttribute("Health")
-		local MaxHealth = ObjectToMine:GetAttribute("MaxHealth")
-		local PercentageMined = math.ceil((1 - (Health / MaxHealth)) * 100)
-		local MiningProgress = (Health / MaxHealth)
-		local TimeToMine = CalculateTimeToMine(Health)
-
-		App = Roact.createElement(PickaxeSelectionComponent, {
-			Name = DisplayName,
-			Health = Health,
-			MaxHealth = MaxHealth,
-			PercentageMined = PercentageMined,
-			MiningProgress = MiningProgress,
-			TimeToMine = TimeToMine,
-			Ore = ObjectToMine,
-		})
-		GUI = Roact.mount(App, Knit.Player.PlayerGui, "PickaxeSelection")
-		--LogService:Log("Mounted pickaxe selection GUI")
-	end)
-
-	local NewGUI = require(ReplicatedStorage.Game.GUI.PickaxeSelection)
-	local NewApp = Roact.createElement(NewGUI, { Block = ReplicatedStorage.Assets.Stone }, {})
-	Roact.mount(NewApp, Knit.Player.PlayerGui, "Pickaxe Selection")
+	local NewGui = require(ReplicatedStorage.Game.GUI.PickaxeSelection)
+	local App = Roact.createElement(NewGui, {}, {})
+	Roact.mount(App, Knit.Player.PlayerGui, "Pickaxe Selection")
 end
 
 return PickaxeSelectionController
