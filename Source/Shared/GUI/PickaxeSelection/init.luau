@@ -1,5 +1,7 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Theme = require(script.Parent.Theme)
 
@@ -17,8 +19,26 @@ function PickaxeSelection:init()
 			return
 		end
 
+		local function UpdateInfo()
+			local Health = Block:GetAttribute("Health")
+			local MaxHealth = Block:GetAttribute("MaxHealth")
+
+			local Pickaxe: Instance = Players.LocalPlayer.Character:FindFirstChild("Pickaxe")
+			local HitsNeeded = math.ceil(Health / Pickaxe:GetAttribute("Damage"))
+			local TimePerHit = Pickaxe:GetAttribute("Delay")
+			local TotalTime = HitsNeeded * TimePerHit
+
+			self:setState({
+				MiningPercentage = math.ceil((1 - (Health / MaxHealth)) * 100),
+				TimeToMine = Core.Util:RoundToxDP(TotalTime, 2),
+			})
+		end
+
 		local DisplayName = Block:GetAttribute("DisplayName")
 		local Emblem = Block:GetAttribute("EmblemImageID")
+
+		Block:GetAttributeChangedSignal("Health"):Connect(UpdateInfo)
+		UpdateInfo()
 
 		self:setState({
 			Selecting = true,
@@ -34,10 +54,13 @@ function PickaxeSelection:init()
 end
 
 function PickaxeSelection:render()
-	local Block = self.state.Block
+	local Block = self.state.Block :: BasePart
 	local DisplayName = self.state.DisplayName
 	local EmblemID = self.state.EmblemID
 	local Selecting = self.state.Selecting
+
+	local MiningPercentage = self.state.MiningPercentage
+	local TimeToMine = self.state.TimeToMine
 
 	return Selecting
 			and Roact.createElement("ScreenGui", {
@@ -119,7 +142,7 @@ function PickaxeSelection:render()
 								BorderSizePixel = 0,
 								LayoutOrder = 2,
 
-								Text = "XX% • xx.xxS",
+								Text = `{MiningPercentage}% • {TimeToMine}S`,
 								TextScaled = true,
 								TextColor3 = Theme.TextColor,
 								FontFace = Theme.Font,

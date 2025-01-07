@@ -14,6 +14,10 @@ function Bar:init()
 
 	ReplicatedStorage.Player.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
 		local Block = ReplicatedStorage.Player.PickaxeSelection.Value
+		if Block == nil then
+			return
+		end
+
 		local function UpdateBar()
 			local Health = Block:GetAttribute("Health")
 			local MaxHealth = Block:GetAttribute("MaxHealth")
