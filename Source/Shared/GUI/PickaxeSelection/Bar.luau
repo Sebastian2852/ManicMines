@@ -7,22 +7,28 @@ local Theme = require(script.Parent.Parent.Theme)
 local Bar = Roact.Component:extend("Bar")
 
 function Bar:init()
-	local Block = self.props.Block :: BasePart
-
 	self.Motor = Flipper.SingleMotor.new(0)
 	local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
 	self.Binding = Binding
 	self.Motor:onStep(SetBinding)
 
-	Block:GetAttributeChangedSignal("Health"):Connect(function()
-		local Health = Block:GetAttribute("Health")
-		local MaxHealth = Block:GetAttribute("MaxHealth")
-		local Size = math.clamp(MaxHealth / Health, 0, 1)
+	ReplicatedStorage.Player.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
+		local Block = ReplicatedStorage.Player.PickaxeSelection.Value
+		local function UpdateBar()
+			local Health = Block:GetAttribute("Health")
+			local MaxHealth = Block:GetAttribute("MaxHealth")
+			local Size = 1 - (Health / MaxHealth)
 
-		self.Motor:setGoal(Flipper.Spring.new(Size, {
-			frequency = 4,
-			dampingRatio = 1,
-		}))
+			self.Motor:setGoal(Flipper.Spring.new(Size, {
+				frequency = 4,
+				dampingRatio = 1,
+			}))
+		end
+
+		Block:GetAttributeChangedSignal("Health"):Connect(function()
+			UpdateBar()
+		end)
+		UpdateBar()
 	end)
 end
 
