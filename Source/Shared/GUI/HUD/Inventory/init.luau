@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local Inventory = Roact.Component:extend("Inventory")
@@ -10,20 +11,35 @@ local Level = require(script.Level)
 local Theme = require(script.Parent.Parent.Theme)
 
 function Inventory:init()
+	local UIService = Knit.GetService("UIService")
+
 	self.Motor = Flipper.SingleMotor.new(0)
 	local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
 	self.Binding = Binding
 	self.Motor:onStep(SetBinding)
 
-	self:setState {
+	self.HideMotor = Flipper.SingleMotor.new(0)
+	local HideBinding, SetHideBinding = Roact.createBinding(self.Motor:getValue())
+	self.HideBinding = HideBinding
+	self.HideMotor:onStep(SetHideBinding)
+
+	UIService.Inventory:Connect(function(New: boolean)
+		local Goal = New == true and 0 or 1
+		self.HideMotor:setGoal(Flipper.Spring.new(Goal, {
+			frequency = 4,
+			dampingRatio = 1,
+		}))
+	end)
+
+	self:setState({
 		Closed = false,
-	}
+	})
 end
 
 function Inventory:Show()
-	self:setState {
+	self:setState({
 		Closed = false,
-	}
+	})
 
 	self.Motor:setGoal(Flipper.Spring.new(0, {
 		frequency = 4,
@@ -32,9 +48,9 @@ function Inventory:Show()
 end
 
 function Inventory:Hide()
-	self:setState {
+	self:setState({
 		Closed = true,
-	}
+	})
 
 	self.Motor:setGoal(Flipper.Spring.new(1, {
 		frequency = 4,
@@ -59,8 +75,13 @@ function Inventory:render()
 		return UDim2.fromScale(-0.1, 0.9):Lerp(UDim2.fromScale(0.9, 0.75), Value)
 	end)
 
+	local MainPosition = self.HideBinding:map(function(Value)
+		return UDim2.fromScale(0, 0):Lerp(UDim2.fromScale(1, 1), Value)
+	end)
+
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
+		Position = MainPosition,
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 	}, {

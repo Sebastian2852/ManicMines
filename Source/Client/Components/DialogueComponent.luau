@@ -4,6 +4,7 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 
 local Component = require(ReplicatedStorage.Packages.Component)
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Trove = require(ReplicatedStorage.Packages.trove)
 
 local Camera = Workspace.CurrentCamera
@@ -46,13 +47,19 @@ end
 
 -- [[ COMPONENT ]] --
 
-local DialogueComponent = Component.new {
+local UIService
+
+local DialogueComponent = Component.new({
 	Tag = "Dialogue/Module/Config",
 	Ancestors = { workspace },
 	Extensions = { Extentions },
-}
+})
 
 function DialogueComponent:Construct()
+	if not UIService then
+		UIService = Knit.GetService("UIService")
+	end
+
 	self.Trove = Trove.new()
 	self.NPC = self.Instance.Parent
 	self.Info = require(self.Instance) :: InfoModule
@@ -161,11 +168,13 @@ function DialogueComponent:StartDialogue(ProximityPrompt)
 	local CameraPart = ProximityPrompt:FindFirstChildWhichIsA("BasePart")
 	local Tween = TweenService:Create(Camera, TweeningInfo, { CFrame = CameraPart.CFrame })
 	Tween:Play()
+	UIService:ToggleInventory(false)
 end
 
 function DialogueComponent:EndDialogue()
 	local Tween = TweenService:Create(Camera, TweeningInfo, { CFrame = OriginalCFrame })
 	Tween:Play()
+	UIService:ToggleInventory(true)
 	Tween.Completed:Wait()
 	Camera.CameraType = Enum.CameraType.Custom
 end
@@ -183,9 +192,9 @@ function DialogueComponent:Start()
 
 	local TriggerConnection = ProximityPrompt.Triggered:Connect(function()
 		self:StartDialogue(ProximityPrompt)
-		self.DialogueModule.CreateDialogue {
+		self.DialogueModule.CreateDialogue({
 			Content = self:CreateContent(),
-		}
+		})
 	end)
 
 	self.Trove:Add(TriggerConnection)
