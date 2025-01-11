@@ -8,7 +8,7 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local CreatOreLikeFrame = require(ReplicatedStorage.Game.GUI.Components.General.OrelikeFrame)
 local CreateForgeButton = require(ReplicatedStorage.Game.GUI.Components.Forge.PickaxeButton)
 
-local ForgeController = Knit.CreateController { Name = "ForgeController" }
+local ForgeController = Knit.CreateController({ Name = "ForgeController" })
 
 local DataService
 local ForgeService
@@ -53,11 +53,11 @@ local ForgeComponent = Roact.Component:extend("Forge")
 local CloseUI = Instance.new("BindableEvent")
 
 function ForgeComponent:init()
-	self:setState {
+	self:setState({
 		PickaxeSelected = false,
 		SelectedConfig = nil,
 		Equipped = self.props.Equipped,
-	}
+	})
 end
 
 local function CreatePickaxeButtons(Pickaxes: { Configuration }, Component: Roact.Component)
@@ -68,11 +68,11 @@ local function CreatePickaxeButtons(Pickaxes: { Configuration }, Component: Roac
 		local Locked = ForgeController:IsPickaxeLocked(Pickaxe)
 
 		local NewButton = CreateForgeButton(Pickaxe, Owned, Locked, function()
-			Component:setState {
+			Component:setState({
 				PickaxeSelected = true,
 				Owned = Owned,
 				SelectedConfig = Pickaxe,
-			}
+			})
 		end)
 
 		Buttons[Pickaxe.Name] = NewButton
@@ -322,10 +322,10 @@ function ForgeComponent:RenderWithInfo()
 					FontFace = Core.UI.Theme.TextFont,
 
 					[Roact.Event.MouseButton1Click] = function()
-						self:setState {
+						self:setState({
 							PickaxeSelected = false,
 							SelectedConfig = nil,
-						}
+						})
 					end,
 				}, {}),
 
@@ -425,20 +425,20 @@ function ForgeComponent:RenderWithInfo()
 
 					[Roact.Event.MouseButton1Click] = self.state.Owned and function()
 						PickaxeService:EquipPickaxe(SelectedConfig)
-						self:setState {
+						self:setState({
 							Equipped = SelectedConfig,
-						}
+						})
 					end or function()
 						local CurrentEquipped = self.state.Equipped
-						self:setState {
+						self:setState({
 							Equipped = SelectedConfig,
-						}
+						})
 
 						PickaxeService:BuyPickaxe(SelectedConfig):andThen(function(Success: boolean)
 							if not Success then
-								self:setState {
+								self:setState({
 									Equipped = CurrentEquipped,
-								}
+								})
 							end
 						end)
 					end,
@@ -497,6 +497,10 @@ function ForgeController:KnitStart()
 		self:TogglePrompts(Prompts, true)
 		CharacterController:EnableMovement()
 	end)
+
+	local NewGui = require(ReplicatedStorage.Game.GUI.Forge)
+	local NewApp = Roact.createElement(NewGui, {}, {})
+	Roact.mount(NewApp, Knit.Player.PlayerGui, "Forge")
 end
 
 return ForgeController

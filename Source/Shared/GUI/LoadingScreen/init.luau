@@ -26,16 +26,16 @@ function LoadingScreen:init()
 		ImageID = RandomImage.Texture
 	end
 
-	self:setState {
+	self:setState({
 		BigText = self.props.BigText or "",
 		SmallText = self.props.SmallText or "",
 		ImageID = ImageID,
-	}
+	})
 
 	LoadingService.UpdateActionText:Connect(function(New)
-		self:setState {
+		self:setState({
 			SmallText = New,
-		}
+		})
 	end)
 
 	self.Motor = Flipper.SingleMotor.new(0)
