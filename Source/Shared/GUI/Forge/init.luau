@@ -7,6 +7,44 @@ local Forge = Roact.Component:extend("Forge")
 local PickaxeButton = require(script.PickaxeButton)
 local Theme = require(script.Parent.Theme)
 
+function Forge:CreateOwnedButton(Name: string)
+	return Roact.createElement("Frame", {
+		Size = UDim2.fromScale(1, 0.08),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+	}, {
+		App = Roact.createElement(PickaxeButton, {
+			Name = Name,
+		}, {}),
+	})
+end
+
+function Forge:CreateUnOwnedButton(Name: string)
+	return Roact.createElement("Frame", {
+		Size = UDim2.fromScale(1, 0.08),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+	}, {
+		App = Roact.createElement(PickaxeButton, {
+			Name = Name,
+			NameColor = Color3.fromHex("3f3f3f"),
+		}, {}),
+	})
+end
+
+function Forge:CreateLockedButton()
+	return Roact.createElement("Frame", {
+		Size = UDim2.fromScale(1, 0.08),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+	}, {
+		App = Roact.createElement(PickaxeButton, {
+			Name = "???",
+			NameColor = Color3.fromHex("3f3f3f"),
+		}, {}),
+	})
+end
+
 function Forge:render()
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
@@ -77,15 +115,19 @@ function Forge:render()
 							SortOrder = Enum.SortOrder.LayoutOrder,
 							FillDirection = Enum.FillDirection.Vertical,
 							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							Padding = UDim.new(0, 10),
 						}, {}),
 
-						TestPickaxe = Roact.createElement("Frame", {
-							Size = UDim2.fromScale(0.85, 0.08),
-							BackgroundTransparency = 1,
-							BorderSizePixel = 0,
-						}, {
-							App = Roact.createElement(PickaxeButton),
-						}),
+						Padding = Roact.createElement("UIPadding", {
+							PaddingTop = UDim.new(0, 10),
+							PaddingLeft = UDim.new(0, 10),
+							PaddingRight = UDim.new(0, 10),
+							PaddingBottom = UDim.new(0, 10),
+						}, {}),
+
+						UnOwned = Forge:CreateUnOwnedButton("Un Owned"),
+						Bought = Forge:CreateOwnedButton("Owned"),
+						Locked = Forge:CreateLockedButton(),
 					}),
 				}),
 			}),

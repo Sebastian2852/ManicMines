@@ -5,7 +5,6 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local PickaxeButton = Roact.Component:extend("PickaxeButton")
 
-local Border = require(ReplicatedStorage.Game.GUI.Common.Border)
 local Theme = require(script.Parent.Parent.Theme)
 
 function PickaxeButton:init()
@@ -16,6 +15,9 @@ function PickaxeButton:init()
 end
 
 function PickaxeButton:render()
+	local PickaxeName = self.props.Name or "[UNKOWN]"
+	local NameColor = self.props.NameColor or Color3.new(1, 1, 1)
+
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
 		BackgroundColor3 = Color3.new(0, 0, 0),
@@ -26,8 +28,6 @@ function PickaxeButton:render()
 			CornerRadius = UDim.new(0, 7),
 		}, {}),
 
-		Border = Roact.createElement(Border, { Color = Color3.new(1, 1, 1) }),
-
 		PickaxeName = Roact.createElement("TextLabel", {
 			Size = UDim2.fromScale(1, 0.7),
 			Position = UDim2.fromScale(0.5, 0.5),
@@ -36,10 +36,10 @@ function PickaxeButton:render()
 			BorderSizePixel = 0,
 			LayoutOrder = 2,
 
-			Text = "Pickaxe Name",
+			Text = PickaxeName,
 			TextScaled = true,
 			TextXAlignment = Enum.TextXAlignment.Center,
-			TextColor3 = Color3.new(1, 1, 1),
+			TextColor3 = NameColor,
 			FontFace = Theme.Font,
 		}, {}),
 	})
