@@ -1,9 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local Forge = Roact.Component:extend("Forge")
+
+local UIService
 
 local PickaxeButton = require(script.PickaxeButton)
 local Theme = require(script.Parent.Theme)
@@ -46,14 +49,20 @@ function Forge:CreateLockedButton()
 	})
 end
 
+function Forge:init()
+	UIService = Knit.GetService("UIService")
+end
+
 function Forge:didMount()
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
+	UIService:ToggleInventory(false)
 end
 
 function Forge:willUnmount()
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, true)
+	UIService:ToggleInventory(true)
 end
 
 function Forge:render()
