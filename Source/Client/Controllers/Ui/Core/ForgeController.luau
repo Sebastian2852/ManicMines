@@ -480,15 +480,19 @@ function ForgeController:KnitStart()
 		DataFolder = PlayerDataFolder
 	end)
 
-	ForgeService.OpenForge:Connect(function(EquippedPickaxe)
-		App = Roact.createElement(
-			ForgeComponent,
-			{ Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren(), Equipped = EquippedPickaxe }
-		)
-		self:TogglePrompts(Prompts, false)
-		CharacterController:DisableMovement()
-		GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")
-		LogService:Log("Mounted Forge GUI")
+	ForgeService.OpenForge:Connect(function()
+		-- App = Roact.createElement(
+		-- 	ForgeComponent,
+		-- 	{ Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren(), Equipped = EquippedPickaxe }
+		-- )
+		-- self:TogglePrompts(Prompts, false)
+		-- CharacterController:DisableMovement()
+		-- GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")
+		-- LogService:Log("Mounted Forge GUI")
+
+		local NewGui = require(ReplicatedStorage.Game.GUI.Forge)
+		local NewApp = Roact.createElement(NewGui, {}, {})
+		Roact.mount(NewApp, Knit.Player.PlayerGui, "Forge")
 	end)
 
 	CloseUI.Event:Connect(function()
@@ -497,10 +501,6 @@ function ForgeController:KnitStart()
 		self:TogglePrompts(Prompts, true)
 		CharacterController:EnableMovement()
 	end)
-
-	local NewGui = require(ReplicatedStorage.Game.GUI.Forge)
-	local NewApp = Roact.createElement(NewGui, {}, {})
-	Roact.mount(NewApp, Knit.Player.PlayerGui, "Forge")
 end
 
 return ForgeController

@@ -2,12 +2,16 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
+local Workspace = game:GetService("Workspace")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local Forge = Roact.Component:extend("Forge")
+
+local Camera = Workspace.CurrentCamera
+local CameraPos = Workspace.Game.ForgeCameraPos
 
 local UIService
 local DataService
@@ -64,12 +68,17 @@ function Forge:didMount()
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
 	UIService:ToggleInventory(false)
+
+	Camera.CameraType = Enum.CameraType.Scriptable
+	Camera.CFrame = CameraPos.CFrame
 end
 
 function Forge:willUnmount()
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, true)
 	UIService:ToggleInventory(true)
+
+	Camera.CameraType = Enum.CameraType.Custom
 end
 
 function Forge:CreateButtons()

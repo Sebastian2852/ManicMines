@@ -1,206 +1,314 @@
 {
   "name": "Manic Mines",
-  "globIgnorePaths": [ "**/PackageLink.model.json" ],
-
+  "globIgnorePaths": [
+    "**/PackageLink.model.json"
+  ],
   "tree": {
     "$className": "DataModel",
-
     "ReplicatedStorage": {
       "Game": {
         "$path": "Source/Shared",
-        "Tests": { "$path": "Tests" }
+        "Tests": {
+          "$path": "Tests"
+        }
       },
       "Packages": {
         "$path": "Packages",
-        "TopbarPlus":{
-          "$path":"Submodules/TopbarPlus/src/Icon"
+        "TopbarPlus": {
+          "$path": "Submodules/TopbarPlus/src/Icon"
         },
-        "DialogueKit":{
-          "$path":"Submodules/DialogueKit.rbxm"
+        "DialogueKit": {
+          "$path": "Submodules/DialogueKit.rbxm"
         }
       },
-
-      "Assets":{
-        "$className":"Folder",
-        "Caves":{
-          "$className":"Folder",
-          "Random":{"$className":"Folder"}
-        },
-
-        "Sounds":{
-          "$className":"Folder",
-          "HitSound":{"$className":"Sound"},
-          "BreakSound":{"$className":"Sound"}
-        },
-        "Layers":{
-          "$className":"Folder"
-        },
-        "Levels":{
-          "$className":"Folder",
-          "0":{"$className":"Configuration"}
-        },
-        "Ores":{
-          "$className":"Folder"
-        },
-        "Pickaxe":{
-          "$className":"Folder",
-          "PickaxeSelection":{"$className":"SelectionBox"},
-          "Pickaxes":{
-            "$className":"Folder",
-            "0":{"$className":"Configuration"}
+      "Assets": {
+        "$className": "Folder",
+        "Caves": {
+          "$className": "Folder",
+          "Random": {
+            "$className": "Folder"
           }
         },
-        "Tycoon":{
-          "$className":"Folder",
-          "UpgradeSelection":{"$className":"SelectionBox"},
-          "TycoonModel":{
-            "$className":"Model",
-            "Main":{
-              "$className":"Folder",
-              "Spawn":{"$className":"Part"}
+        "Sounds": {
+          "$className": "Folder",
+          "HitSound": {
+            "$className": "Sound"
+          },
+          "BreakSound": {
+            "$className": "Sound"
+          }
+        },
+        "Layers": {
+          "$className": "Folder"
+        },
+        "Levels": {
+          "$className": "Folder",
+          "0": {
+            "$className": "Configuration"
+          }
+        },
+        "Ores": {
+          "$className": "Folder"
+        },
+        "Pickaxe": {
+          "$className": "Folder",
+          "PickaxeSelection": {
+            "$className": "SelectionBox"
+          },
+          "Pickaxes": {
+            "$className": "Folder",
+            "0": {
+              "$className": "Configuration"
+            }
+          }
+        },
+        "Tycoon": {
+          "$className": "Folder",
+          "UpgradeSelection": {
+            "$className": "SelectionBox"
+          },
+          "TycoonModel": {
+            "$className": "Model",
+            "Main": {
+              "$className": "Folder",
+              "Spawn": {
+                "$className": "Part"
+              }
             }
           },
-          "Upgrades":{"$className":"Folder"},
-          "Generators":{"$className":"Folder"}
-        },
-        "UI":{
-          "$className":"Folder",
-          "Audio":{
-            "$className":"Folder",
-            "ClickSound":{"$className":"Sound"},
-            "HoverSound":{"$className":"Sound"}
+          "Upgrades": {
+            "$className": "Folder"
           },
-          "LoadingScreenImages":{
-            "$className":"Folder"
+          "Generators": {
+            "$className": "Folder"
           }
         },
-
-        "Misc":{
-          "$className":"Folder",
-          "HeadLight":{
-            "$className":"PointLight",
+        "UI": {
+          "$className": "Folder",
+          "Audio": {
+            "$className": "Folder",
+            "ClickSound": {
+              "$className": "Sound"
+            },
+            "HoverSound": {
+              "$className": "Sound"
+            }
+          },
+          "LoadingScreenImages": {
+            "$className": "Folder"
+          }
+        },
+        "Misc": {
+          "$className": "Folder",
+          "HeadLight": {
+            "$className": "PointLight",
             "$properties": {
-              "Brightness":0.2,
-              "Enabled":true,
-              "Range":18,
-              "Shadows":false
+              "Brightness": 0.2,
+              "Enabled": true,
+              "Range": 18,
+              "Shadows": false
             }
           }
         },
-
-        "Stone":{"$className":"Part"}
+        "Stone": {
+          "$className": "Part"
+        }
       },
-
-      "Player":{
-        "$className":"Folder",
-        "ActiveSelectionBox":{"$className":"ObjectValue"},
-        "MainMenuReady":{"$className":"BoolValue"},
-        "PickaxeActive":{"$className":"BoolValue"},
-        "PickaxeEquipped":{"$className":"BoolValue"},
-        "PickaxeSelection":{"$className":"ObjectValue"},
-        "LastBlockColor":{"$className":"Color3Value"},
-        "Depth":{"$className":"NumberValue"},
-
-        "Debug":{
-          "$className":"Folder",
-          "DebugMode":{"$className":"BoolValue"},
-          "Mine":{
-            "$className":"Folder",
-            "BlocksGenerated":{"$className":"IntValue"},
-            "OresGenerated":{"$className":"IntValue"}
+      "Player": {
+        "$className": "Folder",
+        "ActiveSelectionBox": {
+          "$className": "ObjectValue"
+        },
+        "MainMenuReady": {
+          "$className": "BoolValue"
+        },
+        "PickaxeActive": {
+          "$className": "BoolValue"
+        },
+        "PickaxeEquipped": {
+          "$className": "BoolValue"
+        },
+        "PickaxeSelection": {
+          "$className": "ObjectValue"
+        },
+        "LastBlockColor": {
+          "$className": "Color3Value"
+        },
+        "Depth": {
+          "$className": "NumberValue"
+        },
+        "Debug": {
+          "$className": "Folder",
+          "DebugMode": {
+            "$className": "BoolValue"
           },
-          "Audio":{
-            "$className":"Folder",
-            "TotalSoundsMade":{"$className":"IntValue"},
-            "ActiveSounds":{"$className":"IntValue"},
-            "ActiveGlobalSounds":{"$className":"IntValue"},
-            "ActivePositionalSounds":{"$className":"IntValue"}
+          "Mine": {
+            "$className": "Folder",
+            "BlocksGenerated": {
+              "$className": "IntValue"
+            },
+            "OresGenerated": {
+              "$className": "IntValue"
+            }
+          },
+          "Audio": {
+            "$className": "Folder",
+            "TotalSoundsMade": {
+              "$className": "IntValue"
+            },
+            "ActiveSounds": {
+              "$className": "IntValue"
+            },
+            "ActiveGlobalSounds": {
+              "$className": "IntValue"
+            },
+            "ActivePositionalSounds": {
+              "$className": "IntValue"
+            }
           }
         }
       },
       "PlayerData": {
         "$className": "Folder",
         "Template": {
-          "$className":"Folder",
-          "Emblems":{"$className":"Folder"},
-          "TimesMined":{"$className":"Folder"},
-          "Settings":{"$className":"Folder"},
-
-          "Level":{"$className":"IntValue"},
-          "Gold":{"$className":"IntValue"},
-          "XP":{"$className":"IntValue"},
-          "TycoonName":{"$className":"StringValue"},
-
-          "DataLoaded":{"$className":"BoolValue"},
-          "InMine":{"$className":"BoolValue"},
-          "InTycoon":{"$className":"BoolValue"},
-          "ServerMining":{"$className":"BoolValue"},
-
-          "Inventory":{
-            "$className":"Folder",
-            "InventoryCap":{"$className":"IntValue"},
-            "InventoryItemCount":{"$className":"IntValue"},
-            "Ores":{"$className":"Folder"}
+          "$className": "Folder",
+          "Emblems": {
+            "$className": "Folder"
           },
-          "Storage":{
-            "$className":"Folder",
-            "StorageCap":{"$className":"IntValue"},
-            "StorageItemCount":{"$className":"IntValue"},
-            "Ores":{"$className":"Folder"}
+          "TimesMined": {
+            "$className": "Folder"
           },
-
-          "Tycoon":{
-            "$className":"Folder",
-            "Upgrades":{"$className":"Folder"},
-            "Generators":{"$className":"Folder"}
+          "Settings": {
+            "$className": "Folder"
           },
-
-          "Stats":{
-            "$className":"Folder",
-            "BlocksMined":{"$className":"IntValue"},
-            "DeepestMineLevel":{"$className":"IntValue"},
-            "HoursPlayed":{"$className":"IntValue"},
-            "TotalGoldEarned":{"$className":"IntValue"},
-            "TotalXpEarned":{"$className":"IntValue"}
+          "Level": {
+            "$className": "IntValue"
           },
-
-          "Pickaxes":{
-            "$className":"Folder",
-            "Owned":{"$className":"Folder"},
-            "Upgrades":{"$className":"Folder"},
-            "Equipped":{"$className":"IntValue"}
+          "Gold": {
+            "$className": "IntValue"
+          },
+          "XP": {
+            "$className": "IntValue"
+          },
+          "TycoonName": {
+            "$className": "StringValue"
+          },
+          "DataLoaded": {
+            "$className": "BoolValue"
+          },
+          "InMine": {
+            "$className": "BoolValue"
+          },
+          "InTycoon": {
+            "$className": "BoolValue"
+          },
+          "ServerMining": {
+            "$className": "BoolValue"
+          },
+          "Inventory": {
+            "$className": "Folder",
+            "InventoryCap": {
+              "$className": "IntValue"
+            },
+            "InventoryItemCount": {
+              "$className": "IntValue"
+            },
+            "Ores": {
+              "$className": "Folder"
+            }
+          },
+          "Storage": {
+            "$className": "Folder",
+            "StorageCap": {
+              "$className": "IntValue"
+            },
+            "StorageItemCount": {
+              "$className": "IntValue"
+            },
+            "Ores": {
+              "$className": "Folder"
+            }
+          },
+          "Tycoon": {
+            "$className": "Folder",
+            "Upgrades": {
+              "$className": "Folder"
+            },
+            "Generators": {
+              "$className": "Folder"
+            }
+          },
+          "Stats": {
+            "$className": "Folder",
+            "BlocksMined": {
+              "$className": "IntValue"
+            },
+            "DeepestMineLevel": {
+              "$className": "IntValue"
+            },
+            "HoursPlayed": {
+              "$className": "IntValue"
+            },
+            "TotalGoldEarned": {
+              "$className": "IntValue"
+            },
+            "TotalXpEarned": {
+              "$className": "IntValue"
+            }
+          },
+          "Pickaxes": {
+            "$className": "Folder",
+            "Owned": {
+              "$className": "Folder"
+            },
+            "Upgrades": {
+              "$className": "Folder"
+            },
+            "Equipped": {
+              "$className": "IntValue"
+            }
           }
         }
       }
     },
-
-    "Workspace":{
+    "Workspace": {
       "$properties": {
-        "StreamingMinRadius":64,
-        "StreamingTargetRadius":350
+        "StreamingMinRadius": 64,
+        "StreamingTargetRadius": 350
       },
-
-      "Game":{
-        "$className":"Folder",
-        "Mine":{"$className":"Folder"},
-        "Players":{"$className":"Folder"},
-        "Teleports":{
-          "$className":"Folder",
-          "Surface":{"$className":"Part"}
+      "Game": {
+        "$className": "Folder",
+        "Mine": {
+          "$className": "Folder"
         },
-        "Tycoons":{"$className":"Folder"},
-
-        "MineSpawn":{"$className":"Part"},
-        "TycoonsSpawn":{"$className":"Part"}
+        "Players": {
+          "$className": "Folder"
+        },
+        "Teleports": {
+          "$className": "Folder",
+          "Surface": {
+            "$className": "Part"
+          }
+        },
+        "Tycoons": {
+          "$className": "Folder"
+        },
+        "MineSpawn": {
+          "$className": "Part"
+        },
+        "TycoonsSpawn": {
+          "$className": "Part"
+        },
+        "ForgeCameraPos": {
+          "$className": "Part"
+        }
       }
     },
-
     "ServerScriptService": {
       "Game": {
         "$path": "Source/Server"
       }
     },
-
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "Game": {
@@ -208,96 +316,322 @@
         }
       }
     },
-
     "ServerStorage": {
-      "Resources":{
+      "Resources": {
         "$path": "Resources",
-        "RandomCaveConfig":{
-          "$className":"Configuration",
-          "$properties": {
-            "Attributes":{
-              "DepthRange": {"NumberRange": [0, 0]},
-              "NoiseResolution": {"Vector3": [0, 0, 0]},
-              "NoiseResolutionOffset": {"Vector3": [0, 0, 0]},
-              "NoiseThreshold": {"Int32": 0},
-              "Size": {"NumberRange": [0, 0]},
-              "Rarity": {"Int32": 0},
-              "TestMode": {"Bool": false},
-              "Tint": {"Color3": [1, 1, 1]}
-            }
-          }
-        },
-        "Ore":{
-          "$className":"Part",
-          "$properties": {
-            "Size": [6, 6, 6],
-            "Attributes":{
-              "DisplayName": {"String": ""},
-              "Health": {"Int64": 0},
-              "MaxHealth": {"Int64": 0},
-              "XP": {"Int64": 0},
-              "AmountDroppedWhenMined": {"Int32": 0},
-              
-              "Rarity": {"Int64": 0},
-              "SpawningRange": {"NumberRange": [0, 0]},
-              "SpawningCurve": {"NumberSequence": {"keypoints": [{"time": 0.0,"value": 0.0,"envelope": 0.0},{"time": 1.0,"value": 0.0,"envelope": 0.0}]}},
-
-              "CoinValue": {"Int64": 0},
-              "EmblemCost": {"Int32": 0},
-              "EmblemImageID": {"String": ""},
-
-              "CaveMultiplier": {"Int32": 0},
-              "CaveOnly": {"Bool": false},
-              "NoCave": {"Bool": false},
-
-              "InventoryBackgroundColor": {"ColorSequence": {"keypoints": [{"time": 0.0,"color": [1.0, 1.0, 1.0]},{"time": 1.0,"color": [0.0, 0.0, 0.0]}]}},
-              "MiningBarGradient": {"ColorSequence": {"keypoints": [{"time": 0.0,"color": [1.0, 1.0, 1.0]},{"time": 1.0,"color": [0.0, 0.0, 0.0]}]}},
-              "SelectionColor": {"Color3": [1.0, 1.0, 1.0]},
-
-              
-              "GeodeColorTint": {"Color3": [1.0, 1.0, 1.0]},
-              "CanGenerateGeode": {"Bool": false},
-              "GeodeGenerationChance": {"Int64": 0}
-            }
-          }
-        },
-
-        "Layer":{
-          "$className":"Configuration",
-          "$properties": {
-            "Attributes":{
-              "DisplayName": {"String": ""},
-              "Depth": {"NumberRange": [0, 0]},
-              "Color": {"ColorSequence": {"keypoints": [{"time": 0.0,"color": [1.0, 1.0, 1.0]},{"time": 1.0,"color": [0.0, 0.0, 0.0]}]}}
-            }
-          }
-        },
-
-        "Level":{
-          "$className":"Configuration",
+        "RandomCaveConfig": {
+          "$className": "Configuration",
           "$properties": {
             "Attributes": {
-              "LevelName": {"String": ""},
-              "LevelColor": {"Color3": [1.0, 1.0, 1.0]},
-              "LevelXpBarColor": {"ColorSequence": {"keypoints": [{"time": 0.0,"color": [1.0, 1.0, 1.0]},{"time": 1.0,"color": [0.0, 0.0, 0.0]}]}},
-              "XpNeeded": {"Int64": 0}
+              "DepthRange": {
+                "NumberRange": [
+                  0,
+                  0
+                ]
+              },
+              "NoiseResolution": {
+                "Vector3": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "NoiseResolutionOffset": {
+                "Vector3": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "NoiseThreshold": {
+                "Int32": 0
+              },
+              "Size": {
+                "NumberRange": [
+                  0,
+                  0
+                ]
+              },
+              "Rarity": {
+                "Int32": 0
+              },
+              "TestMode": {
+                "Bool": false
+              },
+              "Tint": {
+                "Color3": [
+                  1,
+                  1,
+                  1
+                ]
+              }
             }
           }
         },
-
-        "Pickaxe":{
-          "$className":"Configuration",
-          "Ores":{"$className":"Folder"},
-          "Upgrades":{"$className":"Folder"},
-          "Pickaxe":{"$className":"Tool"},
+        "Ore": {
+          "$className": "Part",
+          "$properties": {
+            "Size": [
+              6,
+              6,
+              6
+            ],
+            "Attributes": {
+              "DisplayName": {
+                "String": ""
+              },
+              "Health": {
+                "Int64": 0
+              },
+              "MaxHealth": {
+                "Int64": 0
+              },
+              "XP": {
+                "Int64": 0
+              },
+              "AmountDroppedWhenMined": {
+                "Int32": 0
+              },
+              "Rarity": {
+                "Int64": 0
+              },
+              "SpawningRange": {
+                "NumberRange": [
+                  0,
+                  0
+                ]
+              },
+              "SpawningCurve": {
+                "NumberSequence": {
+                  "keypoints": [
+                    {
+                      "time": 0.0,
+                      "value": 0.0,
+                      "envelope": 0.0
+                    },
+                    {
+                      "time": 1.0,
+                      "value": 0.0,
+                      "envelope": 0.0
+                    }
+                  ]
+                }
+              },
+              "CoinValue": {
+                "Int64": 0
+              },
+              "EmblemCost": {
+                "Int32": 0
+              },
+              "EmblemImageID": {
+                "String": ""
+              },
+              "CaveMultiplier": {
+                "Int32": 0
+              },
+              "CaveOnly": {
+                "Bool": false
+              },
+              "NoCave": {
+                "Bool": false
+              },
+              "InventoryBackgroundColor": {
+                "ColorSequence": {
+                  "keypoints": [
+                    {
+                      "time": 0.0,
+                      "color": [
+                        1.0,
+                        1.0,
+                        1.0
+                      ]
+                    },
+                    {
+                      "time": 1.0,
+                      "color": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ]
+                    }
+                  ]
+                }
+              },
+              "MiningBarGradient": {
+                "ColorSequence": {
+                  "keypoints": [
+                    {
+                      "time": 0.0,
+                      "color": [
+                        1.0,
+                        1.0,
+                        1.0
+                      ]
+                    },
+                    {
+                      "time": 1.0,
+                      "color": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ]
+                    }
+                  ]
+                }
+              },
+              "SelectionColor": {
+                "Color3": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "GeodeColorTint": {
+                "Color3": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "CanGenerateGeode": {
+                "Bool": false
+              },
+              "GeodeGenerationChance": {
+                "Int64": 0
+              }
+            }
+          }
+        },
+        "Layer": {
+          "$className": "Configuration",
           "$properties": {
             "Attributes": {
-              "Name": {"String": ""},
-              "Description": {"String": ""},
-              "ButtonGradient": {"ColorSequence": {"keypoints": [{"time": 0.0,"color": [1.0, 1.0, 1.0]},{"time": 1.0,"color": [0.0, 0.0, 0.0]}]}},
-              "Icon": {"Content": ""},
-              "MainUpgrade": {"String": ""},
-              "OwnedByDefault": {"Bool": false}
+              "DisplayName": {
+                "String": ""
+              },
+              "Depth": {
+                "NumberRange": [
+                  0,
+                  0
+                ]
+              },
+              "Color": {
+                "ColorSequence": {
+                  "keypoints": [
+                    {
+                      "time": 0.0,
+                      "color": [
+                        1.0,
+                        1.0,
+                        1.0
+                      ]
+                    },
+                    {
+                      "time": 1.0,
+                      "color": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "Level": {
+          "$className": "Configuration",
+          "$properties": {
+            "Attributes": {
+              "LevelName": {
+                "String": ""
+              },
+              "LevelColor": {
+                "Color3": [
+                  1.0,
+                  1.0,
+                  1.0
+                ]
+              },
+              "LevelXpBarColor": {
+                "ColorSequence": {
+                  "keypoints": [
+                    {
+                      "time": 0.0,
+                      "color": [
+                        1.0,
+                        1.0,
+                        1.0
+                      ]
+                    },
+                    {
+                      "time": 1.0,
+                      "color": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ]
+                    }
+                  ]
+                }
+              },
+              "XpNeeded": {
+                "Int64": 0
+              }
+            }
+          }
+        },
+        "Pickaxe": {
+          "$className": "Configuration",
+          "Ores": {
+            "$className": "Folder"
+          },
+          "Upgrades": {
+            "$className": "Folder"
+          },
+          "Pickaxe": {
+            "$className": "Tool"
+          },
+          "$properties": {
+            "Attributes": {
+              "Name": {
+                "String": ""
+              },
+              "Description": {
+                "String": ""
+              },
+              "ButtonGradient": {
+                "ColorSequence": {
+                  "keypoints": [
+                    {
+                      "time": 0.0,
+                      "color": [
+                        1.0,
+                        1.0,
+                        1.0
+                      ]
+                    },
+                    {
+                      "time": 1.0,
+                      "color": [
+                        0.0,
+                        0.0,
+                        0.0
+                      ]
+                    }
+                  ]
+                }
+              },
+              "Icon": {
+                "Content": ""
+              },
+              "MainUpgrade": {
+                "String": ""
+              },
+              "OwnedByDefault": {
+                "Bool": false
+              }
             }
           }
         }
