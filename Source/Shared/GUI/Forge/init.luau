@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
@@ -43,6 +44,16 @@ function Forge:CreateLockedButton()
 			NameColor = Color3.fromHex("3f3f3f"),
 		}, {}),
 	})
+end
+
+function Forge:didMount()
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
+end
+
+function Forge:willUnmount()
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, true)
 end
 
 function Forge:render()
