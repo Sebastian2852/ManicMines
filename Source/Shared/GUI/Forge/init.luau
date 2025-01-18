@@ -1,12 +1,16 @@
+-- # selene: allow(mixed_table)
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local Forge = Roact.Component:extend("Forge")
 
 local UIService
+local DataService
 
 local PickaxeButton = require(script.PickaxeButton)
 local Theme = require(script.Parent.Theme)
@@ -51,9 +55,12 @@ end
 
 function Forge:init()
 	UIService = Knit.GetService("UIService")
+	DataService = Knit.GetService("DataService")
 end
 
 function Forge:didMount()
+	self:CreateButtons()
+
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
 	UIService:ToggleInventory(false)
@@ -65,7 +72,33 @@ function Forge:willUnmount()
 	UIService:ToggleInventory(true)
 end
 
+function Forge:CreateButtons()
+	DataService:GetPlayerDataFolder():andThen(function(DataFolder: Core.DataFolder)
+		local Elements = {}
+
+		for _, v: BoolValue in pairs(DataFolder.Pickaxes.Owned:GetChildren()) do
+			local PickaxeConfig = ReplicatedStorage.Assets.Pickaxe.Pickaxes:FindFirstChild(v.Name)
+			if not PickaxeConfig then
+				warn("No config")
+				continue
+			end
+
+			if v.Value == true then
+				table.insert(Elements, self:CreateOwnedButton(PickaxeConfig:GetAttribute("Name")))
+			else
+				table.insert(Elements, self:CreateUnOwnedButton(PickaxeConfig:GetAttribute("Name")))
+			end
+		end
+
+		self:setState({
+			Buttons = Elements,
+		})
+	end)
+end
+
 function Forge:render()
+	local PickaxeButtons = self.state.Buttons :: { [number]: Roact.Element } or {}
+
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
 		ClipToDeviceSafeArea = false,
@@ -145,9 +178,7 @@ function Forge:render()
 							PaddingBottom = UDim.new(0, 10),
 						}, {}),
 
-						UnOwned = Forge:CreateUnOwnedButton("Un Owned"),
-						Bought = Forge:CreateOwnedButton("Owned"),
-						Locked = Forge:CreateLockedButton(),
+						table.unpack(PickaxeButtons),
 					}),
 				}),
 			}),
