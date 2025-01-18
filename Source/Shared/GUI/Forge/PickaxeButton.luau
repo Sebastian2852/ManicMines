@@ -28,8 +28,40 @@ function PickaxeButton:render()
 			CornerRadius = UDim.new(0, 7),
 		}, {}),
 
+		Padding = Roact.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 10),
+			PaddingLeft = UDim.new(0, 10),
+			PaddingRight = UDim.new(0, 10),
+			PaddingBottom = UDim.new(0, 10),
+		}, {}),
+
+		Layout = Roact.createElement("UIListLayout", {
+			Padding = UDim.new(0, 10),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			FillDirection = Enum.FillDirection.Horizontal,
+			HorizontalFlex = Enum.UIFlexAlignment.Fill,
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
+		}, {}),
+
+		Image = Roact.createElement("ImageLabel", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = 1,
+
+			Image = Theme.Images.Missing,
+			ScaleType = Enum.ScaleType.Fit,
+		}, {
+			AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
+				AspectRatio = 1,
+				AspectType = Enum.AspectType.ScaleWithParentSize,
+				DominantAxis = Enum.DominantAxis.Height,
+			}, {}),
+		}),
+
 		PickaxeName = Roact.createElement("TextLabel", {
-			Size = UDim2.fromScale(1, 0.7),
+			Size = UDim2.fromScale(1, 1),
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundTransparency = 1,
@@ -38,7 +70,7 @@ function PickaxeButton:render()
 
 			Text = PickaxeName,
 			TextScaled = true,
-			TextXAlignment = Enum.TextXAlignment.Center,
+			TextXAlignment = Enum.TextXAlignment.Left,
 			TextColor3 = NameColor,
 			FontFace = Theme.Font,
 		}, {}),
