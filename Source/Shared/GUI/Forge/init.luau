@@ -12,7 +12,7 @@ local Signal = require(ReplicatedStorage.Packages.Signal)
 local Forge = Roact.Component:extend("Forge")
 
 local Camera = Workspace.CurrentCamera
-local CameraPos = Workspace.Game.ForgeCameraPos
+local CameraPos = Workspace.Game:FindFirstChild("ForgeCameraPos")
 
 local UIService
 local DataService
@@ -65,13 +65,16 @@ end
 
 function Forge:didMount()
 	self:CreateButtons()
+	CameraPos = Workspace.Game:FindFirstChild("ForgeCameraPos")
 
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
 	UIService:ToggleInventory(false)
 
-	Camera.CameraType = Enum.CameraType.Scriptable
-	Camera.CFrame = CameraPos.CFrame
+	if CameraPos then
+		Camera.CameraType = Enum.CameraType.Scriptable
+		Camera.CFrame = CameraPos.CFrame
+	end
 end
 
 function Forge:willUnmount()
