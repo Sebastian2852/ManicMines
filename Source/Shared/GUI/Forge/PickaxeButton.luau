@@ -18,6 +18,7 @@ end
 function PickaxeButton:render()
 	local PickaxeName = self.props.Name or "[UNKOWN]"
 	local NameColor = self.props.NameColor or Color3.new(1, 1, 1)
+	local PickaxeConfig = self.props.PickaxeConfig or ReplicatedStorage.Assets.Pickaxe.Pickaxes["0"]
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
@@ -43,7 +44,7 @@ function PickaxeButton:render()
 			Text = "",
 
 			[Roact.Event.MouseButton1Click] = function()
-				Display.ShowPickaxe(ReplicatedStorage.Assets.Pickaxe.Pickaxes["0"])
+				Display.ShowPickaxe(PickaxeConfig)
 			end,
 		}, {}),
 

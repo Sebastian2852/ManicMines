@@ -24,7 +24,7 @@ local InfoFrame = require(script.InfoFrame)
 local PickaxeButton = require(script.PickaxeButton)
 local Theme = require(script.Parent.Theme)
 
-function Forge:CreateOwnedButton(Name: string)
+function Forge:CreateOwnedButton(Name: string, Config: Configuration)
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 0.08),
 		BackgroundTransparency = 1,
@@ -32,11 +32,12 @@ function Forge:CreateOwnedButton(Name: string)
 	}, {
 		App = Roact.createElement(PickaxeButton, {
 			Name = Name,
+			PickaxeConfig = Config,
 		}, {}),
 	})
 end
 
-function Forge:CreateUnOwnedButton(Name: string)
+function Forge:CreateUnOwnedButton(Name: string, Config: Configuration)
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 0.08),
 		BackgroundTransparency = 1,
@@ -45,6 +46,7 @@ function Forge:CreateUnOwnedButton(Name: string)
 		App = Roact.createElement(PickaxeButton, {
 			Name = Name,
 			NameColor = Color3.fromHex("3f3f3f"),
+			PickaxeConfig = Config,
 		}, {}),
 	})
 end
@@ -108,9 +110,9 @@ function Forge:CreateButtons()
 			end
 
 			if v.Value == true then
-				table.insert(Elements, self:CreateOwnedButton(PickaxeConfig:GetAttribute("Name")))
+				table.insert(Elements, self:CreateOwnedButton(PickaxeConfig:GetAttribute("Name"), PickaxeConfig))
 			else
-				table.insert(Elements, self:CreateUnOwnedButton(PickaxeConfig:GetAttribute("Name")))
+				table.insert(Elements, self:CreateUnOwnedButton(PickaxeConfig:GetAttribute("Name"), PickaxeConfig))
 			end
 		end
 
