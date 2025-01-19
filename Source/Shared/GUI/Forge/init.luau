@@ -288,6 +288,7 @@ function Forge:render()
 						Power = Power,
 						Range = Range,
 						Delay = Delay,
+						Name = SelectedConfig:GetAttribute("Name"),
 						Costs = Costs and Core.OreList.CreateFromFolder(Costs),
 					}, {}),
 				}),

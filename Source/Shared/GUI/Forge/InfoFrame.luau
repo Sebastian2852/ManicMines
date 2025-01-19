@@ -35,9 +35,10 @@ function InfoFrame:CreateCostsFragment(Costs: Core.OreList)
 end
 
 function InfoFrame:render()
-	local Power = self.props.Power or "[UNKOWN]"
-	local Range = self.props.Range or "[UNKOWN]"
-	local Delay = self.props.Delay or "[UNKOWN]"
+	local Power = self.props.Power or "[UNKNOWN]"
+	local Range = self.props.Range or "[UNKNOWN]"
+	local Delay = self.props.Delay or "[UNKNOWN]"
+	local PickaxeName = self.props.Name or "[UNKNOWN]"
 
 	local Costs = self.props.Costs or Core.OreList.New()
 
@@ -76,7 +77,7 @@ function InfoFrame:render()
 				BorderSizePixel = 0,
 				LayoutOrder = 1,
 
-				Text = "[PICKAXE NAME]",
+				Text = PickaxeName,
 				TextScaled = true,
 				TextColor3 = Theme.TextColor,
 				FontFace = Theme.Font,
