@@ -163,6 +163,8 @@ function Forge:render()
 	local Power = SelectedTool and SelectedTool:GetAttribute("Damage") or -1
 	local Range = SelectedTool and SelectedTool:GetAttribute("Range") or -1
 
+	local Costs = SelectedConfig and SelectedConfig:FindFirstChild("Ores")
+
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
 		ClipToDeviceSafeArea = false,
@@ -284,6 +286,7 @@ function Forge:render()
 						Power = Power,
 						Range = Range,
 						Delay = Delay,
+						Costs = Costs and Core.OreList.CreateFromFolder(Costs),
 					}, {}),
 				}),
 
