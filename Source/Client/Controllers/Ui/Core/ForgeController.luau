@@ -2,7 +2,6 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
-local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -79,29 +78,6 @@ function ForgeController:KnitStart()
 		local Prompts = CollectionService:GetTagged(Tag)
 		self:TogglePrompts(Prompts, true)
 	end)
-
-	local FloatingInfo = require(ReplicatedStorage.Game.GUI.Common.FloatingInfo)
-	local TestApp = Roact.createElement("ScreenGui", {}, {
-		Right = Roact.createElement("Frame", {
-			Size = UDim2.fromScale(0.2, 0.2),
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-		}, {
-			App = Roact.createElement(FloatingInfo),
-		}),
-
-		Left = Roact.createElement("Frame", {
-			Size = UDim2.fromScale(0.2, 0.2),
-			BackgroundTransparency = 1,
-			BorderSizePixel = 0,
-		}, {
-			App = Roact.createElement(FloatingInfo, {
-				Direction = Enums.FloatingInfoDirection.Left,
-			}),
-		}),
-	})
-
-	Roact.mount(TestApp, Knit.Player.PlayerGui, "FloatingLabel")
 end
 
 return ForgeController

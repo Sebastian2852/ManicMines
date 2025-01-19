@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.trove)
 
 local Camera = Workspace.CurrentCamera
@@ -8,7 +9,7 @@ local Camera = Workspace.CurrentCamera
 local Display = {}
 
 Display.Trove = Trove.new()
-
+Display.SetCurrentPickaxe = Signal.new()
 Display.CurrentPickaxe = nil :: Model | nil
 
 function Display.HidePickaxe()
@@ -27,6 +28,7 @@ function Display.ShowPickaxe(PickaxeConfig: Configuration)
 	end
 
 	Display.HidePickaxe()
+	Display.SetCurrentPickaxe:Fire(PickaxeConfig)
 	local Model = Instance.new("Model")
 
 	for _, v in pairs(Tool:GetChildren()) do

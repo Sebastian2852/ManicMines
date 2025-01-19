@@ -6,6 +6,7 @@ local Workspace = game:GetService("Workspace")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Display = require(script.Display)
+local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -18,6 +19,7 @@ local CameraPos = Workspace.Game:FindFirstChild("ForgeCameraPos")
 local UIService
 local DataService
 
+local FloatingInfo = require(ReplicatedStorage.Game.GUI.Common.FloatingInfo)
 local PickaxeButton = require(script.PickaxeButton)
 local Theme = require(script.Parent.Theme)
 
@@ -62,6 +64,12 @@ end
 function Forge:init()
 	UIService = Knit.GetService("UIService")
 	DataService = Knit.GetService("DataService")
+
+	Display.SetCurrentPickaxe:Connect(function(Pickaxe: Configuration)
+		self:setState({
+			CurrentPickaxe = Pickaxe,
+		})
+	end)
 end
 
 function Forge:didMount()
@@ -111,9 +119,48 @@ function Forge:CreateButtons()
 	end)
 end
 
+function Forge:CreateLeftInfo(Top: string, Bottom: string, Position: UDim2, AnchorPoint: Vector2)
+	return Roact.createElement("Frame", {
+		Size = UDim2.fromScale(0.2, 0.2),
+		Position = Position,
+		AnchorPoint = AnchorPoint,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+	}, {
+		App = Roact.createElement(FloatingInfo, {
+			TopText = Top,
+			BottomText = Bottom,
+			Direction = Enums.FloatingInfoDirection.Left,
+		}, {}),
+	})
+end
+
+function Forge:CreateRightInfo(Top: string, Bottom: string, Position: UDim2, AnchorPoint: Vector2)
+	return Roact.createElement("Frame", {
+		Size = UDim2.fromScale(0.2, 0.2),
+		Position = Position,
+		AnchorPoint = AnchorPoint,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+	}, {
+		App = Roact.createElement(FloatingInfo, {
+			TopText = Top,
+			BottomText = Bottom,
+			Direction = Enums.FloatingInfoDirection.Right,
+		}, {}),
+	})
+end
+
 function Forge:render()
 	local PickaxeButtons = self.state.Buttons :: { [number]: Roact.Element } or {}
 	local CloseSignal: Signal.Signal = self.props.CloseSignal
+
+	local SelectedConfig = self.state.CurrentPickaxe :: Configuration
+	local SelectedTool = SelectedConfig and SelectedConfig:FindFirstChildWhichIsA("Tool")
+
+	local Delay = SelectedTool and SelectedTool:GetAttribute("Delay") or -1
+	local Power = SelectedTool and SelectedTool:GetAttribute("Damage") or -1
+	local Range = SelectedTool and SelectedTool:GetAttribute("Range") or -1
 
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
@@ -218,6 +265,33 @@ function Forge:render()
 						table.unpack(PickaxeButtons),
 					}),
 				}),
+			}),
+
+			Info = SelectedConfig and Roact.createElement("Frame", {
+				Size = UDim2.fromScale(1, 1),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+			}, {
+				Power = self:CreateRightInfo(
+					"Power",
+					tostring(Power),
+					UDim2.fromScale(0.59, 0.25),
+					Vector2.new(0.5, 0.5)
+				),
+
+				Range = self:CreateRightInfo(
+					"Range",
+					tostring(Range),
+					UDim2.fromScale(0.59, 0.5),
+					Vector2.new(0.5, 0.5)
+				),
+
+				Delay = self:CreateLeftInfo(
+					"Delay",
+					tostring(Delay),
+					UDim2.fromScale(0.405, 0.45),
+					Vector2.new(0.5, 0.5)
+				),
 			}),
 		}),
 	})
