@@ -1,5 +1,6 @@
 -- # selene: allow(mixed_table)
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local Workspace = game:GetService("Workspace")
@@ -23,6 +24,22 @@ local FloatingInfo = require(ReplicatedStorage.Game.GUI.Common.FloatingInfo)
 local InfoFrame = require(script.InfoFrame)
 local PickaxeButton = require(script.PickaxeButton)
 local Theme = require(script.Parent.Theme)
+
+local function IsPickaxeLocked(Pickaxe: Configuration): boolean
+	local MainUpgrade = Pickaxe:GetAttribute("MainUpgrade")
+	local LevelValue = Pickaxe.Upgrades:WaitForChild(MainUpgrade)
+	local NeededLevel = LevelValue.Value
+
+	local DataFolder = ReplicatedStorage.PlayerData:FindFirstChild(tostring(Players.LocalPlayer.UserId))
+	local DataValue = DataFolder.Tycoon.Upgrades:FindFirstChild(MainUpgrade)
+	local CurrentLevel = DataValue.Value
+
+	if CurrentLevel >= NeededLevel then
+		return false
+	end
+
+	return true
+end
 
 local function GetPickaxeImage(Config: Configuration): string
 	local MainOre = Config:FindFirstChild("MainOre") :: StringValue
@@ -71,10 +88,11 @@ function Forge:CreateLockedButton(Config: Configuration)
 		LayoutOrder = tonumber(Config.Name),
 	}, {
 		App = Roact.createElement(PickaxeButton, {
+			PickaxeConfig = Config,
 			Name = "???",
 			Image = GetPickaxeImage(Config),
 			NameColor = Color3.fromHex("3f3f3f"),
-			ImageColor = Color3.fromHex("3f3f3f"),
+			ImageColor = Color3.new(0, 0, 0),
 		}, {}),
 	})
 end
@@ -121,6 +139,11 @@ function Forge:CreateButtons()
 			local PickaxeConfig = ReplicatedStorage.Assets.Pickaxe.Pickaxes:FindFirstChild(v.Name)
 			if not PickaxeConfig then
 				warn("No config")
+				continue
+			end
+
+			if IsPickaxeLocked(PickaxeConfig) then
+				table.insert(Elements, self:CreateLockedButton(PickaxeConfig))
 				continue
 			end
 
@@ -181,6 +204,7 @@ function Forge:render()
 	local Range = SelectedTool and SelectedTool:GetAttribute("Range") or -1
 
 	local Costs = SelectedConfig and SelectedConfig:FindFirstChild("Ores")
+	local IsLocked = SelectedConfig and IsPickaxeLocked(SelectedConfig) or false
 
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
@@ -300,31 +324,31 @@ function Forge:render()
 					BorderSizePixel = 0,
 				}, {
 					App = Roact.createElement(InfoFrame, {
-						Power = Power,
-						Range = Range,
-						Delay = Delay,
-						Name = SelectedConfig:GetAttribute("Name"),
-						Costs = Costs and Core.OreList.CreateFromFolder(Costs),
+						Power = IsLocked and "???" or Power,
+						Range = IsLocked and "???" or Range,
+						Delay = IsLocked and "???" or Delay,
+						Name = IsLocked and "???" or SelectedConfig:GetAttribute("Name"),
+						Costs = IsLocked and Core.OreList.New() or (Costs and Core.OreList.CreateFromFolder(Costs)),
 					}, {}),
 				}),
 
 				Power = self:CreateRightInfo(
 					"Power",
-					tostring(Power),
+					IsLocked and "???" or tostring(Power),
 					UDim2.fromScale(0.59, 0.25),
 					Vector2.new(0.5, 0.5)
 				),
 
 				Range = self:CreateRightInfo(
 					"Range",
-					tostring(Range),
+					IsLocked and "???" or tostring(Range),
 					UDim2.fromScale(0.59, 0.5),
 					Vector2.new(0.5, 0.5)
 				),
 
 				Delay = self:CreateLeftInfo(
 					"Delay",
-					tostring(Delay),
+					IsLocked and "???" or tostring(Delay),
 					UDim2.fromScale(0.405, 0.45),
 					Vector2.new(0.5, 0.5)
 				),
