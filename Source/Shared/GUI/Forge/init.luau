@@ -7,6 +7,7 @@ local Workspace = game:GetService("Workspace")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local Forge = Roact.Component:extend("Forge")
 
@@ -107,6 +108,7 @@ end
 
 function Forge:render()
 	local PickaxeButtons = self.state.Buttons :: { [number]: Roact.Element } or {}
+	local CloseSignal: Signal.Signal = self.props.CloseSignal
 
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
@@ -147,6 +149,27 @@ function Forge:render()
 					RichText = true,
 					FontFace = Theme.Font,
 				}, {}),
+
+				CloseButton = Roact.createElement("TextButton", {
+					Size = UDim2.fromScale(0.1, 0.1),
+					Position = UDim2.new(0.5, 0, 0.4, 10),
+					AnchorPoint = Vector2.new(0.5, 0),
+					BackgroundColor3 = Theme.BackgroundColorRed,
+					BorderSizePixel = 0,
+
+					Text = "<- Back",
+					TextColor3 = Color3.new(1, 1, 1),
+					TextScaled = true,
+					FontFace = Theme.Font,
+
+					[Roact.Event.MouseButton1Click] = function()
+						CloseSignal:Fire()
+					end,
+				}, {
+					Corners = Roact.createElement("UICorner", {
+						CornerRadius = UDim.new(0, 7),
+					}, {}),
+				}),
 			}),
 
 			Left = Roact.createElement("Frame", {

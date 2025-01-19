@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local CreatOreLikeFrame = require(ReplicatedStorage.Game.GUI.Components.General.OrelikeFrame)
 local CreateForgeButton = require(ReplicatedStorage.Game.GUI.Components.Forge.PickaxeButton)
@@ -50,7 +51,7 @@ end
 
 local ForgeComponent = Roact.Component:extend("Forge")
 
-local CloseUI = Instance.new("BindableEvent")
+local CloseUI = Signal.new()
 
 function ForgeComponent:init()
 	self:setState({
@@ -467,13 +468,12 @@ function ForgeController:KnitStart()
 	PickaxeService = Knit.GetService("PickaxeService")
 	CharacterController = Knit.GetController("CharacterController")
 
-	local Prompts = {}
+	local Tag = ""
 
-	ForgeService:GetPromptTag():andThen(function(Tag)
-		Prompts = CollectionService:GetTagged(Tag)
+	ForgeService:GetPromptTag():andThen(function(PromptTag)
+		Tag = PromptTag
 	end)
 
-	local App
 	local GUI
 
 	DataService.DataLoaded:Connect(function(PlayerDataFolder: Core.DataFolder)
@@ -481,25 +481,21 @@ function ForgeController:KnitStart()
 	end)
 
 	ForgeService.OpenForge:Connect(function()
-		-- App = Roact.createElement(
-		-- 	ForgeComponent,
-		-- 	{ Pickaxes = Core.Assets.Pickaxe.Pickaxes:GetChildren(), Equipped = EquippedPickaxe }
-		-- )
-		-- self:TogglePrompts(Prompts, false)
-		-- CharacterController:DisableMovement()
-		-- GUI = Roact.mount(App, Knit.Player.PlayerGui, "Forge")
-		-- LogService:Log("Mounted Forge GUI")
-
 		local NewGui = require(ReplicatedStorage.Game.GUI.Forge)
-		local NewApp = Roact.createElement(NewGui, {}, {})
-		Roact.mount(NewApp, Knit.Player.PlayerGui, "Forge")
+		local NewApp = Roact.createElement(NewGui, {
+			CloseSignal = CloseUI,
+		}, {})
+		GUI = Roact.mount(NewApp, Knit.Player.PlayerGui, "Forge")
+		CharacterController:DisableMovement()
+		local Prompts = CollectionService:GetTagged(Tag)
+		self:TogglePrompts(Prompts, false)
 	end)
 
-	CloseUI.Event:Connect(function()
+	CloseUI:Connect(function()
 		Roact.unmount(GUI)
-		LogService:Log("Unmounted Forge GUI")
-		self:TogglePrompts(Prompts, true)
 		CharacterController:EnableMovement()
+		local Prompts = CollectionService:GetTagged(Tag)
+		self:TogglePrompts(Prompts, true)
 	end)
 end
 
