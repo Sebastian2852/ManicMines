@@ -2,14 +2,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local StatFrame = Roact.PureComponent:extend("StatFrame")
+local IconLabel = Roact.PureComponent:extend("IconLabel")
 
-local Theme = require(script.Parent.Parent.Parent.Theme)
+local Theme = require(script.Parent.Parent.Theme)
 
-function StatFrame:render()
+function IconLabel:render()
 	local LayoutOrder = self.props.LayoutOrder or 0
 	local IconImage = self.props.Image or Theme.Images.Missing
-	local Text = self.props.Text or "[UNKOWN]"
+	local Text = self.props.Text or "[UNKNOWN]"
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
@@ -55,4 +55,4 @@ function StatFrame:render()
 	})
 end
 
-return StatFrame
+return IconLabel

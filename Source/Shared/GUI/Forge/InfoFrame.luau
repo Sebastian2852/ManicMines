@@ -4,16 +4,16 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local InfoFrame = Roact.Component:extend("InfoFrame")
 
-local StatFrame = require(script.StatFrame)
+local IconLabel = require(ReplicatedStorage.Game.GUI.Common.IconLabel)
 local Theme = require(script.Parent.Parent.Theme)
 
-function InfoFrame:CreateStatFrame(Text: string, IconImage: string, LayoutOrder: number)
+function InfoFrame:CreateIconLabel(Text: string, IconImage: string, LayoutOrder: number)
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 0.3),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 	}, {
-		App = Roact.createElement(StatFrame, {
+		App = Roact.createElement(IconLabel, {
 			LayoutOrder = LayoutOrder,
 			Image = IconImage,
 			Text = Text,
@@ -97,9 +97,9 @@ function InfoFrame:render()
 						VerticalAlignment = Enum.VerticalAlignment.Center,
 					}, {}),
 
-					Power = self:CreateStatFrame(Power, Theme.Images.Power, 1),
-					Range = self:CreateStatFrame(Range, Theme.Images.Range, 1),
-					Delay = self:CreateStatFrame(Delay, Theme.Images.Delay, 1),
+					Power = self:CreateIconLabel(Power, Theme.Images.Power, 1),
+					Range = self:CreateIconLabel(Range, Theme.Images.Range, 1),
+					Delay = self:CreateIconLabel(Delay, Theme.Images.Delay, 1),
 				}),
 			}),
 		}),
