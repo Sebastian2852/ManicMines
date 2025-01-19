@@ -7,7 +7,7 @@ local InfoFrame = Roact.Component:extend("InfoFrame")
 local StatFrame = require(script.StatFrame)
 local Theme = require(script.Parent.Parent.Theme)
 
-function InfoFrame:CreateInfoFrame(Text: string, IconImage: string, LayoutOrder: number)
+function InfoFrame:CreateStatFrame(Text: string, IconImage: string, LayoutOrder: number)
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 0.3),
 		BackgroundTransparency = 1,
@@ -97,9 +97,9 @@ function InfoFrame:render()
 						VerticalAlignment = Enum.VerticalAlignment.Center,
 					}, {}),
 
-					Power = self:CreateInfoFrame(Power, Theme.Images.Power, 1),
-					Range = self:CreateInfoFrame(Range, Theme.Images.Range, 1),
-					Delay = self:CreateInfoFrame(Delay, Theme.Images.Delay, 1),
+					Power = self:CreateStatFrame(Power, Theme.Images.Power, 1),
+					Range = self:CreateStatFrame(Range, Theme.Images.Range, 1),
+					Delay = self:CreateStatFrame(Delay, Theme.Images.Delay, 1),
 				}),
 			}),
 		}),
