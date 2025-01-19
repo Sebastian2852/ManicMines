@@ -36,5 +36,10 @@ Enums.StorageOreFrameType = {
 	Storage = CreateEnumValue(),
 }
 
+Enums.FloatingInfoDirection = {
+	Left = CreateEnumValue(),
+	Right = CreateEnumValue(),
+}
+
 table.freeze(Enums)
 return Enums
