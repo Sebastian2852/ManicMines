@@ -20,6 +20,7 @@ local UIService
 local DataService
 
 local FloatingInfo = require(ReplicatedStorage.Game.GUI.Common.FloatingInfo)
+local InfoFrame = require(script.InfoFrame)
 local PickaxeButton = require(script.PickaxeButton)
 local Theme = require(script.Parent.Theme)
 
@@ -231,7 +232,7 @@ function Forge:render()
 			}, {
 				Pickaxes = Roact.createElement("Frame", {
 					Size = UDim2.fromScale(0.7, 0.8),
-					Position = UDim2.fromScale(0.1, 0.5),
+					Position = UDim2.new(0, 10, 0.5, 0),
 					AnchorPoint = Vector2.new(0, 0.5),
 					BackgroundColor3 = Color3.new(0, 0, 0),
 					BackgroundTransparency = 0.5,
@@ -272,6 +273,16 @@ function Forge:render()
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 			}, {
+				PickaxeInfo = Roact.createElement("Frame", {
+					Size = UDim2.fromScale(0.15, 0.5),
+					Position = UDim2.new(1, -10, 0.5, 0),
+					AnchorPoint = Vector2.new(1, 0.5),
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+				}, {
+					App = Roact.createElement(InfoFrame, {}, {}),
+				}),
+
 				Power = self:CreateRightInfo(
 					"Power",
 					tostring(Power),
