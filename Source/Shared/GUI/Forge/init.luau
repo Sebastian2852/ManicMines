@@ -24,15 +24,24 @@ local InfoFrame = require(script.InfoFrame)
 local PickaxeButton = require(script.PickaxeButton)
 local Theme = require(script.Parent.Theme)
 
+local function GetPickaxeImage(Config: Configuration): string
+	local MainOre = Config:FindFirstChild("MainOre") :: StringValue
+	local Ore = ReplicatedStorage.Assets.Ores:FindFirstChild(MainOre.Value)
+		or ReplicatedStorage.Assets.Stone :: BasePart
+	return Ore:GetAttribute("EmblemImageID")
+end
+
 function Forge:CreateOwnedButton(Name: string, Config: Configuration)
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 0.08),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
+		LayoutOrder = tonumber(Config.Name),
 	}, {
 		App = Roact.createElement(PickaxeButton, {
-			Name = Name,
 			PickaxeConfig = Config,
+			Name = Name,
+			Image = GetPickaxeImage(Config),
 		}, {}),
 	})
 end
@@ -42,24 +51,30 @@ function Forge:CreateUnOwnedButton(Name: string, Config: Configuration)
 		Size = UDim2.fromScale(1, 0.08),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
+		LayoutOrder = tonumber(Config.Name),
 	}, {
 		App = Roact.createElement(PickaxeButton, {
-			Name = Name,
-			NameColor = Color3.fromHex("3f3f3f"),
 			PickaxeConfig = Config,
+			Name = Name,
+			Image = GetPickaxeImage(Config),
+			NameColor = Color3.fromHex("3f3f3f"),
+			ImageColor = Color3.fromHex("3f3f3f"),
 		}, {}),
 	})
 end
 
-function Forge:CreateLockedButton()
+function Forge:CreateLockedButton(Config: Configuration)
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 0.08),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
+		LayoutOrder = tonumber(Config.Name),
 	}, {
 		App = Roact.createElement(PickaxeButton, {
 			Name = "???",
+			Image = GetPickaxeImage(Config),
 			NameColor = Color3.fromHex("3f3f3f"),
+			ImageColor = Color3.fromHex("3f3f3f"),
 		}, {}),
 	})
 end

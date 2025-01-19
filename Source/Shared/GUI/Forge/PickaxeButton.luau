@@ -18,6 +18,8 @@ end
 function PickaxeButton:render()
 	local PickaxeName = self.props.Name or "[UNKOWN]"
 	local NameColor = self.props.NameColor or Color3.new(1, 1, 1)
+	local Image = self.props.Image or Theme.Images.Missing
+	local ImageColor = self.props.ImageColor or Color3.new(1, 1, 1)
 	local PickaxeConfig = self.props.PickaxeConfig or ReplicatedStorage.Assets.Pickaxe.Pickaxes["0"]
 
 	return Roact.createElement("Frame", {
@@ -69,7 +71,8 @@ function PickaxeButton:render()
 				BorderSizePixel = 0,
 				LayoutOrder = 1,
 
-				Image = Theme.Images.Missing,
+				Image = Image,
+				ImageColor3 = ImageColor,
 				ScaleType = Enum.ScaleType.Fit,
 			}, {
 				AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
