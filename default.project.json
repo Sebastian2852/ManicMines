@@ -301,6 +301,9 @@
         },
         "ForgeCameraPos": {
           "$className": "Part"
+        },
+        "ForgePickaxePos": {
+          "$className": "Part"
         }
       }
     },

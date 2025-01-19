@@ -5,6 +5,7 @@ local StarterGui = game:GetService("StarterGui")
 local Workspace = game:GetService("Workspace")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Display = require(script.Display)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -83,6 +84,7 @@ function Forge:willUnmount()
 	UIService:ToggleInventory(true)
 
 	Camera.CameraType = Enum.CameraType.Custom
+	Display:CleanUp()
 end
 
 function Forge:CreateButtons()

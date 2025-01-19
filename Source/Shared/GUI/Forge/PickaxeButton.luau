@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Display = require(script.Parent.Display)
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
@@ -42,6 +43,17 @@ function PickaxeButton:render()
 			HorizontalFlex = Enum.UIFlexAlignment.Fill,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			VerticalAlignment = Enum.VerticalAlignment.Center,
+		}, {}),
+
+		ClickArea = Roact.createElement("TextButton", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Text = "",
+
+			[Roact.Event.MouseButton1Click] = function()
+				Display.ShowPickaxe(ReplicatedStorage.Assets.Pickaxe.Pickaxes["0"])
+			end,
 		}, {}),
 
 		Image = Roact.createElement("ImageLabel", {
