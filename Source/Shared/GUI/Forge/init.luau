@@ -280,7 +280,11 @@ function Forge:render()
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
 				}, {
-					App = Roact.createElement(InfoFrame, {}, {}),
+					App = Roact.createElement(InfoFrame, {
+						Power = Power,
+						Range = Range,
+						Delay = Delay,
+					}, {}),
 				}),
 
 				Power = self:CreateRightInfo(

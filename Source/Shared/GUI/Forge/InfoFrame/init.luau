@@ -22,6 +22,10 @@ function InfoFrame:CreateInfoFrame(Text: string, IconImage: string, LayoutOrder:
 end
 
 function InfoFrame:render()
+	local Power = self.props.Power or "[UNKOWN]"
+	local Range = self.props.Range or "[UNKOWN]"
+	local Delay = self.props.Delay or "[UNKOWN]"
+
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
@@ -93,9 +97,9 @@ function InfoFrame:render()
 						VerticalAlignment = Enum.VerticalAlignment.Center,
 					}, {}),
 
-					Power = self:CreateInfoFrame("Power", Theme.Images.Power, 1),
-					Range = self:CreateInfoFrame("Range", Theme.Images.Range, 1),
-					Delay = self:CreateInfoFrame("Delay", Theme.Images.Delay, 1),
+					Power = self:CreateInfoFrame(Power, Theme.Images.Power, 1),
+					Range = self:CreateInfoFrame(Range, Theme.Images.Range, 1),
+					Delay = self:CreateInfoFrame(Delay, Theme.Images.Delay, 1),
 				}),
 			}),
 		}),
