@@ -11,6 +11,7 @@ local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Signal = require(ReplicatedStorage.Packages.Signal)
+local Signals = require(script.Parent.Signals)
 
 local Forge = Roact.Component:extend("Forge")
 
@@ -133,6 +134,8 @@ function Forge:didMount()
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
 	UIService:ToggleInventory(false)
+	Signals.ToggleHUDButtons:Fire(false)
+	Signals.ToggleHUDGold:Fire(false)
 
 	if CameraPos then
 		Camera.CameraType = Enum.CameraType.Scriptable
@@ -144,6 +147,8 @@ function Forge:willUnmount()
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, true)
 	UIService:ToggleInventory(true)
+	Signals.ToggleHUDButtons:Fire(true)
+	Signals.ToggleHUDGold:Fire(true)
 
 	Camera.CameraType = Enum.CameraType.Custom
 	Display:CleanUp()

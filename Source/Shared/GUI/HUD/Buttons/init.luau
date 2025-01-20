@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Signals = require(script.Parent.Parent.Signals)
 
 local Buttons = Roact.Component:extend("Buttons")
 
@@ -19,19 +20,26 @@ function Buttons:init()
 		local InTycoon = DataFolder.InTycoon
 
 		InTycoon:GetPropertyChangedSignal("Value"):Connect(function()
-			self:setState {
+			self:setState({
 				InTycoon = InTycoon.Value,
-			}
+			})
 		end)
 
-		self:setState {
+		self:setState({
 			InTycoon = InTycoon.Value,
-		}
+		})
+	end)
+
+	Signals.ToggleHUDButtons:Connect(function(New: boolean)
+		self:setState({
+			Hidden = not New,
+		})
 	end)
 end
 
 function Buttons:render()
 	local InTycoon = self.state.InTycoon or false
+	local Hidden = self.state.Hidden or false
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
@@ -51,6 +59,7 @@ function Buttons:render()
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 1,
+			Visible = not Hidden,
 		}, {
 			AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
 				AspectRatio = 1,
@@ -72,6 +81,7 @@ function Buttons:render()
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 2,
+			Visible = not Hidden,
 		}, {
 			AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
 				AspectRatio = 1,
