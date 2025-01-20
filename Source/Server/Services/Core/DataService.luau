@@ -5,12 +5,12 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local DataService = Knit.CreateService {
+local DataService = Knit.CreateService({
 	Name = "DataService",
 	Client = {
 		DataLoaded = Knit.CreateSignal(),
 	},
-}
+})
 
 local PickaxeService
 local LogService
@@ -521,6 +521,7 @@ function DataService:HandleCosts(Player: Player, CostList: Core.OreList): boolea
 		return false
 	end
 	PlayerStatsService:TakeOres(Player, CostList)
+	return true
 end
 
 --[[ CLIENT ]]

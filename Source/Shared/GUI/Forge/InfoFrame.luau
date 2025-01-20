@@ -3,12 +3,19 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Display = require(script.Parent.Display)
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+
+local PickaxeService
 
 local InfoFrame = Roact.Component:extend("InfoFrame")
 
 local IconLabel = require(ReplicatedStorage.Game.GUI.Common.IconLabel)
 local Theme = require(script.Parent.Parent.Theme)
+
+local Equipping = false
+local Buying = false
 
 function InfoFrame:CreateIconLabel(Text: string, IconImage: string, LayoutOrder: number)
 	return Roact.createElement("Frame", {
@@ -34,13 +41,138 @@ function InfoFrame:CreateCostsFragment(Costs: Core.OreList)
 	return Roact.createFragment(Elements)
 end
 
+function InfoFrame:CreateEquipButton(ConfigName: string)
+	return Roact.createElement("TextButton", {
+		Size = UDim2.fromScale(0.8, 0.4),
+		Position = UDim2.new(0.5, 0, 1, -10),
+		AnchorPoint = Vector2.new(0.5, 1),
+		BackgroundColor3 = Theme.BackgroundColorBlue,
+		BorderSizePixel = 0,
+
+		Text = "Equip",
+		TextScaled = true,
+		TextColor3 = Theme.TextColor,
+		FontFace = Theme.Font,
+
+		[Roact.Event.MouseButton1Click] = function()
+			if Equipping then
+				warn("Already eqiupping")
+				return
+			end
+			Equipping = true
+			local Config = ReplicatedStorage.Assets.Pickaxe.Pickaxes:FindFirstChild(ConfigName)
+			PickaxeService:EquipPickaxe(Config):andThen(function()
+				Display.ShowPickaxe(Config)
+				Equipping = false
+			end)
+		end,
+	}, {
+		Corners = Roact.createElement("UICorner", {
+			CornerRadius = UDim.new(0, 7),
+		}, {}),
+	})
+end
+
+function InfoFrame:CreateEquippedButton()
+	return Roact.createElement("TextLabel", {
+		Size = UDim2.fromScale(0.8, 0.4),
+		Position = UDim2.new(0.5, 0, 1, -10),
+		AnchorPoint = Vector2.new(0.5, 1),
+		BackgroundColor3 = Theme.BackgroundColorBlue:Lerp(Color3.new(0, 0, 0), 0.5),
+		BorderSizePixel = 0,
+
+		Text = "Equipped",
+		TextScaled = true,
+		TextColor3 = Theme.TextColorDisabled,
+		FontFace = Theme.Font,
+	}, {
+		Corners = Roact.createElement("UICorner", {
+			CornerRadius = UDim.new(0, 7),
+		}, {}),
+	})
+end
+
+function InfoFrame:CreateBuyButton(ConfigName: string)
+	return Roact.createElement("TextButton", {
+		Size = UDim2.fromScale(0.8, 0.4),
+		Position = UDim2.new(0.5, 0, 1, -10),
+		AnchorPoint = Vector2.new(0.5, 1),
+		BackgroundColor3 = Theme.BackgroundColorGreen,
+		BorderSizePixel = 0,
+
+		Text = "Buy",
+		TextScaled = true,
+		TextColor3 = Theme.TextColor,
+		FontFace = Theme.Font,
+
+		[Roact.Event.MouseButton1Click] = function()
+			if Buying then
+				return
+			end
+			Buying = true
+			local Config = ReplicatedStorage.Assets.Pickaxe.Pickaxes:FindFirstChild(ConfigName)
+
+			PickaxeService:BuyPickaxe(Config):andThen(function()
+				Display.ShowPickaxe(Config)
+				Display.UpdateButtons:Fire()
+				Buying = false
+			end)
+		end,
+	}, {
+		Corners = Roact.createElement("UICorner", {
+			CornerRadius = UDim.new(0, 7),
+		}, {}),
+	})
+end
+
+function InfoFrame:CreateDisabledBuyButton()
+	return Roact.createElement("TextLabel", {
+		Size = UDim2.fromScale(0.8, 0.4),
+		Position = UDim2.new(0.5, 0, 1, -10),
+		AnchorPoint = Vector2.new(0.5, 1),
+		BackgroundColor3 = Theme.BackgroundColorGreen:Lerp(Color3.new(0, 0, 0), 0.5),
+		BorderSizePixel = 0,
+
+		Text = "Buy",
+		TextScaled = true,
+		TextColor3 = Theme.TextColorDisabled,
+		FontFace = Theme.Font,
+	}, {
+		Corners = Roact.createElement("UICorner", {
+			CornerRadius = UDim.new(0, 7),
+		}, {}),
+	})
+end
+
+function InfoFrame:init()
+	PickaxeService = Knit.GetService("PickaxeService")
+end
+
 function InfoFrame:render()
 	local Power = self.props.Power or "[UNKNOWN]"
 	local Range = self.props.Range or "[UNKNOWN]"
 	local Delay = self.props.Delay or "[UNKNOWN]"
 	local PickaxeName = self.props.Name or "[UNKNOWN]"
+	local ConfigName = self.props.ConfigName or "0"
 
+	local ShowButton = self.props.ShowButton or false
+	local Unlocked = self.props.Unlocked or false
+	local Equipped = self.props.Equipped or false
 	local Costs = self.props.Costs or Core.OreList.New()
+
+	local Button
+
+	if ShowButton then
+		if Equipped then
+			Button = self:CreateEquippedButton()
+		elseif Unlocked and not Equipped then
+			Button = self:CreateEquipButton(ConfigName)
+		else
+			Button = self:CreateBuyButton(ConfigName)
+		end
+	else
+		Button = self:CreateDisabledBuyButton()
+	end
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
@@ -159,6 +291,15 @@ function InfoFrame:render()
 
 					self:CreateCostsFragment(Costs),
 				}),
+			}),
+
+			Action = Roact.createElement("Frame", {
+				Size = UDim2.fromScale(1, 0.3),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 4,
+			}, {
+				App = Button,
 			}),
 		}),
 	})

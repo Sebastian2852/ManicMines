@@ -11,6 +11,7 @@ local Display = {}
 
 Display.Trove = Trove.new()
 Display.SetCurrentPickaxe = Signal.new()
+Display.UpdateButtons = Signal.new()
 Display.CurrentPickaxe = nil :: Model | nil
 
 local function IsPickaxeLocked(Pickaxe: Configuration): boolean

@@ -41,6 +41,20 @@ local function IsPickaxeLocked(Pickaxe: Configuration): boolean
 	return true
 end
 
+local function IsPickaxeBought(Pickaxe: Configuration): boolean
+	local DataFolder: Core.DataFolder =
+		ReplicatedStorage.PlayerData:FindFirstChild(tostring(Players.LocalPlayer.UserId))
+	local DataValue = DataFolder.Pickaxes.Owned:FindFirstChild(Pickaxe.Name)
+
+	return DataValue.Value
+end
+
+local function IsPickaxeEquipped(Pickaxe: Configuration): boolean
+	local DataFolder: Core.DataFolder =
+		ReplicatedStorage.PlayerData:FindFirstChild(tostring(Players.LocalPlayer.UserId))
+	return DataFolder.Pickaxes.Equipped.Value == tonumber(Pickaxe.Name)
+end
+
 local function GetPickaxeImage(Config: Configuration): string
 	local MainOre = Config:FindFirstChild("MainOre") :: StringValue
 	local Ore = ReplicatedStorage.Assets.Ores:FindFirstChild(MainOre.Value)
@@ -105,6 +119,10 @@ function Forge:init()
 		self:setState({
 			CurrentPickaxe = Pickaxe,
 		})
+	end)
+
+	Display.UpdateButtons:Connect(function()
+		self:CreateButtons()
 	end)
 end
 
@@ -205,6 +223,8 @@ function Forge:render()
 
 	local Costs = SelectedConfig and SelectedConfig:FindFirstChild("Ores")
 	local IsLocked = SelectedConfig and IsPickaxeLocked(SelectedConfig) or false
+	local IsUnlocked = SelectedConfig and IsPickaxeBought(SelectedConfig) or false
+	local Equipped = SelectedConfig and IsPickaxeEquipped(SelectedConfig) or false
 
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
@@ -328,6 +348,10 @@ function Forge:render()
 						Range = IsLocked and "???" or Range,
 						Delay = IsLocked and "???" or Delay,
 						Name = IsLocked and "???" or SelectedConfig:GetAttribute("Name"),
+						ShowButton = not IsLocked,
+						Unlocked = IsUnlocked,
+						Equipped = Equipped,
+						ConfigName = SelectedConfig and SelectedConfig.Name,
 						Costs = IsLocked and Core.OreList.New() or (Costs and Core.OreList.CreateFromFolder(Costs)),
 					}, {}),
 				}),
