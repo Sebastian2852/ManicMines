@@ -3,8 +3,9 @@ local TweenService = game:GetService("TweenService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local NeoHotbar = require(ReplicatedStorage.Packages.NeoHotbar)
+local Signals = require(ReplicatedStorage.Game.GUI.Signals)
 
-local HotbarController = Knit.CreateController { Name = "HotbarController" }
+local HotbarController = Knit.CreateController({ Name = "HotbarController" })
 
 local DataService
 local SpringTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0)
@@ -88,6 +89,14 @@ function HotbarController:KnitStart()
 		NeoHotbar:Start()
 		self.GUI = Knit.Player.PlayerGui:FindFirstChild("NeoHotbar") :: ScreenGui
 		self.MainFrame = self.GUI:FindFirstChildWhichIsA("Frame")
+
+		Signals.ToggleHotbar:Connect(function(New: boolean)
+			if New then
+				self:EnableHotbar(true)
+			else
+				self:DisableHotbar(true)
+			end
+		end)
 	end)
 end
 

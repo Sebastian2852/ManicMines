@@ -136,6 +136,7 @@ function Forge:didMount()
 	UIService:ToggleInventory(false)
 	Signals.ToggleHUDButtons:Fire(false)
 	Signals.ToggleHUDGold:Fire(false)
+	Signals.ToggleHotbar:Fire(false)
 
 	if CameraPos then
 		Camera.CameraType = Enum.CameraType.Scriptable
@@ -149,6 +150,7 @@ function Forge:willUnmount()
 	UIService:ToggleInventory(true)
 	Signals.ToggleHUDButtons:Fire(true)
 	Signals.ToggleHUDGold:Fire(true)
+	Signals.ToggleHotbar:Fire(true)
 
 	Camera.CameraType = Enum.CameraType.Custom
 	Display:CleanUp()
