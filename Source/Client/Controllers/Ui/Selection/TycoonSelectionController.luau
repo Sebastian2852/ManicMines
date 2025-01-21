@@ -5,9 +5,9 @@ local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local TycoonSelectionController = Knit.CreateController {
+local TycoonSelectionController = Knit.CreateController({
 	Name = "TycoonSelectionController",
-}
+})
 
 local TycoonService
 local LogService
@@ -86,22 +86,22 @@ end
 local TycoonSelectionComponent = Roact.Component:extend("TycoonSelection")
 
 function TycoonSelectionComponent:init()
-	self:setState {
+	self:setState({
 		Show = false,
 		UpgradeName = "",
 		UpgradeDescription = "",
-	}
+	})
 
 	TycoonService.SelectUpgrade:Connect(function(UpgradeName: string)
 		local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
 		local NextConfig =
 			UpgradeConfig:FindFirstChild(tostring(DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName).Value + 1))
-		self:setState {
+		self:setState({
 			Show = true,
 			UpgradeName = UpgradeName,
 			UpgradeDescription = UpgradeConfig:GetAttribute("Description"),
 			NextConfig = NextConfig,
-		}
+		})
 	end)
 end
 
@@ -132,9 +132,9 @@ function TycoonSelectionComponent:render()
 				FontFace = Core.UI.Theme.TextFont,
 
 				[Roact.Event.MouseButton1Click] = function()
-					self:setState {
+					self:setState({
 						Show = false,
-					}
+					})
 					TycoonSelectionController:Deselect()
 				end,
 			}, {
@@ -235,9 +235,9 @@ function TycoonSelectionComponent:render()
 						[Roact.Event.MouseButton1Click] = function()
 							TycoonService:Upgrade(Selection.Name):andThen(function(Success: boolean)
 								if Success then
-									self:setState {
+									self:setState({
 										Show = false,
-									}
+									})
 									TycoonSelectionController:Deselect()
 								end
 							end)
@@ -276,6 +276,9 @@ function TycoonSelectionController:KnitStart()
 			self:SelectHitbox(Hitbox)
 		end)
 	end)
+
+	local NewGUI = require(ReplicatedStorage.Game.GUI.TycoonSelection)
+	Roact.mount(Roact.createElement(NewGUI), Knit.Player.PlayerGui, "[NEW] Tycoon Selection [NEW]")
 end
 
 return TycoonSelectionController
