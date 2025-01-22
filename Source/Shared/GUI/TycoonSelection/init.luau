@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local TycoonSelection = Roact.Component:extend("TycoonSelection")
@@ -8,6 +9,11 @@ local CostFrame = require(script.CostFrame)
 local Theme = require(script.Parent.Theme)
 
 function TycoonSelection:render()
+	local UpgradeConfig = self.props.UpgradeConfig or ReplicatedStorage.Assets.Tycoon.Upgrades:GetChildren()[1]
+	local LevelConfig = self.props.LevelConfig or UpgradeConfig:GetChildren()[1]
+	local NextLevelConfig: Configuration = UpgradeConfig:FindFirstChild(tonumber(LevelConfig.Name) + 1)
+	local Costs = NextLevelConfig and Core.OreList.CreateFromFolder(NextLevelConfig.Costs) or nil
+
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
 	}, {
@@ -95,7 +101,7 @@ function TycoonSelection:render()
 						}),
 					}),
 
-					Right = Roact.createElement("Frame", {
+					Right = NextLevelConfig and Roact.createElement("Frame", {
 						Size = UDim2.fromScale(0.3, 1),
 						Position = UDim2.fromScale(1, 0.5),
 						AnchorPoint = Vector2.new(1, 0.5),
@@ -132,7 +138,9 @@ function TycoonSelection:render()
 							BorderSizePixel = 0,
 							LayoutOrder = 2,
 						}, {
-							App = Roact.createElement(CostFrame, {}, {}),
+							App = Roact.createElement(CostFrame, {
+								Orelist = Costs,
+							}, {}),
 						}),
 
 						Action = Roact.createElement("Frame", {

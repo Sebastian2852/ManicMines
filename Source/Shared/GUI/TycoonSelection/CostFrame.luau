@@ -13,10 +13,6 @@ local IconLabel = require(script.Parent.Parent.Common.IconLabel)
 function CostFrame:GetFrames()
 	local Orelist = self.props.OreList or Core.OreList.New()
 
-	Orelist:AddOre("Stone", 300)
-	Orelist:AddOre("Gold", 15)
-	Orelist:AddOre("Iron", 301)
-
 	local Promises = {}
 	local Elements = {}
 
