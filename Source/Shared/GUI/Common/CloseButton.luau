@@ -6,8 +6,10 @@ local CloseButton = Roact.PureComponent:extend("CloseButton")
 local Theme = require(script.Parent.Parent.Theme)
 
 function CloseButton:render()
+	local Size = self.props.Size or UDim2.fromScale(1, 0.09)
+
 	return Roact.createElement("TextButton", {
-		Size = UDim2.fromScale(0.1, 0.09),
+		Size = Size,
 		Position = UDim2.fromScale(0.994, 0.012),
 		AnchorPoint = Vector2.new(1, 0),
 		BackgroundColor3 = Theme.BackgroundColorRed,
@@ -27,11 +29,12 @@ function CloseButton:render()
 		end,
 	}, {
 		Corners = Roact.createElement("UICorner", {
-			CornerRadius = UDim.new(0, 5),
+			CornerRadius = UDim.new(0, 7),
 		}),
 
 		AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
 			AspectRatio = 1,
+			DominantAxis = Enum.DominantAxis.Height,
 		}),
 	})
 end

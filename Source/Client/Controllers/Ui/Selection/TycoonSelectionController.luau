@@ -66,6 +66,9 @@ function TycoonSelectionController:SelectHitbox(Hitbox)
 	local App = Roact.createElement(SelectionGUI, {
 		UpgradeConfig = Config,
 		LevelConfig = LevelConfig,
+		Close = function()
+			self:Deselect()
+		end,
 	}, {})
 
 	ActiveTree = Roact.mount(App, Knit.Player.PlayerGui, "Tycoon Selection")

@@ -5,6 +5,7 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local TycoonSelection = Roact.Component:extend("TycoonSelection")
 
+local CloseButton = require(script.Parent.Common.CloseButton)
 local CostFrame = require(script.CostFrame)
 local Theme = require(script.Parent.Theme)
 
@@ -13,6 +14,9 @@ function TycoonSelection:render()
 	local LevelConfig = self.props.LevelConfig or UpgradeConfig:GetChildren()[1]
 	local NextLevelConfig: Configuration = UpgradeConfig:FindFirstChild(tonumber(LevelConfig.Name) + 1)
 	local Costs = NextLevelConfig and Core.OreList.CreateFromFolder(NextLevelConfig.Costs) or nil
+	local Close = self.props.Close or function()
+		warn("No close func?")
+	end
 
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
@@ -46,6 +50,14 @@ function TycoonSelection:render()
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
 				}, {
+					CloseButton = Roact.createElement(CloseButton, {
+						Size = UDim2.fromScale(0.05, 1),
+
+						OnClick = function()
+							Close()
+						end,
+					}, {}),
+
 					Left = Roact.createElement("Frame", {
 						Size = UDim2.fromScale(0.7, 1),
 						BackgroundTransparency = 1,
