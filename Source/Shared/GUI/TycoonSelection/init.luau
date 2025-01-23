@@ -18,6 +18,9 @@ function TycoonSelection:render()
 		warn("No close func?")
 	end
 
+	local UpgradeName = UpgradeConfig:GetAttribute("UpgradeName")
+	local UpgradeDescription = UpgradeConfig:GetAttribute("Description")
+
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
 	}, {
@@ -79,7 +82,7 @@ function TycoonSelection:render()
 								BackgroundTransparency = 1,
 								BorderSizePixel = 0,
 
-								Text = "[UPGRADE NAME]",
+								Text = UpgradeName,
 								TextScaled = true,
 								TextXAlignment = Enum.TextXAlignment.Left,
 								FontFace = Theme.Font,
@@ -98,7 +101,7 @@ function TycoonSelection:render()
 								BackgroundTransparency = 1,
 								BorderSizePixel = 0,
 
-								Text = "[UPGRADE DESC]",
+								Text = UpgradeDescription,
 								TextScaled = true,
 								TextXAlignment = Enum.TextXAlignment.Left,
 								TextYAlignment = Enum.TextYAlignment.Top,
@@ -151,7 +154,7 @@ function TycoonSelection:render()
 							LayoutOrder = 2,
 						}, {
 							App = Roact.createElement(CostFrame, {
-								Orelist = Costs,
+								OreList = Costs,
 							}, {}),
 						}),
 
