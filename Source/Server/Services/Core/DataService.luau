@@ -2,7 +2,6 @@ local DataStoreService = game:GetService("DataStoreService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
-local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local DataService = Knit.CreateService({
@@ -467,49 +466,34 @@ function DataService:DeleteSlot(Player: Player, SlotNumber: number)
 end
 
 --[=[
-Returns true/false depending on if the given player can afford the given orelist
+	Check if the player has enough of a single ore
 ]=]
-function DataService:CanAfford(Player: Player, OreList: Core.OreList, Includes: Enums.Enum): boolean
+function DataService:CanAffordOre(Player: Player, Ore: Core.OreListItem): boolean
 	local DataFolder = self:GetPlayerDataFolder(Player)
 
-	local CheckInventory = false
-	local CheckStorage = false
-
-	if Includes == Enums.CostInclude.Both then
-		CheckInventory = true
-		CheckStorage = true
-	elseif Enums.CostInclude.Inventory then
-		CheckInventory = true
-	elseif Enums.CostInclude.Storage then
-		CheckStorage = true
+	if Ore.Name == "GoldCoins" then
+		local Amount = DataFolder.Gold.Value
+		return Amount >= Ore.Amount
 	end
 
-	for OreName: string, OreData: Core.OreListItem in pairs(OreList:LoopList()) do
-		if OreName == "GoldCoins" then
-			local PlayerGold = DataFolder.Gold.Value or 0
-			if PlayerGold < OreData.Amount then
-				return false
-			end
-			continue
-		end
+	local InventoryDataValue = DataFolder.Inventory.Ores:FindFirstChild(Ore.Name) :: IntValue
+	local StorageDataValue = DataFolder.Storage.Ores:FindFirstChild(Ore.Name) :: IntValue
 
-		local PlayerAmount = 0
+	local Amount = InventoryDataValue.Value + StorageDataValue.Value
 
-		if CheckInventory then
-			local InventoryValue = DataFolder.Inventory.Ores:FindFirstChild(OreName)
-			PlayerAmount += InventoryValue.Value or 0
-		end
+	return Amount >= Ore.Amount
+end
 
-		if CheckStorage then
-			local StorageValue = DataFolder.Storage.Ores:FindFirstChild(OreName)
-			PlayerAmount += StorageValue.Value or 0
-		end
-
-		if PlayerAmount < OreData.Amount then
+--[=[
+Returns true/false depending on if the given player can afford the given orelist
+]=]
+function DataService:CanAfford(Player: Player, Ores: Core.OreList): boolean
+	for _, Ore in pairs(Ores:LoopList()) do
+		local HasEnough = self:CanAffordOre(Player, Ore)
+		if not HasEnough then
 			return false
 		end
 	end
-
 	return true
 end
 
@@ -517,7 +501,7 @@ end
 Handles the given costs for the given player. Returns true/false for success
 ]=]
 function DataService:HandleCosts(Player: Player, CostList: Core.OreList): boolean
-	if not self:CanAfford(Player, CostList, Enums.CostInclude.Inventory) then
+	if not self:CanAfford(Player, CostList) then
 		return false
 	end
 	PlayerStatsService:TakeOres(Player, CostList)
