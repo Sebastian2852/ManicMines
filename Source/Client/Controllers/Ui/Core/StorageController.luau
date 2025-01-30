@@ -9,7 +9,7 @@ local CreateBasicListLayout = require(ReplicatedStorage.Game.GUI.Elements.BasicL
 local CreateOreFrame = require(ReplicatedStorage.Game.GUI.Components.Storage.StorageOreFrame)
 local CreateRoundedCorners = require(ReplicatedStorage.Game.GUI.Elements.Corners)
 
-local StorageController = Knit.CreateController { Name = "StorageController" }
+local StorageController = Knit.CreateController({ Name = "StorageController" })
 
 local TycoonUpgradeService
 local DataService
@@ -46,20 +46,20 @@ end
 local StorageComponent = Roact.Component:extend("StorageComponent")
 
 function StorageComponent:init()
-	self:setState {
+	self:setState({
 		Enabled = true,
-	}
+	})
 
 	TycoonUpgradeService.OpenStorage:Connect(function()
-		self:setState {
+		self:setState({
 			Enabled = true,
-		}
+		})
 	end)
 
 	StorageService.OpenStorage:Connect(function()
-		self:setState {
+		self:setState({
 			Enabled = true,
-		}
+		})
 	end)
 
 	StorageService.Update:Connect(function()
@@ -114,9 +114,9 @@ function StorageComponent:render()
 				FontFace = Core.UI.Theme.TextFont,
 
 				[Roact.Event.MouseButton1Click] = function()
-					self:setState {
+					self:setState({
 						Enabled = false,
-					}
+					})
 				end,
 			}, {
 				Corners = CreateRoundedCorners(0.2),
@@ -264,7 +264,7 @@ function StorageController:KnitStart()
 
 	DataService.DataLoaded:Connect(function(Data: Core.DataFolder)
 		DataFolder = Data
-		local App = Roact.createElement(StorageComponent)
+		local App = Roact.createElement(require(ReplicatedStorage.Game.GUI.Storage))
 		Roact.mount(App, Knit.Player.PlayerGui, "Storage")
 		LogService:Log("Mounted storage component")
 	end)
