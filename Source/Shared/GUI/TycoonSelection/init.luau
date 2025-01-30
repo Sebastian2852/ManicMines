@@ -151,7 +151,7 @@ function TycoonSelection:render()
 							LayoutOrder = 2,
 						}, {
 							App = Roact.createElement(CostFrame, {
-								Orelist = Costs,
+								OreList = Costs,
 							}, {}),
 						}),
 

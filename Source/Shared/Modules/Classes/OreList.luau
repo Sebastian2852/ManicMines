@@ -220,7 +220,7 @@ end
 function OreList:LoopList(): { OreListItem }
 	local List = self._Ores
 	if self._Gold > 0 then
-		List["GoldCoins"] = { Name = "Gold", Amount = self._Gold, DisplayName = "Gold" }
+		List["GoldCoins"] = { Name = "GoldCoins", Amount = self._Gold, DisplayName = "Gold" }
 	end
 	return List
 end
