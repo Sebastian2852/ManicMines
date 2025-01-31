@@ -2,10 +2,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local PlayerStatsService = Knit.CreateService {
+local PlayerStatsService = Knit.CreateService({
 	Name = "PlayerStatsService",
 	Client = {},
-}
+})
 
 local DataService
 local LogService
@@ -16,8 +16,18 @@ local function FindInventoryValueByName(Name: string, DataFolder: Core.DataFolde
 	return DataFolder.Inventory.Ores:FindFirstChild(Name) or DataFolder.Inventory.Ores:FindFirstChild("Stone")
 end
 
+local function FindStorageValueByName(Name: string, DataFolder: Core.DataFolder)
+	return DataFolder.Storage.Ores:FindFirstChild(Name) or DataFolder.Inventory.Ores:FindFirstChild("Stone")
+end
+
 local function FindTimesMinedValueByName(Name: string, DataFolder: Core.DataFolder)
 	return DataFolder.TimesMined:FindFirstChild(Name) or DataFolder.TimesMined:FindFirstChild("Stone")
+end
+
+local function GetValues(Name: string, DataFolder: Core.DataFolder): (IntValue, IntValue, IntValue)
+	return FindInventoryValueByName(Name, DataFolder),
+		FindStorageValueByName(Name, DataFolder),
+		FindTimesMinedValueByName(Name, DataFolder)
 end
 
 -- [[ PUBLIC ]]--
@@ -102,12 +112,12 @@ Takes ores from the player's inventory and storage
 function PlayerStatsService:TakeOres(Player: Player, OreList)
 	local DataFolder: Core.DataFolder = DataService:GetPlayerDataFolder(Player)
 
-	for OreName, Data in pairs(OreList:LoopList()) do
+	for _, Data: Core.OreListItem in pairs(OreList:LoopList()) do
 		if Data.Amount == 0 then
 			continue
 		end
 
-		if OreName == "Gold" then
+		if Data.Name == "GoldCoins" then
 			local NewAmount = DataFolder.Gold.Value - Data.Amount
 			if NewAmount <= 0 then
 				NewAmount = 0
@@ -117,12 +127,16 @@ function PlayerStatsService:TakeOres(Player: Player, OreList)
 			continue
 		end
 
-		local DataValue = FindInventoryValueByName(OreName, DataFolder)
-		local NewAmount = DataValue.Value - Data.Amount
-		if NewAmount <= 0 then
-			NewAmount = 0
+		local InventoryValue, StorageValue = GetValues(Data.Name, DataFolder)
+		local StorageExcess = Data.Amount - InventoryValue.Value
+
+		if Data.Amount > InventoryValue.Value then
+			InventoryValue.Value = 0
+			StorageValue.Value -= StorageExcess
+		else
+			InventoryValue.Value -= Data.Amount
 		end
-		DataValue.Value = NewAmount
+
 		LogService:Log("removed " .. Player.Name .. " " .. Data.Amount .. " " .. Data.DisplayName)
 	end
 	self:CalculateInventoryCapacity(DataFolder)

@@ -8,12 +8,12 @@ local Promise = require(ReplicatedStorage.Packages.Promise)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 
-local TycoonUpgradeService = Knit.CreateService {
+local TycoonUpgradeService = Knit.CreateService({
 	Name = "TycoonUpgradeService",
 	Client = {
 		OpenStorage = Knit.CreateSignal(),
 	},
-}
+})
 
 local TycoonService
 local DataService
@@ -350,7 +350,7 @@ function TycoonUpgradeService:PayForUpgrade(Player: Player, UpgradeName: string,
 		return
 	end
 
-	local OreCosts = LevelConfig:FindFirstChild("Cost")
+	local OreCosts = LevelConfig:FindFirstChild("Costs")
 
 	if OreCosts then
 		local OreCostList = Core.OreList.CreateFromFolder(OreCosts)

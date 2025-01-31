@@ -3,12 +3,20 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Theme = require(script.Parent.Parent.Theme)
+
+local ClientDataController
 
 local CostFrame = Roact.Component:extend("CostFrame")
 
 local IconLabel = require(script.Parent.Parent.Common.IconLabel)
+
+function CostFrame:init()
+	ClientDataController = Knit.GetController("ClientDataController")
+end
 
 function CostFrame:GetFrames()
 	local Orelist = self.props.OreList or Core.OreList.New()
@@ -17,12 +25,15 @@ function CostFrame:GetFrames()
 	local Elements = {}
 
 	for _, Ore: Core.OreListItem in pairs(Orelist:LoopList()) do
+		local CanAfford = ClientDataController:HasEnoughOre(Ore)
+
 		table.insert(
 			Promises,
 			Promise.new(function(Resolve)
 				Elements[Ore.Name] = Roact.createElement("Frame", {
 					Size = UDim2.fromScale(1, 0.25),
-					BackgroundTransparency = 1,
+					BackgroundTransparency = CanAfford and 1 or 0.5,
+					BackgroundColor3 = CanAfford and Color3.new(0, 0, 0) or Theme.BackgroundColorRed,
 					BorderSizePixel = 0,
 					LayoutOrder = -Ore.Amount,
 				}, {
