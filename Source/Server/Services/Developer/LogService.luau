@@ -1,17 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local LogService = Knit.CreateService {
+local LogService = Knit.CreateService({
 	Name = "LogService",
 	Client = {},
-}
+})
 
 local LOG_SPACING = 40
-
-LogService.LoggingEnabled = RunService:IsStudio()
-LogService.WarningsEnabled = true
-LogService.AssertsEnabled = true
 
 --[[ PUBLIC ]]
 --
@@ -45,7 +40,7 @@ end
 Print out the message passed as well as anything else passed with a space between them
 ]=]
 function LogService:Log(Message: string, ...: string)
-	if not self.LoggingEnabled then
+	if not _G.DEBUG then
 		return
 	end
 	local Extras = { ... }
@@ -59,7 +54,7 @@ end
 Print out the message passed as well as anything else passed with a space between them in orange
 ]=]
 function LogService:Warn(Message: string, ...: string)
-	if not self.WarningsEnabled then
+	if not _G.DEBUG then
 		return
 	end
 	local Extras = { ... }
@@ -77,7 +72,7 @@ function LogService:Error(Message: string, ...: string)
 
 	local AssembledMessage = Message
 	if ... ~= nil then
-		for _, Item: string in pairs { ... } do
+		for _, Item: string in pairs({ ... }) do
 			AssembledMessage = AssembledMessage .. " " .. Item
 		end
 	end
@@ -89,7 +84,7 @@ end
 If the given value is nil or false it errors with a given error message.
 ]=]
 function LogService:Assert(Value: any, ErrorMessage: string)
-	if not self.AssertsEnabled then
+	if not _G.DEBUG then
 		return
 	end
 	if Value == nil or Value == false then
@@ -100,7 +95,7 @@ end
 -- [[ CLIENT ]]--
 
 function LogService.Client:Log(Player: Player, Message: string, ...: string)
-	if not LogService.WarningsEnabled then
+	if not _G.DEBUG then
 		return
 	end
 	local Extras = { ... }
@@ -111,7 +106,7 @@ function LogService.Client:Log(Player: Player, Message: string, ...: string)
 end
 
 function LogService.Client:Warn(Player: Player, Message: string, ...: string)
-	if not LogService.WarningsEnabled then
+	if not _G.DEBUG then
 		return
 	end
 	local Extras = { ... }
@@ -124,7 +119,7 @@ end
 function LogService.Client:Error(_, Message: string, ...: string)
 	local AssembledMessage = Message
 	if ... ~= nil then
-		for _, Item: string in pairs { ... } do
+		for _, Item: string in pairs({ ... }) do
 			AssembledMessage = AssembledMessage .. " " .. Item
 		end
 	end
@@ -132,7 +127,7 @@ function LogService.Client:Error(_, Message: string, ...: string)
 end
 
 function LogService.Client:Assert(Player: Player, Value: string, ErrorMessage: string)
-	if not self.AssertsEnabled then
+	if not _G.DEBUG then
 		return
 	end
 	if Value == nil or Value == false then

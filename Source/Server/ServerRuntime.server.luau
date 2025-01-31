@@ -10,8 +10,9 @@ local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Tests = require(ReplicatedStorage.Game.Tests)
 
 -- [[ TESTING / STUDIO ONLY ]] --
--- TODO: Make this only run in studio
-Tests:RunTests()
+if _G.DEBUG then
+	Tests:RunTests()
+end
 
 -- [[ KNIT ]] --
 
@@ -38,4 +39,4 @@ Knit.Start()
 Cmdr:RegisterHooksIn(script.Parent.Cmdr.Hooks)
 Cmdr:RegisterCommandsIn(script.Parent.Cmdr.Commands)
 Cmdr:RegisterTypesIn(script.Parent.Cmdr.Types)
-Cmdr:RegisterDefaultCommands { "Help", "DefaultUtil" }
+Cmdr:RegisterDefaultCommands({ "Help", "DefaultUtil" })

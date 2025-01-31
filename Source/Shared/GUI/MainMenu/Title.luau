@@ -9,6 +9,10 @@ function Title:render()
 	local GameName = self.props.GameName or "[GAME NAME]"
 	local UpdateName = self.props.UpdateName or "[UPDATE NAME]"
 
+	if _G.DEBUG then
+		UpdateName = UpdateName .. " <font color='rgb(255, 0, 0)'>- DEBUG VERSION</font>"
+	end
+
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
 		Position = UDim2.fromScale(0.5, 0.17),
@@ -42,6 +46,7 @@ function Title:render()
 
 			Text = UpdateName,
 			TextScaled = true,
+			RichText = true,
 			TextXAlignment = Enum.TextXAlignment.Center,
 			TextYAlignment = Enum.TextYAlignment.Top,
 			TextColor3 = Theme.TextDisabledColor,

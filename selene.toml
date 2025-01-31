@@ -1,3 +1,6 @@
 std = "roblox"
 
-exclude = [ "Tests/**", "Packages/**" ]
+exclude = [ "Tests/**", "Packages/**", "Build/**" ]
+
+[lints]
+global_usage = "allow"

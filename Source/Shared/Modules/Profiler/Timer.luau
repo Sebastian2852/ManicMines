@@ -3,8 +3,12 @@ Timer.__index = Timer
 
 function Timer._new(Label: string)
 	local self = setmetatable({}, Timer)
-	self._TimeStarted = os.clock()
-	self._Label = Label
+
+	if _G.DEBUG then
+		self._TimeStarted = os.clock()
+		self._Label = Label
+	end
+
 	return self
 end
 
@@ -19,6 +23,10 @@ end
 Get how long the timer has been running for in seconds
 ]=]
 function Timer:GetTime(): number
+	if not _G.DEBUG then
+		return -1
+	end
+
 	local TimeNow = os.clock()
 	return TimeNow - self._TimeStarted
 end
