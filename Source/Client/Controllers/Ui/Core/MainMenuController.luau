@@ -5,7 +5,7 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local MainMenuController = Knit.CreateController { Name = "MainMenuController" }
+local MainMenuController = Knit.CreateController({ Name = "MainMenuController" })
 
 local DataService
 local LogService
@@ -73,6 +73,7 @@ function MainMenuController:Close()
 
 	if MainMenuTree then
 		Roact.unmount(MainMenuTree)
+		MainMenuTree = nil
 	end
 
 	LogService:Log("Closed main menu")
@@ -99,6 +100,7 @@ function MainMenuController:KnitStart()
 
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
 	Blur = LightingController:AddPersistentObject(Blur)
+	MainMenu = nil
 end
 
 return MainMenuController
