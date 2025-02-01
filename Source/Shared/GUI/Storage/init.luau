@@ -1,10 +1,19 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+
+local StorageService
 
 local Storage = Roact.Component:extend("Storage")
 
-local Inventory = require(script.Inventory)
+local InventorySide = require(ReplicatedStorage.Game.GUI.Storage.Inventory)
+local StorageSide = require(ReplicatedStorage.Game.GUI.Storage.Storage)
+local Theme = require(ReplicatedStorage.Game.GUI.Theme)
+
+function Storage:init()
+	StorageService = Knit.GetService("StorageService")
+end
 
 function Storage:render()
 	return Roact.createElement("ScreenGui", {
@@ -36,7 +45,7 @@ function Storage:render()
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
 				}, {
-					App = Roact.createElement(Inventory, {}, {}),
+					App = Roact.createElement(InventorySide, {}, {}),
 				}),
 
 				Right = Roact.createElement("Frame", {
@@ -45,7 +54,9 @@ function Storage:render()
 					AnchorPoint = Vector2.new(1, 0),
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
-				}, {}),
+				}, {
+					App = Roact.createElement(StorageSide, {}, {}),
+				}),
 
 				Bottom = Roact.createElement("Frame", {
 					Size = UDim2.fromScale(1, 0.1),
@@ -53,7 +64,41 @@ function Storage:render()
 					AnchorPoint = Vector2.new(0.5, 1),
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
-				}, {}),
+				}, {
+					DepositButton = Roact.createElement("TextButton", {
+						Size = UDim2.fromScale(0.3, 0.9),
+						Position = UDim2.fromScale(0, 0.5),
+						AnchorPoint = Vector2.new(0, 0.5),
+						BackgroundColor3 = Theme.BackgroundColorGreen,
+						BorderSizePixel = 0,
+
+						Text = "Deposit All",
+						TextScaled = true,
+						TextColor3 = Theme.TextColorDisabled,
+						FontFace = Theme.Font,
+
+						[Roact.Event.MouseButton1Click] = function()
+							StorageService:MoveAllToStorage()
+						end,
+					}, {}),
+
+					WithdrawalAll = Roact.createElement("TextButton", {
+						Size = UDim2.fromScale(0.3, 0.9),
+						Position = UDim2.fromScale(1, 0.5),
+						AnchorPoint = Vector2.new(1, 0.5),
+						BackgroundColor3 = Theme.BackgroundColorRed,
+						BorderSizePixel = 0,
+
+						Text = "Withdrawal All",
+						TextScaled = true,
+						TextColor3 = Theme.TextColor,
+						FontFace = Theme.Font,
+
+						[Roact.Event.MouseButton1Click] = function()
+							StorageService:MoveAllToInventory()
+						end,
+					}, {}),
+				}),
 			}),
 		}),
 	})

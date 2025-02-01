@@ -29,6 +29,7 @@ function OreFrame:render()
 	}, {
 		Info = Roact.createElement("Frame", {
 			Size = UDim2.fromScale(0.5, 1),
+			Position = UDim2.fromScale(0.5, 0),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 		}, {
@@ -43,7 +44,7 @@ function OreFrame:render()
 				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				LayoutOrder = 1,
+				LayoutOrder = 2,
 
 				Image = IconImage,
 				ScaleType = Enum.ScaleType.Fit,
@@ -59,7 +60,7 @@ function OreFrame:render()
 				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				LayoutOrder = 2,
+				LayoutOrder = 1,
 
 				Text = Text .. " - " .. Amount,
 				TextScaled = true,
@@ -71,7 +72,6 @@ function OreFrame:render()
 
 		Buttons = Roact.createElement("Frame", {
 			Size = UDim2.fromScale(0.5, 1),
-			Position = UDim2.fromScale(0.5, 0),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 		}, {
@@ -85,7 +85,7 @@ function OreFrame:render()
 				Size = UDim2.fromScale(0.2, 0.9),
 				BackgroundColor3 = Theme.BackgroundColorBlue,
 				BorderSizePixel = 0,
-				LayoutOrder = 1,
+				LayoutOrder = 3,
 
 				Text = "50%",
 				TextColor3 = Theme.TextColor,
@@ -93,7 +93,7 @@ function OreFrame:render()
 				FontFace = Theme.Font,
 
 				[Roact.Event.MouseButton1Click] = function()
-					StorageService:MoveToStorage(OreName, math.floor(Amount / 2))
+					StorageService:MoveToInventory(OreName, math.floor(Amount / 2))
 				end,
 			}, {}),
 
@@ -109,7 +109,7 @@ function OreFrame:render()
 				FontFace = Theme.Font,
 
 				[Roact.Event.MouseButton1Click] = function()
-					StorageService:MoveToStorage(OreName, Amount)
+					StorageService:MoveToInventory(OreName, Amount)
 				end,
 			}, {}),
 
@@ -118,7 +118,7 @@ function OreFrame:render()
 				BackgroundColor3 = Color3.new(0, 0, 0),
 				BackgroundTransparency = 0.5,
 				BorderSizePixel = 0,
-				LayoutOrder = 3,
+				LayoutOrder = 1,
 
 				Text = "",
 				PlaceholderText = "...",
@@ -135,7 +135,7 @@ function OreFrame:render()
 
 					local RoundedAmount = math.floor(EnteredAmount)
 					local ClamppedAmount = math.clamp(RoundedAmount, 0, Amount)
-					StorageService:MoveToStorage(OreName, ClamppedAmount)
+					StorageService:MoveToInventory(OreName, ClamppedAmount)
 				end,
 			}, {}),
 		}),

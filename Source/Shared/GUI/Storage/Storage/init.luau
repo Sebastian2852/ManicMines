@@ -7,12 +7,12 @@ local Trove = require(ReplicatedStorage.Packages.trove)
 
 local ClientDataController
 
-local Inventory = Roact.Component:extend("Inventory")
+local Storage = Roact.Component:extend("Storage")
 
 local OreFrame = require(script.OreFrame)
 local Theme = require(script.Parent.Parent.Theme)
 
-function Inventory:init()
+function Storage:init()
 	ClientDataController = Knit.GetController("ClientDataController")
 	self.Trove = Trove.new()
 
@@ -21,7 +21,7 @@ function Inventory:init()
 	})
 end
 
-function Inventory:CreateOreFrame(Emblem: string, Name: string, Amount: number, OreName: string)
+function Storage:CreateOreFrame(Emblem: string, Name: string, Amount: number, OreName: string)
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 0.1),
 		BackgroundTransparency = 1,
@@ -36,14 +36,14 @@ function Inventory:CreateOreFrame(Emblem: string, Name: string, Amount: number, 
 	})
 end
 
-function Inventory:didMount()
+function Storage:didMount()
 	self:setState({
 		OreFrames = {},
 	})
 
 	local DataFolder: Core.DataFolder = ClientDataController:GetDataFolder()
 
-	for _, v: IntValue in pairs(DataFolder.Inventory.Ores:GetChildren()) do
+	for _, v: IntValue in pairs(DataFolder.Storage.Ores:GetChildren()) do
 		local RealOre = v.Name == "Stone" and Core.Assets.Stone or Core.Assets.Ores:FindFirstChild(v.Name)
 
 		local Connection = v:GetPropertyChangedSignal("Value"):Connect(function()
@@ -78,11 +78,11 @@ function Inventory:didMount()
 	end
 end
 
-function Inventory:willUnmount()
+function Storage:willUnmount()
 	self.Trove:Clean()
 end
 
-function Inventory:render()
+function Storage:render()
 	local OreFrames = self.state.OreFrames
 	OreFrames["Layout"] = Roact.createElement("UIListLayout", {}, {})
 
@@ -102,9 +102,9 @@ function Inventory:render()
 			BorderSizePixel = 0,
 			LayoutOrder = 1,
 
-			Text = "Inventory",
+			Text = "Storage",
 			TextScaled = true,
-			TextXAlignment = Enum.TextXAlignment.Left,
+			TextXAlignment = Enum.TextXAlignment.Right,
 			TextColor3 = Theme.TextColor,
 			FontFace = Theme.Font,
 		}, {}),
@@ -120,9 +120,9 @@ function Inventory:render()
 			ScrollBarThickness = 5,
 			ScrollingDirection = Enum.ScrollingDirection.Y,
 			VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar,
-			VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right,
+			VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left,
 		}, OreFrames),
 	})
 end
 
-return Inventory
+return Storage

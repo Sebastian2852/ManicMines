@@ -4,6 +4,13 @@
 			"rule": "inject_global_value",
 			"identifier": "DEBUG",
 			"value": true
+		},
+
+		"remove_comments",
+
+		{
+			"rule": "append_text_comment",
+			"text": "Script compiled in debug\nVariables and local functions are re-named, Comments have been removed"
 		}
 	]
 }
