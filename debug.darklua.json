@@ -9,6 +9,12 @@
 		"remove_comments",
 
 		{
+			"rule": "rename_variables",
+			"include_functions": true,
+			"globals": ["$default", "$roblox"]
+		},
+
+		{
 			"rule": "append_text_comment",
 			"text": "Script compiled in debug\nVariables and local functions are re-named, Comments have been removed"
 		}

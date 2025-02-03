@@ -31,7 +31,6 @@
 		"remove_method_definition",
 		"convert_index_to_field",
 		"remove_nil_declaration",
-		"rename_variables",
 		"filter_after_early_return",
 		"group_local_assignment"
 	]

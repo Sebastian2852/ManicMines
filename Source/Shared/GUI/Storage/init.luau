@@ -80,7 +80,11 @@ function Storage:render()
 						[Roact.Event.MouseButton1Click] = function()
 							StorageService:MoveAllToStorage()
 						end,
-					}, {}),
+					}, {
+						Corners = Roact.createElement("UICorner", {
+							CornerRadius = UDim.new(0, 7),
+						}, {}),
+					}),
 
 					WithdrawalAll = Roact.createElement("TextButton", {
 						Size = UDim2.fromScale(0.3, 0.9),
@@ -97,7 +101,11 @@ function Storage:render()
 						[Roact.Event.MouseButton1Click] = function()
 							StorageService:MoveAllToInventory()
 						end,
-					}, {}),
+					}, {
+						Corners = Roact.createElement("UICorner", {
+							CornerRadius = UDim.new(0, 7),
+						}, {}),
+					}),
 				}),
 			}),
 		}),

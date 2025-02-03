@@ -20,13 +20,20 @@ function OreFrame:render()
 	local Text = self.props.Text or "[UNKNOWN]"
 
 	local OreName = self.props.OreName or "Stone"
+	local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName) or ReplicatedStorage.Assets.Stone
+	local Color = RealOre:GetAttribute("InventoryBackgroundColor") or ColorSequence.new(Color3.new(1, 0, 1))
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
-		BackgroundTransparency = 1,
+		BackgroundColor3 = Color3.new(1, 1, 1),
+		BackgroundTransparency = 0.65,
 		BorderSizePixel = 0,
 		LayoutOrder = LayoutOrder,
 	}, {
+		Gradient = Roact.createElement("UIGradient", {
+			Color = Color,
+		}, {}),
+
 		Info = Roact.createElement("Frame", {
 			Size = UDim2.fromScale(0.5, 1),
 			BackgroundTransparency = 1,
@@ -61,8 +68,9 @@ function OreFrame:render()
 				BorderSizePixel = 0,
 				LayoutOrder = 2,
 
-				Text = Text .. " - " .. Amount,
+				Text = Amount .. " " .. Text,
 				TextScaled = true,
+				TextStrokeTransparency = 0,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextColor3 = Theme.TextColor,
 				FontFace = Theme.Font,
@@ -70,51 +78,41 @@ function OreFrame:render()
 		}),
 
 		Buttons = Roact.createElement("Frame", {
-			Size = UDim2.fromScale(0.5, 1),
+			Size = UDim2.new(0.5, -10, 1, 0),
 			Position = UDim2.fromScale(0.5, 0),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 		}, {
 			Layout = Roact.createElement("UIListLayout", {
+				Padding = UDim.new(0, 10),
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				FillDirection = Enum.FillDirection.Horizontal,
-				HorizontalFlex = Enum.UIFlexAlignment.SpaceEvenly,
-			}, {}),
-
-			HalfButton = Roact.createElement("TextButton", {
-				Size = UDim2.fromScale(0.2, 0.9),
-				BackgroundColor3 = Theme.BackgroundColorBlue,
-				BorderSizePixel = 0,
-				LayoutOrder = 1,
-
-				Text = "50%",
-				TextColor3 = Theme.TextColor,
-				TextScaled = true,
-				FontFace = Theme.Font,
-
-				[Roact.Event.MouseButton1Click] = function()
-					StorageService:MoveToStorage(OreName, math.floor(Amount / 2))
-				end,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				HorizontalAlignment = Enum.HorizontalAlignment.Right,
 			}, {}),
 
 			FullButton = Roact.createElement("TextButton", {
-				Size = UDim2.fromScale(0.2, 0.9),
-				BackgroundColor3 = Theme.BackgroundColorGreen,
+				Size = UDim2.fromScale(0.2, 0.8),
+				BackgroundColor3 = Theme.BackgroundColorBlue,
 				BorderSizePixel = 0,
 				LayoutOrder = 2,
 
-				Text = "100%",
-				TextColor3 = Theme.BackgroundColor,
+				Text = "All",
+				TextColor3 = Theme.TextColor,
 				TextScaled = true,
 				FontFace = Theme.Font,
 
 				[Roact.Event.MouseButton1Click] = function()
 					StorageService:MoveToStorage(OreName, Amount)
 				end,
-			}, {}),
+			}, {
+				Corners = Roact.createElement("UICorner", {
+					CornerRadius = UDim.new(0, 7),
+				}, {}),
+			}),
 
 			Custom = Roact.createElement("TextBox", {
-				Size = UDim2.fromScale(0.2, 0.9),
+				Size = UDim2.fromScale(0.2, 0.8),
 				BackgroundColor3 = Color3.new(0, 0, 0),
 				BackgroundTransparency = 0.5,
 				BorderSizePixel = 0,
@@ -137,7 +135,11 @@ function OreFrame:render()
 					local ClamppedAmount = math.clamp(RoundedAmount, 0, Amount)
 					StorageService:MoveToStorage(OreName, ClamppedAmount)
 				end,
-			}, {}),
+			}, {
+				Corners = Roact.createElement("UICorner", {
+					CornerRadius = UDim.new(0, 7),
+				}, {}),
+			}),
 		}),
 	})
 end

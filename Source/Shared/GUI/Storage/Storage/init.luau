@@ -111,7 +111,8 @@ function Storage:render()
 
 		Ores = Roact.createElement("ScrollingFrame", {
 			Size = UDim2.fromScale(1, 1),
-			BackgroundTransparency = 1,
+			BackgroundColor3 = Color3.new(0, 0, 0),
+			BackgroundTransparency = 0.6,
 			BorderSizePixel = 0,
 			LayoutOrder = 2,
 
