@@ -1,61 +1,53 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
-
-local TycoonSelectionController = Knit.CreateController({
-	Name = "TycoonSelectionController",
-})
 
 local TycoonService
 local LogService
 local DataService
 
-local Assets = ReplicatedStorage.Assets
-local TycoonAssets = Assets.Tycoon
-local DataFolder: Core.DataFolder
+local DataFolder
 
-local SelectionOutline: SelectionBox = TycoonAssets.UpgradeSelection
-local CurrentlySelecting = false
-local CurrentOutline = nil
-local Selection = nil
+local TycoonSelectionOutline = ReplicatedStorage.Assets.Tycoon.UpgradeSelection
+local CurrentlySelectingTycoon = false
+local TycoonSelectionUITree = nil
+local CurrentTycoonOutline = nil
+local TycoonSelection = nil
 
-local ActiveTree = nil
-
--- [[ PUBLIC ]]--
+local SelectionUIController = Knit.CreateController({ Name = "SelectionUIController" })
 
 --[=[
 Deselects the currently selected hitbox by destroying the outline it was given
 ]=]
-function TycoonSelectionController:Deselect()
-	if not CurrentlySelecting then
+function SelectionUIController:Deselect()
+	if not CurrentlySelectingTycoon then
 		return
 	end
 	LogService:Log("Deselecting upgrade hitbox")
-	if CurrentOutline then
-		CurrentOutline:Destroy()
+	if CurrentTycoonOutline then
+		CurrentTycoonOutline:Destroy()
 	end
-	if ActiveTree then
-		Roact.unmount(ActiveTree)
-		ActiveTree = nil
+	if TycoonSelectionUITree then
+		Roact.unmount(TycoonSelectionUITree)
+		TycoonSelectionUITree = nil
 	end
-	if Selection ~= nil then
-		Selection = nil
+	if TycoonSelection ~= nil then
+		TycoonSelection = nil
 	end
-	CurrentlySelecting = false
+	CurrentlySelectingTycoon = false
 end
 
 --[=[
 Selectes a given hitbox by giving it an outline, if anything is already selected it will
 automatically deslect it
 ]=]
-function TycoonSelectionController:SelectHitbox(Hitbox)
+function SelectionUIController:SelectTycoonHitbox(Hitbox)
 	LogService:Log("Selecting upgrade hitbox")
-	if CurrentlySelecting then
+	if CurrentlySelectingTycoon then
 		self:Deselect()
 	end
-	if Selection ~= nil then
+	if TycoonSelection ~= nil then
 		self:Deselect()
 	end
 
@@ -71,36 +63,22 @@ function TycoonSelectionController:SelectHitbox(Hitbox)
 		end,
 	}, {})
 
-	ActiveTree = Roact.mount(App, Knit.Player.PlayerGui, "Tycoon Selection")
+	TycoonSelectionUITree = Roact.mount(App, Knit.Player.PlayerGui, "Tycoon Selection")
 
-	local New = SelectionOutline:Clone()
+	local New = TycoonSelectionOutline:Clone()
 	New.Parent = Hitbox
 	New.Adornee = Hitbox
 	New.Name = "Selection"
 
-	CurrentOutline = New
-	Selection = Hitbox
-	CurrentlySelecting = true
+	CurrentTycoonOutline = New
+	TycoonSelection = Hitbox
+	CurrentlySelectingTycoon = true
 	LogService:Log("Selected upgrade hitbox: " .. Hitbox.Name)
 end
 
---[=[
-Takes in an upgrade config and returns the cost for the upgrade as a OreList or nil
-if there is no config passed or no cost folder in the config
-]=]
-function TycoonSelectionController:CreateCostOreList(UpgradeConfig: Configuration)
-	if UpgradeConfig == nil then
-		return nil
-	end
-	if not UpgradeConfig:FindFirstChild("Cost") then
-		return nil
-	end
-	return Core.Util:CreateOreListFromFolder(UpgradeConfig:FindFirstChild("Cost"))
-end
+--[[ KNIT ]]
 
--- [[ KNIT ]]--
-
-function TycoonSelectionController:KnitStart()
+function SelectionUIController:KnitStart()
 	TycoonService = Knit.GetService("TycoonService")
 	LogService = Knit.GetService("LogService")
 	DataService = Knit.GetService("DataService")
@@ -109,12 +87,15 @@ function TycoonSelectionController:KnitStart()
 		DataFolder = Data
 	end)
 
+	local App = Roact.createElement(require(ReplicatedStorage.Game.GUI.PickaxeSelection), {}, {})
+	Roact.mount(App, Knit.Player.PlayerGui, "Pickaxe Selection")
+
 	TycoonService.SelectUpgrade:Connect(function(UpgradeName: string)
 		TycoonService:GetPlayerTycoon():andThen(function(Tycoon: Model)
 			local Hitbox = Tycoon.Main.Upgrades:FindFirstChild(UpgradeName)
-			self:SelectHitbox(Hitbox)
+			self:SelectTycoonHitbox(Hitbox)
 		end)
 	end)
 end
 
-return TycoonSelectionController
+return SelectionUIController
