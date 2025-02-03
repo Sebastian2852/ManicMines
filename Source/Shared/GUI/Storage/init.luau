@@ -17,6 +17,10 @@ function Storage:init()
 end
 
 function Storage:render()
+	local Close = self.props.Close or function()
+		warn("Missing Close function")
+	end
+
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
@@ -31,9 +35,7 @@ function Storage:render()
 		}, {
 			Close = Roact.createElement(CloseButton, {
 				Size = UDim2.fromScale(1, 0.08),
-				OnClick = function()
-					print("Close")
-				end,
+				OnClick = Close,
 			}, {}),
 
 			Title = Roact.createElement("TextLabel", {
