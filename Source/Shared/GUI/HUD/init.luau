@@ -4,9 +4,10 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local HUD = Roact.Component:extend("HUD")
 
-local Buttons = require(script.Buttons)
-local Currency = require(script.Currency)
-local Inventory = require(script.Inventory)
+local Buttons = require(ReplicatedStorage.Game.GUI.HUD.Buttons)
+local Currency = require(ReplicatedStorage.Game.GUI.HUD.Currency)
+local DepthMeter = require(ReplicatedStorage.Game.GUI.HUD.DepthMeter)
+local Inventory = require(ReplicatedStorage.Game.GUI.HUD.Inventory)
 
 function HUD:render()
 	return Roact.createElement("ScreenGui", {
@@ -55,6 +56,14 @@ function HUD:render()
 				}, {}),
 
 				Buttons = Roact.createElement(Buttons, {}, {}),
+			}),
+
+			DepthMeterContainer = Roact.createElement("Frame", {
+				Size = UDim2.fromScale(1, 1),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+			}, {
+				App = Roact.createElement(DepthMeter, {}, {}),
 			}),
 		}),
 	})
