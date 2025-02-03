@@ -2,17 +2,22 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Roact = require(ReplicatedStorage.Packages.Roact)
-local Theme = require(script.Parent.Parent.Theme)
+local Theme = require(ReplicatedStorage.Game.GUI.Theme)
+local Trove = require(ReplicatedStorage.Packages.trove)
 
 local Bar = Roact.Component:extend("Bar")
 
 function Bar:init()
+	self.Trove = Trove.new()
+
 	self.Motor = Flipper.SingleMotor.new(0)
 	local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
 	self.Binding = Binding
 	self.Motor:onStep(SetBinding)
+end
 
-	ReplicatedStorage.Player.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
+function Bar:didMount()
+	local Connection = ReplicatedStorage.Player.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
 		local Block = ReplicatedStorage.Player.PickaxeSelection.Value
 		if Block == nil then
 			return
@@ -39,6 +44,12 @@ function Bar:init()
 			BarGradient = BarGradient,
 		})
 	end)
+
+	self.Trove:Add(Connection)
+end
+
+function Bar:willUnmount()
+	self.Trove:Clean()
 end
 
 function Bar:render()
