@@ -7,6 +7,7 @@ local StorageService
 
 local Storage = Roact.Component:extend("Storage")
 
+local CloseButton = require(ReplicatedStorage.Game.GUI.Common.CloseButton)
 local InventorySide = require(ReplicatedStorage.Game.GUI.Storage.Inventory)
 local StorageSide = require(ReplicatedStorage.Game.GUI.Storage.Storage)
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
@@ -28,18 +29,41 @@ function Storage:render()
 			BackgroundColor3 = Color3.new(0, 0, 0),
 			BorderSizePixel = 0,
 		}, {
-			Padding = Roact.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, 10),
-				PaddingBottom = UDim.new(0, 10),
-				PaddingLeft = UDim.new(0, 10),
-				PaddingRight = UDim.new(0, 10),
+			Close = Roact.createElement(CloseButton, {
+				Size = UDim2.fromScale(1, 0.08),
+				OnClick = function()
+					print("Close")
+				end,
 			}, {}),
 
-			Content = Roact.createElement("Frame", {
-				Size = UDim2.fromScale(1, 1),
+			Title = Roact.createElement("TextLabel", {
+				Size = UDim2.fromScale(0.5, 0.1),
+				Position = UDim2.fromOffset(10, 3),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+
+				Text = "<u>Storage</u>",
+				TextScaled = true,
+				RichText = true,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				FontFace = Theme.Font,
+				TextColor3 = Theme.TextColor,
+			}, {}),
+
+			Main = Roact.createElement("Frame", {
+				Size = UDim2.new(1, 0, 0.9, 10),
+				Position = UDim2.fromScale(0.5, 1),
+				AnchorPoint = Vector2.new(0.5, 1),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 			}, {
+				Padding = Roact.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 10),
+					PaddingBottom = UDim.new(0, 10),
+					PaddingLeft = UDim.new(0, 10),
+					PaddingRight = UDim.new(0, 10),
+				}, {}),
+
 				Left = Roact.createElement("Frame", {
 					Size = UDim2.fromScale(0.5, 0.9),
 					BackgroundTransparency = 1,
