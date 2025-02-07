@@ -4,7 +4,7 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 
 local Component = require(ReplicatedStorage.Packages.Component)
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Signals = require(ReplicatedStorage.Game.GUI.Signals)
 local Trove = require(ReplicatedStorage.Packages.trove)
 
 local Camera = Workspace.CurrentCamera
@@ -47,8 +47,6 @@ end
 
 -- [[ COMPONENT ]] --
 
-local UIService
-
 local DialogueComponent = Component.new({
 	Tag = "Dialogue/Module/Config",
 	Ancestors = { workspace },
@@ -56,10 +54,6 @@ local DialogueComponent = Component.new({
 })
 
 function DialogueComponent:Construct()
-	if not UIService then
-		UIService = Knit.GetService("UIService")
-	end
-
 	self.Trove = Trove.new()
 	self.NPC = self.Instance.Parent
 	self.Info = require(self.Instance) :: InfoModule
@@ -105,7 +99,7 @@ function DialogueComponent:CreateContent()
 			BackgroundSound = nil,
 			BackgroundSoundVol = 0.1,
 
-			DisableBackpack = true,
+			DisableBackpack = false,
 			DisableChat = false,
 			DisableLeaderboard = false,
 
@@ -168,13 +162,19 @@ function DialogueComponent:StartDialogue(ProximityPrompt)
 	local CameraPart = ProximityPrompt:FindFirstChildWhichIsA("BasePart")
 	local Tween = TweenService:Create(Camera, TweeningInfo, { CFrame = CameraPart.CFrame })
 	Tween:Play()
-	UIService:ToggleInventory(false)
+	Signals.ToggleHotbar:Fire(false)
+	Signals.ToggleHUDButtons:Fire(false)
+	Signals.ToggleHUDGold:Fire(false)
+	Signals.ToggleInventory:Fire(false)
 end
 
 function DialogueComponent:EndDialogue()
 	local Tween = TweenService:Create(Camera, TweeningInfo, { CFrame = OriginalCFrame })
 	Tween:Play()
-	UIService:ToggleInventory(true)
+	Signals.ToggleHotbar:Fire(true)
+	Signals.ToggleHUDButtons:Fire(true)
+	Signals.ToggleHUDGold:Fire(true)
+	Signals.ToggleInventory:Fire(true)
 	Tween.Completed:Wait()
 	Camera.CameraType = Enum.CameraType.Custom
 end

@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
-local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Signals = require(ReplicatedStorage.Game.GUI.Signals)
 
 local Inventory = Roact.Component:extend("Inventory")
 
@@ -11,8 +11,6 @@ local Level = require(script.Level)
 local Theme = require(script.Parent.Parent.Theme)
 
 function Inventory:init()
-	local UIService = Knit.GetService("UIService")
-
 	self.Motor = Flipper.SingleMotor.new(0)
 	local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
 	self.Binding = Binding
@@ -23,7 +21,7 @@ function Inventory:init()
 	self.HideBinding = HideBinding
 	self.HideMotor:onStep(SetHideBinding)
 
-	UIService.Inventory:Connect(function(New: boolean)
+	Signals.ToggleInventory:Connect(function(New: boolean)
 		local Goal = New == true and 0 or 1
 		self.HideMotor:setGoal(Flipper.Spring.new(Goal, {
 			frequency = 4,

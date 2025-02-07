@@ -11,14 +11,13 @@ local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Signal = require(ReplicatedStorage.Packages.Signal)
-local Signals = require(script.Parent.Signals)
+local Signals = require(ReplicatedStorage.Game.GUI.Signals)
 
 local Forge = Roact.Component:extend("Forge")
 
 local Camera = Workspace.CurrentCamera
 local CameraPos = Workspace.Game:FindFirstChild("ForgeCameraPos")
 
-local UIService
 local DataService
 
 local FloatingInfo = require(ReplicatedStorage.Game.GUI.Common.FloatingInfo)
@@ -113,7 +112,6 @@ function Forge:CreateLockedButton(Config: Configuration)
 end
 
 function Forge:init()
-	UIService = Knit.GetService("UIService")
 	DataService = Knit.GetService("DataService")
 
 	Display.SetCurrentPickaxe:Connect(function(Pickaxe: Configuration)
@@ -133,7 +131,7 @@ function Forge:didMount()
 
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
-	UIService:ToggleInventory(false)
+	Signals.ToggleInventory:Fire(false)
 	Signals.ToggleHUDButtons:Fire(false)
 	Signals.ToggleHUDGold:Fire(false)
 	Signals.ToggleHotbar:Fire(false)
@@ -147,7 +145,7 @@ end
 function Forge:willUnmount()
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
 	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, true)
-	UIService:ToggleInventory(true)
+	Signals.ToggleInventory:Fire(true)
 	Signals.ToggleHUDButtons:Fire(true)
 	Signals.ToggleHUDGold:Fire(true)
 	Signals.ToggleHotbar:Fire(true)

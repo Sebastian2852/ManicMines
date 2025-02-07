@@ -5,4 +5,5 @@ return {
 	ToggleHUDButtons = Signal.new(),
 	ToggleHUDGold = Signal.new(),
 	ToggleHotbar = Signal.new(),
+	ToggleInventory = Signal.new(),
 }
