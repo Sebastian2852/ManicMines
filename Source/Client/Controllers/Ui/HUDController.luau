@@ -61,8 +61,54 @@ function HUDController:EnableHotbar(Animated: boolean?)
 	end
 end
 
+function HUDController:SetupSettingsGUI()
+	local Visible = false
+	local SettingsTree = nil
+
+	local function Hide()
+		if SettingsTree then
+			Roact.unmount(SettingsTree)
+			SettingsTree = nil
+			Visible = false
+		end
+	end
+
+	local function Show()
+		Hide()
+		SettingsTree = Roact.mount(
+			Roact.createElement(require(ReplicatedStorage.Game.GUI.Settings)),
+			Knit.Player.PlayerGui,
+			"Settings"
+		)
+		Visible = true
+	end
+
+	local SettingsIcon =
+		self:AddTopBarButton("rbxasset://studio_svg_textures/Shared/Navigation/Dark/Standard/Settings@3x.png", nil)
+	SettingsIcon:oneClick()
+	SettingsIcon:bindEvent("deselected", function()
+		if Visible then
+			Hide()
+		else
+			Show()
+		end
+	end)
+end
+
+--[=[
+	Add a simple text "label" to the top-bar
+]=]
 function HUDController:AddTopBarLabel(Text: string)
 	TopbarPlus.new():setLabel(Text):disableOverlay(true):lock()
+end
+
+--[=[
+	Creates and returns a button with the given image and text
+]=]
+function HUDController:AddTopBarButton(Image: string?, Text: string?)
+	local Icon = TopbarPlus.new()
+	Icon:setImage(Image):setImageScale(1):setLabel(Text):setCaption("Settings")
+	return Icon
 end
 
 -- [[ KNIT ]] --
@@ -71,6 +117,7 @@ function HUDController:KnitStart()
 	local LogService = Knit.GetService("LogService")
 	local DataService = Knit.GetService("DataService")
 
+	self:SetupSettingsGUI()
 	self:AddTopBarLabel("v 1.0.0")
 
 	local HUD = require(ReplicatedStorage.Game.GUI.HUD)
