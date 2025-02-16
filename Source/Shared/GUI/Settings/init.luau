@@ -15,6 +15,7 @@ function Settings:PageButton(LayoutOrder: number, Name: string, Page: ModuleScri
 
 		Text = Name,
 		TextScaled = true,
+		RichText = true,
 		FontFace = Theme.Font,
 		TextColor3 = Theme.TextColor,
 
@@ -101,6 +102,12 @@ function Settings:render()
 
 						Graphics = self:PageButton(1, "Graphics", ReplicatedStorage.Game.GUI.Settings.Pages.Graphics),
 						Gameplay = self:PageButton(2, "Gameplay", ReplicatedStorage.Game.GUI.Settings.Pages.Gameplay),
+
+						Experimental = self:PageButton(
+							999,
+							"<font color='#fc9905'> Experimental </font>",
+							ReplicatedStorage.Game.GUI.Settings.Pages.Experimental
+						),
 					}),
 
 					PageContainer = Roact.createElement("Frame", {
