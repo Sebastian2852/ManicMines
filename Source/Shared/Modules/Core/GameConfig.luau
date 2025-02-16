@@ -266,6 +266,7 @@ Config.DefaultSettings = {
 	RainbowEffect = true,
 	MusicVolume = 0.5,
 	InventoryShortUnits = false,
+	HideMapProps = false,
 }
 
 Config.MainMenu = {

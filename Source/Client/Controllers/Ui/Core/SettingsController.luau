@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game.ReplicatedStorage
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
@@ -8,6 +9,10 @@ local SettingsController = Knit.CreateController({ Name = "PlayerSettingsControl
 local LogService
 local SettingsService
 local DataService
+
+local MapProps = Instance.new("Folder")
+MapProps.Parent = workspace
+MapProps.Name = "MAP_PROPS"
 
 local Settings: Core.Settings = {}
 
@@ -29,6 +34,12 @@ Only does things that can be done by the client. The rest will be handled by the
 local function Update()
 	LogService:Log("Updating settings")
 	game.Lighting.GlobalShadows = Settings.GlobalShadows
+
+	if Settings.HideMapProps then
+		MapProps.Parent = ReplicatedStorage
+	else
+		MapProps.Parent = workspace
+	end
 end
 
 -- [[ PUBLIC ]] --
@@ -61,6 +72,18 @@ function SettingsController:KnitStart()
 		end
 
 		Update()
+	end)
+
+	task.spawn(function()
+		local function AddAllParts()
+			for _, v in pairs(CollectionService:GetTagged("SettingsController/HideWithPropHiding")) do
+				v.Parent = MapProps
+			end
+		end
+
+		CollectionService:GetInstanceAddedSignal("SettingsController/HideWithPropHiding"):Connect(function()
+			AddAllParts()
+		end)
 	end)
 end
 

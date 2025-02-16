@@ -71,6 +71,7 @@ export type Settings = {
 	RainbowEffect: boolean,
 	MusicVolume: number,
 	InventoryShortUnits: boolean,
+	HideMapProps: boolean,
 }
 
 --[=[
