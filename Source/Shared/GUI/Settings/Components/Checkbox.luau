@@ -26,7 +26,7 @@ return function(Component: Roact.Component, SettingName: string)
 		[Roact.Event.MouseButton1Click] = function()
 			SettingsController:ModifySetting(SettingName, not Value)
 			Component:setState({
-				SettingName = not Value,
+				[SettingName] = not Value,
 			})
 		end,
 	}, {

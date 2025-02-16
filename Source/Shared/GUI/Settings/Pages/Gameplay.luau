@@ -5,6 +5,7 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local Gameplay = Roact.Component:extend("Gameplay")
 
 local BooleanSetting = require(ReplicatedStorage.Game.GUI.Settings.Components.BooleanSetting)
+local NumberSetting = require(ReplicatedStorage.Game.GUI.Settings.Components.NumberSetting)
 local Title = require(ReplicatedStorage.Game.GUI.Settings.Components.Title)
 
 function Gameplay:render()
@@ -26,6 +27,15 @@ function Gameplay:render()
 			DisplayName = "Inventory Uses Short Units",
 			Description = "Make the inventory (and storage) use short units. E.g. 1000 -> 1k",
 			LayoutOrder = 1,
+		}, {}),
+
+		MusicVolume = Roact.createElement(NumberSetting, {
+			SettingName = "MusicVolume",
+			DisplayName = "Music volume",
+			Description = "The volume of all music in the game. This excludes any sound effects",
+			LayoutOrder = 2,
+			MinValue = 0,
+			MaxValue = 1,
 		}, {}),
 	})
 end
