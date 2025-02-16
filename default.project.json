@@ -273,8 +273,8 @@
     },
     "Workspace": {
       "$properties": {
-        "StreamingMinRadius": 64,
-        "StreamingTargetRadius": 350
+        "StreamingMinRadius": 300,
+        "StreamingTargetRadius": 500
       },
       "Game": {
         "$className": "Folder",
@@ -292,6 +292,12 @@
         },
         "Tycoons": {
           "$className": "Folder"
+        },
+        "MainMenuCameraPositions": {
+          "$className": "Model",
+          "$properties": {
+            "ModelStreamingMode": "Persistent"
+          }
         },
         "MineSpawn": {
           "$className": "Part"
