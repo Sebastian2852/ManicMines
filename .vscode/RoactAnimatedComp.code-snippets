@@ -1,0 +1,27 @@
+{
+    "Animated Roact Component": {
+        "prefix": "EmptyAnimatedComponent",
+        "body": [
+            "local ReplicatedStorage = game:GetService(\"ReplicatedStorage\")",
+            "",
+            "local Roact = require(ReplicatedStorage.Packages.Roact)",
+            "local Flipper = require(ReplicatedStorage.Packages.Flipper)",
+            "",
+            "local ${TM_FILENAME_BASE} = Roact.Component:extend(\"${TM_FILENAME_BASE}\")",
+            "",
+            "function ${TM_FILENAME_BASE}:init()",
+            "    self.Motor = Flipper.SingleMotor.new(0)",
+            "    local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())",
+            "    self.Binding = Binding",
+            "    self.Motor:onStep(SetBinding)",
+            "end",
+            "",
+            "function ${TM_FILENAME_BASE}:render()",
+            "    ",
+            "end",
+            "",
+            "return ${TM_FILENAME_BASE}"
+        ],
+        "description": "Blank roact component with flipper setup"
+    }
+}

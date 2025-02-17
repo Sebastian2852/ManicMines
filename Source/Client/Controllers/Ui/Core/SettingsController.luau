@@ -1,278 +1,90 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game.ReplicatedStorage
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
-local Roact = require(ReplicatedStorage.Packages.Roact)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local CreateSettingsHeader = require(ReplicatedStorage.Game.GUI.Components.Settings.SettingsHeader)
-local CreateSettingSubtitle = require(ReplicatedStorage.Game.GUI.Components.Settings.SettingSubtitle)
-
-local CreateCheckbox = require(ReplicatedStorage.Game.GUI.Components.Settings.Checkbox)
-local CreateNumberInput = require(ReplicatedStorage.Game.GUI.Components.Settings.NumberInput)
-
-local SettingsController = Knit.CreateController { Name = "PlayerSettingsController" }
+local SettingsController = Knit.CreateController({ Name = "PlayerSettingsController" })
 
 local LogService
 local SettingsService
 local DataService
-local UIService
 
-local Settings :Core.Settings = {}
+local MapProps = Instance.new("Folder")
+MapProps.Parent = workspace
+MapProps.Name = "MAP_PROPS"
 
---[[ PRIVATE ]]--
+local Settings: Core.Settings = {}
+
+--[[ PRIVATE ]]
+--
 
 --[=[
 Pushes the current settings to the server
 ]=]
 local function PushToServer()
-    LogService:Log("Pushing settings to server")
-    SettingsService:PushSettings(Settings)
+	LogService:Log("Pushing settings to server")
+	SettingsService:PushSettings(Settings)
 end
-
 
 --[=[
 Updates the settings by actually doing the settings (e.g. Disabling shadows)
 Only does things that can be done by the client. The rest will be handled by the server
 ]=]
 local function Update()
-    LogService:Log("Updating settings")
-    game.Lighting.GlobalShadows = Settings.GlobalShadows
+	LogService:Log("Updating settings")
+	game.Lighting.GlobalShadows = Settings.GlobalShadows
+
+	if Settings.HideMapProps then
+		MapProps.Parent = ReplicatedStorage
+	else
+		MapProps.Parent = workspace
+	end
 end
 
+-- [[ PUBLIC ]] --
 
-
--- [[ UI ]] --
-
-local SettingsComponent = Roact.Component:extend("SettingsComponent")
-
-local Objects = 0
-
-function SettingsComponent:SettingsHeader(HeadingText :string)
-    Objects += 1;
-    return CreateSettingsHeader(HeadingText, Objects)
+function SettingsController:ModifySetting(SettingName: string, NewValue: any)
+	Settings[SettingName] = NewValue
+	PushToServer()
 end
 
-function SettingsComponent:SettingsSubtitle(SubtitleText :string)
-    Objects += 1;
-    return CreateSettingSubtitle(SubtitleText, Objects)
+function SettingsController:GetSetting(SettingName: string)
+	return Settings[SettingName]
 end
 
-function SettingsComponent:BooleanToggle(SettingName :string, DisplayName :string, Description :string)
-    Objects += 1;
-    return Roact.createElement("Frame", {
-        Size = UDim2.fromScale(0.9, 0.15);
-        Position = UDim2.fromScale(0.5, 0);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-        LayoutOrder = Objects;
-    }, {
-        NameLabel = Roact.createElement("TextLabel", {
-            Size = UDim2.fromScale(0.9, 0.6);
-
-            BackgroundTransparency = 1;
-
-            Text = DisplayName;
-            TextScaled = true;
-            RichText = true;
-            TextXAlignment = Enum.TextXAlignment.Left;
-
-            FontFace = Core.UI.Theme.TextFont;
-            TextColor3 = Core.UI.Theme.TextColor3;
-        }, {}),
-
-        DescriptionLabel = Roact.createElement("TextLabel", {
-            Size = UDim2.fromScale(0.9, 0.4);
-            Position = UDim2.fromScale(0, 0.6);
-
-            BackgroundTransparency = 1;
-
-            Text = Description;
-            TextScaled = true;
-            RichText = true;
-            TextXAlignment = Enum.TextXAlignment.Left;
-
-            FontFace = Core.UI.Theme.TextFont;
-            TextColor3 = Core.UI.Theme.TextColorDisabled;
-        }, {}),
-
-        Toggle = CreateCheckbox(self, PushToServer, SettingName, Settings)
-    })
-end
-
-function SettingsComponent:NumberInput(SettingName :string, DisplayName :string, Description :string, MinValue :number, MaxValue :number)
-    Objects += 1
-    return Roact.createElement("Frame", {
-        Size = UDim2.fromScale(0.9, 0.15);
-        Position = UDim2.fromScale(0.5, 0);
-        AnchorPoint = Vector2.new(0.5, 0.5);
-
-        BackgroundTransparency = 1;
-        BorderSizePixel = 0;
-        LayoutOrder = Objects;
-    }, {
-        NameLabel = Roact.createElement("TextLabel", {
-            Size = UDim2.fromScale(0.9, 0.6);
-
-            BackgroundTransparency = 1;
-
-            Text = DisplayName;
-            TextScaled = true;
-            RichText = true;
-            TextXAlignment = Enum.TextXAlignment.Left;
-
-            FontFace = Core.UI.Theme.TextFont;
-            TextColor3 = Core.UI.Theme.TextColor3;
-        }, {}),
-
-        DescriptionLabel = Roact.createElement("TextLabel", {
-            Size = UDim2.fromScale(0.9, 0.4);
-            Position = UDim2.fromScale(0, 0.6);
-
-            BackgroundTransparency = 1;
-
-            Text = Description;
-            TextScaled = true;
-            RichText = true;
-            TextXAlignment = Enum.TextXAlignment.Left;
-
-            FontFace = Core.UI.Theme.TextFont;
-            TextColor3 = Core.UI.Theme.TextColorDisabled;
-        }, {}),
-
-        Input = CreateNumberInput(self, PushToServer, SettingName, Settings, MinValue, MaxValue);
-    })
-end
-
-function SettingsComponent:init()
-    self:setState({
-        Hidden = false;
-        IsSettingsVisible = false;
-        Settings = Settings;
-    })
-
-    UIService.HUDButtons:Connect(function(New :boolean)
-        self:setState({
-            Hidden = not New;
-        })
-    end)
-end
-
-function SettingsComponent:render()
-    LogService:Log("Rendering settings GUI")
-    return Roact.createElement("ScreenGui", {
-        ResetOnSpawn = false;
-    }, {
-        ToggleButton = not self.state.Hidden and Roact.createElement("ImageButton", {
-            Size = UDim2.fromScale(0.04, 0.08);
-            Position = UDim2.fromScale(0.01, 0.98);
-            AnchorPoint = Core.UI.AnchorPoint.BottomLeft;
-
-            Image = Core.UI.Images.SettingsButton;
-            BorderSizePixel = 0;
-
-            BackgroundTransparency = 1;
-
-            [Roact.Event.Activated] = function()
-                self:setState({
-                    IsSettingsVisible = not self.state.IsSettingsVisible
-                })
-            end
-        }, {
-            AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
-                AspectRatio = 1;
-            }, {})
-        }),
-
-        SettingsPanel = self.state.IsSettingsVisible and Roact.createElement("Frame", {
-            Size = UDim2.fromScale(0.5, 0.5);
-            Position = Core.UI.Position.Center;
-            AnchorPoint = Core.UI.AnchorPoint.Center;
-
-            BackgroundColor3 = Core.UI.Theme.BackgroundColorPrimary;
-            BorderSizePixel = 0;
-        }, {
-            Title = Roact.createElement("TextLabel", {
-                Size = UDim2.fromScale(1, 0.15);
-
-                BackgroundTransparency = 1;
-                Text = "Settings";
-                TextScaled = true;
-                TextXAlignment = Enum.TextXAlignment.Left;
-
-                TextColor3 = Core.UI.Theme.TextColor3;
-                FontFace = Core.UI.Theme.TextFont;
-            }, {});
-
-            SettingsFrame = Roact.createElement("ScrollingFrame", {
-                Size = UDim2.fromScale(1, 0.85);
-                Position = UDim2.fromScale(0.5, 0.575);
-                AnchorPoint = Core.UI.AnchorPoint.Center;
-                BackgroundTransparency = 1;
-                BorderSizePixel = 0;
-
-                ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255);
-                ScrollBarThickness = 5;
-                VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right;
-                VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar;
-                AutomaticCanvasSize = Enum.AutomaticSize.Y;
-                ScrollingDirection = Enum.ScrollingDirection.Y;
-                CanvasSize = UDim2.fromScale(1, 1);
-            }, {
-                Layout = Roact.createElement("UIListLayout", {
-                    Padding = UDim.new(0.01, 0);
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center;
-                    SortOrder = Enum.SortOrder.LayoutOrder;
-                }, {}),
-
-                GraphicsHeader = self:SettingsHeader("Graphics");
-                GraphicsDescription = self:SettingsSubtitle("Adjust visual quality; Higher settings enhance detail but may impact performance on lower-end devices.");
-
-                ShadowsToggle = self:BooleanToggle("GlobalShadows", "Shadows", "Toggle all shadows");
-                RainbowToggle = self:BooleanToggle("RainbowEffect", "Rainbow effects", "Toggle all rainbow (RGB) effects and set them to white");
-
-                AudioHeader = self:SettingsHeader("Audio");
-                MusicVolume = self:NumberInput("MusicVolume", "Music Volume", "Set the global volume of music", 0, 1);
-
-                ExperimentalHeader = self:SettingsHeader("Experimental");
-                ExperimentalWarning = self:SettingsSubtitle("⚠️ THESE SETTINGS ARE EXPERIMENTAL AND <font color='#fc9905'>CAN CAUSE ERRORS OR DATA LOSS</font>; USE AT YOUR OWN RISK ⚠️");
-
-                InventoryShortUnits = self:BooleanToggle("InventoryShortUnits", "Inventory short units", "Should the inventory use short units (e.g. 1000 -> 1k)");
-
-                -- No settings here yet but there will be one for the custom map streamer thingy
-                -- because I already know its going to cause a lot of issues
-            })
-        })
-    })
-end
-
-
-
---[[ KNIT ]]--
+--[[ KNIT ]]
+--
 
 function SettingsController:KnitStart()
-    LogService = Knit.GetService("LogService")
-    SettingsService = Knit.GetService("SettingsService")
-    DataService = Knit.GetService("DataService")
-    UIService = Knit.GetService("UIService")
+	LogService = Knit.GetService("LogService")
+	SettingsService = Knit.GetService("SettingsService")
+	DataService = Knit.GetService("DataService")
 
-    DataService.DataLoaded:Connect(function(DataFolder :Core.DataFolder)
-        for _, SettingValue :ValueBase in pairs(DataFolder.Settings:GetChildren()) do
-            Settings[SettingValue.Name] = SettingValue.Value
+	DataService.DataLoaded:Connect(function(DataFolder: Core.DataFolder)
+		for _, SettingValue: ValueBase in pairs(DataFolder.Settings:GetChildren()) do
+			Settings[SettingValue.Name] = SettingValue.Value
 
-            SettingValue:GetPropertyChangedSignal("Value"):Connect(function()
-                Settings[SettingValue.Name] = SettingValue.Value
-                Update()
-            end)
-        end
+			SettingValue:GetPropertyChangedSignal("Value"):Connect(function()
+				Settings[SettingValue.Name] = SettingValue.Value
+				Update()
+			end)
+		end
 
-        Update()
+		Update()
+	end)
 
-        local App = Roact.createElement(SettingsComponent)
-        Roact.mount(App, Knit.Player.PlayerGui, "Settings")
-        LogService:Log("Mounted settings component")
-    end)
+	task.spawn(function()
+		local function AddAllParts()
+			for _, v in pairs(CollectionService:GetTagged("SettingsController/HideWithPropHiding")) do
+				v.Parent = MapProps
+			end
+		end
+
+		CollectionService:GetInstanceAddedSignal("SettingsController/HideWithPropHiding"):Connect(function()
+			AddAllParts()
+		end)
+	end)
 end
 
 return SettingsController
