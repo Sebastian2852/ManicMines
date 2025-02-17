@@ -42,7 +42,7 @@ end
 Selectes a given hitbox by giving it an outline, if anything is already selected it will
 automatically deslect it
 ]=]
-function SelectionUIController:SelectTycoonHitbox(Hitbox)
+function SelectionUIController:SelectTycoonHitbox(Hitbox: BasePart)
 	LogService:Log("Selecting upgrade hitbox")
 	if CurrentlySelectingTycoon then
 		self:Deselect()
@@ -69,6 +69,13 @@ function SelectionUIController:SelectTycoonHitbox(Hitbox)
 	New.Parent = Hitbox
 	New.Adornee = Hitbox
 	New.Name = "Selection"
+
+	local Highlight = Instance.new("Highlight")
+	Highlight.Adornee = Hitbox:FindFirstChildWhichIsA("Model")
+	Highlight.FillTransparency = 0.9
+	Highlight.FillColor = Hitbox.Color
+	Highlight.OutlineColor = Color3.new(0, 0, 0)
+	Highlight.Parent = New
 
 	CurrentTycoonOutline = New
 	TycoonSelection = Hitbox

@@ -40,7 +40,8 @@ function TycoonUpgradeService:SetupHitbox(Hitbox: BasePart)
 	return Promise.new(function(Resolve)
 		Hitbox.CanCollide = false
 		Hitbox.Anchored = true
-		Hitbox.Transparency = 0.5
+		Hitbox.Transparency = 1
+		Hitbox.Material = Enum.Material.SmoothPlastic
 		Hitbox.CastShadow = false
 		Hitbox:AddTag("Tycoon/Upgrades/Hitbox")
 		Resolve()
@@ -150,6 +151,13 @@ function TycoonUpgradeService:AddModelToHitbox(Hitbox: BasePart, LevelConfig: Co
 		end
 
 		local NewModel = Model:Clone()
+
+		local ModelHitbox = NewModel:FindFirstChild("Hitbox") :: BasePart
+		NewModel.PrimaryPart = ModelHitbox
+		ModelHitbox.CanCollide = false
+		ModelHitbox.Transparency = 1
+		ModelHitbox.Anchored = true
+
 		NewModel:PivotTo(Hitbox.CFrame)
 		NewModel.Parent = Hitbox
 		Resolve()

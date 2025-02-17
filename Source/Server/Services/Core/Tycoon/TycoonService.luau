@@ -7,12 +7,12 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local TycoonAssets = ReplicatedStorage.Assets.Tycoon
 local Tycoons = workspace.Game.Tycoons
 
-local TycoonService = Knit.CreateService {
+local TycoonService = Knit.CreateService({
 	Name = "TycoonService",
 	Client = {
 		SelectUpgrade = Knit.CreateSignal(),
 	},
-}
+})
 
 local LogService
 local DataService
@@ -20,6 +20,7 @@ local TeleportService
 local AdminService
 local TycoonUpgradeService
 local TycoonGeneratorService
+local LoadingService
 
 local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
 
@@ -90,8 +91,15 @@ function TycoonService:CreateTycoonForPlayer(Player: Player): Model
 
 	local DataFolder = DataService:GetPlayerDataFolder(Player)
 
-	Player.CharacterAdded:Connect(function()
-		TeleportService:TeleportPlayerToTycoon(Player, NewTycoon)
+	Player.CharacterAdded:Connect(function(Character)
+		local Humanoid = Character.Humanoid
+		Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+			if Humanoid.Health <= 0 then
+				LoadingService:StartLoading(Player)
+				LoadingService:UpdateActionText(Player, "Loading tycoon")
+			end
+		end)
+		TeleportService:TeleportPlayerToTycoon(Player, NewTycoon, true)
 	end)
 
 	AddUpgradeModels(DataFolder, NewTycoon)
@@ -99,6 +107,16 @@ function TycoonService:CreateTycoonForPlayer(Player: Player): Model
 
 	if Player.Character then
 		TeleportService:TeleportPlayerToTycoon(Player, NewTycoon, false)
+		local Humanoid = Player.Character.Humanoid
+
+		local HealthConnection
+		HealthConnection = Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+			if Humanoid.Health <= 0 then
+				LoadingService:StartLoading(Player)
+				LoadingService:UpdateActionText(Player, "Loading tycoon")
+				HealthConnection:Disconnect()
+			end
+		end)
 	end
 
 	LogService:Log("Created " .. Player.Name .. "'s tycoon")
@@ -196,6 +214,7 @@ function TycoonService:KnitStart()
 	AdminService = Knit.GetService("AdminService")
 	TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")
 	TycoonGeneratorService = Knit.GetService("TycoonGeneratorService")
+	LoadingService = Knit.GetService("LoadingService")
 end
 
 return TycoonService
