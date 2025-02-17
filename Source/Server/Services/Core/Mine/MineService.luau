@@ -311,9 +311,6 @@ function MineService:GenerateBlockAtPosition(
 	if GenerationCache[KeyPosition(Position)] == 1 then
 		return
 	end
-	if Position.Y > TopLayerY then
-		return
-	end
 
 	GenerationCache[KeyPosition(Position)] = 1
 
@@ -456,7 +453,7 @@ function MineService:GenerateTopLayer()
 				local Position = TopLeftPosition + Vector3.new((X - 1) * BlockSize.X, 0, (Y - 1) * BlockSize.Z)
 				local AbovePos = Position + Vector3.new(0, BlockSize.Y, 0)
 
-				table.insert(self.TopLayerPositions, Position)
+				table.insert(self.TopLayerPositions, self:SnapPositionToGrid(Position))
 				self:GenerateBlockAtPosition(Position)
 				self:AddAirPosition(AbovePos)
 			end

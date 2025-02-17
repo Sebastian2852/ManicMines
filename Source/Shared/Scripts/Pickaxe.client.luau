@@ -13,7 +13,6 @@ until script.Parent:IsA("Tool")
 
 local Tool: Tool = script.Parent
 local PickaxeService = Knit.GetService("PickaxeService")
-local Workspace = game:GetService("Workspace")
 
 local PlayerFolder = game.ReplicatedStorage.Player
 local PlayerDataFolder = game.ReplicatedStorage.PlayerData:WaitForChild(Player.UserId)
@@ -171,8 +170,7 @@ local function GetOreFromRayCast(X, Y)
 	local CameraRay = Camera:ScreenPointToRay(X, Y)
 
 	local RaycastParamaters = RaycastParams.new()
-	RaycastParamaters.FilterDescendantsInstances =
-		{ workspace.Game.Players:GetDescendants(), Workspace:WaitForChild("AudioEngine"):GetDescendants() }
+	RaycastParamaters.FilterDescendantsInstances = { workspace.Game.Players:GetDescendants() }
 	RaycastParamaters.FilterType = Enum.RaycastFilterType.Exclude
 
 	local RayCastResult = workspace:Raycast(CameraRay.Origin, CameraRay.Direction * 100, RaycastParamaters)
