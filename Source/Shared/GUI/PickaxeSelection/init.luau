@@ -142,7 +142,11 @@ function PickaxeSelection:render()
 								BorderSizePixel = 0,
 								LayoutOrder = 2,
 
-								Text = `{MiningPercentage}% • {TimeToMine}S`,
+								Text = `{math.clamp(MiningPercentage, 0, 100)}% • {math.clamp(
+									TimeToMine,
+									0,
+									math.huge
+								)}S`,
 								TextScaled = true,
 								TextColor3 = Theme.TextColor,
 								FontFace = Theme.Font,

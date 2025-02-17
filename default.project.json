@@ -392,9 +392,6 @@
               "Health": {
                 "Int64": 0
               },
-              "MaxHealth": {
-                "Int64": 0
-              },
               "XP": {
                 "Int64": 0
               },

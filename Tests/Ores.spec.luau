@@ -10,7 +10,6 @@ local NeededAttribs = {
 	EmblemImageID = "string",
 	Health = "number",
 	InventoryBackgroundColor = "ColorSequence",
-	MaxHealth = "number",
 	MiningBarGradient = "ColorSequence",
 	NoCave = "boolean",
 	Rarity = "number",
