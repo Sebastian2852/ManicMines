@@ -19,7 +19,6 @@ in the project's **root directory**.
 ### Dependencies
 - Knit: Framework
 - Component: Framework
-- **(TO-BE-REMOVED)** Maid: Cleanup
 - Trove: Cleanup
 - Roact: GUI
 - Flipper: GUI Motion
