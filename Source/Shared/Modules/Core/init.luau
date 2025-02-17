@@ -124,8 +124,6 @@ local Queue = require(script.Parent.Classes.Queue)
 local Data = require(script.Parent.Classes.SaveData.Data)
 local SaveData = require(script.Parent.Classes.SaveData.SaveData)
 
-local Maid = require(ReplicatedStorage.Packages.maid)
-
 export type OreList = OreList.OreList
 export type OreListItem = OreList.OreListItem
 
@@ -137,8 +135,6 @@ return {
 
 	UI = UI,
 	Roact = Roact,
-
-	Maid = Maid,
 
 	Data = {
 		SaveData = SaveData,

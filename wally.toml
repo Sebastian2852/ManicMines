@@ -7,7 +7,6 @@ realm = "shared"
 [dependencies]
 Knit = "sleitnick/knit@^1.7"
 Component = "sleitnick/component@2.4.8"
-maid = "alexinite/maid@2.3.2"
 trove = "sleitnick/trove@1.5.0"
 Roact = "roblox/roact@1.4.4"
 Flipper = "reselim/flipper@2.0.0"
