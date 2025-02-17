@@ -1,7 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local AudioEngine = Knit.GetController("AudioEngine")
+local AudioEngine = RunService:IsClient() and Knit.GetController("AudioEngine") or nil
 
 local Theme = {
 	BackgroundColor = Color3.fromRGB(31, 31, 31),
@@ -33,6 +34,10 @@ Theme.Images = {
 	TycoonTeleportButton = "rbxassetid://83761770070710",
 	SurfaceButton = "rbxassetid://119967532396729",
 }
+
+if RunService:IsServer() then
+	return Theme
+end
 
 Theme.RawAudio = {
 	ButtonHover = AudioEngine:CreateFromSound(ReplicatedStorage.Assets.UI.Audio.HoverSound, false),
