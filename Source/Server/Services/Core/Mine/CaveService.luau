@@ -15,89 +15,7 @@ local LogService
 
 local BlockSize = Core.GameConfig.Mine.BlockSize
 
--- [[ PRIVATE ]] --
-
-local function GetSphereAirPositions(Center: Vector3, Radius: number): { Vector3 }
-	local Positions = {}
-
-	for X = -Radius, Radius, BlockSize.X do
-		for Y = -Radius, Radius, BlockSize.Y do
-			for Z = -Radius, Radius, BlockSize.Z do
-				local Offset = Vector3.new(X, Y, Z)
-				local Position = Center + Offset
-				if Offset.Magnitude <= Radius then
-					table.insert(Positions, Position)
-				end
-			end
-		end
-	end
-
-	return Positions
-end
-
-local function GetToalWeightOfCaves(Caves: { Configuration }?)
-	if Caves == nil then
-		Caves = Core.Assets.Caves.Random:GetChildren()
-	end
-
-	local Weight = 0
-
-	for _, Cave: Configuration in pairs(Caves) do
-		local Rarity = Cave:GetAttribute("Rarity")
-		Weight += Rarity
-	end
-
-	return Weight
-end
-
 -- [[ PUBLIC ]] --
-
---[=[
-Generate a geode around the center with a given radius for the given ore
-]=]
-function CaveService:GenerateGeodeAsync(Center: Vector3, Radius: number, Ore: BasePart)
-	LogService:Log("Generating geode")
-	return Promise.new(function(Resolve)
-		local Positions = GetSphereAirPositions(Center, Radius)
-
-		LogService:Log("Generated air positions")
-
-		local OreData = Core.OreList.CreateOreData(Ore)
-
-		for _, Position: Vector3 in pairs(Positions) do
-			MineService:AddAirPosition(Position)
-		end
-
-		LogService:Log("Generating blocks")
-
-		local Blocks: { BasePart } = {}
-		local BlockGen = {}
-
-		for _, Position: Vector3 in pairs(Positions) do
-			local GenPromise = MineService
-				:GenerateAroundPositionAsync(Position, true, OreData, Ore:GetAttribute("GeodeColorTint"))
-				:andThen(function(Generated: { BasePart })
-					for _, v in pairs(Generated) do
-						table.insert(Blocks, v)
-					end
-				end)
-			table.insert(BlockGen, GenPromise)
-		end
-
-		Promise.all(BlockGen):andThen(function()
-			LogService:Log("changing brightness of lights")
-			for _, Block in pairs(Blocks) do
-				local Light = Block:FindFirstChildWhichIsA("Light")
-				if Light then
-					Light.Brightness = Light.Brightness / 2
-				end
-			end
-
-			LogService:Log("Generated geode")
-			Resolve()
-		end)
-	end)
-end
 
 --[=[
 Do not use this function, instead use "GenerateRandomCaveAsync"
@@ -107,8 +25,8 @@ function CaveService:GenerateCaveAsync(
 	Size: number,
 	NoiseResolution: Vector3,
 	NoiseResolutionOffset: Vector3,
-	NoiseThreshold: number
-	-- Tint: Color3?
+	NoiseThreshold: number,
+	Tint: Color3?
 )
 	return Promise.new(function(Resolve)
 		if Size % 2 == 0 then
@@ -128,17 +46,29 @@ function CaveService:GenerateCaveAsync(
 					local Position = Center + Offset
 
 					if X == -Size or X + BlockSize.X > Size then
-						MineService:GenerateAtPositionAsync(Position, true)
+						MineService:GenerateAtPositionAsync(Position, true):andThen(function(Block)
+							if Block then
+								Block.Color = Core.Util:TintColor(Block.Color, Tint)
+							end
+						end)
 						continue
 					end
 
 					if Y == -Size or Y + BlockSize.Y > Size then
-						MineService:GenerateAtPositionAsync(Position, true)
+						MineService:GenerateAtPositionAsync(Position, true):andThen(function(Block)
+							if Block then
+								Block.Color = Core.Util:TintColor(Block.Color, Tint)
+							end
+						end)
 						continue
 					end
 
 					if Z == -Size or Z + BlockSize.Z > Size then
-						MineService:GenerateAtPositionAsync(Position, true)
+						MineService:GenerateAtPositionAsync(Position, true):andThen(function(Block)
+							if Block then
+								Block.Color = Core.Util:TintColor(Block.Color, Tint)
+							end
+						end)
 						continue
 					end
 
@@ -149,7 +79,11 @@ function CaveService:GenerateCaveAsync(
 					)
 
 					if Noise < NoiseThreshold then
-						MineService:GenerateAtPositionAsync(Position, true)
+						MineService:GenerateAtPositionAsync(Position, true):andThen(function(Block)
+							if Block then
+								Block.Color = Core.Util:TintColor(Block.Color, Tint)
+							end
+						end)
 					end
 
 					MineService:AddAirPosition(Position)
@@ -189,22 +123,35 @@ function CaveService:GetSpawnableCaves(Depth: number): { Configuration }
 	return SpawnableCaves
 end
 
---[=[
-Picks a random cave from the caves given based on weight
-]=]
-function CaveService:PickRandomCaveConfig(Caves: { Configuration }): Configuration
-	local NumberGenerator: Random = MineService:GetRandomObject()
-	local TotalWeight = GetToalWeightOfCaves(Caves)
-	local RandomWeight = NumberGenerator:NextInteger(1, TotalWeight)
-	local CurrentWeight = 0
+function CaveService:GetRandomConfig(Depth: number): Configuration
+	local PossibleCaves = self:GetSpawnableCaves(Depth)
+	local NumberGenerator = MineService:GetRandomObject()
 
-	for _, Cave: Configuration in pairs(Caves) do
-		local CaveWeight = Cave:GetAttribute("Rarity")
-		CurrentWeight += CaveWeight
-		if RandomWeight <= CurrentWeight then
+	local function GetRemainingCaves(CavesLeft: { BasePart })
+		for i, Cave: Configuration in pairs(CavesLeft) do
+			local RandomNumber = NumberGenerator:NextInteger(1, Cave:GetAttribute("Rarity"))
+			if RandomNumber ~= 1 then
+				table.remove(CavesLeft, i)
+			end
+		end
+		return CavesLeft
+	end
+
+	if #PossibleCaves > 1 then
+		repeat
+			PossibleCaves = GetRemainingCaves(PossibleCaves)
+		until #PossibleCaves == 1
+	end
+
+	if #PossibleCaves == 1 then
+		local Cave = PossibleCaves[1]
+		local RandomNumber = NumberGenerator:NextInteger(1, Cave:GetAttribute("Rarity") or 1)
+		if RandomNumber == 1 then
 			return Cave
 		end
 	end
+
+	return nil
 end
 
 --[=[
@@ -232,17 +179,14 @@ Generates a random cave from a random config at the given position
 ]=]
 function CaveService:GenerateRandomCave(Position: Vector3)
 	LogService:Log("Generating new cave")
+
 	Position = MineService:SnapPositionToGrid(Position)
-
 	local Depth = MineService:ConvertToDepth(Position.Y)
-	local PossibleCaves = self:GetSpawnableCaves(Depth)
-	local RandomCave = self:PickRandomCaveConfig(PossibleCaves)
-	if not RandomCave then
-		LogService:Warn("No possible caves can spawn")
-		return
-	end
+	local RandomCaveConfig = self:GetRandomConfig(Depth)
 
-	self:GenerateCaveFromConfigAsync(RandomCave, Position)
+	if RandomCaveConfig then
+		self:GenerateCaveFromConfigAsync(RandomCaveConfig, Position)
+	end
 end
 
 -- [[ KNIT ]] --
@@ -251,17 +195,18 @@ function CaveService:KnitStart()
 	MineService = Knit.GetService("MineService")
 	LogService = Knit.GetService("LogService")
 
-	task.wait(5)
+	if _G.DEBUG then
+		task.wait(5)
+		local Generated = 0
 
-	local Generated = 0
-
-	for _, CaveConfig: Configuration in pairs(Core.Assets.Caves.Random:GetChildren()) do
-		if CaveConfig:GetAttribute("TestMode") == false then
-			continue
+		for _, CaveConfig: Configuration in pairs(Core.Assets.Caves.Random:GetChildren()) do
+			if CaveConfig:GetAttribute("TestMode") == false then
+				continue
+			end
+			Generated += 1
+			LogService:Log("Generateing test cave: " .. CaveConfig.Name)
+			self:GenerateCaveFromConfigAsync(CaveConfig, Vector3.new(500 * Generated, -500, 0)):await()
 		end
-		Generated += 1
-		LogService:Log("Generateing test cave: " .. CaveConfig.Name)
-		self:GenerateCaveFromConfigAsync(CaveConfig, Vector3.new(500 * Generated, -500, 0)):await()
 	end
 end
 
