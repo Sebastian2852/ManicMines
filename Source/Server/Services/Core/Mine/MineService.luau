@@ -275,63 +275,68 @@ Returns a promise
 ]=]
 function MineService:GenerateAtPositionAsync(Position: Vector3, InCave: boolean)
 	return Promise.new(function(Resolve)
-		if self:IsPositionAir(Position) then
-			Resolve()
-			return
-		end
-
-		if Position.Y > TopLayerY then
-			Resolve()
-			return
-		end
-
-		self:AddAirPosition(Position)
-
-		local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
-		local Block: BasePart = nil
-		local Stone = self:YLevelToLayer(Position.Y).Stone
-
-		if RandomNumber == 1 then
-			local Ore = PickRandomOre(ConvertYLevelToDepth(Position.Y), InCave)
-
-			local NewOre = Stone:Clone() :: BasePart
-			NewOre.Name = Ore.Name
-			NewOre:ClearAllChildren()
-
-			local AttribsToSet = Ore:GetAttributes()
-
-			for Key, Value in pairs(AttribsToSet) do
-				NewOre:SetAttribute(Key, Value)
-			end
-
-			for _, v in pairs(Ore:GetChildren()) do
-				v:Clone().Parent = NewOre
-			end
-
-			Block = NewOre
-		end
-
-		if Block == nil then
-			Stone = Stone:Clone()
-			SetupStoneBlock(Stone)
-			Block = Stone
-		end
-
-		Block.Size = Vector3.new(6, 6, 6)
-		Block:PivotTo(CFrame.new(Position))
-		Block.Parent = Workspace.Game.Mine
-		Block.Anchored = true
-		self.MineStats.BlocksGenerated += 1
-
-		if Position.Y == TopLayerY and not (TopLayerPositions[KeyVector(Position)] == true) then
-			Block.Color = Core.Util:TintColor(Block.Color, Color3.new(0, 0, 0))
-			Resolve(Block)
-			return
-		end
-
-		Block:SetAttribute("CanMine", true)
-		Resolve(Block)
+		local GeneratedBlock = self:GenerateAtPosition(Position, InCave)
+		Resolve(GeneratedBlock)
 	end)
+end
+
+--[=[
+Generate a random block at the given position
+]=]
+function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
+	if self:IsPositionAir(Position) then
+		return
+	end
+
+	if Position.Y > TopLayerY then
+		return
+	end
+
+	self:AddAirPosition(Position)
+
+	local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
+	local Block: BasePart = nil
+	local Stone = self:YLevelToLayer(Position.Y).Stone
+
+	if RandomNumber == 1 then
+		local Ore = PickRandomOre(ConvertYLevelToDepth(Position.Y), InCave)
+
+		local NewOre = Stone:Clone() :: BasePart
+		NewOre.Name = Ore.Name
+		NewOre:ClearAllChildren()
+
+		local AttribsToSet = Ore:GetAttributes()
+
+		for Key, Value in pairs(AttribsToSet) do
+			NewOre:SetAttribute(Key, Value)
+		end
+
+		for _, v in pairs(Ore:GetChildren()) do
+			v:Clone().Parent = NewOre
+		end
+
+		Block = NewOre
+	end
+
+	if Block == nil then
+		Stone = Stone:Clone()
+		SetupStoneBlock(Stone)
+		Block = Stone
+	end
+
+	Block.Size = Vector3.new(6, 6, 6)
+	Block:PivotTo(CFrame.new(Position))
+	Block.Parent = Workspace.Game.Mine
+	Block.Anchored = true
+	self.MineStats.BlocksGenerated += 1
+
+	if Position.Y == TopLayerY and not (TopLayerPositions[KeyVector(Position)] == true) then
+		Block.Color = Core.Util:TintColor(Block.Color, Color3.new(0, 0, 0))
+		return Block
+	end
+
+	Block:SetAttribute("CanMine", true)
+	return Block
 end
 
 --[=[
@@ -343,18 +348,11 @@ function MineService:GenerateAroundBlockAsync(Block: BasePart)
 		local Origin = Block.Position
 		local Blocks = {}
 
-		local Gens = {}
-
 		for _, Offset: Vector3 in pairs(BlockGenerationOffsets) do
-			table.insert(
-				Gens,
-				self:GenerateAtPositionAsync(Origin + Offset):andThen(function(NewBlock)
-					table.insert(Blocks, NewBlock)
-				end)
-			)
+			local NewBlock = self:GenerateAtPosition(Origin + Offset)
+			table.insert(Blocks, NewBlock)
 		end
 
-		Promise.all(Gens):await()
 		Resolve(Blocks)
 	end)
 end
