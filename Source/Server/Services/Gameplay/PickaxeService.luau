@@ -44,15 +44,19 @@ Calculates the mining power for the given player
 ]=]
 function PickaxeService:CalculateMiningPower(Player: Player): number
 	local Pickaxe = self:GetPlayerPickaxe(Player)
+	local DataFolder = DataService:GetPlayerDataFolder(Player) :: Core.DataFolder
 	if not Pickaxe then
-		return 0
+		return -1
 	end
 
 	local Damage = Pickaxe:GetAttribute("Damage") :: number or 0
 	local Delay = Pickaxe:GetAttribute("Delay") :: number or 0
 	local Range = Pickaxe:GetAttribute("Range") :: number or 0
 
-	local MiningPower = math.floor((Damage * Delay * Range) * 10)
+	local Upgrade = DataFolder.Tycoon.Upgrades:FindFirstChild("ResearchAndDevelopment").Value
+	local UpgradeMultiplier = (Upgrade or 0) * 1.2
+
+	local MiningPower = math.floor((Damage * Delay * Range) * (UpgradeMultiplier == 0 and 1 or UpgradeMultiplier) * 10)
 	self.Client.UpdateMiningPower:Fire(Player, MiningPower)
 	return MiningPower
 end

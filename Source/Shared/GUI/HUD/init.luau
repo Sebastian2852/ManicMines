@@ -31,8 +31,7 @@ function HUD:render()
 
 			CurrencyContainer = Roact.createElement("Frame", {
 				Size = UDim2.fromScale(0.2, 0.3),
-				Position = UDim2.fromScale(0, 0.525),
-				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.fromScale(0, 0.5),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 			}, {

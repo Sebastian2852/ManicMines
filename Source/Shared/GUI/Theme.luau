@@ -33,6 +33,7 @@ Theme.Images = {
 	Gold = "rbxassetid://92870304618730",
 	TycoonTeleportButton = "rbxassetid://83761770070710",
 	SurfaceButton = "rbxassetid://119967532396729",
+	MiningPower = "rbxassetid://94366503795994",
 }
 
 if RunService:IsServer() then

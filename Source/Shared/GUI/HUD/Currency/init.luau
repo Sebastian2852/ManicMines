@@ -6,7 +6,8 @@ local Signals = require(script.Parent.Parent.Signals)
 local Currency = Roact.Component:extend("Currency")
 
 local Amount = require(script.Currency)
-local Theme = require(script.Parent.Parent.Theme)
+local MiningPower = require(ReplicatedStorage.Game.GUI.HUD.Currency.MiningPower)
+local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
 function Currency:init()
 	Signals.ToggleHUDGold:Connect(function(New: boolean)
@@ -28,7 +29,7 @@ function Currency:render()
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
-			VerticalAlignment = Enum.VerticalAlignment.Bottom,
+			VerticalAlignment = Enum.VerticalAlignment.Top,
 		}, {}),
 
 		GoldContainer = Roact.createElement("Frame", {
@@ -36,10 +37,23 @@ function Currency:render()
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Visible = not Hidden,
+			LayoutOrder = 1,
 		}, {
 			Gold = Roact.createElement(Amount, {
 				Currency = "Gold",
 				Image = Theme.Images.Gold,
+			}, {}),
+		}),
+
+		MiningPowerContainer = Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 0.1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Visible = not Hidden,
+			LayoutOrder = 2,
+		}, {
+			MiningPower = Roact.createElement(MiningPower, {
+				Image = Theme.Images.MiningPower,
 			}, {}),
 		}),
 	})
