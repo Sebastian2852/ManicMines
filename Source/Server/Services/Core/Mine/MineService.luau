@@ -245,11 +245,12 @@ function MineService:GenerateAtPositionAsync(Position: Vector3, InCave: boolean)
 
 		local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
 		local Block: BasePart = nil
+		local Stone = self:YLevelToLayer(Position.Y).Stone
 
 		if RandomNumber == 1 then
 			local Ore = PickRandomOre(ConvertYLevelToDepth(Position.Y), InCave)
 
-			local NewOre = Core.Assets.Stone:Clone() :: BasePart
+			local NewOre = Stone:Clone() :: BasePart
 			NewOre.Name = Ore.Name
 			NewOre:ClearAllChildren()
 
@@ -266,7 +267,7 @@ function MineService:GenerateAtPositionAsync(Position: Vector3, InCave: boolean)
 			Block = NewOre
 		end
 
-		Block = Block and Block or Core.Assets.Stone:Clone()
+		Block = Block and Block or Stone:Clone()
 		Block.Size = Vector3.new(6, 6, 6)
 		Block:PivotTo(CFrame.new(Position))
 		Block.Parent = Workspace.Game.Mine
