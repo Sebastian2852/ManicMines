@@ -170,7 +170,8 @@ local function GetOreFromRayCast(X, Y)
 	local CameraRay = Camera:ScreenPointToRay(X, Y)
 
 	local RaycastParamaters = RaycastParams.new()
-	RaycastParamaters.FilterDescendantsInstances = { workspace.Game.Players:GetDescendants() }
+	RaycastParamaters.FilterDescendantsInstances =
+		{ workspace.Game.Players:GetDescendants(), workspace:WaitForChild("AudioEngine"):GetDescendants() }
 	RaycastParamaters.FilterType = Enum.RaycastFilterType.Exclude
 
 	local RayCastResult = workspace:Raycast(CameraRay.Origin, CameraRay.Direction * 100, RaycastParamaters)

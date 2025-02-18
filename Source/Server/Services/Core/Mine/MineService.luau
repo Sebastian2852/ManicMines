@@ -400,12 +400,6 @@ function MineService:KnitStart()
 
 	self:GenerateTopLayer()
 	self:GenerateAtPositionAsync(Vector3.new(0, 0, 0))
-
-	local Timer = Profiler.Timer.new("RandomOre")
-	local Ore = PickRandomOre()
-	Timer:Stop()
-
-	print(Ore)
 end
 
 return MineService
