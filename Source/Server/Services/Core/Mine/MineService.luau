@@ -5,10 +5,13 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local MineService = Knit.CreateService({
 	Name = "MineService",
 	Client = {},
+
+	OnBlockMined = Signal.new(),
 
 	MineStats = {
 		BlocksGenerated = 0,
@@ -197,9 +200,9 @@ Snaps the given position to the mine's grid
 ]=]
 function MineService:SnapPositionToGrid(Position: Vector3): Vector3
 	return Vector3.new(
-		math.round(Position.X / BlockSize.X) * BlockSize.X,
-		math.round(Position.Y / BlockSize.Y) * BlockSize.Y,
-		math.round(Position.Z / BlockSize.Z) * BlockSize.Z
+		math.floor(Position.X / BlockSize.X + 0.5) * BlockSize.X,
+		math.floor(Position.Y / BlockSize.Y + 0.5) * BlockSize.Y,
+		math.floor(Position.Z / BlockSize.Z + 0.5) * BlockSize.Z
 	)
 end
 
@@ -224,7 +227,9 @@ function MineService:GenerateTopLayer()
 	local function Generate(Y)
 		return Promise.new(function(Resolve)
 			for X = 1, BlocksToGenerateX, 1 do
-				local Position = TopLeftPosition + Vector3.new((X - 1) * BlockSize.X, 0, (Y - 1) * BlockSize.Z)
+				local Position = self:SnapPositionToGrid(
+					TopLeftPosition + Vector3.new((X - 1) * BlockSize.X, 0, (Y - 1) * BlockSize.Z)
+				)
 				local AbovePos = Position + Vector3.new(0, BlockSize.Y, 0)
 
 				TopLayerPositions[KeyVector(Position)] = true
@@ -284,6 +289,7 @@ end
 Generate a random block at the given position
 ]=]
 function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
+	Position = self:SnapPositionToGrid(Position)
 	if self:IsPositionAir(Position) then
 		return
 	end
@@ -389,6 +395,9 @@ function MineService:BlockMined(Block: BasePart)
 		return
 	end
 
+	self.OnBlockMined:Fire(Block, Block.CFrame.Position)
+	print("Fired Signal")
+
 	Promise.new(function(Resolve)
 		local Module = Block:FindFirstChildWhichIsA("ModuleScript")
 		if not Module then
@@ -408,6 +417,10 @@ function MineService:BlockMined(Block: BasePart)
 			Block:Destroy()
 		end)
 	end)
+end
+
+function MineService:YLevelToDepth(YLevel: number)
+	return ConvertYLevelToDepth(YLevel)
 end
 
 -- [[ CLIENT ]] --

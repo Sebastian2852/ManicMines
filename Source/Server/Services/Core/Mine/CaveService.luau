@@ -34,7 +34,6 @@ function CaveService:GenerateCaveAsync(
 		end
 
 		Size = Size / 2
-		Center = MineService:SnapPositionToGrid(Center)
 
 		local Gens = {}
 		local function GenZ(X, Y)
@@ -181,11 +180,14 @@ function CaveService:GenerateRandomCave(Position: Vector3)
 	LogService:Log("Generating new cave")
 
 	Position = MineService:SnapPositionToGrid(Position)
-	local Depth = MineService:ConvertToDepth(Position.Y)
+	local Depth = MineService:YLevelToDepth(Position.Y)
 	local RandomCaveConfig = self:GetRandomConfig(Depth)
 
 	if RandomCaveConfig then
-		self:GenerateCaveFromConfigAsync(RandomCaveConfig, Position)
+		self:GenerateCaveFromConfigAsync(
+			RandomCaveConfig,
+			Position - Vector3.new(0, RandomCaveConfig:GetAttribute("Size").Max, 0)
+		)
 	end
 end
 
@@ -194,6 +196,18 @@ end
 function CaveService:KnitStart()
 	MineService = Knit.GetService("MineService")
 	LogService = Knit.GetService("LogService")
+
+	MineService.OnBlockMined:Connect(function(_, Position: Vector3)
+		local NumberGenerator = MineService:GetRandomObject() :: Random
+		local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateCave)
+
+		if RandomNumber ~= 1 then
+			return
+		end
+
+		local NewPosition = Position - Vector3.new(0, 60, 0)
+		self:GenerateRandomCave(NewPosition)
+	end)
 
 	if _G.DEBUG then
 		task.wait(5)
