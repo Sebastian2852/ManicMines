@@ -22,18 +22,6 @@ local TopLayerPositions = {}
 
 local NumberGenerator = Random.new()
 
-local function KeyVector(Vector: Vector3)
-	return `{Vector.X};{Vector.Y};{Vector.Z}`
-end
-
-function MineService:AddAirPosition(Position: Vector3)
-	UsedPositions[KeyVector(Position)] = true
-end
-
-function MineService:IsPositionAir(Position: Vector3)
-	return UsedPositions[KeyVector(Position)] == true
-end
-
 local BlockGenerationOffsets = {
 	-- Direct neighbors
 	Vector3.new(BlockSize.X, 0, 0),
@@ -72,23 +60,19 @@ local BlockGenerationOffsets = {
 	Vector3.new(-BlockSize.X, -BlockSize.Y, -BlockSize.Z),
 }
 
-function MineService:SnapPositionToGrid(Position: Vector3): Vector3
-	return Vector3.new(
-		math.round(Position.X / BlockSize.X) * BlockSize.X,
-		math.round(Position.Y / BlockSize.Y) * BlockSize.Y,
-		math.round(Position.Z / BlockSize.Z) * BlockSize.Z
-	)
-end
-
 local MineSpawn = Workspace.Game.MineSpawn
-local OriginalMineSpawnPosition = MineService:SnapPositionToGrid(MineSpawn.CFrame.Position)
-local HiddenMineSpawnPosition = MineService:SnapPositionToGrid(OriginalMineSpawnPosition + Vector3.new(0, 50, 0))
-local TopLayerY = OriginalMineSpawnPosition.Y
+local OriginalMineSpawnPosition
+local HiddenMineSpawnPosition
+local TopLayerY
 
 local function ConvertYLevelToDepth(WorldY: number): number
 	local Top = TopLayerY
 	local CellSize = Core.GameConfig.Mine.BlockSize.Y
 	return math.floor((Top - WorldY) / CellSize)
+end
+
+local function KeyVector(Vector: Vector3)
+	return `{Vector.X};{Vector.Y};{Vector.Z}`
 end
 
 local function HideMineSpawn()
@@ -184,6 +168,44 @@ local function PickRandomOre(Depth: number, InCave: boolean)
 	return Core.Assets.Stone
 end
 
+-- [[ PUBLIC ]] --
+
+--[=[
+Add a position to the UsedPositions table
+]=]
+function MineService:AddAirPosition(Position: Vector3)
+	UsedPositions[KeyVector(Position)] = true
+end
+
+--[=[
+Returns if the given position is in the UsedPositions table
+]=]
+function MineService:IsPositionAir(Position: Vector3)
+	return UsedPositions[KeyVector(Position)] == true
+end
+
+--[=[
+Returns the current NumberGenerator that the mine is using
+to generate random numbers
+]=]
+function MineService:GetRandomObject()
+	return NumberGenerator:Clone()
+end
+
+--[=[
+Snaps the given position to the mine's grid
+]=]
+function MineService:SnapPositionToGrid(Position: Vector3): Vector3
+	return Vector3.new(
+		math.round(Position.X / BlockSize.X) * BlockSize.X,
+		math.round(Position.Y / BlockSize.Y) * BlockSize.Y,
+		math.round(Position.Z / BlockSize.Z) * BlockSize.Z
+	)
+end
+
+--[=[
+Generates the top layer of the mine
+]=]
 function MineService:GenerateTopLayer()
 	ShowMineSpawn()
 
@@ -227,6 +249,11 @@ function MineService:GenerateTopLayer()
 	end)
 end
 
+--[=[
+Reset the mine seed
+Clear all mine blocks
+Generate new top layer
+]=]
 function MineService:Collapse()
 	if Collapsing then
 		return
@@ -242,10 +269,10 @@ function MineService:Collapse()
 	Collapsing = false
 end
 
-function MineService:GetRandomObject()
-	return NumberGenerator:Clone()
-end
-
+--[=[
+Generates a random block at the given position
+Returns a promise
+]=]
 function MineService:GenerateAtPositionAsync(Position: Vector3, InCave: boolean)
 	return Promise.new(function(Resolve)
 		if self:IsPositionAir(Position) then
@@ -307,6 +334,10 @@ function MineService:GenerateAtPositionAsync(Position: Vector3, InCave: boolean)
 	end)
 end
 
+--[=[
+Generates blocks all around the given block
+Returns a promise
+]=]
 function MineService:GenerateAroundBlockAsync(Block: BasePart)
 	return Promise.new(function(Resolve)
 		local Origin = Block.Position
@@ -328,6 +359,9 @@ function MineService:GenerateAroundBlockAsync(Block: BasePart)
 	end)
 end
 
+--[=[
+Converts the given YLevel into a layer configuration
+]=]
 function MineService:YLevelToLayer(YLevel: number): Configuration
 	local Depth = ConvertYLevelToDepth(YLevel)
 
@@ -341,6 +375,12 @@ function MineService:YLevelToLayer(YLevel: number): Configuration
 	return game.ReplicatedStorage.Assets.Layers.Surface
 end
 
+--[=[
+If the mine needs to collapse it does then returns otherwise
+Checks if the given block has a module to run and runs it in a seperate thread
+Generates blocks around the given block
+Destroys the given block
+]=]
 function MineService:BlockMined(Block: BasePart)
 	if Block == nil then
 		return
@@ -389,6 +429,10 @@ end
 -- [[ KNIT ]] --
 
 function MineService:KnitStart()
+	OriginalMineSpawnPosition = MineService:SnapPositionToGrid(MineSpawn.CFrame.Position)
+	HiddenMineSpawnPosition = MineService:SnapPositionToGrid(OriginalMineSpawnPosition + Vector3.new(0, 50, 0))
+	TopLayerY = OriginalMineSpawnPosition.Y
+
 	local function SetMaxHealthAttrib(Ore: BasePart)
 		Ore:SetAttribute("MaxHealth", Ore:GetAttribute("Health"))
 	end
