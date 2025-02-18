@@ -103,6 +103,23 @@ local function ShowMineSpawn()
 	MineSpawn.CanCollide = true
 end
 
+local function SetupStoneBlock(StoneBlock: BasePart)
+	local NormalStone = Core.Assets.Stone
+	local Attribs = StoneBlock:GetAttributes()
+
+	for Key, _ in pairs(StoneBlock:GetAttributes()) do
+		StoneBlock:SetAttribute(Key, nil)
+	end
+
+	for Key, Value in pairs(NormalStone:GetAttributes()) do
+		StoneBlock:SetAttribute(Key, Value)
+	end
+
+	for Key, Value in pairs(Attribs) do
+		StoneBlock:SetAttribute(Key, Value)
+	end
+end
+
 local function GetSpawnableOres(Depth: number, InCave: boolean)
 	local Ores = Core.Assets.Ores:GetChildren()
 	local SpawnableOres = {}
@@ -267,7 +284,12 @@ function MineService:GenerateAtPositionAsync(Position: Vector3, InCave: boolean)
 			Block = NewOre
 		end
 
-		Block = Block and Block or Stone:Clone()
+		if Block == nil then
+			Stone = Stone:Clone()
+			SetupStoneBlock(Stone)
+			Block = Stone
+		end
+
 		Block.Size = Vector3.new(6, 6, 6)
 		Block:PivotTo(CFrame.new(Position))
 		Block.Parent = Workspace.Game.Mine
@@ -329,8 +351,24 @@ function MineService:BlockMined(Block: BasePart)
 		return
 	end
 
-	self:GenerateAroundBlockAsync(Block):andThen(function()
-		Block:Destroy()
+	Promise.new(function(Resolve)
+		local Module = Block:FindFirstChildWhichIsA("ModuleScript")
+		if not Module then
+			Resolve()
+			return
+		end
+
+		local Success = require(Module)
+
+		if not Success then
+			warn("Block code FAILED")
+		end
+
+		Resolve(Success)
+	end):andThen(function()
+		self:GenerateAroundBlockAsync(Block):andThen(function()
+			Block:Destroy()
+		end)
 	end)
 end
 
