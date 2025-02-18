@@ -5,10 +5,10 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
-local CaveService = Knit.CreateService {
+local CaveService = Knit.CreateService({
 	Name = "CaveService",
 	Client = {},
-}
+})
 
 local MineService
 local LogService
@@ -107,8 +107,8 @@ function CaveService:GenerateCaveAsync(
 	Size: number,
 	NoiseResolution: Vector3,
 	NoiseResolutionOffset: Vector3,
-	NoiseThreshold: number,
-	Tint: Color3?
+	NoiseThreshold: number
+	-- Tint: Color3?
 )
 	return Promise.new(function(Resolve)
 		if Size % 2 == 0 then
@@ -117,9 +117,6 @@ function CaveService:GenerateCaveAsync(
 
 		Size = Size / 2
 		Center = MineService:SnapPositionToGrid(Center)
-
-		local Blocks = 0
-		local Airs = 0
 
 		local Gens = {}
 		local function GenZ(X, Y)
@@ -131,17 +128,17 @@ function CaveService:GenerateCaveAsync(
 					local Position = Center + Offset
 
 					if X == -Size or X + BlockSize.X > Size then
-						MineService:GenerateBlockAtPosition(Position, true, nil, Tint)
+						MineService:GenerateAtPositionAsync(Position, true)
 						continue
 					end
 
 					if Y == -Size or Y + BlockSize.Y > Size then
-						MineService:GenerateBlockAtPosition(Position, true, nil, Tint)
+						MineService:GenerateAtPositionAsync(Position, true)
 						continue
 					end
 
 					if Z == -Size or Z + BlockSize.Z > Size then
-						MineService:GenerateBlockAtPosition(Position, true, nil, Tint)
+						MineService:GenerateAtPositionAsync(Position, true)
 						continue
 					end
 
@@ -152,12 +149,10 @@ function CaveService:GenerateCaveAsync(
 					)
 
 					if Noise < NoiseThreshold then
-						MineService:GenerateBlockAtPosition(Position, true, nil, Tint)
-						Blocks += 1
+						MineService:GenerateAtPositionAsync(Position, true)
 					end
 
 					MineService:AddAirPosition(Position)
-					Airs += 1
 				end
 				ResolveGen()
 			end)
