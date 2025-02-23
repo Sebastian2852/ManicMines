@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Trove = require(ReplicatedStorage.Packages.trove)
@@ -62,6 +63,18 @@ function DepthMeter:GetLayerName(): string
 	return LayerName
 end
 
+function DepthMeter:GetConditions(Percentage: number)
+	if Percentage >= 90 then
+		return "Critical", Color3.fromRGB(255, 0, 0), Core.Util:RoundToxDP(Percentage, 2)
+	elseif Percentage >= 80 then
+		return "Dangerous", Color3.fromRGB(255, 100, 0), Core.Util:RoundToxDP(Percentage, 2)
+	elseif Percentage >= 70 then
+		return "Risky", Color3.fromRGB(255, 255, 0), Core.Util:RoundToxDP(Percentage, 2)
+	else
+		return "Safe", Color3.fromRGB(0, 255, 0), Core.Util:RoundToxDP(Percentage, 2)
+	end
+end
+
 function DepthMeter:GetLayerColor(): Color3
 	local Color = Color3.fromRGB(255, 0, 255)
 
@@ -103,6 +116,7 @@ function DepthMeter:render()
 	local LayerName = self:GetLayerName()
 	local LayerColor = self:GetLayerColor()
 	local BelowOptimalDepth = ReplicatedStorage.Player.BelowOptimalDepth.Value
+	local Text, Color, Percentage = self:GetConditions(ReplicatedStorage.Player.MiningConditions.Value)
 
 	return Roact.createElement("ScreenGui", {
 		IgnoreGuiInset = true,
@@ -114,9 +128,10 @@ function DepthMeter:render()
 			AnchorPoint = Vector2.new(0.5, 0),
 			BackgroundTransparency = 1,
 
-			Text = PositionText,
+			Text = `{PositionText} | Mining Conditions: <font color="#{Color:ToHex()}"> {Text} ({Percentage}%)</font>`,
 			TextStrokeTransparency = 0,
 			TextScaled = true,
+			RichText = true,
 			TextColor3 = Theme.TextColor,
 			FontFace = Theme.Font,
 		}, {}),

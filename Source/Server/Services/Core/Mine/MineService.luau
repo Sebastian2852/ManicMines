@@ -159,8 +159,6 @@ local function GetRarityFromCurve(
 		AdjustedRarity = NormalRarity ^ x
 	end
 
-	print(NormalRarity .. " -> " .. AdjustedRarity)
-
 	return AdjustedRarity
 end
 
@@ -196,6 +194,13 @@ local function PickRandomOre(Depth: number, InCave: boolean)
 	end
 
 	return Ore and Ore or Core.Assets.Stone
+end
+
+function MineService:UpdateMiningConditions()
+	local Generated = self.MineStats.BlocksGenerated
+	local BlocksToCollapse = Core.GameConfig.Mine.BlocksToCollapse
+	local Percentage = (Generated / BlocksToCollapse) * 100
+	ReplicatedStorage.Player.MiningConditions.Value = Percentage
 end
 
 -- [[ PUBLIC ]] --
@@ -370,6 +375,7 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	Block.Parent = Workspace.Game.Mine
 	Block.Anchored = true
 	self.MineStats.BlocksGenerated += 1
+	self:UpdateMiningConditions()
 
 	if Position.Y == TopLayerY and not (TopLayerPositions[KeyVector(Position)] == true) then
 		Block.Color = Core.Util:TintColor(Block.Color, Color3.new(0, 0, 0))
