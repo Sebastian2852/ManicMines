@@ -141,32 +141,25 @@ end
 
 local function PickRandomOre(Depth: number, InCave: boolean)
 	local Ores = GetSpawnableOres(Depth, InCave)
+	local TotalWeight = 0
 
-	local function GetRemainingOres(OresLeft: { BasePart })
-		for i, Ore: Part in pairs(OresLeft) do
-			local RandomNumber = NumberGenerator:NextInteger(1, Ore:GetAttribute("Rarity"))
-			if RandomNumber ~= 1 then
-				table.remove(OresLeft, i)
-			end
-		end
-		return OresLeft
+	for _, v in pairs(Ores) do
+		TotalWeight += v:GetAttribute("Rarity")
 	end
 
-	if #Ores > 1 then
-		repeat
-			Ores = GetRemainingOres(Ores)
-		until #Ores == 1
-	end
+	local RandomWeight = NumberGenerator:NextInteger(1, TotalWeight)
+	local CurrentWeight = 0
+	local Ore = nil
 
-	if #Ores == 1 then
-		local Ore = Ores[1]
-		local RandomNumber = NumberGenerator:NextInteger(1, Ore:GetAttribute("Rarity") or 1)
-		if RandomNumber == 1 then
-			return Ore
+	for _, v in pairs(Ores) do
+		CurrentWeight += v:GetAttribute("Rarity")
+		if RandomWeight <= CurrentWeight then
+			Ore = v
+			break
 		end
 	end
 
-	return Core.Assets.Stone
+	return Ore and Ore or Core.Assets.Stone
 end
 
 -- [[ PUBLIC ]] --
