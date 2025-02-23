@@ -137,6 +137,9 @@
         "Depth": {
           "$className": "NumberValue"
         },
+        "BelowOptimalDepth": {
+          "$className": "BoolValue"
+        },
         "Debug": {
           "$className": "Folder",
           "DebugMode": {

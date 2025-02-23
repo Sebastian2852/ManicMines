@@ -102,6 +102,7 @@ function DepthMeter:render()
 	local PositionText = self:GetPositionText()
 	local LayerName = self:GetLayerName()
 	local LayerColor = self:GetLayerColor()
+	local BelowOptimalDepth = ReplicatedStorage.Player.BelowOptimalDepth.Value
 
 	return Roact.createElement("ScreenGui", {
 		IgnoreGuiInset = true,
@@ -111,7 +112,6 @@ function DepthMeter:render()
 			Size = UDim2.fromScale(0.3, 0.05),
 			Position = UDim2.fromScale(0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0),
-
 			BackgroundTransparency = 1,
 
 			Text = PositionText,
@@ -125,7 +125,6 @@ function DepthMeter:render()
 			Size = UDim2.fromScale(0.3, 0.025),
 			Position = UDim2.fromScale(0.5, 0.05),
 			AnchorPoint = Vector2.new(0.5, 0),
-
 			BackgroundTransparency = 1,
 
 			Text = "(" .. LayerName .. ")",
@@ -138,6 +137,19 @@ function DepthMeter:render()
 				Color = LayerColor,
 			}, {}),
 		}),
+
+		DepthWarning = BelowOptimalDepth and Roact.createElement("TextLabel", {
+			Size = UDim2.fromScale(0.3, 0.025),
+			Position = UDim2.fromScale(0.5, 0.08),
+			AnchorPoint = Vector2.new(0.5, 0),
+			BackgroundTransparency = 1,
+
+			Text = "(Below Turning Point)",
+			TextStrokeTransparency = 0,
+			TextScaled = true,
+			TextColor3 = Theme.BackgroundColorRed,
+			FontFace = Theme.Font,
+		}, {}),
 	})
 end
 

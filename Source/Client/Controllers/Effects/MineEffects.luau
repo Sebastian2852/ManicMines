@@ -4,9 +4,8 @@ local RunService = game:GetService("RunService")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local MineEffects = Knit.CreateController { Name = "MineEffects" }
+local MineEffects = Knit.CreateController({ Name = "MineEffects" })
 
---local PlayerDisplayService
 local LightingController
 local MusicController
 local PickaxeService
@@ -55,7 +54,6 @@ function MineEffects:KnitStart()
 	MusicController = Knit.GetController("MusicController")
 	LogService = Knit.GetService("LogService")
 	MineService = Knit.GetService("MineService")
-	--PlayerDisplayService         = Knit.GetService("PlayerDisplayService")
 	PickaxeService = Knit.GetService("PickaxeService")
 
 	RunService:BindToRenderStep("CharacterPositionInfo", Enum.RenderPriority.Input.Value + 1, function()
@@ -81,13 +79,12 @@ function MineEffects:KnitStart()
 
 		MineService:ConvertToDepth(Position.Y):andThen(function(Depth: number)
 			ReplicatedStorage.Player.Depth.Value = Depth
+
+			PickaxeService:GetOptimalDepth():andThen(function(OptimalDepth)
+				ReplicatedStorage.Player.BelowOptimalDepth.Value = Depth >= OptimalDepth
+			end)
 		end)
 	end)
-
-	-- PlayerDisplayService.GiveHeadlight:Connect(function(Character)
-	-- local Light = Core.Assets.Misc.HeadLight:Clone()
-	-- Light.Parent = Character:WaitForChild("Head")
-	-- end)
 
 	local Player = Knit.Player
 	local Character = Player.Character or Player.CharacterAdded:Wait()
