@@ -7,6 +7,7 @@ local Currency = Roact.Component:extend("Currency")
 
 local Amount = require(script.Currency)
 local MiningPower = require(ReplicatedStorage.Game.GUI.HUD.Currency.MiningPower)
+local OptimalDepth = require(ReplicatedStorage.Game.GUI.HUD.Currency.OptimalDepth)
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
 function Currency:init()
@@ -54,6 +55,18 @@ function Currency:render()
 		}, {
 			MiningPower = Roact.createElement(MiningPower, {
 				Image = Theme.Images.MiningPower,
+			}, {}),
+		}),
+
+		OptimalDepthContainer = Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 0.1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Visible = not Hidden,
+			LayoutOrder = 3,
+		}, {
+			MiningPower = Roact.createElement(OptimalDepth, {
+				Image = Theme.Images.OptimalDepth,
 			}, {}),
 		}),
 	})

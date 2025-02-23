@@ -17,6 +17,7 @@ local PickaxeService = Knit.CreateService({
 	Client = {
 		UpdateMiningSelection = Knit.CreateSignal(),
 		UpdateMiningPower = Knit.CreateSignal(),
+		UpdateOptimalDepth = Knit.CreateSignal(),
 		PlayHitSound = Knit.CreateSignal(),
 		PlayBreakSound = Knit.CreateSignal(),
 	},
@@ -59,6 +60,19 @@ function PickaxeService:CalculateMiningPower(Player: Player): number
 	local MiningPower = math.floor((Damage * Delay * Range) * (UpgradeMultiplier == 0 and 1 or UpgradeMultiplier) * 10)
 	self.Client.UpdateMiningPower:Fire(Player, MiningPower)
 	return MiningPower
+end
+
+--[=[
+Get the player's optimal depth
+]=]
+function PickaxeService:GetOptimalDepth(Player: Player): number
+	local DataFolder = DataService:GetPlayerDataFolder(Player) :: Core.DataFolder
+	local UpgradeValue = DataFolder.Tycoon.Upgrades:FindFirstChild("DataAndAnalysis").Value
+	local LevelConfig: Configuration =
+		Core.Assets.Tycoon.Upgrades:FindFirstChild("DataAndAnalysis"):FindFirstChild(tostring(UpgradeValue))
+	local OptimalDepth = LevelConfig:FindFirstChild("OptimalDepth").Value
+	self.Client.UpdateOptimalDepth:Fire(Player, OptimalDepth)
+	return OptimalDepth
 end
 
 --[=[
@@ -191,6 +205,7 @@ function PickaxeService:GivePickaxeToPlayer(Player: Player)
 	NewPickaxe:AddTag("Pickaxe")
 
 	self:CalculateMiningPower(Player)
+	self:GetOptimalDepth(Player)
 end
 
 --[=[
@@ -245,6 +260,8 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 
 	LogService:Log(Player.Name .. " started mining")
 
+	local OptimalDepth = self:GetOptimalDepth(Player)
+
 	local OreList = Core.OreList.New()
 	OreList:AddOre(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
 	MineService:GenerateAroundBlockAsync(ObjectToMine)
@@ -263,7 +280,14 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 			break
 		end
 
-		Health -= Damage
+		local Depth = MineService:YLevelToDepth(ObjectToMine.CFrame.Position.Y)
+
+		if Depth >= OptimalDepth then
+			Health -= (Damage / 2) / Depth
+		else
+			Health -= Damage
+		end
+
 		ObjectToMine:SetAttribute("Health", Health)
 		self.Client.UpdateMiningSelection:Fire(
 			Player,
@@ -423,6 +447,10 @@ end
 
 function PickaxeService.Client:GetMiningPower(Player: Player): number
 	return self.Server:CalculateMiningPower(Player)
+end
+
+function PickaxeService.Client:GetOptimalDepth(Player: Player): number
+	return self.Server:GetOptimalDepth(Player)
 end
 
 --[[ KNIT ]]
