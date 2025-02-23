@@ -117,13 +117,11 @@ local function GetSpawnableOres(Depth: number, InCave: boolean)
 		local MinY = SpawningRange.Min
 		local MaxY = SpawningRange.Max
 
-		if Ore:GetAttribute("CaveOnly") and InCave then
-			table.insert(SpawnableOres, Ore)
+		if Ore:GetAttribute("CaveOnly") and not InCave then
 			continue
 		end
 
-		if Ore:GetAttribute("NoCave") and not InCave then
-			table.insert(SpawnableOres, Ore)
+		if Ore:GetAttribute("NoCave") and InCave then
 			continue
 		end
 
@@ -177,6 +175,7 @@ end
 Add a position to the UsedPositions table
 ]=]
 function MineService:AddAirPosition(Position: Vector3)
+	Position = self:SnapPositionToGrid(Position)
 	UsedPositions[KeyVector(Position)] = true
 end
 
@@ -184,6 +183,7 @@ end
 Returns if the given position is in the UsedPositions table
 ]=]
 function MineService:IsPositionAir(Position: Vector3)
+	Position = self:SnapPositionToGrid(Position)
 	return UsedPositions[KeyVector(Position)] == true
 end
 

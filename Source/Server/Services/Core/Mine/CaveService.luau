@@ -3,6 +3,7 @@ local RunService = game:GetService("RunService")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
 local CaveService = Knit.CreateService({
@@ -33,9 +34,69 @@ function CaveService:GenerateCaveAsync(
 			Size += 1
 		end
 
-		Size = Size / 2
-
+		Size = (Size / 2) * BlockSize.X
 		local Gens = {}
+		local NoiseCache = {}
+		local CaveMap = {}
+
+		local function GetNoise(X, Y, Z)
+			local Key = string.format("%d_%d_%d", X, Y, Z)
+			if NoiseCache[Key] then
+				return NoiseCache[Key]
+			end
+
+			local Noise = math.noise(
+				X / NoiseResolution.X + NoiseResolutionOffset.X,
+				Y / NoiseResolution.Y + NoiseResolutionOffset.Y,
+				Z / NoiseResolution.Z + NoiseResolutionOffset.Z
+			)
+
+			NoiseCache[Key] = Noise
+			return Noise
+		end
+
+		-- Precompute cave structure
+		for X = -Size, Size, BlockSize.X do
+			for Y = -Size, Size, BlockSize.Y do
+				for Z = -Size, Size, BlockSize.Z do
+					local NoiseValue = GetNoise(X, Y, Z)
+					CaveMap[X .. "," .. Y .. "," .. Z] = NoiseValue < NoiseThreshold
+				end
+			end
+		end
+
+		local function IsSurfaceBlock(X, Y, Z)
+			if not CaveMap[X .. "," .. Y .. "," .. Z] then
+				return false
+			end
+
+			local Offsets = {
+				Vector3.new(BlockSize.X, 0, 0),
+				Vector3.new(-BlockSize.X, 0, 0),
+				Vector3.new(0, BlockSize.Y, 0),
+				Vector3.new(0, -BlockSize.Y, 0),
+				Vector3.new(0, 0, BlockSize.Z),
+				Vector3.new(0, 0, -BlockSize.Z),
+			}
+
+			for _, Offset in Offsets do
+				local NeighborKey = (X + Offset.X) .. "," .. (Y + Offset.Y) .. "," .. (Z + Offset.Z)
+				if not CaveMap[NeighborKey] then
+					return true -- This block is exposed to air
+				end
+			end
+
+			return false -- Fully enclosed, skip it
+		end
+
+		local function GenerateBlock(Position, ForceGenerate)
+			MineService:GenerateAtPositionAsync(Position, ForceGenerate):andThen(function(Block)
+				if Block and Tint ~= nil and Tint ~= Color3.new(1, 1, 1) then
+					Block.Color = Core.Util:TintColor(Block.Color, Tint)
+				end
+			end)
+		end
+
 		local function GenZ(X, Y)
 			return Promise.new(function(ResolveGen)
 				for Z = -Size, Size, BlockSize.Z do
@@ -44,48 +105,28 @@ function CaveService:GenerateCaveAsync(
 					local Offset = Vector3.new(X, Y, Z)
 					local Position = Center + Offset
 
-					if X == -Size or X + BlockSize.X > Size then
-						MineService:GenerateAtPositionAsync(Position, true):andThen(function(Block)
-							if Block then
-								Block.Color = Core.Util:TintColor(Block.Color, Tint)
-							end
-						end)
+					if MineService:IsPositionAir(Position) then
 						continue
 					end
 
-					if Y == -Size or Y + BlockSize.Y > Size then
-						MineService:GenerateAtPositionAsync(Position, true):andThen(function(Block)
-							if Block then
-								Block.Color = Core.Util:TintColor(Block.Color, Tint)
-							end
-						end)
+					-- Generate outer shell
+					if
+						X == -Size
+						or X + BlockSize.X > Size
+						or Y == -Size
+						or Y + BlockSize.Y > Size
+						or Z == -Size
+						or Z + BlockSize.Z > Size
+					then
+						GenerateBlock(Position, true)
 						continue
 					end
 
-					if Z == -Size or Z + BlockSize.Z > Size then
-						MineService:GenerateAtPositionAsync(Position, true):andThen(function(Block)
-							if Block then
-								Block.Color = Core.Util:TintColor(Block.Color, Tint)
-							end
-						end)
-						continue
+					-- Generate only surface blocks inside the cave
+					if IsSurfaceBlock(X, Y, Z) then
+						GenerateBlock(Position, false)
+						MineService:AddAirPosition(Position)
 					end
-
-					local Noise = math.noise(
-						X / NoiseResolution.X + NoiseResolutionOffset.X,
-						Y / NoiseResolution.Y + NoiseResolutionOffset.Y,
-						Z / NoiseResolution.Z + NoiseResolutionOffset.Z
-					)
-
-					if Noise < NoiseThreshold then
-						MineService:GenerateAtPositionAsync(Position, true):andThen(function(Block)
-							if Block then
-								Block.Color = Core.Util:TintColor(Block.Color, Tint)
-							end
-						end)
-					end
-
-					MineService:AddAirPosition(Position)
 				end
 				ResolveGen()
 			end)
@@ -197,17 +238,17 @@ function CaveService:KnitStart()
 	MineService = Knit.GetService("MineService")
 	LogService = Knit.GetService("LogService")
 
-	MineService.OnBlockMined:Connect(function(_, Position: Vector3)
-		local NumberGenerator = MineService:GetRandomObject() :: Random
-		local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateCave)
+	-- MineService.OnBlockMined:Connect(function(_, Position: Vector3)
+	-- 	local NumberGenerator = MineService:GetRandomObject() :: Random
+	-- 	local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateCave)
 
-		if RandomNumber ~= 1 then
-			return
-		end
+	-- 	if RandomNumber ~= 1 then
+	-- 		return
+	-- 	end
 
-		local NewPosition = Position - Vector3.new(0, 60, 0)
-		self:GenerateRandomCave(NewPosition)
-	end)
+	-- 	local NewPosition = Position - Vector3.new(0, 60, 0)
+	-- 	self:GenerateRandomCave(NewPosition)
+	-- end)
 
 	if _G.DEBUG then
 		task.wait(5)
@@ -219,7 +260,9 @@ function CaveService:KnitStart()
 			end
 			Generated += 1
 			LogService:Log("Generateing test cave: " .. CaveConfig.Name)
+			local Timer = Profiler.Timer.new("CaveGen")
 			self:GenerateCaveFromConfigAsync(CaveConfig, Vector3.new(500 * Generated, -500, 0)):await()
+			Timer:Stop()
 		end
 	end
 end
