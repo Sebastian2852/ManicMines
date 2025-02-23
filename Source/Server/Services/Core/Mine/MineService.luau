@@ -139,12 +139,43 @@ local function GetSpawnableOres(Depth: number, InCave: boolean)
 	return SpawnableOres
 end
 
+local function GetRarityFromCurve(
+	OreSpawningRange: NumberRange,
+	NormalRarity: number,
+	Depth: number,
+	Curve: NumberSequence
+)
+	local NormalDepth = (Depth - OreSpawningRange.Min) / (OreSpawningRange.Max - OreSpawningRange.Min)
+	local Rarity = Core.Util:EvaluateNumberSequence(Curve, NormalDepth)
+
+	local AdjustedRarity = 0
+
+	if Rarity <= 0 then
+		AdjustedRarity = math.huge
+	elseif Rarity >= 1 then
+		AdjustedRarity = 1
+	else
+		local x = 1 - (Rarity * 2)
+		AdjustedRarity = NormalRarity ^ x
+	end
+
+	print(NormalRarity .. " -> " .. AdjustedRarity)
+
+	return AdjustedRarity
+end
+
 local function PickRandomOre(Depth: number, InCave: boolean)
 	local Ores = GetSpawnableOres(Depth, InCave)
 	local TotalWeight = 0
 
 	for _, v in pairs(Ores) do
-		TotalWeight += v:GetAttribute("Rarity")
+		print(v:GetFullName())
+		TotalWeight += GetRarityFromCurve(
+			v:GetAttribute("SpawningRange"),
+			v:GetAttribute("Rarity"),
+			Depth,
+			v:GetAttribute("SpawningCurve")
+		)
 	end
 
 	local RandomWeight = NumberGenerator:NextInteger(1, TotalWeight)
@@ -152,7 +183,12 @@ local function PickRandomOre(Depth: number, InCave: boolean)
 	local Ore = nil
 
 	for _, v in pairs(Ores) do
-		CurrentWeight += v:GetAttribute("Rarity")
+		CurrentWeight += GetRarityFromCurve(
+			v:GetAttribute("SpawningRange"),
+			v:GetAttribute("Rarity"),
+			Depth,
+			v:GetAttribute("SpawningCurve")
+		)
 		if RandomWeight <= CurrentWeight then
 			Ore = v
 			break
