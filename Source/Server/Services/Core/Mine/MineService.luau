@@ -300,6 +300,8 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 
 	self:AddAirPosition(Position)
 
+	local Layer = self:YLevelToLayer(Position.Y)
+
 	local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
 	local Block: BasePart = nil
 	local Stone = self:YLevelToLayer(Position.Y).Stone
@@ -331,6 +333,10 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	end
 
 	Block.Size = Vector3.new(6, 6, 6)
+	Block.Color = Block.Color:Lerp(
+		Layer:GetAttribute("BlockColorOffset"),
+		NumberGenerator:NextNumber(0, Layer:GetAttribute("BlockColorOffsetLerp"))
+	)
 	Block:PivotTo(CFrame.new(Position))
 	Block.Parent = Workspace.Game.Mine
 	Block.Anchored = true
