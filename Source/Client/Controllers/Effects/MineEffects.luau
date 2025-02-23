@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -15,6 +16,8 @@ local LogService
 
 local PreviousLayer = ""
 local Animation
+local LastBelowOptimalDepth = true
+local CurrentlyTweening = false
 
 -- [[ PUBLIC ]] --
 
@@ -81,7 +84,36 @@ function MineEffects:KnitStart()
 			ReplicatedStorage.Player.Depth.Value = Depth
 
 			PickaxeService:GetOptimalDepth():andThen(function(OptimalDepth)
-				ReplicatedStorage.Player.BelowOptimalDepth.Value = Depth >= OptimalDepth
+				local BelowOptimalDepth = Depth >= OptimalDepth
+
+				if BelowOptimalDepth == LastBelowOptimalDepth then
+					return
+				end
+
+				LastBelowOptimalDepth = BelowOptimalDepth
+				ReplicatedStorage.Player.BelowOptimalDepth.Value = BelowOptimalDepth
+
+				if CurrentlyTweening then
+					return
+				end
+
+				CurrentlyTweening = true
+				local TargetFOV = BelowOptimalDepth and 60 or 70
+				if workspace.CurrentCamera.FieldOfView == TargetFOV then
+					CurrentlyTweening = false
+					return
+				end
+
+				local Tween = TweenService:Create(
+					workspace.CurrentCamera,
+					TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false, 0),
+					{ FieldOfView = TargetFOV }
+				)
+
+				Tween:Play()
+				Tween.Completed:Connect(function()
+					CurrentlyTweening = false
+				end)
 			end)
 		end)
 	end)
