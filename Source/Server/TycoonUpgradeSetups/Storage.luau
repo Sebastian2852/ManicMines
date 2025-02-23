@@ -1,3 +1,8 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Knit = require(ReplicatedStorage.Packages.Knit)
+
+local StorageService = Knit.GetService("StorageService")
+
 --[=[
 TODO:
     - Add a setting to only make the proximity prompt appear for the owner of the tycoon.
@@ -7,7 +12,7 @@ TODO:
 local UpgradeSetup = {}
 
 -- Does this upgrade have a proximity prompt
-UpgradeSetup.HasPrompt = false
+UpgradeSetup.HasPrompt = true
 
 -- Should the proximity prompt be put in the hitbox
 UpgradeSetup.ParentToHitbox = true
@@ -18,9 +23,8 @@ ONLY IF `HasPrompt` IS TRUE
 This function is expected to return 2 strings. First the action string and then second the object string.
 The function is provided with all of the info needed (TycoonName, Level, MaxLevel).
 ]=]
-function UpgradeSetup.CreatePrompt(TycoonName: string, Level: number, MaxLevel: number): (string, string)
-	print("Data recieved: \nName: " .. TycoonName .. "\nLevel: " .. Level .. "\nMaxLevel: " .. MaxLevel)
-	return "Action", "Object"
+function UpgradeSetup.CreatePrompt(_: string, Level: number, MaxLevel: number): (string, string)
+	return "Open Storage", `Storage (lvl {Level}/{MaxLevel})`
 end
 
 --[=[
@@ -30,7 +34,11 @@ This function doesnt need to return anything. This function is called when the p
 is provided with the player who triggered the prompt and the owner of the tycoon.
 ]=]
 function UpgradeSetup.Triggered(Player: Player, IsOwner: boolean)
-	print("Data recieved: \nPlayer: " .. tostring(Player.Name) .. "\nIsOwner: " .. tostring(IsOwner))
+	if not IsOwner then
+		return
+	end
+
+	StorageService:OpenStorageForPlayer(Player)
 end
 
 return UpgradeSetup
