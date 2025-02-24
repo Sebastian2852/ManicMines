@@ -317,6 +317,7 @@ function MineService:Collapse()
 	end
 
 	Workspace.Game.Mine:ClearAllChildren()
+	self.MineStats.BlocksGenerated = 0
 	NumberGenerator = Random.new()
 
 	task.wait(1)
