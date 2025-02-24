@@ -18,6 +18,8 @@ local MineService = Knit.CreateService({
 	},
 })
 
+local TeleportService
+
 local Collapsing = false
 local BlockSize = Core.GameConfig.Mine.BlockSize
 local UsedPositions = {}
@@ -167,7 +169,6 @@ local function PickRandomOre(Depth: number, InCave: boolean)
 	local TotalWeight = 0
 
 	for _, v in pairs(Ores) do
-		print(v:GetFullName())
 		TotalWeight += GetRarityFromCurve(
 			v:GetAttribute("SpawningRange"),
 			v:GetAttribute("Rarity"),
@@ -188,8 +189,11 @@ local function PickRandomOre(Depth: number, InCave: boolean)
 			v:GetAttribute("SpawningCurve")
 		)
 		if RandomWeight <= CurrentWeight then
-			Ore = v
-			break
+			local Number = NumberGenerator:NextInteger(1, v:GetAttribute("Rarity"))
+			if Number == 1 then
+				Ore = v
+				break
+			end
 		end
 	end
 
@@ -299,6 +303,19 @@ function MineService:Collapse()
 	end
 	Collapsing = true
 	ShowMineSpawn()
+
+	for _, DataFolder: Core.DataFolder in pairs(ReplicatedStorage.PlayerData:GetChildren()) do
+		if DataFolder.Name == "Template" then
+			continue
+		end
+
+		local Player = game.Players:GetPlayerByUserId(tonumber(DataFolder.Name))
+
+		if not DataFolder.InTycoon.Value then
+			TeleportService:TeleportPlayerToSurface(Player)
+		end
+	end
+
 	Workspace.Game.Mine:ClearAllChildren()
 	NumberGenerator = Random.new()
 
@@ -481,6 +498,8 @@ end
 -- [[ KNIT ]] --
 
 function MineService:KnitStart()
+	TeleportService = Knit.GetService("TeleportService")
+
 	OriginalMineSpawnPosition = MineService:SnapPositionToGrid(MineSpawn.CFrame.Position)
 	HiddenMineSpawnPosition = MineService:SnapPositionToGrid(OriginalMineSpawnPosition + Vector3.new(0, 50, 0))
 	TopLayerY = OriginalMineSpawnPosition.Y
