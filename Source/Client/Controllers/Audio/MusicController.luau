@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local MusicController = Knit.CreateController { Name = "MusicController" }
+local MusicController = Knit.CreateController({ Name = "MusicController" })
 
 local LogService
 local DataService
@@ -104,6 +104,7 @@ function MusicController:KnitStart()
 
 	DataService.DataLoaded:Connect(function(Data: Core.DataFolder)
 		DataFolder = Data
+		self:PlayMusicForLayer(Core.Assets.Layers:FindFirstChild("Surface"))
 	end)
 
 	SettingsService.SettingsChanged:Connect(function()
