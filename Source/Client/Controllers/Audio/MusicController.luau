@@ -13,7 +13,7 @@ local SettingsService
 local DataFolder
 local ActiveSong
 local HadSongs = false
-local CurrentConfig = nil
+local CurrentFolder = nil
 local SongQueue = Core.Queue.new()
 
 -- [[ PUBLIC ]] --
@@ -37,6 +37,24 @@ function MusicController:ClearQueue()
 end
 
 --[=[
+Takes a folder and plays all the songs in the queue
+(does not stop or clear the music queue)
+]=]
+function MusicController:PlayMusicFromFolder(Folder: Folder, ApplySettingsVolume: boolean)
+	local Songs = Core.Util:RandomiseTable(Folder:GetChildren())
+	CurrentFolder = Folder
+	HadSongs = true
+
+	for _, Song in pairs(Songs) do
+		local Sound = AudioEngine:CreateFromSound(Song, false, nil) :: Core.Sound
+		Sound.Config.Volume = ApplySettingsVolume and DataFolder.Settings.MusicVolume.Value or 1
+		SongQueue:Enqueue(Sound)
+	end
+
+	self:PlayNextSong()
+end
+
+--[=[
 Plays the music for the given LayerConfig
 ]=]
 function MusicController:PlayMusicForLayer(LayerConfig: Configuration)
@@ -46,34 +64,24 @@ function MusicController:PlayMusicForLayer(LayerConfig: Configuration)
 	self:StopActiveMusic()
 	self:ClearQueue()
 
-	CurrentConfig = LayerConfig
 	local MusicFolder = LayerConfig:FindFirstChild("Music")
 	if not MusicFolder then
 		HadSongs = false
 		return
 	end
 
-	local Songs = Core.Util:RandomiseTable(MusicFolder:GetChildren())
-	HadSongs = true
-
-	for _, Song in pairs(Songs) do
-		local Sound = AudioEngine:CreateFromSound(Song, false, nil) :: Core.Sound
-		Sound.Config.Volume = DataFolder.Settings.MusicVolume.Value or 1
-		SongQueue:Enqueue(Sound)
-	end
-
-	self:PlayNextSong()
+	self:PlayMusicFromFolder(MusicFolder, true)
 end
 
 --[=[
 Plays the next song; if no songs are in the queue and the config had songs then new queue is made
 ]=]
-function MusicController:PlayNextSong()
+function MusicController:PlayNextSong(UseSettingVolume: boolean)
 	LogService:Log("Playing next song")
 	if SongQueue:IsEmpty() then
-		if HadSongs and CurrentConfig ~= nil then
+		if HadSongs and CurrentFolder ~= nil then
 			LogService:Log("Refreshing song queue; end of queue")
-			self:PlayMusicForLayer(CurrentConfig)
+			self:PlayMusicFromFolder(CurrentFolder, UseSettingVolume)
 		else
 			return
 		end
@@ -82,13 +90,13 @@ function MusicController:PlayNextSong()
 	self:StopActiveMusic()
 	local Song = SongQueue:Dequeue()
 	if not Song then
-		self:PlayMusicForLayer(CurrentConfig)
+		self:PlayMusicFromFolder(CurrentFolder, UseSettingVolume)
 		return
 	end
 
 	Song.OnFinish = function()
 		LogService:Log("Song finished")
-		self:PlayNextSong()
+		self:PlayNextSong(UseSettingVolume)
 	end
 
 	ActiveSong = AudioEngine:PlaySound(Song)
@@ -101,6 +109,11 @@ function MusicController:KnitStart()
 	LogService = Knit.GetService("LogService")
 	DataService = Knit.GetService("DataService")
 	SettingsService = Knit.GetService("SettingsService")
+
+	task.spawn(function()
+		ReplicatedStorage.PlayerData:WaitForChild(Knit.Player.UserId)
+		self:PlayMusicFromFolder(Core.Assets.Sounds.MainMenuMusic, false)
+	end)
 
 	DataService.DataLoaded:Connect(function(Data: Core.DataFolder)
 		DataFolder = Data
