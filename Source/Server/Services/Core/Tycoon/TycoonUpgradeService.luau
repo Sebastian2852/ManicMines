@@ -16,6 +16,8 @@ local TycoonUpgradeService = Knit.CreateService({
 })
 
 local TycoonService
+local PlayerStatsService
+local PickaxeService
 local DataService
 local LogService
 
@@ -392,8 +394,11 @@ function TycoonUpgradeService:Upgrade(Player: Player, Tycoon: Model, UpgradeName
 
 	self:PayForUpgrade(Player, UpgradeName, DataValue.Value + 1)
 	DataValue.Value += 1
-
 	self:AddUpgradeToTycoonAsync(Player, UpgradeName, Tycoon)
+
+	PlayerStatsService:CalculateInventoryMaxCapactiy(DataService:GetPlayerDataFolder(Player))
+	PickaxeService:CalculateMiningPower(Player)
+
 	return true
 end
 
@@ -403,6 +408,8 @@ function TycoonUpgradeService:KnitStart()
 	DataService = Knit.GetService("DataService")
 	LogService = Knit.GetService("LogService")
 	TycoonService = Knit.GetService("TycoonService")
+	PlayerStatsService = Knit.GetService("PlayerStatsService")
+	PickaxeService = Knit.GetService("PickaxeService")
 end
 
 return TycoonUpgradeService
