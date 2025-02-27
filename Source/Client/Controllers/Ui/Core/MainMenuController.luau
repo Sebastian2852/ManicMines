@@ -58,7 +58,7 @@ end
 function MainMenuController:CreateSlotSettings(Name: string): Core.SaveSlotSettings
 	local Settings: Core.SaveSlotSettings = {}
 
-	Settings.Name = Name
+	Settings.Name = Name or self:PickRandomName()
 	Settings.Tutorial = false
 
 	return Settings
