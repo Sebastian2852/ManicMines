@@ -118,7 +118,7 @@ function HUDController:KnitStart()
 	local DataService = Knit.GetService("DataService")
 
 	self:SetupSettingsGUI()
-	self:AddTopBarLabel("v 1.0.0")
+	self:AddTopBarLabel("v 1.0.2")
 
 	local HUD = require(ReplicatedStorage.Game.GUI.HUD)
 

@@ -99,14 +99,14 @@ function TycoonService:CreateTycoonForPlayer(Player: Player): Model
 				LoadingService:UpdateActionText(Player, "Loading tycoon")
 			end
 		end)
-		TeleportService:TeleportPlayerToTycoon(Player, NewTycoon, true)
+		TeleportService:TeleportPlayerToTycoon(Player, Player, true)
 	end)
 
 	AddUpgradeModels(DataFolder, NewTycoon)
 	TycoonGeneratorService:AddGeneratorsToTycoonAsync(NewTycoon, Player)
 
 	if Player.Character then
-		TeleportService:TeleportPlayerToTycoon(Player, NewTycoon, false)
+		TeleportService:TeleportPlayerToTycoon(Player, Player, false)
 		local Humanoid = Player.Character.Humanoid
 
 		local HealthConnection
