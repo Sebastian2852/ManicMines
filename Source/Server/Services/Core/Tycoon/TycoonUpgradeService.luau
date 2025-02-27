@@ -16,6 +16,8 @@ local TycoonUpgradeService = Knit.CreateService({
 })
 
 local TycoonService
+local PlayerStatsService
+local PickaxeService
 local DataService
 local LogService
 
@@ -173,38 +175,40 @@ function TycoonUpgradeService:AddFunctionality(
 	Tycoon: Model,
 	LevelConfig: Configuration
 )
-	return Promise.new(function(Resolve, Reject)
-		if not SetupModule.HasPrompt then
-			Resolve()
-		end
+	if not SetupModule.HasPrompt then
+		return
+	end
 
-		local TycoonOwner = TycoonService:GetTycoonOwner(Tycoon)
-		if not TycoonOwner then
-			Reject("No owner for tycoon")
-		end
-		local OwnerData: Core.DataFolder = DataService:GetPlayerDataFolder(TycoonOwner)
+	local CurrentPrompt = Hitbox:FindFirstChildWhichIsA("ProximityPrompt")
+	if CurrentPrompt then
+		CurrentPrompt:Destroy()
+	end
 
-		local Info: UpgradeSetupInformation = SetupModule.CreatePrompt(
-			OwnerData.TycoonName.Value,
-			tonumber(LevelConfig.Name),
-			self:GetUpgradeMaxLevel(LevelConfig.Parent)
-		)
+	local TycoonOwner = TycoonService:GetTycoonOwner(Tycoon)
+	if not TycoonOwner then
+		LogService:Error("No owner for tycoon")
+		return
+	end
+	local OwnerData: Core.DataFolder = DataService:GetPlayerDataFolder(TycoonOwner)
 
-		local NewPrompt = Instance.new("ProximityPrompt")
-		NewPrompt.Name = "Interact"
-		NewPrompt.ActionText = Info.ActionText
-		NewPrompt.ObjectText = Info.ObjectText
-		NewPrompt.Parent = Hitbox
+	local ActionText, ObjectText = SetupModule.CreatePrompt(
+		OwnerData.TycoonName.Value,
+		tonumber(LevelConfig.Name),
+		self:GetUpgradeMaxLevel(LevelConfig.Parent)
+	)
 
-		NewPrompt.Triggered:Connect(function(Player)
-			local IsOwner = Player == TycoonOwner
-			SetupModule.Triggered(Player, IsOwner)
-		end)
+	local NewPrompt = Instance.new("ProximityPrompt")
+	NewPrompt.Name = "Interact"
+	NewPrompt.ActionText = ActionText
+	NewPrompt.ObjectText = ObjectText
+	NewPrompt.Parent = Hitbox
 
-		LogService:Log("Created proximity prompt")
-
-		Resolve()
+	NewPrompt.Triggered:Connect(function(Player)
+		local IsOwner = Player == TycoonOwner
+		SetupModule.Triggered(Player, IsOwner)
 	end)
+
+	LogService:Log("Created proximity prompt")
 end
 
 --[=[
@@ -220,7 +224,7 @@ This function add the model to the tycoon, sets up the hitbox (if needed) and ad
 ]=]
 function TycoonUpgradeService:AddUpgradeToTycoonAsync(Player: Player, UpgradeName: string, Tycoon: Model)
 	LogService:Log("Adding upgrade", UpgradeName, "to", tostring(Player.UserId) .. "'s", "tycoon")
-	return Promise.new(function(Resolve, Reject)
+	return Promise.new(function(Resolve)
 		assert(Player:IsDescendantOf(Players), "Player is not a valid player")
 		assert(Tycoon:IsDescendantOf(workspace.Game.Tycoons), "Tycoon must be a tycoon in workspace")
 
@@ -255,13 +259,13 @@ function TycoonUpgradeService:AddUpgradeToTycoonAsync(Player: Player, UpgradeNam
 		table.insert(Tasks, self:AddUIToHitbox(TycoonHitbox, LevelConfig))
 		table.insert(Tasks, self:AddModelToHitbox(TycoonHitbox, LevelConfig))
 		table.insert(Tasks, self:AddClickDetectorToHitbox(TycoonHitbox))
-		table.insert(Tasks, self:AddFunctionality(TycoonHitbox, SetupModule, Tycoon, LevelConfig))
+		self:AddFunctionality(TycoonHitbox, SetupModule, Tycoon, LevelConfig)
 
 		local Success = Promise.all(Tasks):await()
 		if Success then
 			Resolve()
-		else
-			Reject("a task(s) failed")
+			-- else
+			-- 	Reject("a task(s) failed")
 		end
 	end)
 end
@@ -390,8 +394,11 @@ function TycoonUpgradeService:Upgrade(Player: Player, Tycoon: Model, UpgradeName
 
 	self:PayForUpgrade(Player, UpgradeName, DataValue.Value + 1)
 	DataValue.Value += 1
-
 	self:AddUpgradeToTycoonAsync(Player, UpgradeName, Tycoon)
+
+	PlayerStatsService:CalculateInventoryMaxCapactiy(DataService:GetPlayerDataFolder(Player))
+	PickaxeService:CalculateMiningPower(Player)
+
 	return true
 end
 
@@ -401,6 +408,8 @@ function TycoonUpgradeService:KnitStart()
 	DataService = Knit.GetService("DataService")
 	LogService = Knit.GetService("LogService")
 	TycoonService = Knit.GetService("TycoonService")
+	PlayerStatsService = Knit.GetService("PlayerStatsService")
+	PickaxeService = Knit.GetService("PickaxeService")
 end
 
 return TycoonUpgradeService

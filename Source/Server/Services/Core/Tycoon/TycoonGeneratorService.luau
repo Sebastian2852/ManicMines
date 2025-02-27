@@ -4,11 +4,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Promise = require(ReplicatedStorage.Packages.Promise)
+local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local TycoonGeneratorService = Knit.CreateService {
+local GeneratorGUI = require(ReplicatedStorage.Game.GUI.TycoonGenerator)
+
+local TycoonGeneratorService = Knit.CreateService({
 	Name = "TycoonGeneratorService",
 	Client = {},
-}
+})
 
 local LogService
 local DataService
@@ -32,52 +35,18 @@ function TycoonGeneratorService:AddGuiToGenerator(
 	DataFolder: Core.DataFolder
 )
 	local DataValue = self:GetGeneratorDataValue(Players:GetPlayerByUserId(DataFolder.Name), Generator.Name)
+	local DisplayName = Configuration:GetAttribute("DisplayName")
+	local Color = Configuration:GetAttribute("NameColor")
 
-	local Gui = Instance.new("BillboardGui")
-	Gui.Parent = Generator
-	Gui.Adornee = Generator
-	Gui.LightInfluence = 0
-	Gui.Size = UDim2.fromScale(7, 7)
-	Gui.MaxDistance = 100
-	Gui.StudsOffset = Vector3.new(0, 5, 0)
-	Gui.ResetOnSpawn = false
-
-	local TopText = Instance.new("TextLabel")
-	TopText.BackgroundTransparency = 1
-	TopText.BorderSizePixel = 0
-	TopText.Size = UDim2.fromScale(1, 0.6)
-	TopText.FontFace = Core.UI.Theme.TextFont
-	TopText.TextColor3 = Core.UI.Color.White
-	TopText.TextScaled = true
-	TopText.TextYAlignment = Enum.TextYAlignment.Bottom
-	TopText.TextStrokeTransparency = 0
-	TopText.Text = Configuration:GetAttribute("DisplayName")
-	TopText.Parent = Gui
-
-	local TopTextGradient = Instance.new("UIGradient")
-	TopTextGradient.Color = Configuration:GetAttribute("NameColor")
-	TopTextGradient.Parent = TopText
-
-	local BottomText = Instance.new("TextLabel")
-	BottomText.BackgroundTransparency = 1
-	BottomText.BorderSizePixel = 0
-	BottomText.Size = UDim2.fromScale(1, 0.4)
-	BottomText.Position = UDim2.fromScale(0, 0.6)
-	BottomText.FontFace = Core.UI.Theme.TextFont
-	BottomText.TextColor3 = Core.UI.Color.White
-	BottomText.TextScaled = true
-	BottomText.TextYAlignment = Enum.TextYAlignment.Top
-	BottomText.TextStrokeTransparency = 0
-	BottomText.Text = DataValue.Value
-	BottomText.Parent = Gui
-
-	local BottomTextGradient = Instance.new("UIGradient")
-	BottomTextGradient.Color = Configuration:GetAttribute("AmountColor")
-	BottomTextGradient.Parent = BottomText
-
-	DataValue:GetPropertyChangedSignal("Value"):Connect(function()
-		BottomText.Text = DataValue.Value
-	end)
+	Roact.mount(
+		Roact.createElement(GeneratorGUI, {
+			DisplayName = DisplayName,
+			Color = Color,
+			WatchValue = DataValue,
+		}),
+		Generator,
+		"GUI"
+	)
 end
 
 --[=[
@@ -172,13 +141,13 @@ function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon: Model, Owner:
 						break
 					end
 
+					task.wait(TickRate)
+
 					DataValue.Value += Amount
 					LogService:Log(
 						"[" .. Owner.Name .. "]",
 						"Added " .. tostring(Amount) .. " value to generator: " .. DataValue.Name
 					)
-
-					task.wait(TickRate)
 				end
 				LogService:Log("[" .. Owner.Name .. "]", "Finished generator loop")
 			end)

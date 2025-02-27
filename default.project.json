@@ -36,6 +36,10 @@
           },
           "BreakSound": {
             "$className": "Sound"
+          },
+
+          "MainMenuMusic":{
+            "$className":"Folder"
           }
         },
         "Layers": {
@@ -116,6 +120,9 @@
       },
       "Player": {
         "$className": "Folder",
+        "MiningConditions": {
+          "$className":"NumberValue"
+        },
         "ActiveSelectionBox": {
           "$className": "ObjectValue"
         },
@@ -136,6 +143,9 @@
         },
         "Depth": {
           "$className": "NumberValue"
+        },
+        "BelowOptimalDepth": {
+          "$className": "BoolValue"
         },
         "Debug": {
           "$className": "Folder",
@@ -390,9 +400,6 @@
                 "String": ""
               },
               "Health": {
-                "Int64": 0
-              },
-              "MaxHealth": {
                 "Int64": 0
               },
               "XP": {

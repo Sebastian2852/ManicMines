@@ -1,37 +1,31 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local OctoTree = require(ReplicatedStorage.Packages["octo-tree"])
+local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Promise = require(ReplicatedStorage.Packages.Promise)
-
-local NumberGenerator = Random.new()
-
-local TeleportService
-local LogService
-local CaveService
+local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local MineService = Knit.CreateService({
 	Name = "MineService",
 	Client = {},
+
+	OnBlockMined = Signal.new(),
+
+	MineStats = {
+		BlocksGenerated = 0,
+	},
 })
 
-local MineSpawn: BasePart = workspace.Game.MineSpawn
-local OriginalMineSpawnPosition = MineSpawn.Position
+local TeleportService
 
-local OresFolder = game.ReplicatedStorage.Assets.Ores
-local TopLayerY = 0
-local TopLayerCanGenerate = true
 local Collapsing = false
-
 local BlockSize = Core.GameConfig.Mine.BlockSize
-local MineOctree = OctoTree.new()
 local UsedPositions = {}
-local SpawnableOresCache = {}
-local OreWeightCahce = {}
+local TopLayerPositions = {}
 
--- Stores blocks that are being generated before it is added to used positions
-local GenerationCache = {}
+local NumberGenerator = Random.new()
 
 local BlockGenerationOffsets = {
 	-- Direct neighbors
@@ -71,50 +65,10 @@ local BlockGenerationOffsets = {
 	Vector3.new(-BlockSize.X, -BlockSize.Y, -BlockSize.Z),
 }
 
-MineService.TopLayerPositions = {}
-MineService.LowestDepth = 0
-
-MineService.MineStats = {
-	BlocksGenerated = 0,
-	OresGenerated = 0,
-}
-
--- [[ PRIVATE ]] --
-
-local function CollapseMine(NewSeed: number?)
-	if Collapsing then
-		return
-	end
-
-	LogService:Log("Mine collapsing")
-	Collapsing = true
-	for _, Player in pairs(game.Players:GetPlayers()) do
-		TeleportService:TeleportPlayerToSurface(Player)
-	end
-
-	MineSpawn.Position = OriginalMineSpawnPosition
-	MineSpawn.Transparency = 0
-
-	LogService:Log("Deleting all blocks in mine")
-	for _, Part in ipairs(workspace.Game.Mine:GetChildren()) do
-		Part:Destroy()
-	end
-	MineOctree:ClearAllNodes()
-
-	-- Reset the random number generator so that there is a new seed
-	NumberGenerator = Random.new(NewSeed)
-
-	task.wait(1)
-
-	LogService:Log("Generating top layer")
-	TopLayerCanGenerate = true
-	MineService:GenerateTopLayer()
-	MineSpawn.Transparency = 1
-end
-
-local function KeyPosition(Vector: Vector3): string
-	return Vector.X .. ";" .. Core.Util:RoundToxDP(Vector.Y, 3) .. ";" .. Vector.Z
-end
+local MineSpawn = Workspace.Game.MineSpawn
+local OriginalMineSpawnPosition
+local HiddenMineSpawnPosition
+local TopLayerY
 
 local function ConvertYLevelToDepth(WorldY: number): number
 	local Top = TopLayerY
@@ -122,10 +76,20 @@ local function ConvertYLevelToDepth(WorldY: number): number
 	return math.floor((Top - WorldY) / CellSize)
 end
 
-local function ConvertDepthToYLevel(Depth: number): number
-	local Top = TopLayerY
-	local CellSize = Core.GameConfig.Mine.BlockSize.Y
-	return Top - (Depth * CellSize)
+local function KeyVector(Vector: Vector3)
+	return `{Vector.X};{Vector.Y};{Vector.Z}`
+end
+
+local function HideMineSpawn()
+	MineSpawn:PivotTo(CFrame.new(HiddenMineSpawnPosition))
+	MineSpawn.Transparency = 1
+	MineSpawn.CanCollide = false
+end
+
+local function ShowMineSpawn()
+	MineSpawn:PivotTo(CFrame.new(OriginalMineSpawnPosition))
+	MineSpawn.Transparency = 0
+	MineSpawn.CanCollide = true
 end
 
 local function SetupStoneBlock(StoneBlock: BasePart)
@@ -145,61 +109,321 @@ local function SetupStoneBlock(StoneBlock: BasePart)
 	end
 end
 
-local function GetProbabilityForOreUsingCurve(Rarity: number, Curve: NumberSequence, NormalizedY: number): number
-	local RawProbability = Core.Util:EvaluateNumberSequence(Curve, NormalizedY)
-	return Rarity - (Rarity / RawProbability)
+local function GetSpawnableOres(Depth: number, InCave: boolean)
+	local Ores = Core.Assets.Ores:GetChildren()
+	local SpawnableOres = {}
+
+	for _, Ore: Part in ipairs(Ores) do
+		local SpawningRange = Ore:GetAttribute("SpawningRange")
+
+		local MinY = SpawningRange.Min
+		local MaxY = SpawningRange.Max
+
+		if Ore:GetAttribute("CaveOnly") and not InCave then
+			continue
+		end
+
+		if Ore:GetAttribute("NoCave") and InCave then
+			continue
+		end
+
+		if (Depth or math.huge) >= (MinY or -math.huge) and (Depth or math.huge) <= (MaxY or -math.huge) then
+			table.insert(SpawnableOres, Ore)
+			continue
+		end
+	end
+
+	if #SpawnableOres == 0 then
+		warn("No ores that can spawn")
+		return { Core.Assets.Stone }
+	end
+
+	return SpawnableOres
 end
 
-local function GetTotalWeightOfOres(Ores: { BasePart }?)
-	if Ores == nil then
-		Ores = Core.Assets.Ores:GetChildren()
+local function GetRarityFromCurve(
+	OreSpawningRange: NumberRange,
+	NormalRarity: number,
+	Depth: number,
+	Curve: NumberSequence
+)
+	local NormalDepth = (Depth - OreSpawningRange.Min) / (OreSpawningRange.Max - OreSpawningRange.Min)
+	local Rarity = Core.Util:EvaluateNumberSequence(Curve, NormalDepth)
+
+	local AdjustedRarity = 0
+
+	if Rarity <= 0 then
+		AdjustedRarity = math.huge
+	elseif Rarity >= 1 then
+		AdjustedRarity = 1
+	else
+		local x = 1 - (Rarity * 2)
+		AdjustedRarity = NormalRarity ^ x
 	end
 
-	if OreWeightCahce[Ores] then
-		return OreWeightCahce[Ores]
+	return AdjustedRarity
+end
+
+local function PickRandomOre(Depth: number, InCave: boolean)
+	local Ores = GetSpawnableOres(Depth, InCave)
+	local TotalWeight = 0
+
+	for _, v in pairs(Ores) do
+		TotalWeight += GetRarityFromCurve(
+			v:GetAttribute("SpawningRange"),
+			v:GetAttribute("Rarity"),
+			Depth,
+			v:GetAttribute("SpawningCurve")
+		)
 	end
 
-	local Weight = 0
+	local RandomWeight = NumberGenerator:NextInteger(1, TotalWeight)
+	local CurrentWeight = 0
+	local Ore = nil
 
-	for _, Ore: BasePart in pairs(Ores) do
-		local Rarity = Ore:GetAttribute("Rarity")
-		Weight += Rarity
+	for _, v in pairs(Ores) do
+		CurrentWeight += GetRarityFromCurve(
+			v:GetAttribute("SpawningRange"),
+			v:GetAttribute("Rarity"),
+			Depth,
+			v:GetAttribute("SpawningCurve")
+		)
+		if RandomWeight <= CurrentWeight then
+			local Number = NumberGenerator:NextInteger(1, v:GetAttribute("Rarity"))
+			if Number == 1 then
+				Ore = v
+				break
+			end
+		end
 	end
 
-	OreWeightCahce[Ores] = Weight
-	return Weight
+	return Ore and Ore or Core.Assets.Stone
+end
+
+function MineService:UpdateMiningConditions()
+	local Generated = self.MineStats.BlocksGenerated
+	local BlocksToCollapse = Core.GameConfig.Mine.BlocksToCollapse
+	local Percentage = (Generated / BlocksToCollapse) * 100
+	ReplicatedStorage.Player.MiningConditions.Value = Percentage
 end
 
 -- [[ PUBLIC ]] --
 
 --[=[
-Returns a copy of the CURRENT random number generator
+Add a position to the UsedPositions table
 ]=]
-function MineService:GetRandomObject(): Random
+function MineService:AddAirPosition(Position: Vector3)
+	Position = self:SnapPositionToGrid(Position)
+	UsedPositions[KeyVector(Position)] = true
+end
+
+--[=[
+Returns if the given position is in the UsedPositions table
+]=]
+function MineService:IsPositionAir(Position: Vector3)
+	Position = self:SnapPositionToGrid(Position)
+	return UsedPositions[KeyVector(Position)] == true
+end
+
+--[=[
+Returns the current NumberGenerator that the mine is using
+to generate random numbers
+]=]
+function MineService:GetRandomObject()
 	return NumberGenerator:Clone()
 end
 
 --[=[
-Snaps the given position to the grid
+Snaps the given position to the mine's grid
 ]=]
 function MineService:SnapPositionToGrid(Position: Vector3): Vector3
 	return Vector3.new(
-		math.round(Position.X / BlockSize.X) * BlockSize.X,
-		math.round(Position.Y / BlockSize.Y) * BlockSize.Y,
-		math.round(Position.Z / BlockSize.Z) * BlockSize.Z
+		math.floor(Position.X / BlockSize.X + 0.5) * BlockSize.X,
+		math.floor(Position.Y / BlockSize.Y + 0.5) * BlockSize.Y,
+		math.floor(Position.Z / BlockSize.Z + 0.5) * BlockSize.Z
 	)
 end
 
 --[=[
-Converts the World Y Level passed into a depth value
+Generates the top layer of the mine
 ]=]
-function MineService:ConvertToDepth(YLevel: number): number
-	return ConvertYLevelToDepth(YLevel)
+function MineService:GenerateTopLayer()
+	ShowMineSpawn()
+
+	local BlocksToGenerateX = math.round(MineSpawn.Size.X / BlockSize.X)
+	local BlocksToGenerateY = math.round(MineSpawn.Size.Z / BlockSize.Z)
+
+	local TopLeftPosition = Vector3.new(
+		OriginalMineSpawnPosition.X - ((MineSpawn.Size.X / 2) - (BlockSize.X / 2)),
+		OriginalMineSpawnPosition.Y,
+		OriginalMineSpawnPosition.Z - ((MineSpawn.Size.Z / 2) - (BlockSize.X / 2))
+	)
+
+	UsedPositions = {}
+	TopLayerPositions = {}
+
+	local function Generate(Y)
+		return Promise.new(function(Resolve)
+			for X = 1, BlocksToGenerateX, 1 do
+				local Position = self:SnapPositionToGrid(
+					TopLeftPosition + Vector3.new((X - 1) * BlockSize.X, 0, (Y - 1) * BlockSize.Z)
+				)
+				local AbovePos = Position + Vector3.new(0, BlockSize.Y, 0)
+
+				TopLayerPositions[KeyVector(Position)] = true
+				self:AddAirPosition(AbovePos)
+				self:GenerateAtPositionAsync(Position)
+			end
+			Resolve()
+		end)
+	end
+
+	local Promises = {}
+
+	local Timer = Profiler.Timer.new("TopLayerGen")
+	for Y = 1, BlocksToGenerateY, 1 do
+		table.insert(Promises, Generate(Y))
+	end
+	Timer:Stop()
+
+	Promise.all(Promises):andThen(function()
+		task.wait(1)
+		HideMineSpawn()
+	end)
 end
 
 --[=[
-Convert any Y level number into a layer config. If no valid layer config is found then the default
-layer is used.
+Reset the mine seed
+Clear all mine blocks
+Generate new top layer
+]=]
+function MineService:Collapse()
+	if Collapsing then
+		return
+	end
+	Collapsing = true
+	ShowMineSpawn()
+
+	for _, DataFolder: Core.DataFolder in pairs(ReplicatedStorage.PlayerData:GetChildren()) do
+		if DataFolder.Name == "Template" then
+			continue
+		end
+
+		local Player = game.Players:GetPlayerByUserId(tonumber(DataFolder.Name))
+
+		if not DataFolder.InTycoon.Value then
+			TeleportService:TeleportPlayerToSurface(Player)
+		end
+	end
+
+	Workspace.Game.Mine:ClearAllChildren()
+	self.MineStats.BlocksGenerated = 0
+	NumberGenerator = Random.new()
+
+	task.wait(1)
+
+	self:GenerateTopLayer()
+	Collapsing = false
+end
+
+--[=[
+Generates a random block at the given position
+Returns a promise
+]=]
+function MineService:GenerateAtPositionAsync(Position: Vector3, InCave: boolean)
+	return Promise.new(function(Resolve)
+		local GeneratedBlock = self:GenerateAtPosition(Position, InCave)
+		Resolve(GeneratedBlock)
+	end)
+end
+
+--[=[
+Generate a random block at the given position
+]=]
+function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
+	Position = self:SnapPositionToGrid(Position)
+	if self:IsPositionAir(Position) then
+		return
+	end
+
+	if Position.Y > TopLayerY then
+		return
+	end
+
+	self:AddAirPosition(Position)
+
+	local Layer = self:YLevelToLayer(Position.Y)
+
+	local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
+	local Block: BasePart = nil
+	local Stone = self:YLevelToLayer(Position.Y).Stone
+
+	if RandomNumber == 1 then
+		local Ore = PickRandomOre(ConvertYLevelToDepth(Position.Y), InCave)
+
+		local NewOre = Stone:Clone() :: BasePart
+		NewOre.Name = Ore.Name
+		NewOre:ClearAllChildren()
+
+		local AttribsToSet = Ore:GetAttributes()
+
+		for Key, Value in pairs(AttribsToSet) do
+			NewOre:SetAttribute(Key, Value)
+		end
+
+		for _, v in pairs(Ore:GetChildren()) do
+			v:Clone().Parent = NewOre
+		end
+
+		Block = NewOre
+	end
+
+	if Block == nil then
+		Stone = Stone:Clone()
+		SetupStoneBlock(Stone)
+		Block = Stone
+	end
+
+	Block.Size = Vector3.new(6, 6, 6)
+	Block.Color = Block.Color:Lerp(
+		Layer:GetAttribute("BlockColorOffset"),
+		NumberGenerator:NextNumber(0, Layer:GetAttribute("BlockColorOffsetLerp"))
+	)
+	Block:PivotTo(CFrame.new(Position))
+	Block.Parent = Workspace.Game.Mine
+	Block.Anchored = true
+	self.MineStats.BlocksGenerated += 1
+	self:UpdateMiningConditions()
+
+	if Position.Y == TopLayerY and not (TopLayerPositions[KeyVector(Position)] == true) then
+		Block.Color = Core.Util:TintColor(Block.Color, Color3.new(0, 0, 0))
+		return Block
+	end
+
+	Block:SetAttribute("CanMine", true)
+	return Block
+end
+
+--[=[
+Generates blocks all around the given block
+Returns a promise
+]=]
+function MineService:GenerateAroundBlockAsync(Block: BasePart)
+	return Promise.new(function(Resolve)
+		local Origin = Block.Position
+		local Blocks = {}
+
+		for _, Offset: Vector3 in pairs(BlockGenerationOffsets) do
+			local NewBlock = self:GenerateAtPosition(Origin + Offset)
+			table.insert(Blocks, NewBlock)
+		end
+
+		Resolve(Blocks)
+	end)
+end
+
+--[=[
+Converts the given YLevel into a layer configuration
 ]=]
 function MineService:YLevelToLayer(YLevel: number): Configuration
 	local Depth = ConvertYLevelToDepth(YLevel)
@@ -215,444 +439,10 @@ function MineService:YLevelToLayer(YLevel: number): Configuration
 end
 
 --[=[
-Gets a table of the possible ores that can spawn at a given Y level
-]=]
-function MineService:GetSpawnableOres(YLevel: number, InCave: boolean)
-	local SpawnableOres = {}
-	local Depth = ConvertYLevelToDepth(YLevel)
-
-	if SpawnableOresCache[YLevel] then
-		return SpawnableOresCache[YLevel]
-	end
-
-	for _, Ore in pairs(OresFolder:GetChildren()) do
-		if Ore:GetAttribute("CaveOnly") and not InCave then
-			continue
-		end
-		if Ore:GetAttribute("NoCave") and InCave then
-			continue
-		end
-
-		local SpawningRange = Ore:GetAttribute("SpawningRange")
-
-		local MinY = SpawningRange.Min
-		local MaxY = SpawningRange.Max
-
-		if MinY <= Depth and Depth <= MaxY then
-			table.insert(SpawnableOres, Ore)
-		end
-	end
-
-	SpawnableOresCache[YLevel] = SpawnableOres
-
-	return SpawnableOres
-end
-
---[=[
-Generate a random ore to use
-THIS RETURN THE PART; DOES NOT PUT IT IN THE MINE
-]=]
-function MineService:GenerateRandomOre(YLevel: number, Cave: boolean): BasePart
-	local SpawnableOres = self:GetSpawnableOres(YLevel, Cave)
-
-	if #SpawnableOres == 0 then
-		LogService:Warn("No possible ores that can spawn!")
-		return false
-	end
-
-	local NormalizedY = math.clamp((YLevel - TopLayerY) / (self.LowestDepth - TopLayerY), 0, 1)
-
-	local TotalOreWeight = GetTotalWeightOfOres(SpawnableOres)
-	local RandomWeight = NumberGenerator:NextInteger(1, TotalOreWeight)
-	local CurrentWeight = 0
-	local GeneratedBlock = nil
-
-	for _, Ore: BasePart in pairs(SpawnableOres) do
-		local OreWeight = Ore:GetAttribute("Rarity")
-		CurrentWeight += OreWeight
-		if RandomWeight <= CurrentWeight then
-			if Ore:GetAttribute("SpawningCurve") then
-				local Curve: NumberSequence = Ore:GetAttribute("SpawningCurve")
-				local Probability = GetProbabilityForOreUsingCurve(OreWeight, Curve, NormalizedY)
-				local RandomNumber = NumberGenerator:NextInteger(1, Probability)
-
-				if RandomNumber == 1 then
-					GeneratedBlock = Ore
-					break
-				end
-			else
-				GeneratedBlock = Ore
-				break
-			end
-		end
-	end
-
-	if GeneratedBlock then
-		return true, GeneratedBlock
-	end
-
-	return false
-end
-
---[=[
-Generates a block at a given position, has a random chance to be an ore. If a block info is passed then that block will be generated
-]=]
-function MineService:GenerateBlockAtPosition(
-	Position: Vector3,
-	InCave: boolean | false,
-	BlockInfo: Core.OreListItem?,
-	Tint: Color3?
-)
-	if self:IsPositionAir(Position) then
-		return
-	end
-	Position = self:SnapPositionToGrid(Position)
-
-	if GenerationCache[KeyPosition(Position)] == 1 then
-		return
-	end
-	if Position.Y > TopLayerY then
-		return
-	end
-
-	GenerationCache[KeyPosition(Position)] = 1
-
-	local RandomNumber = BlockInfo == nil and NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
-		or 0
-	local StoneBlock = self:YLevelToLayer(Position.Y).Stone
-	local BlockToGenerate = StoneBlock
-
-	if RandomNumber == 1 and BlockInfo == nil then
-		local Success, Ore = self:GenerateRandomOre(Position.Y, InCave)
-		if Success then
-			BlockToGenerate = Ore
-			BlockToGenerate:AddTag("Mine/BlockType/Ore")
-			self.MineStats.OresGenerated += 1
-		else
-			BlockToGenerate = StoneBlock
-			BlockToGenerate:AddTag("Mine/BlockType/Stone")
-			BlockToGenerate:AddTag("Mine/BlockType/OreFail")
-		end
-	end
-
-	if BlockInfo then
-		BlockToGenerate = BlockInfo.RealOre
-		BlockToGenerate:SetAttribute("Health", BlockToGenerate:GetAttribute("MaxHealth"))
-	end
-
-	SetupStoneBlock(StoneBlock)
-	local NewBlock: BasePart = BlockToGenerate:Clone()
-	NewBlock.Parent = workspace.Game.Mine
-	NewBlock.Position = Position
-	NewBlock.Color = StoneBlock.Color
-	NewBlock.Size = Core.GameConfig.Mine.BlockSize
-
-	if Tint then
-		NewBlock.Color = Core.Util:TintColor(NewBlock.Color, Tint)
-	end
-
-	self:AddAirPosition(Position)
-	MineOctree:CreateNode(Position, NewBlock)
-	self.MineStats.BlocksGenerated += 1
-	GenerationCache[KeyPosition(Position)] = nil
-
-	NewBlock:SetAttribute("CanMine", true)
-
-	ReplicatedStorage.Player.Debug.Mine.BlocksGenerated.Value = self.MineStats.BlocksGenerated
-	ReplicatedStorage.Player.Debug.Mine.OresGenerated.Value = self.MineStats.OresGenerated
-
-	if Position.Y >= TopLayerY and table.find(self.TopLayerPositions, Position) then
-		NewBlock:SetAttribute("CanMine", true)
-		return NewBlock
-	end
-
-	local function DisableBlock()
-		LogService:Warn("Making block unminable!")
-		NewBlock = self:ReplaceBlockAtPosition(Position, StoneBlock)
-		NewBlock.Color = Color3.fromRGB(27, 42, 53)
-		NewBlock:SetAttribute("CanMine", false)
-	end
-
-	if Position.Y >= TopLayerY then
-		DisableBlock()
-	end
-
-	local Depth = ConvertYLevelToDepth(Position.Y)
-	if Depth > self.LowestDepth then
-		DisableBlock()
-	end
-
-	return NewBlock
-end
-
---[=[
-Gets the block at a given position
-]=]
-function MineService:GetBlockAtPosition(Position: Vector3)
-	local Nodes = MineOctree:GetNearest(Position, 6, 1)
-	local Node = Nodes and Nodes[1]
-	if not Node then
-		return nil
-	end
-
-	local Block = Node.Object
-	return Block
-end
-
---[=[
-Replaces a block at a given position
-]=]
-function MineService:ReplaceBlockAtPosition(Position: Vector3, NewBlock: BasePart): BasePart
-	local Block = self:GetBlockAtPosition(Position)
-	local Pos = Block.Position
-	local Color = Block.BrickColor
-
-	Block:Destroy()
-	MineOctree:RemoveNode(MineOctree:FindFirstNode(Block))
-
-	Block = NewBlock:Clone()
-	Block.Parent = workspace.Game.Mine
-	Block.Position = Pos
-	Block.BrickColor = Color
-	Block.Size = Core.GameConfig.Mine.BlockSize
-	MineOctree:CreateNode(Pos, Block)
-	Block:SetAttribute("CanMine", true)
-	return Block
-end
-
---[=[
-Generates the top layer of the mine based of the mine spawn
-]=]
-function MineService:GenerateTopLayer()
-	if not TopLayerCanGenerate then
-		return
-	end
-
-	Collapsing = false
-	TopLayerCanGenerate = false
-	MineSpawn.Position = OriginalMineSpawnPosition
-	MineSpawn.Transparency = 0
-	MineSpawn.CanCollide = true
-	TopLayerY = MineSpawn.Position.Y
-
-	local BlocksToGenerateX = math.round(MineSpawn.Size.X / BlockSize.X)
-	local BlocksToGenerateY = math.round(MineSpawn.Size.Z / BlockSize.Z)
-
-	LogService:Log("Generating top layer (" .. (BlocksToGenerateX * BlocksToGenerateY) .. " blocks)")
-	local TopLeftPosition = Vector3.new(
-		MineSpawn.Position.X - ((MineSpawn.Size.X / 2) - (BlockSize.X / 2)),
-		MineSpawn.Position.Y,
-		MineSpawn.Position.Z - ((MineSpawn.Size.Z / 2) - (BlockSize.X / 2))
-	)
-
-	UsedPositions = {}
-	self.TopLayerPositions = {}
-	self.MineStats.BlocksGenerated = 0
-	self.MineStats.OresGenerated = 0
-
-	local function Generate(Y)
-		return Promise.new(function(Resolve)
-			for X = 1, BlocksToGenerateX, 1 do
-				local Position = TopLeftPosition + Vector3.new((X - 1) * BlockSize.X, 0, (Y - 1) * BlockSize.Z)
-				local AbovePos = Position + Vector3.new(0, BlockSize.Y, 0)
-
-				table.insert(self.TopLayerPositions, Position)
-				self:GenerateBlockAtPosition(Position)
-				self:AddAirPosition(AbovePos)
-			end
-			Resolve()
-		end)
-	end
-
-	local Promises = {}
-
-	for Y = 1, BlocksToGenerateY, 1 do
-		table.insert(Promises, Generate(Y))
-	end
-
-	Promise.all(Promises):await()
-
-	MineSpawn.Position = MineSpawn.Position + Vector3.new(0, 50, 0)
-	MineSpawn.Transparency = 1
-	MineSpawn.CanCollide = false
-	LogService:Log("Finished generating top layer")
-end
-
---[=[
-Generate a 3x3 room for people to teleport into to. Returns the position where players
-can be teleported to
-]=]
-function MineService:GenerateRoomAtDepth(Depth: number): Vector3
-	local YLevel = ConvertDepthToYLevel(Depth)
-	local RandomXZ = NumberGenerator:NextInteger(-100, 100)
-	local CenterPos = Vector3.new(RandomXZ, YLevel, RandomXZ)
-
-	local YSize = Core.GameConfig.Mine.BlockSize.Y
-
-	local AirPositions: { Vector3 } = {
-		Vector3.new(0, YSize, 0),
-		Vector3.new(0, -YSize, 0),
-
-		Vector3.new(YSize, 0, 0),
-		Vector3.new(-YSize, 0, 0),
-
-		Vector3.new(0, 0, YSize),
-		Vector3.new(0, 0, -YSize),
-	}
-
-	local CenterOffset = YSize * 2
-
-	local Offsets = {
-		--Floor
-		Vector3.new(0, -CenterOffset, 0),
-		Vector3.new(YSize, -CenterOffset, 0),
-		Vector3.new(-YSize, -CenterOffset, 0),
-		Vector3.new(0, -CenterOffset, YSize),
-		Vector3.new(0, -CenterOffset, -YSize),
-		Vector3.new(YSize, -CenterOffset, YSize),
-		Vector3.new(-YSize, -CenterOffset, YSize),
-		Vector3.new(YSize, -CenterOffset, -YSize),
-		Vector3.new(-YSize, -CenterOffset, -YSize),
-
-		--Roof
-		Vector3.new(0, CenterOffset, 0),
-		Vector3.new(YSize, CenterOffset, 0),
-		Vector3.new(-YSize, CenterOffset, 0),
-		Vector3.new(0, CenterOffset, YSize),
-		Vector3.new(0, CenterOffset, -YSize),
-		Vector3.new(YSize, CenterOffset, YSize),
-		Vector3.new(-YSize, CenterOffset, YSize),
-		Vector3.new(YSize, CenterOffset, -YSize),
-		Vector3.new(-YSize, CenterOffset, -YSize),
-
-		--Wall
-		Vector3.new(CenterOffset, 0, 0),
-		Vector3.new(CenterOffset, YSize, 0),
-		Vector3.new(CenterOffset, -YSize, 0),
-		Vector3.new(CenterOffset, 0, YSize),
-		Vector3.new(CenterOffset, 0, -YSize),
-		Vector3.new(CenterOffset, YSize, YSize),
-		Vector3.new(CenterOffset, -YSize, YSize),
-		Vector3.new(CenterOffset, YSize, -YSize),
-		Vector3.new(CenterOffset, -YSize, -YSize),
-
-		--Wall
-		Vector3.new(-CenterOffset, 0, 0),
-		Vector3.new(-CenterOffset, YSize, 0),
-		Vector3.new(-CenterOffset, -YSize, 0),
-		Vector3.new(-CenterOffset, 0, YSize),
-		Vector3.new(-CenterOffset, 0, -YSize),
-		Vector3.new(-CenterOffset, YSize, YSize),
-		Vector3.new(-CenterOffset, -YSize, YSize),
-		Vector3.new(-CenterOffset, YSize, -YSize),
-		Vector3.new(-CenterOffset, -YSize, -YSize),
-
-		--Wall
-		Vector3.new(0, 0, CenterOffset),
-		Vector3.new(0, YSize, CenterOffset),
-		Vector3.new(0, -YSize, CenterOffset),
-		Vector3.new(YSize, 0, CenterOffset),
-		Vector3.new(-YSize, 0, CenterOffset),
-		Vector3.new(YSize, YSize, CenterOffset),
-		Vector3.new(-YSize, YSize, CenterOffset),
-		Vector3.new(YSize, -YSize, CenterOffset),
-		Vector3.new(-YSize, -YSize, CenterOffset),
-
-		--Wall
-		Vector3.new(0, 0, -CenterOffset),
-		Vector3.new(0, YSize, -CenterOffset),
-		Vector3.new(0, -YSize, -CenterOffset),
-		Vector3.new(YSize, 0, -CenterOffset),
-		Vector3.new(-YSize, 0, -CenterOffset),
-		Vector3.new(YSize, YSize, -CenterOffset),
-		Vector3.new(-YSize, YSize, -CenterOffset),
-		Vector3.new(YSize, -YSize, -CenterOffset),
-		Vector3.new(-YSize, -YSize, -CenterOffset),
-	}
-
-	for _, Offset in pairs(AirPositions) do
-		local NewPos = CenterPos + Offset
-		self:AddAirPosition(NewPos)
-	end
-
-	for _, Offset in pairs(Offsets) do
-		local NewPos = CenterPos + Offset
-		self:GenerateBlockAtPosition(NewPos)
-	end
-
-	return CenterPos
-end
-
---[=[
-Sets a position as "air" meaning nothing can generate there
-]=]
-function MineService:AddAirPosition(Position: Vector3)
-	if self:IsPositionAir(Position) then
-		return
-	end
-	Position = self:SnapPositionToGrid(Position)
-	UsedPositions[KeyPosition(Position)] = 1
-end
-
---[=[
-Checks weather the position is air
-]=]
-function MineService:IsPositionAir(Position: Vector3): boolean
-	Position = self:SnapPositionToGrid(Position)
-	return UsedPositions[KeyPosition(Position)] and true or false
-end
-
---[=[
-Attempts to generate a geode from a mined block. "Attempts" because an ore can not generate geode
-or the random chance can not work out you know
-]=]
-function MineService:AttemptToGenerateGeode(Ore: BasePart)
-	local CanGenerate = Ore:GetAttribute("CanGenerateGeode") :: boolean
-	local GenerationChance = Ore:GetAttribute("GeodeGenerationChance") :: number
-	local SizeBounds = Ore:GetAttribute("GeodeRadiusSize") :: NumberRange
-
-	if not CanGenerate then
-		return
-	end
-
-	local RandomNumber = NumberGenerator:NextInteger(1, GenerationChance)
-	if RandomNumber ~= 1 then
-		return
-	end
-
-	local Radius = NumberGenerator:NextInteger(SizeBounds.Min, SizeBounds.Max)
-
-	local Direction = NumberGenerator:NextInteger(1, 3)
-	local Negative = NumberGenerator:NextInteger(1, 2)
-
-	local Position = Ore.CFrame.Position
-	local Offset
-	local FinalPosition
-	local Distance = (Radius * 2 + 6)
-
-	if Direction == 1 then
-		Offset = Vector3.new(Distance, 0, 0)
-	elseif Direction == 2 then
-		Offset = Vector3.new(0, Distance, 0)
-	elseif Direction == 3 then
-		Offset = Vector3.new(0, 0, Direction)
-	end
-
-	if Negative then
-		FinalPosition = Position - Offset
-	else
-		FinalPosition = Position + Offset
-	end
-
-	if (FinalPosition.Y + Radius) > TopLayerY then
-		FinalPosition = FinalPosition - Vector3.new(0, Radius * 2, 0)
-	end
-
-	CaveService:GenerateGeodeAsync(FinalPosition, Radius, Ore)
-end
-
---[=[
-Generates blocks around a block that was mined aswell as destroying the block
+If the mine needs to collapse it does then returns otherwise
+Checks if the given block has a module to run and runs it in a seperate thread
+Generates blocks around the given block
+Destroys the given block
 ]=]
 function MineService:BlockMined(Block: BasePart)
 	if Block == nil then
@@ -660,73 +450,36 @@ function MineService:BlockMined(Block: BasePart)
 	end
 
 	if self.MineStats.BlocksGenerated >= Core.GameConfig.Mine.BlocksToCollapse then
-		CollapseMine()
+		self:Collapse()
 		return
 	end
 
-	self:GenerateAroundBlockAsync(Block)
-	local Node = MineOctree:FindFirstNode(Block)
+	self.OnBlockMined:Fire(Block, Block.CFrame.Position)
+	print("Fired Signal")
 
-	if Node then
-		MineOctree:RemoveNode(Node)
-	end
-
-	self:AttemptToGenerateGeode(Block)
-	Block:Destroy()
-end
-
---[=[
-Generate blocks around the passed part using offsets
-]=]
-function MineService:GenerateAroundBlockAsync(Block: BasePart)
-	return Promise.new(function(Resolve)
-		local Origin = Block.Position
-		local Blocks = {}
-
-		for _, Offset: Vector3 in pairs(BlockGenerationOffsets) do
-			local NewBlock = self:GenerateBlockAtPosition(Origin + Offset)
-			table.insert(Blocks, NewBlock)
+	Promise.new(function(Resolve)
+		local Module = Block:FindFirstChildWhichIsA("ModuleScript")
+		if not Module then
+			Resolve()
+			return
 		end
 
-		Resolve(Blocks)
+		local Success = require(Module)
+
+		if not Success then
+			warn("Block code FAILED")
+		end
+
+		Resolve(Success)
+	end):andThen(function()
+		self:GenerateAroundBlockAsync(Block):andThen(function()
+			Block:Destroy()
+		end)
 	end)
 end
 
---[=[
-Generate blocks around the passed position using offsets
-]=]
-function MineService:GenerateAroundPositionAsync(
-	Origin: Vector3,
-	InCave: boolean | true,
-	BlockInfo: Core.OreListItem,
-	Tint: Color3
-)
-	return Promise.new(function(Resolve)
-		local Blocks = {}
-		for _, Offset: Vector3 in pairs(BlockGenerationOffsets) do
-			local Position = Origin + Offset
-			local NewBlock = self:GenerateBlockAtPosition(Position, InCave, BlockInfo, Tint)
-			self:AddAirPosition(Position)
-			table.insert(Blocks, NewBlock)
-		end
-		Resolve(Blocks)
-	end)
-end
-
---[=[
-Force the mine to collapse with an optional seed
-]=]
-function MineService:Collapse(NewSeed: number?)
-	CollapseMine(NewSeed)
-end
-
---[=[
-Returns the closest block to a given position
-]=]
-function MineService:GetClosestBlock(Position: number, Radius: number)
-	local Nodes = MineOctree:GetNearest(Position, Radius, 1)
-	local Node = Nodes[1]
-	return Node.Object or nil
+function MineService:YLevelToDepth(YLevel: number)
+	return ConvertYLevelToDepth(YLevel)
 end
 
 -- [[ CLIENT ]] --
@@ -743,39 +496,26 @@ function MineService.Client:GetLayerConfig(_, YLevel: number): Configuration
 	return self.Server:YLevelToLayer(YLevel)
 end
 
---[[ KNIT ]]
---
-
-function MineService:KnitInit()
-	local LowestDepth = 0
-	for _, Layer: Configuration in pairs(Core.Assets.Layers:GetChildren()) do
-		local LayerDepthRange: NumberRange = Layer:GetAttribute("Depth")
-		local LayerLowestDepth = LayerDepthRange.Max
-
-		if LayerLowestDepth > LowestDepth then
-			LowestDepth = LayerLowestDepth
-		end
-	end
-
-	self.LowestDepth = LowestDepth
-end
+-- [[ KNIT ]] --
 
 function MineService:KnitStart()
-	LogService = Knit.GetService("LogService")
 	TeleportService = Knit.GetService("TeleportService")
-	CaveService = Knit.GetService("CaveService")
 
-	for _, Object in pairs(ReplicatedStorage.Assets.Ores:GetChildren()) do
-		if not Object:IsA("BasePart") then
-			Object:Destroy()
-		end
+	OriginalMineSpawnPosition = MineService:SnapPositionToGrid(MineSpawn.CFrame.Position)
+	HiddenMineSpawnPosition = MineService:SnapPositionToGrid(OriginalMineSpawnPosition + Vector3.new(0, 50, 0))
+	TopLayerY = OriginalMineSpawnPosition.Y
+
+	local function SetMaxHealthAttrib(Ore: BasePart)
+		Ore:SetAttribute("MaxHealth", Ore:GetAttribute("Health"))
+	end
+
+	SetMaxHealthAttrib(Core.Assets.Stone)
+	for _, v in pairs(Core.Assets.Ores:GetChildren()) do
+		SetMaxHealthAttrib(v)
 	end
 
 	self:GenerateTopLayer()
-
-	if workspace:FindFirstChild("Baseplate") then
-		workspace:FindFirstChild("Baseplate"):Destroy()
-	end
+	self:GenerateAtPositionAsync(Vector3.new(0, 0, 0))
 end
 
 return MineService

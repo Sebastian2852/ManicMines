@@ -298,6 +298,7 @@ Config.Mine = {
 	BlockSize = Vector3.new(6, 6, 6),
 	BlocksToCollapse = 100000000,
 	ChanceToGenerateOre = 2,
+	ChanceToGenerateCave = 2,
 }
 
 Config.Chat = {

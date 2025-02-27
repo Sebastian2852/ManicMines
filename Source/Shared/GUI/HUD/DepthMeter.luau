@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Trove = require(ReplicatedStorage.Packages.trove)
@@ -62,6 +63,18 @@ function DepthMeter:GetLayerName(): string
 	return LayerName
 end
 
+function DepthMeter:GetConditions(Percentage: number)
+	if Percentage >= 90 then
+		return "Critical", Color3.fromRGB(255, 0, 0), Core.Util:RoundToxDP(Percentage, 2)
+	elseif Percentage >= 80 then
+		return "Dangerous", Color3.fromRGB(255, 100, 0), Core.Util:RoundToxDP(Percentage, 2)
+	elseif Percentage >= 70 then
+		return "Risky", Color3.fromRGB(255, 255, 0), Core.Util:RoundToxDP(Percentage, 2)
+	else
+		return "Safe", Color3.fromRGB(0, 255, 0), Core.Util:RoundToxDP(Percentage, 2)
+	end
+end
+
 function DepthMeter:GetLayerColor(): Color3
 	local Color = Color3.fromRGB(255, 0, 255)
 
@@ -102,6 +115,8 @@ function DepthMeter:render()
 	local PositionText = self:GetPositionText()
 	local LayerName = self:GetLayerName()
 	local LayerColor = self:GetLayerColor()
+	local BelowOptimalDepth = ReplicatedStorage.Player.BelowOptimalDepth.Value
+	local Text, Color, Percentage = self:GetConditions(ReplicatedStorage.Player.MiningConditions.Value)
 
 	return Roact.createElement("ScreenGui", {
 		IgnoreGuiInset = true,
@@ -111,12 +126,12 @@ function DepthMeter:render()
 			Size = UDim2.fromScale(0.3, 0.05),
 			Position = UDim2.fromScale(0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0),
-
 			BackgroundTransparency = 1,
 
-			Text = PositionText,
+			Text = `{PositionText} | Mining Conditions: <font color="#{Color:ToHex()}"> {Text} ({Percentage}%)</font>`,
 			TextStrokeTransparency = 0,
 			TextScaled = true,
+			RichText = true,
 			TextColor3 = Theme.TextColor,
 			FontFace = Theme.Font,
 		}, {}),
@@ -125,7 +140,6 @@ function DepthMeter:render()
 			Size = UDim2.fromScale(0.3, 0.025),
 			Position = UDim2.fromScale(0.5, 0.05),
 			AnchorPoint = Vector2.new(0.5, 0),
-
 			BackgroundTransparency = 1,
 
 			Text = "(" .. LayerName .. ")",
@@ -138,6 +152,19 @@ function DepthMeter:render()
 				Color = LayerColor,
 			}, {}),
 		}),
+
+		DepthWarning = BelowOptimalDepth and Roact.createElement("TextLabel", {
+			Size = UDim2.fromScale(0.3, 0.025),
+			Position = UDim2.fromScale(0.5, 0.08),
+			AnchorPoint = Vector2.new(0.5, 0),
+			BackgroundTransparency = 1,
+
+			Text = "(Below Turning Point)",
+			TextStrokeTransparency = 0,
+			TextScaled = true,
+			TextColor3 = Theme.BackgroundColorRed,
+			FontFace = Theme.Font,
+		}, {}),
 	})
 end
 

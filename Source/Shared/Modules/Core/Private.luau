@@ -23,6 +23,7 @@ export type DataFolder_PickaxesFolder = {
 	Owned: Folder,
 	Upgrades: Folder,
 	Equipped: IntValue,
+	OptimalDepth: IntValue,
 }
 
 export type DataFolder_SettingsFolder = {

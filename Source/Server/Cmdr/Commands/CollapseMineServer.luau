@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-return function(_, Seed: number?)
+return function()
 	local MineService = Knit.GetService("MineService")
-	MineService:Collapse(Seed)
+	MineService:Collapse()
 end

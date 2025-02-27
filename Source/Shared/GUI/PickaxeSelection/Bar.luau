@@ -56,7 +56,7 @@ function Bar:render()
 	local BarGradient = self.state.BarGradient
 
 	local BarSize = self.Binding:map(function(Value)
-		return UDim2.fromScale(0, 1):Lerp(UDim2.fromScale(1, 1), Value)
+		return UDim2.fromScale(0, 1):Lerp(UDim2.fromScale(1, 1), math.clamp(Value, 0, 1))
 	end)
 
 	return Roact.createElement("Frame", {

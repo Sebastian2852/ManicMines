@@ -16,6 +16,8 @@ Then install all the packages by running
 `wally install`  
 in the project's **root directory**.  
 
+This project uses DarkLua. Use the provided `darklua-watch.bat` to automatically process all files with DarkLua. This creates a `Build/` folder, this is the folder that the `Rojo` project uses. 
+
 ### Dependencies
 - Knit: Framework
 - Component: Framework

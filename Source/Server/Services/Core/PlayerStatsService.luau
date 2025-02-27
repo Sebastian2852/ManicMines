@@ -9,6 +9,7 @@ local PlayerStatsService = Knit.CreateService({
 
 local DataService
 local LogService
+local TycoonUpgradeService
 
 -- [[ PRIVATE ]] --
 
@@ -46,6 +47,21 @@ function PlayerStatsService:CalculateInventoryCapacity(DataFolder: Core.DataFold
 	end
 
 	DataFolder.Inventory.InventoryItemCount.Value = Total
+end
+
+function PlayerStatsService:CalculateInventoryMaxCapactiy(DataFolder: Core.DataFolder)
+	local UpgradeLevel = DataFolder.Tycoon.Upgrades:FindFirstChild("Storage") :: IntValue
+	local Upgrade = TycoonUpgradeService:GetUpgradeByName("Storage")
+	local LevelConfig = Upgrade:FindFirstChild(UpgradeLevel.Value)
+
+	local Cap = LevelConfig:FindFirstChild("InventoryCap")
+
+	if not Cap then
+		DataFolder.Inventory.InventoryItemCount.Value = -1
+		return
+	end
+
+	DataFolder.Inventory.InventoryItemCount.Value = Cap.Value
 end
 
 --[=[
@@ -175,6 +191,7 @@ end
 function PlayerStatsService:KnitStart()
 	DataService = Knit.GetService("DataService")
 	LogService = Knit.GetService("LogService")
+	TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")
 end
 
 return PlayerStatsService
