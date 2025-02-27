@@ -3,10 +3,10 @@ local TweenService = game:GetService("TweenService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local TeleportService = Knit.CreateService {
+local TeleportService = Knit.CreateService({
 	Name = "TeleportService",
 	Client = {},
-}
+})
 
 local LogService
 local TycoonService
@@ -112,13 +112,14 @@ end
 Teleports a player to a given tycoon's spawn. If no tycoon is passed the player is teleported to their own
 tycoon.
 ]=]
-function TeleportService:TeleportPlayerToTycoon(Player: Player, Tycoon: Model?, WithLoadingScreen: boolean?)
+function TeleportService:TeleportPlayerToTycoon(Player: Player, TycoonPlayer: Player?, WithLoadingScreen: boolean?)
 	LogService:Log("Teleporting", Player.Name, "to their player")
 	local DataFolder = DataService:GetPlayerDataFolder(Player)
 	local TeleportLocation
 
-	if Tycoon then
-		local TycoonSpawn: BasePart = Tycoon.Main.Spawn
+	if TycoonPlayer then
+		local PlayerTycoon = TycoonService:GetPlayerTycoon(TycoonPlayer)
+		local TycoonSpawn: BasePart = PlayerTycoon.Main.Spawn
 		TeleportLocation = TycoonSpawn.Position + Vector3.new(0, 5, 0)
 	else
 		local PlayerTycoon = TycoonService:GetPlayerTycoon(Player)

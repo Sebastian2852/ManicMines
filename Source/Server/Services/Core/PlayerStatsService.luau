@@ -61,7 +61,7 @@ function PlayerStatsService:CalculateInventoryMaxCapactiy(DataFolder: Core.DataF
 		return
 	end
 
-	DataFolder.Inventory.InventoryItemCount.Value = Cap.Value
+	DataFolder.Inventory.InventoryCap.Value = Cap.Value
 end
 
 --[=[
