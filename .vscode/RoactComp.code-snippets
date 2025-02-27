@@ -1,0 +1,23 @@
+{
+    "Roact Component": {
+        "prefix": "EmptyComponent",
+        "body": [
+            "local ReplicatedStorage = game:GetService(\"ReplicatedStorage\")",
+            "",
+            "local Roact = require(ReplicatedStorage.Packages.Roact)",
+            "",
+            "local ${TM_FILENAME_BASE} = Roact.Component:extend(\"${TM_FILENAME_BASE}\")",
+            "",
+            "function ${TM_FILENAME_BASE}:init()",
+            "    ",
+            "end",
+            "",
+            "function ${TM_FILENAME_BASE}:render()",
+            "    ",
+            "end",
+            "",
+            "return ${TM_FILENAME_BASE}"
+        ],
+        "description": "blank roact component"
+    }
+}

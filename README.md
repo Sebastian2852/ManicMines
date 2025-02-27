@@ -1,24 +1,57 @@
 [![Linter](https://github.com/Sebastian2852/ManicMines/actions/workflows/Lint.yml/badge.svg?event=push)](https://github.com/Sebastian2852/ManicMines/actions/workflows/Lint.yml)
 
 # Manic Mines
-Welcome to the source code repository for **Manic Mines** (Roblox game), versions 1.3 and above.
+The source code for the Manic Mines Roblox game. This repo only holds code for versions after the recode update.
 
-**Note**: This code is provided for community use and collaboration. Feel free to use it as a reference or build upon it, but please credit the original work.
-
-## Build Instructions
+## Building
 To use start using this repo you need to have [Git](https://git-scm.com/), [Aftman](https://github.com/LPGhatguy/aftman) and [Wally](https://wally.run/) installed.
 
 To setup the coding environment start by cloning the repo using the command:  
-```git clone https://github.com/Sebastian2852/ManicMines```  
-This will automatically download the latest version of the game *(Note that this downloads the latest DEV version meaning it may contain code not actually in prod).*  
+```git clone --recursive https://github.com/Sebastian2852/ManicMines```  
+This will automatically download the latest version of the game.
+
+*Note: You can add `-b [BRANCH NAME]` to clone a branch. e.g. ```git clone -b Dev https://github.com/Sebastian2852/ManicMines```*  
+
 Then install all the packages by running  
 `wally install`  
 in the project's **root directory**.  
 
-**Note:** this project is will error when first running since all assets are not present. I do not plan to provide any assets or the folder structure of the game for now. Maybe sometime in the future I will add it.
+This project uses DarkLua. Use the provided `darklua-watch.bat` to automatically process all files with DarkLua. This creates a `Build/` folder, this is the folder that the `Rojo` project uses. 
 
-## Bugs / Issues
-Please report in-game bugs on the [Discord server](https://discord.gg/xtSNQAnSDt) in the `bug-reports` channel. This Issues section is reserved for code-related problems not yet present in the public game (i.e., not in the `Game` branch).
+### Dependencies
+- Knit: Framework
+- Component: Framework
+- Trove: Cleanup
+- Roact: GUI
+- Flipper: GUI Motion
+- TestEZ: Testing
+- cmdr: Command Bar
+- Promise: Async
+- octo-tree: Mine performance
+- Iris: Dev GUIs
+- ImGizmo: Dev visuals
+- NeoHotbar: Custom hotbar
+- TopbarPlus: Custom top-bar elements
+
+
+## Branches
+- The public game is on the `Game` branch. This branch is only updated when the game releases an update.
+- The main development branch is the `Dev` branch. It contains the latest stable code being actively worked on.
+
+Feature work, bug fixes, and improvements are created in separate branches and merged into `Dev` once completed. Here is the branch naming scheme:
+
+- `Feature/`: New features
+- `BugFix/`: Bug fixes
+- `Improvement/`: Reworks or improvements to existing systems
+- `Hotfix/`: Urgent fixes for critical issues
+- `Chore/`: Refactoring, documentation, or minor updates
+- `Experiment/`: Experimental features or ideas
+
+---
+
+# Systems
+## Caves
+Caves currently only support random caves that can only be guided by settings. These are all in the "Random" folder under "Assets/Caves". In the future there will be a "Structures" folder with caves that are randomly generated based on pre-built stuff.
 
 ---
 

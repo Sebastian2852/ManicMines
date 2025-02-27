@@ -1,0 +1,270 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Knit = require(ReplicatedStorage.Packages.Knit)
+local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
+local Promise = require(ReplicatedStorage.Packages.Promise)
+
+local CaveService = Knit.CreateService({
+	Name = "CaveService",
+	Client = {},
+})
+
+local MineService
+local LogService
+
+local BlockSize = Core.GameConfig.Mine.BlockSize
+
+-- [[ PUBLIC ]] --
+
+--[=[
+Do not use this function, instead use "GenerateRandomCaveAsync"
+]=]
+function CaveService:GenerateCaveAsync(
+	Center: Vector3,
+	Size: number,
+	NoiseResolution: Vector3,
+	NoiseResolutionOffset: Vector3,
+	NoiseThreshold: number,
+	Tint: Color3?
+)
+	return Promise.new(function(Resolve)
+		if Size % 2 == 0 then
+			Size += 1
+		end
+
+		Size = (Size / 2) * BlockSize.X
+		local Gens = {}
+		local NoiseCache = {}
+		local CaveMap = {}
+
+		local function GetNoise(X, Y, Z)
+			local Key = string.format("%d_%d_%d", X, Y, Z)
+			if NoiseCache[Key] then
+				return NoiseCache[Key]
+			end
+
+			local Noise = math.noise(
+				X / NoiseResolution.X + NoiseResolutionOffset.X,
+				Y / NoiseResolution.Y + NoiseResolutionOffset.Y,
+				Z / NoiseResolution.Z + NoiseResolutionOffset.Z
+			)
+
+			NoiseCache[Key] = Noise
+			return Noise
+		end
+
+		-- Precompute cave structure
+		for X = -Size, Size, BlockSize.X do
+			for Y = -Size, Size, BlockSize.Y do
+				for Z = -Size, Size, BlockSize.Z do
+					local NoiseValue = GetNoise(X, Y, Z)
+					CaveMap[X .. "," .. Y .. "," .. Z] = NoiseValue < NoiseThreshold
+				end
+			end
+		end
+
+		local function IsSurfaceBlock(X, Y, Z)
+			if not CaveMap[X .. "," .. Y .. "," .. Z] then
+				return false
+			end
+
+			local Offsets = {
+				Vector3.new(BlockSize.X, 0, 0),
+				Vector3.new(-BlockSize.X, 0, 0),
+				Vector3.new(0, BlockSize.Y, 0),
+				Vector3.new(0, -BlockSize.Y, 0),
+				Vector3.new(0, 0, BlockSize.Z),
+				Vector3.new(0, 0, -BlockSize.Z),
+			}
+
+			for _, Offset in Offsets do
+				local NeighborKey = (X + Offset.X) .. "," .. (Y + Offset.Y) .. "," .. (Z + Offset.Z)
+				if not CaveMap[NeighborKey] then
+					return true -- This block is exposed to air
+				end
+			end
+
+			return false -- Fully enclosed, skip it
+		end
+
+		local function GenerateBlock(Position, ForceGenerate)
+			MineService:GenerateAtPositionAsync(Position, ForceGenerate):andThen(function(Block)
+				if Block and Tint ~= nil and Tint ~= Color3.new(1, 1, 1) then
+					Block.Color = Core.Util:TintColor(Block.Color, Tint)
+				end
+			end)
+		end
+
+		local function GenZ(X, Y)
+			return Promise.new(function(ResolveGen)
+				for Z = -Size, Size, BlockSize.Z do
+					RunService.Heartbeat:Wait()
+
+					local Offset = Vector3.new(X, Y, Z)
+					local Position = Center + Offset
+
+					if MineService:IsPositionAir(Position) then
+						continue
+					end
+
+					-- Generate outer shell
+					if
+						X == -Size
+						or X + BlockSize.X > Size
+						or Y == -Size
+						or Y + BlockSize.Y > Size
+						or Z == -Size
+						or Z + BlockSize.Z > Size
+					then
+						GenerateBlock(Position, true)
+						continue
+					end
+
+					-- Generate only surface blocks inside the cave
+					if IsSurfaceBlock(X, Y, Z) then
+						GenerateBlock(Position, false)
+						MineService:AddAirPosition(Position)
+					end
+				end
+				ResolveGen()
+			end)
+		end
+
+		for X = -Size, Size, BlockSize.X do
+			for Y = -Size, Size, BlockSize.Y do
+				table.insert(Gens, GenZ(X, Y))
+			end
+		end
+
+		Promise.all(Gens):await()
+		Resolve()
+	end)
+end
+
+--[=[
+Returns a table of configs of valid cave configs at the given depth
+]=]
+function CaveService:GetSpawnableCaves(Depth: number): { Configuration }
+	local SpawnableCaves = {}
+
+	for _, CaveConfig: Configuration in pairs(Core.Assets.Caves.Random:GetChildren()) do
+		local SpawningRange = CaveConfig:GetAttribute("DepthRange")
+
+		local MinY = SpawningRange.Min
+		local MaxY = SpawningRange.Max
+
+		if MinY <= Depth and Depth <= MaxY then
+			table.insert(SpawnableCaves, CaveConfig)
+		end
+	end
+
+	return SpawnableCaves
+end
+
+function CaveService:GetRandomConfig(Depth: number): Configuration
+	local PossibleCaves = self:GetSpawnableCaves(Depth)
+	local NumberGenerator = MineService:GetRandomObject()
+
+	local function GetRemainingCaves(CavesLeft: { BasePart })
+		for i, Cave: Configuration in pairs(CavesLeft) do
+			local RandomNumber = NumberGenerator:NextInteger(1, Cave:GetAttribute("Rarity"))
+			if RandomNumber ~= 1 then
+				table.remove(CavesLeft, i)
+			end
+		end
+		return CavesLeft
+	end
+
+	if #PossibleCaves > 1 then
+		repeat
+			PossibleCaves = GetRemainingCaves(PossibleCaves)
+		until #PossibleCaves == 1
+	end
+
+	if #PossibleCaves == 1 then
+		local Cave = PossibleCaves[1]
+		local RandomNumber = NumberGenerator:NextInteger(1, Cave:GetAttribute("Rarity") or 1)
+		if RandomNumber == 1 then
+			return Cave
+		end
+	end
+
+	return nil
+end
+
+--[=[
+Generates a cave from the given config at the given position
+]=]
+function CaveService:GenerateCaveFromConfigAsync(CaveConfig: Configuration, Position: Vector3)
+	LogService:Log("Generating cave from config: " .. CaveConfig.Name)
+	local NumberGenerator: Random = MineService:GetRandomObject()
+
+	local SizeRange = CaveConfig:GetAttribute("Size")
+	local MinSize = SizeRange.Min
+	local MaxSize = SizeRange.Max
+	local Size = NumberGenerator:NextInteger(MinSize, MaxSize)
+
+	local NoiseResolution = CaveConfig:GetAttribute("NoiseResolution")
+	local NoiseResolutionOffset = CaveConfig:GetAttribute("NoiseResolutionOffset")
+	local NoiseThreshold = CaveConfig:GetAttribute("NoiseThreshold")
+	local Tint = CaveConfig:GetAttribute("Tint")
+
+	return self:GenerateCaveAsync(Position, Size, NoiseResolution, NoiseResolutionOffset, NoiseThreshold, Tint)
+end
+
+--[=[
+Generates a random cave from a random config at the given position
+]=]
+function CaveService:GenerateRandomCave(Position: Vector3)
+	LogService:Log("Generating new cave")
+
+	Position = MineService:SnapPositionToGrid(Position)
+	local Depth = MineService:YLevelToDepth(Position.Y)
+	local RandomCaveConfig = self:GetRandomConfig(Depth)
+
+	if RandomCaveConfig then
+		self:GenerateCaveFromConfigAsync(
+			RandomCaveConfig,
+			Position - Vector3.new(0, RandomCaveConfig:GetAttribute("Size").Max, 0)
+		)
+	end
+end
+
+-- [[ KNIT ]] --
+
+function CaveService:KnitStart()
+	MineService = Knit.GetService("MineService")
+	LogService = Knit.GetService("LogService")
+
+	-- MineService.OnBlockMined:Connect(function(_, Position: Vector3)
+	-- 	local NumberGenerator = MineService:GetRandomObject() :: Random
+	-- 	local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateCave)
+
+	-- 	if RandomNumber ~= 1 then
+	-- 		return
+	-- 	end
+
+	-- 	local NewPosition = Position - Vector3.new(0, 60, 0)
+	-- 	self:GenerateRandomCave(NewPosition)
+	-- end)
+
+	if _G.DEBUG then
+		task.wait(5)
+		local Generated = 0
+
+		for _, CaveConfig: Configuration in pairs(Core.Assets.Caves.Random:GetChildren()) do
+			if CaveConfig:GetAttribute("TestMode") == false then
+				continue
+			end
+			Generated += 1
+			LogService:Log("Generateing test cave: " .. CaveConfig.Name)
+			local Timer = Profiler.Timer.new("CaveGen")
+			self:GenerateCaveFromConfigAsync(CaveConfig, Vector3.new(500 * Generated, -500, 0)):await()
+			Timer:Stop()
+		end
+	end
+end
+
+return CaveService
