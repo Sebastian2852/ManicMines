@@ -115,7 +115,7 @@ function OreList.CreateFromFolder(Folder: Folder): OreList
 		end
 
 		if Object.Name == "GoldCoins" then
-			self:AddGold(Object.Name)
+			self:AddGold(Object.Value)
 			continue
 		end
 
