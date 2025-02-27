@@ -436,8 +436,16 @@ function DataService:NewSlot(Player: Player, SlotNumber: number, SlotSettings: C
 		return
 	end
 
-	local PlayerData = DataService:GetPlayerDataFolder(Player)
-	PlayerData.TycoonName.Value = SlotSettings.Name
+	if SlotSettings == nil then
+		Player:Kick("Invalid slot settings; nil \nThis is a bug, report this to the developers!")
+	end
+
+	if SlotSettings.Name == nil then
+		Player:Kick("Invalid slot settings; Name nil \nThis is a bug, report this to the developers!")
+	end
+
+	local PlayerData = RootDataFolder:WaitForChild(tostring(Player.UserId))
+	PlayerData.TycoonName.Value = SlotSettings.Name or "[INVALID SLOT DATA]"
 
 	self.Players[Player.UserId] = AsDataStore
 	LoadingService:StartLoading(Player)
