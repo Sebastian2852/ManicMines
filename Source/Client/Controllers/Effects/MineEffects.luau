@@ -151,6 +151,7 @@ function MineEffects:KnitStart()
 	end)
 
 	PickaxeService.PlayHitSound:Connect(function(Block)
+		if Block == nil then return end
 		local HitSoundConfig = AudioEngine:CreateFromSound(
 			Block:FindFirstChild("HitSound") or Core.Assets.Sounds.HitSound,
 			true,
@@ -160,6 +161,7 @@ function MineEffects:KnitStart()
 	end)
 
 	PickaxeService.PlayBreakSound:Connect(function(Block)
+		if Block == nil then return end
 		local BreakSoundConfig = AudioEngine:CreateFromSound(
 			Block:FindFirstChild("BreakSound") or Core.Assets.Sounds.BreakSound,
 			true,
