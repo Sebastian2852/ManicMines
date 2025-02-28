@@ -7,6 +7,8 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local Signals = require(ReplicatedStorage.Game.GUI.Signals)
 local TopbarPlus = require(ReplicatedStorage.Packages.TopbarPlus)
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
+
 local HUDController = Knit.CreateController({ Name = "HUDController" })
 
 local SpringTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0)
@@ -118,7 +120,7 @@ function HUDController:KnitStart()
 	local DataService = Knit.GetService("DataService")
 
 	self:SetupSettingsGUI()
-	self:AddTopBarLabel("v 1.0.2")
+	self:AddTopBarLabel(Core.GameConfig.MainMenu.Version)
 
 	local HUD = require(ReplicatedStorage.Game.GUI.HUD)
 
