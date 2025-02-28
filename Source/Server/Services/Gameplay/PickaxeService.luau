@@ -215,8 +215,8 @@ function PickaxeService:GivePickaxeToPlayer(Player: Player)
 	NewScript.Parent = NewPickaxe
 	NewPickaxe:AddTag("Pickaxe")
 
-	self:CalculateMiningPower(Player)
-	self:GetOptimalDepth(Player)
+	self:CalculateMiningPower(Player, true)
+	self:GetOptimalDepth(Player, true)
 end
 
 --[=[
