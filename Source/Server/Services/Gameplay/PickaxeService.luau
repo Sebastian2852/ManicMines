@@ -468,6 +468,9 @@ function PickaxeService:KnitInit()
 			continue
 		end
 
+		PickaxeTool.CanBeDropped = false
+		PickaxeTool:SetAttribute("Range", PickaxeTool:GetAttribute("Range") * Core.GameConfig.Mine.BlockSize.X)
+
 		LogService:Log("    - Setting up pickaxe: " .. PickaxeTool:GetFullName())
 		local Handle = PickaxeTool:FindFirstChild("Handle")
 		if not Handle then
