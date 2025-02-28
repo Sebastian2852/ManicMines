@@ -296,7 +296,7 @@ Config.Admins = {
 
 Config.Mine = {
 	BlockSize = Vector3.new(6, 6, 6),
-	BlocksToCollapse = 100000000,
+	BlocksToCollapse = 10000,
 	ChanceToGenerateOre = 2,
 	ChanceToGenerateCave = 2,
 }
