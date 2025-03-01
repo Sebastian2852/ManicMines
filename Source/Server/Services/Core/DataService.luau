@@ -32,9 +32,9 @@ local TycoonUpgradesFolder: Folder = ReplicatedStorage.Assets.Tycoon.Upgrades
 A list of all the data stores but as save slots so its easier to refrence in the code
 ]=]
 DataService.SaveSlots = {
-	Slot1 = DataStoreService:GetDataStore("SLOT1"),
-	Slot2 = DataStoreService:GetDataStore("SLOT2"),
-	Slot3 = DataStoreService:GetDataStore("SLOT3"),
+	Slot1 = DataStoreService:GetDataStore("SLOT1_Wipe1"),
+	Slot2 = DataStoreService:GetDataStore("SLOT2_Wipe1"),
+	Slot3 = DataStoreService:GetDataStore("SLOT3_Wipe1"),
 }
 
 DataService.Players = {}
