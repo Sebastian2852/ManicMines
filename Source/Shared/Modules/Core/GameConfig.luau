@@ -254,7 +254,7 @@ Config.Tycoon = {
 	},
 
 	MaxNameCharacters = 30,
-	UpgradeSelectionDistance = 32,
+	UpgradeSelectionDistance = 100,
 }
 
 --[=[
@@ -296,7 +296,7 @@ Config.Admins = {
 
 Config.Mine = {
 	BlockSize = Vector3.new(6, 6, 6),
-	BlocksToCollapse = 10000,
+	BlocksToCollapse = 100000,
 	ChanceToGenerateOre = 2,
 	ChanceToGenerateCave = 2,
 }
