@@ -24,6 +24,14 @@ function PickaxeSelection:init()
 			local MaxHealth = Block:GetAttribute("MaxHealth")
 
 			local Pickaxe: Instance = Players.LocalPlayer.Character:FindFirstChild("Pickaxe")
+
+			if not Pickaxe then
+				self:setState({
+					Selecting = false,
+				})
+				return
+			end
+
 			local HitsNeeded = math.ceil(Health / Pickaxe:GetAttribute("Damage"))
 			local TimePerHit = Pickaxe:GetAttribute("Delay")
 			local TotalTime = HitsNeeded * TimePerHit
