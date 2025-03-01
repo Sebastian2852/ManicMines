@@ -469,10 +469,12 @@ function MineService:BlockMined(Block: BasePart)
 			return
 		end
 
-		local Success = require(Module)
+		local Success, ErrorMessage = pcall(function()
+			require(Module)(self)
+		end)
 
 		if not Success then
-			warn("Block code FAILED")
+			warn("Block code FAILED: " .. ErrorMessage)
 		end
 
 		Resolve(Success)
