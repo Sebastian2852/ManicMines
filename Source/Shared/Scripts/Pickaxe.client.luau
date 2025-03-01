@@ -1,5 +1,6 @@
 local ReplicatedStorage = game.ReplicatedStorage
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local TaskQueue = require(ReplicatedStorage.Packages.TaskQueue)
 
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -24,11 +25,28 @@ local Active = false
 
 local MouseDown = false
 local Automining = false
-local EventSent = false
 
 local LatestPosition = {}
 LatestPosition.X = 0
 LatestPosition.Y = 0
+
+local MineQueue = TaskQueue.new(function(Blocks: { Part })
+	local DoneBlocks = {}
+
+	for _, v in pairs(Blocks) do
+		if v == nil then
+			continue
+		end
+
+		if table.find(DoneBlocks, v) then
+			continue
+		end
+		table.insert(DoneBlocks, v)
+
+		PickaxeService:StartMining(v)
+		return
+	end
+end)
 
 local function Activate()
 	if not PlayerFolder.PickaxeSelection.Value then
@@ -52,26 +70,16 @@ local function Activate()
 
 	if not Active then
 		Active = true
-		if not EventSent then
-			print("Sent event")
-			PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
-			EventSent = true
-		end
+		MineQueue:Add(PlayerFolder.PickaxeSelection.Value)
 		while Active do
 			PlayerFolder.PickaxeActive.Value = Active
-			if not EventSent then
-				print("Sent event")
-				PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
-				EventSent = true
-			end
+			MineQueue:Add(PlayerFolder.PickaxeSelection.Value)
 			if PlayerFolder.PickaxeSelection.Value == nil then
-				EventSent = false
 				break
 			end
 			task.wait(0.1)
 		end
 		PlayerFolder.PickaxeActive.Value = false
-		EventSent = false
 	end
 end
 
@@ -79,11 +87,7 @@ local function Deactivate()
 	if Automining then
 		return
 	end
-	if EventSent then
-		print("Sent stop mining")
-		PickaxeService:StopMining()
-		EventSent = false
-	end
+	PickaxeService:StopMining()
 	Active = false
 end
 
@@ -140,6 +144,7 @@ local function CanReach(OreBlock: BasePart)
 end
 
 local function DeselectOre()
+	PickaxeService:StopMining()
 	Deactivate()
 	PlayerFolder.PickaxeSelection.Value = nil
 	if Outline then
@@ -154,10 +159,10 @@ local function SelectOre(Ore: BasePart)
 	if PlayerFolder.PickaxeSelection.Value == Ore then
 		return
 	end
-	-- Deactivate()
+	Deactivate()
 	DeselectOre()
 	if not Ore:GetAttribute("CanMine") then
-		-- Deactivate()
+		Deactivate()
 		DeselectOre()
 		return
 	end
@@ -169,7 +174,7 @@ local function SelectOre(Ore: BasePart)
 		SetTarget(Ore.Parent)
 		PlayerFolder.PickaxeSelection.Value = Ore.Parent
 	elseif not UserInputService.TouchEnabled then
-		-- Deactivate()
+		Deactivate()
 		DeselectOre()
 	end
 end
@@ -237,6 +242,7 @@ RunService.Heartbeat:Connect(function()
 		end
 	else
 		DeselectOre()
+		Deactivate()
 	end
 end)
 
