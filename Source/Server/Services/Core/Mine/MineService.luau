@@ -455,7 +455,6 @@ function MineService:BlockMined(Block: BasePart)
 	end
 
 	self.OnBlockMined:Fire(Block, Block.CFrame.Position)
-	print("Fired Signal")
 
 	Promise.new(function(Resolve)
 		local Module = Block:FindFirstChildWhichIsA("ModuleScript")

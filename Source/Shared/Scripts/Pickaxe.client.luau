@@ -24,6 +24,7 @@ local Active = false
 
 local MouseDown = false
 local Automining = false
+local EventSent = false
 
 local LatestPosition = {}
 LatestPosition.X = 0
@@ -51,16 +52,26 @@ local function Activate()
 
 	if not Active then
 		Active = true
-		PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
+		if not EventSent then
+			print("Sent event")
+			PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
+			EventSent = true
+		end
 		while Active do
 			PlayerFolder.PickaxeActive.Value = Active
-			PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
+			if not EventSent then
+				print("Sent event")
+				PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
+				EventSent = true
+			end
 			if PlayerFolder.PickaxeSelection.Value == nil then
+				EventSent = false
 				break
 			end
 			task.wait(0.1)
 		end
 		PlayerFolder.PickaxeActive.Value = false
+		EventSent = false
 	end
 end
 
@@ -68,7 +79,11 @@ local function Deactivate()
 	if Automining then
 		return
 	end
-	PickaxeService:StopMining()
+	if EventSent then
+		print("Sent stop mining")
+		PickaxeService:StopMining()
+		EventSent = false
+	end
 	Active = false
 end
 
@@ -125,7 +140,6 @@ local function CanReach(OreBlock: BasePart)
 end
 
 local function DeselectOre()
-	PickaxeService:StopMining()
 	Deactivate()
 	PlayerFolder.PickaxeSelection.Value = nil
 	if Outline then
@@ -140,10 +154,10 @@ local function SelectOre(Ore: BasePart)
 	if PlayerFolder.PickaxeSelection.Value == Ore then
 		return
 	end
-	Deactivate()
+	-- Deactivate()
 	DeselectOre()
 	if not Ore:GetAttribute("CanMine") then
-		Deactivate()
+		-- Deactivate()
 		DeselectOre()
 		return
 	end
@@ -155,7 +169,7 @@ local function SelectOre(Ore: BasePart)
 		SetTarget(Ore.Parent)
 		PlayerFolder.PickaxeSelection.Value = Ore.Parent
 	elseif not UserInputService.TouchEnabled then
-		Deactivate()
+		-- Deactivate()
 		DeselectOre()
 	end
 end
@@ -223,7 +237,6 @@ RunService.Heartbeat:Connect(function()
 		end
 	else
 		DeselectOre()
-		Deactivate()
 	end
 end)
 
