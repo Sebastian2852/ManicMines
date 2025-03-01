@@ -278,7 +278,6 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 	MineService:GenerateAroundBlockAsync(ObjectToMine)
 	while self.Mining[Player.UserId].Mining and self:VerifyIfCanMine(Player, Character, ObjectToMine) do
 		local Health = ObjectToMine:GetAttribute("Health")
-		local MaxHealth = ObjectToMine:GetAttribute("MaxHealth")
 		local Damage = Pickaxe:GetAttribute("Damage")
 		local Delay = Pickaxe:GetAttribute("Delay")
 		local IsDestroyed = ObjectToMine == nil or ObjectToMine:GetAttribute("_BROKEN", true)
@@ -305,13 +304,6 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 		end
 
 		ObjectToMine:SetAttribute("Health", Health)
-		self.Client.UpdateMiningSelection:Fire(
-			Player,
-			ObjectToMine.Name,
-			self:CalculateTimeToMine(Player, Health),
-			math.ceil((1 - (Health / MaxHealth)) * 100),
-			(Health / MaxHealth)
-		)
 
 		if Health <= 0 then
 			self.Client.PlayBreakSound:FireAll(ObjectToMine)

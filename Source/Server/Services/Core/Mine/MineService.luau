@@ -449,6 +449,12 @@ function MineService:BlockMined(Block: BasePart)
 		return
 	end
 
+	local Mined = Block:GetAttribute("_MINED")
+	if Mined == true then
+		return
+	end
+	Block:SetAttribute("_MINED", true)
+
 	if self.MineStats.BlocksGenerated >= Core.GameConfig.Mine.BlocksToCollapse then
 		self:Collapse()
 		return
