@@ -1,5 +1,6 @@
 local ReplicatedStorage = game.ReplicatedStorage
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local TaskQueue = require(ReplicatedStorage.Packages.TaskQueue)
 
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -29,6 +30,24 @@ local LatestPosition = {}
 LatestPosition.X = 0
 LatestPosition.Y = 0
 
+local MineQueue = TaskQueue.new(function(Blocks: { Part })
+	local DoneBlocks = {}
+
+	for _, v in pairs(Blocks) do
+		if v == nil then
+			continue
+		end
+
+		if table.find(DoneBlocks, v) then
+			continue
+		end
+		table.insert(DoneBlocks, v)
+
+		PickaxeService:StartMining(v)
+		return
+	end
+end)
+
 local function Activate()
 	if not PlayerFolder.PickaxeSelection.Value then
 		return
@@ -51,10 +70,10 @@ local function Activate()
 
 	if not Active then
 		Active = true
-		PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
+		MineQueue:Add(PlayerFolder.PickaxeSelection.Value)
 		while Active do
 			PlayerFolder.PickaxeActive.Value = Active
-			PickaxeService:StartMining(PlayerFolder.PickaxeSelection.Value)
+			MineQueue:Add(PlayerFolder.PickaxeSelection.Value)
 			if PlayerFolder.PickaxeSelection.Value == nil then
 				break
 			end

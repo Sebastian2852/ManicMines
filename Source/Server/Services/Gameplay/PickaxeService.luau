@@ -43,7 +43,7 @@ end
 --[=[
 Calculates the mining power for the given player
 ]=]
-function PickaxeService:CalculateMiningPower(Player: Player): number
+function PickaxeService:CalculateMiningPower(Player: Player, SendToPlayer: boolean?): number
 	local Pickaxe = self:GetPlayerPickaxe(Player)
 	local DataFolder = DataService:GetPlayerDataFolder(Player) :: Core.DataFolder
 	if not Pickaxe then
@@ -58,20 +58,31 @@ function PickaxeService:CalculateMiningPower(Player: Player): number
 	local UpgradeMultiplier = (Upgrade or 0) * 1.2
 
 	local MiningPower = math.floor((Damage * Delay * Range) * (UpgradeMultiplier == 0 and 1 or UpgradeMultiplier) * 10)
-	self.Client.UpdateMiningPower:Fire(Player, MiningPower)
+
+	SendToPlayer = SendToPlayer == nil and false or SendToPlayer
+	if SendToPlayer then
+		self.Client.UpdateMiningPower:Fire(Player, MiningPower)
+	end
+
 	return MiningPower
 end
 
 --[=[
 Get the player's optimal depth
 ]=]
-function PickaxeService:GetOptimalDepth(Player: Player): number
+function PickaxeService:GetOptimalDepth(Player: Player, SendToPlayer: boolean?): number
 	local DataFolder = DataService:GetPlayerDataFolder(Player) :: Core.DataFolder
 	local UpgradeValue = DataFolder.Tycoon.Upgrades:FindFirstChild("DataAndAnalysis").Value
 	local LevelConfig: Configuration =
 		Core.Assets.Tycoon.Upgrades:FindFirstChild("DataAndAnalysis"):FindFirstChild(tostring(UpgradeValue))
 	local OptimalDepth = LevelConfig:FindFirstChild("OptimalDepth").Value
-	self.Client.UpdateOptimalDepth:Fire(Player, OptimalDepth)
+
+	SendToPlayer = SendToPlayer == nil and false or SendToPlayer
+
+	if SendToPlayer then
+		self.Client.UpdateOptimalDepth:Fire(Player, OptimalDepth)
+	end
+
 	return OptimalDepth
 end
 
@@ -204,8 +215,8 @@ function PickaxeService:GivePickaxeToPlayer(Player: Player)
 	NewScript.Parent = NewPickaxe
 	NewPickaxe:AddTag("Pickaxe")
 
-	self:CalculateMiningPower(Player)
-	self:GetOptimalDepth(Player)
+	self:CalculateMiningPower(Player, true)
+	self:GetOptimalDepth(Player, true)
 end
 
 --[=[
@@ -267,9 +278,13 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 	MineService:GenerateAroundBlockAsync(ObjectToMine)
 	while self.Mining[Player.UserId].Mining and self:VerifyIfCanMine(Player, Character, ObjectToMine) do
 		local Health = ObjectToMine:GetAttribute("Health")
-		local MaxHealth = ObjectToMine:GetAttribute("MaxHealth")
 		local Damage = Pickaxe:GetAttribute("Damage")
 		local Delay = Pickaxe:GetAttribute("Delay")
+		local IsDestroyed = ObjectToMine == nil or ObjectToMine:GetAttribute("_BROKEN", true)
+
+		if IsDestroyed then
+			return
+		end
 
 		if Health <= 0 then
 			self.Client.PlayBreakSound:FireAll(ObjectToMine)
@@ -289,13 +304,6 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 		end
 
 		ObjectToMine:SetAttribute("Health", Health)
-		self.Client.UpdateMiningSelection:Fire(
-			Player,
-			ObjectToMine.Name,
-			self:CalculateTimeToMine(Player, Health),
-			math.ceil((1 - (Health / MaxHealth)) * 100),
-			(Health / MaxHealth)
-		)
 
 		if Health <= 0 then
 			self.Client.PlayBreakSound:FireAll(ObjectToMine)
@@ -340,11 +348,10 @@ function PickaxeService:StopMining(Player: Player)
 		local Pickaxe = self:GetPlayerPickaxe(Player)
 		LogService:Log(Player.Name .. " stopped mining")
 
+		self.Mining[Player.UserId].Cooldown = true
 		DataFolder.ServerMining.Value = false
 		self.Mining[Player.UserId].Mining = false
 		self.Mining[Player.UserId].Object = nil
-
-		self.Mining[Player.UserId].Cooldown = true
 
 		task.wait(Pickaxe:GetAttribute("Delay") * 2)
 		self.Mining[Player.UserId].Cooldown = false
@@ -446,11 +453,11 @@ function PickaxeService.Client:BuyPickaxe(Player: Player, PickaxeConfig: Configu
 end
 
 function PickaxeService.Client:GetMiningPower(Player: Player): number
-	return self.Server:CalculateMiningPower(Player)
+	return self.Server:CalculateMiningPower(Player, false)
 end
 
 function PickaxeService.Client:GetOptimalDepth(Player: Player): number
-	return self.Server:GetOptimalDepth(Player)
+	return self.Server:GetOptimalDepth(Player, false)
 end
 
 --[[ KNIT ]]
@@ -467,6 +474,9 @@ function PickaxeService:KnitInit()
 			LogService:Warn("Pickaxe config has no pickaxe tool: " .. PickaxeConfig:GetFullName())
 			continue
 		end
+
+		PickaxeTool.CanBeDropped = false
+		PickaxeTool:SetAttribute("Range", PickaxeTool:GetAttribute("Range") * Core.GameConfig.Mine.BlockSize.X)
 
 		LogService:Log("    - Setting up pickaxe: " .. PickaxeTool:GetFullName())
 		local Handle = PickaxeTool:FindFirstChild("Handle")

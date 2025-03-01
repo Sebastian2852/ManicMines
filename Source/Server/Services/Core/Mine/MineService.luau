@@ -449,13 +449,18 @@ function MineService:BlockMined(Block: BasePart)
 		return
 	end
 
+	local Mined = Block:GetAttribute("_MINED")
+	if Mined == true then
+		return
+	end
+	Block:SetAttribute("_MINED", true)
+
 	if self.MineStats.BlocksGenerated >= Core.GameConfig.Mine.BlocksToCollapse then
 		self:Collapse()
 		return
 	end
 
 	self.OnBlockMined:Fire(Block, Block.CFrame.Position)
-	print("Fired Signal")
 
 	Promise.new(function(Resolve)
 		local Module = Block:FindFirstChildWhichIsA("ModuleScript")
@@ -464,10 +469,12 @@ function MineService:BlockMined(Block: BasePart)
 			return
 		end
 
-		local Success = require(Module)
+		local Success, ErrorMessage = pcall(function()
+			require(Module)(self)
+		end)
 
 		if not Success then
-			warn("Block code FAILED")
+			warn("Block code FAILED: " .. ErrorMessage)
 		end
 
 		Resolve(Success)

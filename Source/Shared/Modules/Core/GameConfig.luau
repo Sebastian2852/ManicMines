@@ -254,7 +254,7 @@ Config.Tycoon = {
 	},
 
 	MaxNameCharacters = 30,
-	UpgradeSelectionDistance = 32,
+	UpgradeSelectionDistance = 100,
 }
 
 --[=[
@@ -270,7 +270,7 @@ Config.DefaultSettings = {
 }
 
 Config.MainMenu = {
-	Version = "1.0.0",
+	Version = "v1.0.3",
 	--[=[
     All the credits for the game; main menu will automatically fill out the credits gui with these names. DO NOT EDIT YET!!
     ]=]
@@ -296,7 +296,7 @@ Config.Admins = {
 
 Config.Mine = {
 	BlockSize = Vector3.new(6, 6, 6),
-	BlocksToCollapse = 100000000,
+	BlocksToCollapse = 100000,
 	ChanceToGenerateOre = 2,
 	ChanceToGenerateCave = 2,
 }

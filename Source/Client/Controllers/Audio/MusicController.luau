@@ -15,6 +15,7 @@ local ActiveSong
 local HadSongs = false
 local CurrentFolder = nil
 local SongQueue = Core.Queue.new()
+local UseSettingVolume = false
 
 -- [[ PUBLIC ]] --
 
@@ -76,7 +77,7 @@ end
 --[=[
 Plays the next song; if no songs are in the queue and the config had songs then new queue is made
 ]=]
-function MusicController:PlayNextSong(UseSettingVolume: boolean)
+function MusicController:PlayNextSong()
 	LogService:Log("Playing next song")
 	if SongQueue:IsEmpty() then
 		if HadSongs and CurrentFolder ~= nil then
@@ -117,11 +118,13 @@ function MusicController:KnitStart()
 
 	DataService.DataLoaded:Connect(function(Data: Core.DataFolder)
 		DataFolder = Data
+		UseSettingVolume = true
 		self:PlayMusicForLayer(Core.Assets.Layers:FindFirstChild("Surface"))
 	end)
 
 	SettingsService.SettingsChanged:Connect(function()
 		LogService:Log("Settings updated, updating sound volume")
+		UseSettingVolume = true
 
 		if not ActiveSong then
 			LogService:Warn("No active song")

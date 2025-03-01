@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Theme = require(script.Parent.Theme)
 
 local MainMenu = Roact.Component:extend("MainMenu")
@@ -13,10 +14,10 @@ local SlotSelector = require(script.SlotSelector)
 local Title = require(script.Title)
 
 function MainMenu:init()
-	self:setState {
+	self:setState({
 		ShowCredits = false,
 		ShowPlay = false,
-	}
+	})
 
 	self.Motor = Flipper.SingleMotor.new(0)
 	local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
@@ -60,11 +61,11 @@ function MainMenu:render()
 			}, {
 				Gradient = Roact.createElement("UIGradient", {
 					Color = ColorSequence.new(Theme.BackgroundColor),
-					Transparency = NumberSequence.new {
+					Transparency = NumberSequence.new({
 						NumberSequenceKeypoint.new(0, 0, 0),
 						NumberSequenceKeypoint.new(0.5, 1, 0),
 						NumberSequenceKeypoint.new(1, 1, 0),
-					},
+					}),
 				}, {}),
 			}),
 
@@ -89,7 +90,7 @@ function MainMenu:render()
 					}, {
 						Title = Roact.createElement(
 							Title,
-							{ GameName = "Manic Mines", UpdateName = "Recode update" },
+							{ GameName = "Manic Mines", UpdateName = Core.GameConfig.MainMenu.Version },
 							{}
 						),
 					}),
@@ -110,9 +111,9 @@ function MainMenu:render()
 
 								task.wait(0.3)
 
-								self:setState {
+								self:setState({
 									ShowCredits = not self.state.ShowCredits,
-								}
+								})
 							end,
 
 							OnClickPlay = function()
@@ -123,9 +124,9 @@ function MainMenu:render()
 
 								task.wait(0.3)
 
-								self:setState {
+								self:setState({
 									ShowPlay = not self.state.ShowPlay,
-								}
+								})
 							end,
 						}, {}),
 					}),
@@ -149,9 +150,9 @@ function MainMenu:render()
 
 						task.wait(0.2)
 
-						self:setState {
+						self:setState({
 							ShowCredits = false,
-						}
+						})
 					end,
 				}),
 
@@ -164,9 +165,9 @@ function MainMenu:render()
 
 						task.wait(0.2)
 
-						self:setState {
+						self:setState({
 							ShowPlay = false,
-						}
+						})
 					end,
 				}),
 			}),
