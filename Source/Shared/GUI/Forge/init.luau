@@ -224,7 +224,7 @@ function Forge:render()
 
 	local Delay = SelectedTool and SelectedTool:GetAttribute("Delay") or -1
 	local Power = SelectedTool and SelectedTool:GetAttribute("Damage") or -1
-	local Range = SelectedTool and SelectedTool:GetAttribute("Range") or -1
+	local Range = SelectedTool and (SelectedTool:GetAttribute("Range") / 6) or -1
 
 	local Costs = SelectedConfig and SelectedConfig:FindFirstChild("Ores")
 	local IsLocked = SelectedConfig and IsPickaxeLocked(SelectedConfig) or false
