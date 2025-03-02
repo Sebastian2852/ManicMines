@@ -25,6 +25,7 @@ local LoadingService
 local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
 
 local TycoonsAmount = 1
+local Debounces = {}
 
 --[[ PRIVATE ]]
 --
@@ -153,7 +154,17 @@ end
 Tell the server to upgrade a given upgrade.
 ]=]
 function TycoonService.Client:Upgrade(Player: Player, UpgradeName: string)
-	return TycoonUpgradeService:Upgrade(Player, self:GetPlayerTycoon(Player), UpgradeName)
+	local IsDebounce = Debounces[Player.UserId] == true
+	if IsDebounce then
+		return
+	end
+	Debounces[Player.UserId] = true
+	local Result = TycoonUpgradeService:Upgrade(Player, self:GetPlayerTycoon(Player), UpgradeName)
+	task.spawn(function()
+		task.wait(1)
+		Debounces[Player.UserId] = false
+	end)
+	return Result
 end
 
 function TycoonService.Client:SetUpgradeValue(Setter: Player, Player: Player, UpgradeName: string, Value: number)
