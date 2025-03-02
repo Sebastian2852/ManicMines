@@ -280,13 +280,15 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 		local Health = ObjectToMine:GetAttribute("Health")
 		local Damage = Pickaxe:GetAttribute("Damage")
 		local Delay = Pickaxe:GetAttribute("Delay")
-		local IsDestroyed = ObjectToMine == nil or ObjectToMine:GetAttribute("_BROKEN", true)
-
-		if IsDestroyed then
-			return
-		end
 
 		if Health <= 0 then
+			local Mined = ObjectToMine:GetAttribute("_MINED")
+			if Mined == true then
+				self:StopMining(Player)
+				continue
+			end
+			ObjectToMine:SetAttribute("_MINED", true)
+
 			self.Client.PlayBreakSound:FireAll(ObjectToMine)
 			self:StopMining(Player)
 			task.wait(Delay)
@@ -306,6 +308,13 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 		ObjectToMine:SetAttribute("Health", Health)
 
 		if Health <= 0 then
+			local Mined = ObjectToMine:GetAttribute("_MINED")
+			if Mined == true then
+				self:StopMining(Player)
+				continue
+			end
+			ObjectToMine:SetAttribute("_MINED", true)
+
 			self.Client.PlayBreakSound:FireAll(ObjectToMine)
 			self:StopMining(Player)
 			task.wait(Delay)
