@@ -24,6 +24,8 @@ local LoadingService
 
 local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
 
+local TycoonsAmount = 1
+
 --[[ PRIVATE ]]
 --
 
@@ -84,10 +86,11 @@ spawns they get teleported to their tycoon spawn instead of the SpawnLocation.
 function TycoonService:CreateTycoonForPlayer(Player: Player): Model
 	LogService:Assert(not self:DoesPlayerHaveTycoon(Player), "Player already has tycoon?")
 
+	TycoonsAmount += 1
 	local NewTycoon = TycoonAssets.TycoonModel:Clone()
 	NewTycoon.Name = Player.UserId
 	NewTycoon.Parent = Tycoons
-	NewTycoon:PivotTo(CFrame.new(TycoonsSpawn.Position + Vector3.new(500 * (#Tycoons:GetChildren() + 1), 0, 0)))
+	NewTycoon:PivotTo(CFrame.new(TycoonsSpawn.Position + Vector3.new(500 * (TycoonsAmount + 1), 0, 0)))
 
 	local DataFolder = DataService:GetPlayerDataFolder(Player)
 
