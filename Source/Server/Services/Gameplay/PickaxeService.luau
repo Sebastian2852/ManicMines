@@ -4,7 +4,6 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
-local PlayerStatsService
 local DataService
 local MineService
 local LogService
@@ -292,8 +291,7 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 			self.Client.PlayBreakSound:FireAll(ObjectToMine)
 			self:StopMining(Player)
 			task.wait(Delay)
-			MineService:BlockMined(ObjectToMine)
-			PlayerStatsService:MinedOre(Player, OreList)
+			MineService:BlockMined(ObjectToMine, Player)
 			break
 		end
 
@@ -318,8 +316,7 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 			self.Client.PlayBreakSound:FireAll(ObjectToMine)
 			self:StopMining(Player)
 			task.wait(Delay)
-			MineService:BlockMined(ObjectToMine)
-			PlayerStatsService:MinedOre(Player, OreList)
+			MineService:BlockMined(ObjectToMine, Player)
 			task.wait(Delay / 2)
 			break
 		end
@@ -537,7 +534,6 @@ end
 function PickaxeService:KnitStart()
 	DataService = Knit.GetService("DataService")
 	MineService = Knit.GetService("MineService")
-	PlayerStatsService = Knit.GetService("PlayerStatsService")
 
 	game.Players.PlayerAdded:Connect(function(Player)
 		self.Mining[Player.UserId] = { Mining = false, Object = nil, Cooldown = false }

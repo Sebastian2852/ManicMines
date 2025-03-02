@@ -19,6 +19,7 @@ local MineService = Knit.CreateService({
 })
 
 local TeleportService
+local PlayerStatsService
 
 local Collapsing = false
 local BlockSize = Core.GameConfig.Mine.BlockSize
@@ -444,16 +445,10 @@ Checks if the given block has a module to run and runs it in a seperate thread
 Generates blocks around the given block
 Destroys the given block
 ]=]
-function MineService:BlockMined(Block: BasePart)
+function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 	if Block == nil then
 		return
 	end
-
-	local Mined = Block:GetAttribute("_MINED")
-	if Mined == true then
-		return
-	end
-	Block:SetAttribute("_MINED", true)
 
 	if self.MineStats.BlocksGenerated >= Core.GameConfig.Mine.BlocksToCollapse then
 		self:Collapse()
@@ -480,6 +475,12 @@ function MineService:BlockMined(Block: BasePart)
 		Resolve(Success)
 	end):andThen(function()
 		self:GenerateAroundBlockAsync(Block):andThen(function()
+			if PlayerWhoMined then
+				PlayerStatsService:MinedOre(
+					PlayerWhoMined,
+					Core.OreList.CreateFromOre(Block.Name, Block:GetAttribute("AmountDroppedWhenMined"))
+				)
+			end
 			Block:Destroy()
 		end)
 	end)
@@ -507,6 +508,7 @@ end
 
 function MineService:KnitStart()
 	TeleportService = Knit.GetService("TeleportService")
+	PlayerStatsService = Knit.GetService("PlayerStatsService")
 
 	OriginalMineSpawnPosition = MineService:SnapPositionToGrid(MineSpawn.CFrame.Position)
 	HiddenMineSpawnPosition = MineService:SnapPositionToGrid(OriginalMineSpawnPosition + Vector3.new(0, 50, 0))

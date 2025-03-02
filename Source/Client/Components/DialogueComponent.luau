@@ -53,6 +53,8 @@ local DialogueComponent = Component.new({
 	Extensions = { Extentions },
 })
 
+local Prompts = {}
+
 function DialogueComponent:Construct()
 	self.Trove = Trove.new()
 	self.NPC = self.Instance.Parent
@@ -162,6 +164,13 @@ function DialogueComponent:StartDialogue(ProximityPrompt)
 	local CameraPart = ProximityPrompt:FindFirstChildWhichIsA("BasePart")
 	local Tween = TweenService:Create(Camera, TweeningInfo, { CFrame = CameraPart.CFrame })
 	Tween:Play()
+
+	for _, v in pairs(Prompts) do
+		if v then
+			v.Enabled = false
+		end
+	end
+
 	Signals.ToggleHotbar:Fire(false)
 	Signals.ToggleHUDButtons:Fire(false)
 	Signals.ToggleHUDGold:Fire(false)
@@ -175,6 +184,13 @@ function DialogueComponent:EndDialogue()
 	Signals.ToggleHUDButtons:Fire(true)
 	Signals.ToggleHUDGold:Fire(true)
 	Signals.ToggleInventory:Fire(true)
+
+	for _, v in pairs(Prompts) do
+		if v then
+			v.Enabled = true
+		end
+	end
+
 	Tween.Completed:Wait()
 	Camera.CameraType = Enum.CameraType.Custom
 end
@@ -186,6 +202,7 @@ function DialogueComponent:Start()
 	ProximityPrompt.ActionText = self.Info.InteractMessage
 	ProximityPrompt.RequiresLineOfSight = false
 	ProximityPrompt.Parent = self.NPC
+	table.insert(Prompts, ProximityPrompt)
 
 	self.CameraDialoguePart:Clone().Parent = ProximityPrompt
 	self.ProximityPrompt = ProximityPrompt
