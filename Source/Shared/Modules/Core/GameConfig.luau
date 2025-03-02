@@ -314,6 +314,11 @@ Config.Chat = {
 			TagColor = Color3.fromRGB(179, 138, 255),
 			NameColor = Color3.fromRGB(255, 255, 255),
 		},
+		[4367923334] = {
+			Tag = "Quasar",
+			TagColor = Color3.fromRGB(0, 255, 0),
+			NameColor = Color3.fromRGB(255, 255, 255),
+		},
 	},
 }
 
