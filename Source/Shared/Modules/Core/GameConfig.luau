@@ -270,7 +270,7 @@ Config.DefaultSettings = {
 }
 
 Config.MainMenu = {
-	Version = "v1.0.4",
+	Version = "v1.0.5",
 	--[=[
     All the credits for the game; main menu will automatically fill out the credits gui with these names. DO NOT EDIT YET!!
     ]=]
