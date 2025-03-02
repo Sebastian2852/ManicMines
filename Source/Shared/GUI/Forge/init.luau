@@ -231,6 +231,14 @@ function Forge:render()
 	local IsUnlocked = SelectedConfig and IsPickaxeBought(SelectedConfig) or false
 	local Equipped = SelectedConfig and IsPickaxeEquipped(SelectedConfig) or false
 
+	local UpgradeMessage = ""
+
+	if SelectedConfig then
+		local Upgrade = SelectedConfig.Upgrades:FindFirstChild(SelectedConfig:GetAttribute("MainUpgrade"))
+		local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(SelectedConfig:GetAttribute("MainUpgrade"))
+		UpgradeMessage = `Level {Upgrade.Value} {UpgradeConfig:GetAttribute("UpgradeName")} needed`
+	end
+
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
 		ClipToDeviceSafeArea = false,
@@ -358,6 +366,8 @@ function Forge:render()
 						Equipped = Equipped,
 						ConfigName = SelectedConfig and SelectedConfig.Name,
 						Costs = IsLocked and Core.OreList.New() or (Costs and Core.OreList.CreateFromFolder(Costs)),
+						IsLocked = IsLocked,
+						UpgradeMessage = UpgradeMessage,
 					}, {}),
 				}),
 

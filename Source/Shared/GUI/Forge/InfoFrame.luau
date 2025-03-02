@@ -154,6 +154,8 @@ function InfoFrame:render()
 	local Delay = self.props.Delay or "[UNKNOWN]"
 	local PickaxeName = self.props.Name or "[UNKNOWN]"
 	local ConfigName = self.props.ConfigName or "0"
+	local IsLocked = self.props.IsLocked or false
+	local NeededUpgradeMessage = self.props.UpgradeMessage or "[UNKNOWN]"
 
 	local ShowButton = self.props.ShowButton or false
 	local Unlocked = self.props.Unlocked or false
@@ -215,11 +217,24 @@ function InfoFrame:render()
 				FontFace = Theme.Font,
 			}, {}),
 
+			UpgradeMessage = IsLocked and Roact.createElement("TextLabel", {
+				Size = UDim2.fromScale(1, 0.05),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 2,
+
+				Text = NeededUpgradeMessage,
+				TextScaled = true,
+				TextColor3 = Theme.BackgroundColorRed,
+				FontFace = Theme.Font,
+				TextXAlignment = Enum.TextXAlignment.Center,
+			}, {}),
+
 			Stats = Roact.createElement("Frame", {
 				Size = UDim2.fromScale(1, 0.3),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				LayoutOrder = 2,
+				LayoutOrder = 3,
 			}, {
 				Title = Roact.createElement("TextLabel", {
 					Size = UDim2.fromScale(1, 0.2),
@@ -255,7 +270,7 @@ function InfoFrame:render()
 				Size = UDim2.fromScale(1, 0.3),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				LayoutOrder = 3,
+				LayoutOrder = 4,
 			}, {
 				Title = Roact.createElement("TextLabel", {
 					Size = UDim2.fromScale(1, 0.2),
@@ -297,7 +312,7 @@ function InfoFrame:render()
 				Size = UDim2.fromScale(1, 0.3),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				LayoutOrder = 4,
+				LayoutOrder = 5,
 			}, {
 				App = Button,
 			}),
