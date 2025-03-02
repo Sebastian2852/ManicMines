@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
@@ -59,63 +58,58 @@ function MineEffects:KnitStart()
 	MineService = Knit.GetService("MineService")
 	PickaxeService = Knit.GetService("PickaxeService")
 
-	RunService:BindToRenderStep("CharacterPositionInfo", Enum.RenderPriority.Input.Value + 1, function()
-		local Character = Knit.Player.Character
-		if not Character or not Character:FindFirstChild("HumanoidRootPart") then
-			return
-		end
-
-		local RootPart = Character:FindFirstChild("HumanoidRootPart")
-		local X = math.floor(RootPart.CFrame.Position.X)
-		local Y = math.floor(RootPart.CFrame.Position.Y)
-		local Z = math.floor(RootPart.CFrame.Position.Z)
-		local Position = Vector3.new(X, Y, Z)
-
-		MineService:GetLayerConfig(Position.Y):andThen(function(Config: Configuration)
-			if PreviousLayer == Config.Name then
-				return
+	task.spawn(function()
+		while true do
+			local Character = Knit.Player.Character
+			if not Character or not Character:FindFirstChild("HumanoidRootPart") then
+				continue
 			end
 
-			MineEffects:Layer(Config.Name)
-			PreviousLayer = Config.Name
-		end)
+			local RootPart = Character:FindFirstChild("HumanoidRootPart")
+			local X = math.floor(RootPart.CFrame.Position.X)
+			local Y = math.floor(RootPart.CFrame.Position.Y)
+			local Z = math.floor(RootPart.CFrame.Position.Z)
+			local Position = Vector3.new(X, Y, Z)
 
-		MineService:ConvertToDepth(Position.Y):andThen(function(Depth: number)
+			local _, Config = MineService:GetLayerConfig(Position.Y):await()
+			if PreviousLayer ~= Config.Name then
+				MineEffects:Layer(Config.Name)
+				PreviousLayer = Config.Name
+			end
+
+			local _, Depth = MineService:ConvertToDepth(Position.Y):await()
 			ReplicatedStorage.Player.Depth.Value = Depth
 
-			PickaxeService:GetOptimalDepth():andThen(function(OptimalDepth)
-				local BelowOptimalDepth = Depth >= OptimalDepth
+			local _, OptimalDepth = PickaxeService:GetOptimalDepth():await()
+			local BelowOptimalDepth = Depth >= OptimalDepth
 
-				if BelowOptimalDepth == LastBelowOptimalDepth then
-					return
-				end
-
+			if BelowOptimalDepth ~= LastBelowOptimalDepth then
 				LastBelowOptimalDepth = BelowOptimalDepth
 				ReplicatedStorage.Player.BelowOptimalDepth.Value = BelowOptimalDepth
+			end
 
-				if CurrentlyTweening then
-					return
-				end
+			if CurrentlyTweening then
+				continue
+			end
 
-				CurrentlyTweening = true
-				local TargetFOV = BelowOptimalDepth and 60 or 70
-				if workspace.CurrentCamera.FieldOfView == TargetFOV then
-					CurrentlyTweening = false
-					return
-				end
+			CurrentlyTweening = true
+			local TargetFOV = BelowOptimalDepth and 60 or 70
+			if workspace.CurrentCamera.FieldOfView == TargetFOV then
+				CurrentlyTweening = false
+				continue
+			end
 
-				local Tween = TweenService:Create(
-					workspace.CurrentCamera,
-					TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false, 0),
-					{ FieldOfView = TargetFOV }
-				)
+			local Tween = TweenService:Create(
+				workspace.CurrentCamera,
+				TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false, 0),
+				{ FieldOfView = TargetFOV }
+			)
 
-				Tween:Play()
-				Tween.Completed:Connect(function()
-					CurrentlyTweening = false
-				end)
+			Tween:Play()
+			Tween.Completed:Connect(function()
+				CurrentlyTweening = false
 			end)
-		end)
+		end
 	end)
 
 	local Player = Knit.Player
@@ -151,7 +145,9 @@ function MineEffects:KnitStart()
 	end)
 
 	PickaxeService.PlayHitSound:Connect(function(Block)
-		if Block == nil then return end
+		if Block == nil then
+			return
+		end
 		local HitSoundConfig = AudioEngine:CreateFromSound(
 			Block:FindFirstChild("HitSound") or Core.Assets.Sounds.HitSound,
 			true,
@@ -161,7 +157,9 @@ function MineEffects:KnitStart()
 	end)
 
 	PickaxeService.PlayBreakSound:Connect(function(Block)
-		if Block == nil then return end
+		if Block == nil then
+			return
+		end
 		local BreakSoundConfig = AudioEngine:CreateFromSound(
 			Block:FindFirstChild("BreakSound") or Core.Assets.Sounds.BreakSound,
 			true,
