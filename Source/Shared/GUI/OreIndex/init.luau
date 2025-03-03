@@ -64,7 +64,7 @@ function OreIndex:render()
 		FillDirection = Enum.FillDirection.Vertical,
 	}, {})
 
-	local SelectedBlock = self.state.SelectedBlock or ReplicatedStorage.Assets.Stone
+	local SelectedBlock = self.state.SelectedBlock or ReplicatedStorage.Assets.Ores:GetChildren()[1]
 	local AmountOfOres = ReplicatedStorage.Assets.Ores:GetChildren()
 
 	return Roact.createElement("ScreenGui", {
