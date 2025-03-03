@@ -53,6 +53,7 @@ function OreIndex:render()
 	}, {})
 
 	local SelectedBlock = self.state.SelectedBlock or ReplicatedStorage.Assets.Stone
+	local AmountOfOres = ReplicatedStorage.Assets.Ores:GetChildren()
 
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
@@ -117,7 +118,7 @@ function OreIndex:render()
 						LayoutOrder = 1,
 
 						Text = "",
-						PlaceholderText = "Search ...",
+						PlaceholderText = `Search {#AmountOfOres} ores`,
 						TextScaled = true,
 						TextColor3 = Theme.TextColor,
 						PlaceholderColor3 = Theme.TextDisabledColor,
