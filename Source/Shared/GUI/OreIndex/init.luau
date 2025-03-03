@@ -29,6 +29,9 @@ function OreIndex:CreateOreButton(RealOreName: string, Locked: boolean, OreName:
 			OreName = OreName,
 			IsLocked = Locked,
 			OnClick = function()
+				if Locked then
+					return
+				end
 				self:setState({ SelectedBlock = ReplicatedStorage.Assets.Ores:FindFirstChild(RealOreName) })
 			end,
 		}, {}),
