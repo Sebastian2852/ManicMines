@@ -51,4 +51,18 @@ function ClientDataController:HasEnoughOres(Ores: Core.OreList): boolean
 	return true
 end
 
+--[=[
+	Returns how many times the player has mined the given ore
+]=]
+function ClientDataController:GetTimesMinedForOre(OreName: string): number
+	local DataFolder = self:GetDataFolder()
+	local DataValue: IntValue = DataFolder.TimesMined:FindFirstChild(OreName)
+
+	if DataValue == nil then
+		return 0
+	end
+
+	return DataValue.Value
+end
+
 return ClientDataController

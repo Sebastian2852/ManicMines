@@ -1,6 +1,10 @@
+local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+
+local OreIndexController
 
 local OreIndex = Roact.Component:extend("OreIndex")
 
@@ -9,6 +13,8 @@ local OreInfo = require(ReplicatedStorage.Game.GUI.OreIndex.OreInfo)
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
 function OreIndex:init()
+	OreIndexController = Knit.GetController("OreIndexController")
+
 	self.ScrollerRef = Roact.createRef()
 end
 
@@ -35,9 +41,9 @@ function OreIndex:CreateOreButtons()
 
 	for _, Ore in pairs(ReplicatedStorage.Assets.Ores:GetChildren()) do
 		local DisplayName = Ore:GetAttribute("DisplayName")
-		local Locked = math.random(1, 2) == 1
 		if Search == "" or string.find(string.lower(DisplayName), string.lower(Search)) then
-			Buttons[Locked and "???" or DisplayName] =
+			local Locked = OreIndexController:ShouldOreBeLocked(Ore.Name)
+			Buttons[Locked and HttpService:GenerateGUID(true) or DisplayName] =
 				self:CreateOreButton(Ore.Name, Locked, DisplayName, Ore:GetAttribute("EmblemImageID"))
 		end
 	end
