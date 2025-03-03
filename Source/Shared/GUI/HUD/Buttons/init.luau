@@ -8,7 +8,7 @@ local Signals = require(script.Parent.Parent.Signals)
 local Buttons = Roact.Component:extend("Buttons")
 
 local AnimatedButton = require(script.AnimatedButton)
-local Theme = require(script.Parent.Parent.Theme)
+local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
 local TeleportService
 
@@ -76,11 +76,33 @@ function Buttons:render()
 			}, {}),
 		}),
 
-		TycoonTeleport = not InTycoon and Roact.createElement("Frame", {
+		OreIndex = Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 2,
+			Visible = not Hidden,
+		}, {
+			AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
+				AspectRatio = 1,
+				AspectType = Enum.AspectType.FitWithinMaxSize,
+				DominantAxis = Enum.DominantAxis.Height,
+			}, {}),
+
+			Button = Roact.createElement(AnimatedButton, {
+				Background = Theme.Images.OreIndexButton,
+				Icon = "",
+				OnClick = function()
+					warn("No impl")
+				end,
+			}, {}),
+		}),
+
+		TycoonTeleport = not InTycoon and Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = 3,
 			Visible = not Hidden,
 		}, {
 			AspectRatio = Roact.createElement("UIAspectRatioConstraint", {

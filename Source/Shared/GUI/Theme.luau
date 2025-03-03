@@ -29,12 +29,17 @@ Theme.Images = {
 	Range = "rbxassetid://129170502469860",
 	Power = "rbxassetid://88283392867459",
 
-	-- Misc
-	Gold = "rbxassetid://92870304618730",
-	TycoonTeleportButton = "rbxassetid://83761770070710",
+	-- HUD buttons
 	SurfaceButton = "rbxassetid://119967532396729",
+	OreIndexButton = "rbxassetid://123713792355132",
+	TycoonTeleportButton = "rbxassetid://83761770070710",
+
+	-- HUD
+	Gold = "rbxassetid://92870304618730",
 	MiningPower = "rbxassetid://94366503795994",
 	OptimalDepth = "rbxassetid://95810331033800",
+
+	-- Misc
 	Vignette = "rbxassetid://127366667073715",
 }
 
