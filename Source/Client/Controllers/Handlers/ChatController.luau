@@ -17,7 +17,10 @@ function ChatController:KnitStart()
 			local Player = Players:GetPlayerByUserId(Message.TextSource.UserId)
 			local Character = Player.Character
 			local _, Depth =
-				MineService:ConvertToDepth(Character and Character.HumanoidRootPart.CFrame.Position.Y or 100000):await()
+				MineService:ConvertToDepth(
+					Character:FindFirstChild("HumanoidRootPart") and Character.HumanoidRootPart.CFrame.Position.Y
+						or 100000
+				):await()
 
 			local DepthTag = ""
 			local PlayerTag = ""
