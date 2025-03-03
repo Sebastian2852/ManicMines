@@ -27,6 +27,13 @@ function OreInfo:render()
 			SortOrder = Enum.SortOrder.LayoutOrder,
 		}, {}),
 
+		Padding = Roact.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, 10),
+			PaddingBottom = UDim.new(0, 10),
+			PaddingLeft = UDim.new(0, 10),
+			PaddingRight = UDim.new(0, 10),
+		}, {}),
+
 		OreHeader = Roact.createElement("TextLabel", {
 			Size = UDim2.fromScale(1, 0.15),
 			BackgroundTransparency = 1,
