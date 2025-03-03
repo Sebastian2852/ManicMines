@@ -11,10 +11,12 @@ local AnimatedButton = require(script.AnimatedButton)
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
 local TeleportService
+local OreIndexController
 
 function Buttons:init()
 	local DataService = Knit.GetService("DataService")
 	TeleportService = Knit.GetService("TeleportService")
+	OreIndexController = Knit.GetController("OreIndexController")
 
 	DataService:GetPlayerDataFolder():andThen(function(DataFolder: Core.DataFolder)
 		local InTycoon = DataFolder.InTycoon
@@ -76,7 +78,7 @@ function Buttons:render()
 			}, {}),
 		}),
 
-		OreIndex = Roact.createElement("Frame", {
+		TycoonTeleport = not InTycoon and Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
@@ -90,15 +92,15 @@ function Buttons:render()
 			}, {}),
 
 			Button = Roact.createElement(AnimatedButton, {
-				Background = Theme.Images.OreIndexButton,
+				Background = Theme.Images.TycoonTeleportButton,
 				Icon = "",
 				OnClick = function()
-					warn("No impl")
+					TeleportService:TeleportToTycoon()
 				end,
 			}, {}),
 		}),
 
-		TycoonTeleport = not InTycoon and Roact.createElement("Frame", {
+		OreIndex = Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 1),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
@@ -112,10 +114,10 @@ function Buttons:render()
 			}, {}),
 
 			Button = Roact.createElement(AnimatedButton, {
-				Background = Theme.Images.TycoonTeleportButton,
+				Background = Theme.Images.OreIndexButton,
 				Icon = "",
 				OnClick = function()
-					TeleportService:TeleportToTycoon()
+					OreIndexController:Open()
 				end,
 			}, {}),
 		}),

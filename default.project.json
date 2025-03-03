@@ -309,6 +309,16 @@
             "ModelStreamingMode": "Persistent"
           }
         },
+        "OreIndexScene":{
+          "$className": "Model",
+          "$properties": {
+            "ModelStreamingMode": "Persistent"
+          },
+
+          "CameraPos":{
+            "$className":"Part"
+          }
+        },
         "MineSpawn": {
           "$className": "Part"
         },
