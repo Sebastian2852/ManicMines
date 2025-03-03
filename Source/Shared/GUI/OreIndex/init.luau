@@ -43,6 +43,9 @@ function OreIndex:CreateOreButtons()
 		local DisplayName = Ore:GetAttribute("DisplayName")
 		if Search == "" or string.find(string.lower(DisplayName), string.lower(Search)) then
 			local Locked = OreIndexController:ShouldOreBeLocked(Ore.Name)
+			if Search ~= "" and Locked then
+				continue
+			end
 			Buttons[Locked and HttpService:GenerateGUID(true) or DisplayName] =
 				self:CreateOreButton(Ore.Name, Locked, DisplayName, Ore:GetAttribute("EmblemImageID"))
 		end
