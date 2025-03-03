@@ -9,6 +9,7 @@ local Theme = require(script.Parent.Parent.Theme)
 function IconLabel:render()
 	local LayoutOrder = self.props.LayoutOrder or 0
 	local IconImage = self.props.Image or Theme.Images.Missing
+	local IconImageColor = self.props.ImageColor or Color3.new(1, 1, 1)
 	local Text = self.props.Text or "[UNKNOWN]"
 
 	return Roact.createElement("Frame", {
@@ -31,6 +32,7 @@ function IconLabel:render()
 			LayoutOrder = 1,
 
 			Image = IconImage,
+			ImageColor3 = IconImageColor,
 			ScaleType = Enum.ScaleType.Fit,
 		}, {
 			AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
