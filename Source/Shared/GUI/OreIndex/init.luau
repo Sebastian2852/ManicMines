@@ -20,7 +20,7 @@ end
 
 function OreIndex:CreateOreButton(RealOreName: string, Locked: boolean, OreName: string, Emblem: string)
 	return Roact.createElement("Frame", {
-		Size = UDim2.fromScale(1, 0.1),
+		Size = UDim2.fromScale(1, 0.05),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 	}, {
@@ -64,122 +64,167 @@ function OreIndex:render()
 		FillDirection = Enum.FillDirection.Vertical,
 	}, {})
 
-	local SelectedBlock = self.state.SelectedBlock or ReplicatedStorage.Assets.Ores:GetChildren()[1]
+	local SelectedBlock = self.state.SelectedBlock
 	local AmountOfOres = ReplicatedStorage.Assets.Ores:GetChildren()
 
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
+		IgnoreGuiInset = true,
 	}, {
-		App = Roact.createElement("Frame", {
-			Size = UDim2.fromScale(0.5, 0.5),
-			Position = UDim2.new(0, 10, 0.5, 0),
-			AnchorPoint = Vector2.new(0, 0.5),
-			BackgroundColor3 = Theme.BackgroundColor,
-			BackgroundTransparency = 0.5,
+		Top = Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 0.3),
+			BackgroundColor3 = Color3.new(1, 1, 1),
 			BorderSizePixel = 0,
 		}, {
-			Padding = Roact.createElement("UIPadding", {
-				PaddingTop = UDim.new(0, 10),
-				PaddingBottom = UDim.new(0, 10),
-				PaddingLeft = UDim.new(0, 10),
-				PaddingRight = UDim.new(0, 10),
+			Gradient = Roact.createElement("UIGradient", {
+				Rotation = 90,
+				Color = ColorSequence.new(Color3.new(0, 0, 0)),
+				Transparency = NumberSequence.new({
+					NumberSequenceKeypoint.new(0, 0, 0),
+					NumberSequenceKeypoint.new(1, 1, 0),
+				}),
 			}, {}),
 
-			Header = Roact.createElement("TextLabel", {
-				Size = UDim2.fromScale(1, 0.1),
+			Title = Roact.createElement("TextLabel", {
+				Size = UDim2.fromScale(0.3, 0.3),
+				Position = UDim2.fromScale(0.5, 0.1),
+				AnchorPoint = Vector2.new(0.5, 0),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 
-				Text = "Ore Index",
+				Text = "<u>Ore Index</u>",
+				TextColor3 = Color3.new(1, 1, 1),
 				TextScaled = true,
-				TextColor3 = Theme.TextColor,
+				RichText = true,
 				FontFace = Theme.Font,
-				TextXAlignment = Enum.TextXAlignment.Left,
 			}, {}),
 
-			Content = Roact.createElement("Frame", {
-				Size = UDim2.fromScale(1, 0.9),
-				Position = UDim2.fromScale(0, 0.1),
-				BackgroundTransparency = 1,
+			CloseButton = Roact.createElement("TextButton", {
+				Size = UDim2.fromScale(0.1, 0.1),
+				Position = UDim2.new(0.5, 0, 0.4, 10),
+				AnchorPoint = Vector2.new(0.5, 0),
+				BackgroundColor3 = Theme.BackgroundColorRed,
+				BorderSizePixel = 0,
+
+				Text = "<- Back",
+				TextColor3 = Color3.new(1, 1, 1),
+				TextScaled = true,
+				FontFace = Theme.Font,
+
+				[Roact.Event.MouseButton1Click] = function()
+					OreIndexController:Close()
+				end,
+			}, {
+				Corners = Roact.createElement("UICorner", {
+					CornerRadius = UDim.new(0, 7),
+				}, {}),
+			}),
+		}),
+
+		Left = Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+		}, {
+			OreSelector = Roact.createElement("Frame", {
+				Size = UDim2.fromScale(0.2, 0.7),
+				Position = UDim2.new(0, 10, 0.5, 0),
+				AnchorPoint = Vector2.new(0, 0.5),
+				BackgroundColor3 = Theme.BackgroundColor,
+				BackgroundTransparency = 0.5,
 				BorderSizePixel = 0,
 			}, {
-				Layout = Roact.createElement("UIListLayout", {
-					Padding = UDim.new(0, 10),
-					FillDirection = Enum.FillDirection.Horizontal,
-					HorizontalFlex = Enum.UIFlexAlignment.Fill,
-					SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = Roact.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 10),
+					PaddingBottom = UDim.new(0, 10),
+					PaddingLeft = UDim.new(0, 10),
+					PaddingRight = UDim.new(0, 10),
 				}, {}),
 
-				OreSelection = Roact.createElement("Frame", {
-					Size = UDim2.fromScale(0.4, 1),
-					BackgroundTransparency = 1,
-					BorderSizePixel = 0,
-					LayoutOrder = 1,
-				}, {
-					Layout = Roact.createElement("UIListLayout", {
-						Padding = UDim.new(0, 10),
-						FillDirection = Enum.FillDirection.Vertical,
-						VerticalFlex = Enum.UIFlexAlignment.Fill,
-						SortOrder = Enum.SortOrder.LayoutOrder,
-					}, {}),
-
-					SearchBox = Roact.createElement("TextBox", {
-						Size = UDim2.fromScale(1, 0.1),
-						BackgroundTransparency = 0.75,
-						BackgroundColor3 = Theme.BackgroundColor,
-						LayoutOrder = 1,
-
-						Text = "",
-						PlaceholderText = `Search {#AmountOfOres} ores`,
-						TextScaled = true,
-						TextColor3 = Theme.TextColor,
-						PlaceholderColor3 = Theme.TextDisabledColor,
-						FontFace = Theme.Font,
-
-						[Roact.Change.Text] = function(TextBox: TextBox)
-							self:setState({ SearchQuery = TextBox.Text })
-
-							local Scroller: ScrollingFrame = self.ScrollerRef:getValue()
-							if Scroller == nil then
-								warn("Scroller ref not set; This is not a bug!")
-								return
-							end
-
-							Scroller.CanvasPosition = Vector2.new(0, 0)
-						end,
-					}, {
-						Corners = Roact.createElement("UICorner", {
-							CornerRadius = UDim.new(0, 10),
-						}, {}),
-					}),
-
-					Scroller = Roact.createElement("ScrollingFrame", {
-						Size = UDim2.fromScale(1, 1),
-						BackgroundTransparency = 1,
-						BorderSizePixel = 0,
-						LayoutOrder = 2,
-
-						ScrollBarThickness = 5,
-						VerticalScrollBarInset = Enum.ScrollBarInset.Always,
-						VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left,
-						ScrollingDirection = Enum.ScrollingDirection.Y,
-						ScrollBarImageColor3 = Theme.TextColor,
-						AutomaticCanvasSize = Enum.AutomaticSize.Y,
-
-						[Roact.Ref] = self.ScrollerRef,
-					}, Buttons),
-				}),
-
-				OreInfo = Roact.createElement("Frame", {
+				Content = Roact.createElement("Frame", {
 					Size = UDim2.fromScale(1, 1),
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
-					LayoutOrder = 2,
 				}, {
-					App = Roact.createElement(OreInfo, {
-						Block = SelectedBlock,
-					}, {}),
+					OreSelection = Roact.createElement("Frame", {
+						Size = UDim2.fromScale(1, 1),
+						BackgroundTransparency = 1,
+						BorderSizePixel = 0,
+						LayoutOrder = 1,
+					}, {
+						Layout = Roact.createElement("UIListLayout", {
+							Padding = UDim.new(0, 10),
+							FillDirection = Enum.FillDirection.Vertical,
+							VerticalFlex = Enum.UIFlexAlignment.Fill,
+							SortOrder = Enum.SortOrder.LayoutOrder,
+						}, {}),
+
+						SearchBox = Roact.createElement("TextBox", {
+							Size = UDim2.fromScale(1, 0.05),
+							BackgroundTransparency = 0.75,
+							BackgroundColor3 = Theme.BackgroundColor,
+							LayoutOrder = 1,
+
+							Text = "",
+							PlaceholderText = `Search {#AmountOfOres} ores`,
+							TextScaled = true,
+							TextColor3 = Theme.TextColor,
+							PlaceholderColor3 = Theme.TextDisabledColor,
+							FontFace = Theme.Font,
+
+							[Roact.Change.Text] = function(TextBox: TextBox)
+								self:setState({ SearchQuery = TextBox.Text })
+
+								local Scroller: ScrollingFrame = self.ScrollerRef:getValue()
+								if Scroller == nil then
+									warn("Scroller ref not set; This is not a bug!")
+									return
+								end
+
+								Scroller.CanvasPosition = Vector2.new(0, 0)
+							end,
+						}, {
+							Corners = Roact.createElement("UICorner", {
+								CornerRadius = UDim.new(0, 10),
+							}, {}),
+						}),
+
+						Scroller = Roact.createElement("ScrollingFrame", {
+							Size = UDim2.fromScale(1, 1),
+							BackgroundTransparency = 1,
+							BorderSizePixel = 0,
+							LayoutOrder = 2,
+
+							ScrollBarThickness = 5,
+							VerticalScrollBarInset = Enum.ScrollBarInset.Always,
+							VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left,
+							ScrollingDirection = Enum.ScrollingDirection.Y,
+							ScrollBarImageColor3 = Theme.TextColor,
+							AutomaticCanvasSize = Enum.AutomaticSize.Y,
+
+							[Roact.Ref] = self.ScrollerRef,
+						}, Buttons),
+					}),
 				}),
+			}),
+		}),
+
+		Right = SelectedBlock and Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+		}, {
+			OreInfo = Roact.createElement("Frame", {
+				Size = UDim2.fromScale(0.2, 0.3),
+				Position = UDim2.new(1, -10, 0.5, 0),
+				AnchorPoint = Vector2.new(1, 0.5),
+				BackgroundColor3 = Theme.BackgroundColor,
+				BackgroundTransparency = 0.5,
+				BorderSizePixel = 0,
+			}, {
+				App = Roact.createElement(OreInfo, {
+					Block = SelectedBlock,
+				}, {}),
 			}),
 		}),
 	})

@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local OreButton = Roact.Component:extend("OreButton")
+local OreButton = Roact.PureComponent:extend("OreButton")
 
 local IconLabel = require(ReplicatedStorage.Game.GUI.Common.IconLabel)
 

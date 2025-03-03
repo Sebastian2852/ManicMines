@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local OreInfo = Roact.Component:extend("OreInfo")
+local OreInfo = Roact.PureComponent:extend("OreInfo")
 
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
@@ -28,7 +28,7 @@ function OreInfo:render()
 		}, {}),
 
 		OreHeader = Roact.createElement("TextLabel", {
-			Size = UDim2.fromScale(1, 0.1),
+			Size = UDim2.fromScale(1, 0.15),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 1,
@@ -41,7 +41,7 @@ function OreInfo:render()
 		}, {}),
 
 		OreInfo = Roact.createElement("Frame", {
-			Size = UDim2.fromScale(1, 0.2),
+			Size = UDim2.fromScale(1, 0.25),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 2,
@@ -92,7 +92,7 @@ function OreInfo:render()
 		}),
 
 		RarityHeader = Roact.createElement("TextLabel", {
-			Size = UDim2.fromScale(1, 0.07),
+			Size = UDim2.fromScale(1, 0.125),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 3,
@@ -105,11 +105,25 @@ function OreInfo:render()
 		}, {}),
 
 		RarityGraph = Roact.createElement("Frame", {
-			Size = UDim2.fromScale(1, 0.3),
+			Size = UDim2.fromScale(1, 0.4),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 4,
-		}, {}),
+		}, {
+			WipLabel = Roact.createElement("TextLabel", {
+				Size = UDim2.fromScale(1, 0.5),
+				Position = UDim2.fromScale(0, 0.5),
+				AnchorPoint = Vector2.new(0, 0.5),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+
+				Text = "[RARITY GRAPH]<br />Work in progress",
+				TextScaled = true,
+				RichText = true,
+				TextColor3 = Theme.TextDisabledColor,
+				FontFace = Theme.Font,
+			}, {}),
+		}),
 	})
 end
 
