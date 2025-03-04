@@ -33,6 +33,7 @@ function OreIndex:CreateOreButton(RealOreName: string, Locked: boolean, OreName:
 					return
 				end
 				self:setState({ SelectedBlock = ReplicatedStorage.Assets.Ores:FindFirstChild(RealOreName) })
+				OreIndexController:DisplayOre(RealOreName)
 			end,
 		}, {}),
 	})

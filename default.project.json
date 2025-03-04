@@ -317,6 +317,10 @@
 
           "CameraPos":{
             "$className":"Part"
+          },
+
+          "OrePos":{
+            "$className":"Part"
           }
         },
         "MineSpawn": {

@@ -11,9 +11,13 @@ local OreIndexController = Knit.CreateController({ Name = "OreIndexController" }
 local ClientDataController
 
 local Camera = workspace.CurrentCamera
+
 local OreIndexSceneCamera = workspace.Game.OreIndexScene.CameraPos
 local CameraBaseCFrame = OreIndexSceneCamera.CFrame
 local CameraOffsetFactor = 0.2
+
+local OreIndexSceneOrePosition = workspace.Game.OreIndexScene.OrePos
+local CurrentDisplayOre = nil
 
 local CurrentGuiTree = nil
 local MouseMoveConnection = nil
@@ -31,6 +35,28 @@ function OreIndexController:OnMouseMove(MousePosition: Vector2)
 
 	local OffsetCFrame = CFrame.new(OffsetX * CameraOffsetFactor, OffsetY * CameraOffsetFactor, 0)
 	Camera.CFrame = CameraBaseCFrame * OffsetCFrame
+end
+
+function OreIndexController:DisplayOre(OreName: string)
+	local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
+	if not RealOre then
+		return
+	end
+
+	if CurrentDisplayOre then
+		CurrentDisplayOre:Destroy()
+	end
+
+	local NewOre = ReplicatedStorage.Assets.Layers:FindFirstChild("Surface").Stone:Clone()
+	for _, v in pairs(RealOre:GetChildren()) do
+		v:Clone().Parent = NewOre
+	end
+
+	NewOre.Parent = workspace
+	NewOre.Size = Vector3.new(6, 6, 6)
+	NewOre:PivotTo(OreIndexSceneOrePosition.CFrame)
+
+	CurrentDisplayOre = NewOre
 end
 
 function OreIndexController:Open()
@@ -71,6 +97,10 @@ function OreIndexController:Close()
 	if MouseMoveConnection then
 		MouseMoveConnection:Disconnect()
 		MouseMoveConnection = nil
+	end
+
+	if CurrentDisplayOre then
+		CurrentDisplayOre:Destroy()
 	end
 
 	Camera.CameraType = Enum.CameraType.Custom
