@@ -3,5 +3,9 @@
 		"editor.defaultFormatter": "JohnnyMorganz.stylua"
 	},
 
-	"editor.formatOnSave": true
+	"editor.formatOnSave": true,
+
+	"files.watcherExclude": {
+		"**/Build": true
+	}
 }
