@@ -38,13 +38,36 @@ function MysteryMerchantService:GenerateTrades()
 		table.remove(PossibleBuyOres, OreIndex)
 
 		local CoinValue = Ore:GetAttribute("CoinValue")
-		local BuyPrice = CoinValue * 0.75
+		local BuyPrice = math.round(CoinValue * 0.75)
 		BuyTrades[Ore.Name] = BuyPrice
+	end
+
+	local SellTrades = {}
+	local SellTradesToGenerate =
+		NumberGenerator:NextInteger(Config.MerchantSellTrades.Min, Config.MerchantSellTrades.Max)
+
+	local PossibleSellOres = ReplicatedStorage.Assets.Ores:GetChildren() :: { Part }
+
+	for i, Ore in pairs(PossibleSellOres) do
+		local CanBuy = Ore:GetAttribute("MysteryMerchantCanSell")
+		if not CanBuy then
+			table.remove(PossibleSellOres, i)
+		end
+	end
+
+	for _ = 1, SellTradesToGenerate, 1 do
+		local OreIndex = NumberGenerator:NextInteger(1, #PossibleSellOres)
+		local Ore = PossibleSellOres[OreIndex]
+		table.remove(PossibleSellOres, OreIndex)
+
+		local CoinValue = Ore:GetAttribute("CoinValue")
+		local SellPrice = math.round(CoinValue * 1.5)
+		SellTrades[Ore.Name] = SellPrice
 	end
 
 	self.Trades = {
 		Buy = BuyTrades,
-		Sell = {},
+		Sell = SellTrades,
 	}
 end
 
