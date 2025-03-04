@@ -40,32 +40,47 @@ end
 
 function OreIndex:CreateOreButtons()
 	local Buttons = {}
+	local UnlockedOres = 0
 	local Search = self.state.SearchQuery or ""
 
 	for _, Ore in pairs(ReplicatedStorage.Assets.Ores:GetChildren()) do
 		local DisplayName = Ore:GetAttribute("DisplayName")
 		if Search == "" or string.find(string.lower(DisplayName), string.lower(Search)) then
 			local Locked = OreIndexController:ShouldOreBeLocked(Ore.Name)
+
+			if not Locked then
+				UnlockedOres += 1
+			end
+
 			if Search ~= "" and Locked then
 				continue
 			end
-			Buttons[Locked and HttpService:GenerateGUID(true) or DisplayName] =
+
+			local LockedName = ""
+			if Locked then
+				local Got = Ore:GetAttribute("OREINDEX_CLIENT_LOCKEDNAME")
+				LockedName = Got == nil and HttpService:GenerateGUID(true) or Got
+				if Ore:GetAttribute("OREINDEX_CLIENT_LOCKEDNAME") == nil then
+					Ore:SetAttribute("OREINDEX_CLIENT_LOCKEDNAME", LockedName)
+				end
+			end
+
+			Buttons[Locked and LockedName or DisplayName] =
 				self:CreateOreButton(Ore.Name, Locked, DisplayName, Ore:GetAttribute("EmblemImageID"))
 		end
 	end
 
-	return Buttons
+	return Buttons, UnlockedOres
 end
 
 function OreIndex:render()
-	local Buttons = self:CreateOreButtons()
+	local Buttons, UnlockedOres = self:CreateOreButtons()
 	Buttons["Layout"] = Roact.createElement("UIListLayout", {
 		SortOrder = Enum.SortOrder.Name,
 		FillDirection = Enum.FillDirection.Vertical,
 	}, {})
 
 	local SelectedBlock = self.state.SelectedBlock
-	local AmountOfOres = ReplicatedStorage.Assets.Ores:GetChildren()
 
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
@@ -166,7 +181,7 @@ function OreIndex:render()
 							LayoutOrder = 1,
 
 							Text = "",
-							PlaceholderText = `Search {#AmountOfOres} ores`,
+							PlaceholderText = `Search {UnlockedOres} ores`,
 							TextScaled = true,
 							TextColor3 = Theme.TextColor,
 							PlaceholderColor3 = Theme.TextDisabledColor,
