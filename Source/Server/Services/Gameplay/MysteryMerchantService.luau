@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -16,6 +17,8 @@ local MysteryMerchantService = Knit.CreateService({
 		Sell = {},
 	},
 })
+
+local NPC = ServerStorage.MysteryMerchant.NPC
 
 -- [[ PUBLIC ]] --
 
@@ -71,6 +74,27 @@ function MysteryMerchantService:GenerateTrades()
 	}
 end
 
+function MysteryMerchantService:PickRandomSpawn()
+	local Spawns = ServerStorage.MysteryMerchant.Spawns:GetChildren()
+	return Spawns[NumberGenerator:NextInteger(1, #Spawns)].CFrame
+end
+
+function MysteryMerchantService:Spawn()
+	local SpawnCFrame = self:PickRandomSpawn() :: CFrame
+	NPC.Parent = workspace
+
+	if not NPC:HasTag("MysteryMerchant/OpenGUI") then
+		NPC:AddTag("MysteryMerchant/OpenGUI")
+	end
+
+	NPC:PivotTo(SpawnCFrame)
+end
+
+function MysteryMerchantService:DeSpawn()
+	NPC:PivotTo(CFrame.new(0, 0, 0))
+	NPC.Parent = ServerStorage.MysteryMerchant
+end
+
 -- [[ CLIENT ]] --
 
 function MysteryMerchantService.Client:GetTrades()
@@ -80,8 +104,16 @@ end
 -- [[ KNIT ]] --
 
 function MysteryMerchantService:KnitStart()
-	self:GenerateTrades()
-	print(self.Trades)
+	task.spawn(function()
+		while true do
+			self:GenerateTrades()
+			print(self.Trades)
+			self:Spawn()
+			task.wait(5)
+			self:DeSpawn()
+			task.wait(5)
+		end
+	end)
 end
 
 return MysteryMerchantService

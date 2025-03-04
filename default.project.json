@@ -668,6 +668,15 @@
             }
           }
         }
+      },
+      "MysteryMerchant": {
+        "$className":"Folder",
+        "Spawns":{
+          "$className":"Folder"
+        },
+        "NPC":{
+          "$className":"Model"
+        }
       }
     }
   }
