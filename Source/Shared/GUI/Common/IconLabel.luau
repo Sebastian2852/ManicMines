@@ -23,6 +23,7 @@ function IconLabel:render()
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalFlex = Enum.UIFlexAlignment.Fill,
+			VerticalAlignment = Enum.VerticalAlignment.Center,
 		}, {}),
 
 		Icon = Roact.createElement("ImageLabel", {
