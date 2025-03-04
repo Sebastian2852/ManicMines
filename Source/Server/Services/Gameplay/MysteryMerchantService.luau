@@ -106,12 +106,17 @@ end
 function MysteryMerchantService:KnitStart()
 	task.spawn(function()
 		while true do
-			self:GenerateTrades()
-			print(self.Trades)
-			self:Spawn()
-			task.wait(5)
 			self:DeSpawn()
-			task.wait(5)
+
+			local IdleTime = NumberGenerator:NextInteger(Config.MerchantIdleLength.Min, Config.MerchantIdleLength.Max)
+			task.wait(IdleTime)
+
+			self:GenerateTrades()
+			self:Spawn()
+
+			local LivingTime =
+				NumberGenerator:NextInteger(Config.MerchantLivingLength.Min, Config.MerchantLivingLength.Max)
+			task.wait(LivingTime)
 		end
 	end)
 end
