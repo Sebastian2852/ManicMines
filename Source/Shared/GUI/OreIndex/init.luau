@@ -81,6 +81,7 @@ function OreIndex:render()
 	}, {})
 
 	local SelectedBlock = self.state.SelectedBlock
+	local TotalOres = #ReplicatedStorage.Assets.Ores:GetChildren()
 
 	return Roact.createElement("ScreenGui", {
 		ResetOnSpawn = false,
@@ -241,6 +242,27 @@ function OreIndex:render()
 					Block = SelectedBlock,
 				}, {}),
 			}),
+		}),
+
+		Bottom = Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+		}, {
+			UnlockedOres = Roact.createElement("TextLabel", {
+				Size = UDim2.fromScale(0.3, 0.05),
+				Position = UDim2.new(0.5, 0, 1, -10),
+				AnchorPoint = Vector2.new(0.5, 1),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+
+				Text = `Unlocked {UnlockedOres} / {TotalOres} ores`,
+				TextScaled = true,
+				TextColor3 = Theme.TextColor,
+				TextStrokeTransparency = 0,
+				TextYAlignment = Enum.TextYAlignment.Bottom,
+				FontFace = Theme.Font,
+			}, {}),
 		}),
 	})
 end
