@@ -301,6 +301,13 @@ Config.Mine = {
 	ChanceToGenerateCave = 2,
 }
 
+Config.MysteryMerchant = {
+	MerchantLivingLength = NumberRange.new(5, 10),
+	MerchantIdleLength = NumberRange.new(1, 5),
+	MerchantBuyTrades = NumberRange.new(3, 10),
+	MerchantSellTrades = NumberRange.new(3, 10),
+}
+
 Config.Chat = {
 	ServerTagColor = Color3.fromRGB(255, 0, 0),
 	Players = {

@@ -20,6 +20,8 @@ local NeededAttribs = {
 	CanGenerateGeode = "boolean",
 	GeodeColorTint = "Color3",
 	GeodeGenerationChance = "number",
+	MysteryMerchantCanSell = "boolean",
+	MysteryMerchantCanBuy = "boolean",
 }
 
 return function()
