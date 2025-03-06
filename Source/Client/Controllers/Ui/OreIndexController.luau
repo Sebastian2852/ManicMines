@@ -12,11 +12,12 @@ local ClientDataController
 
 local Camera = workspace.CurrentCamera
 
-local OreIndexSceneCamera = workspace.Game.OreIndexScene.CameraPos
+local OreIndexScene = workspace.Game:WaitForChild("OreIndexScene")
+local OreIndexSceneCamera = OreIndexScene.CameraPos
 local CameraBaseCFrame = OreIndexSceneCamera.CFrame
 local CameraOffsetFactor = 0.2
 
-local OreIndexSceneOrePosition = workspace.Game.OreIndexScene.OrePos
+local OreIndexSceneOrePosition = OreIndexScene.OrePos
 local CurrentDisplayOre = nil
 
 local CurrentGuiTree = nil
