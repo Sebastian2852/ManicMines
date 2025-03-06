@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
+local Flipper = require(ReplicatedStorage.Packages.Flipper)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.trove)
 
@@ -32,7 +33,7 @@ end
 
 function Display.HidePickaxe()
 	if Display.CurrentPickaxe then
-		Display.CurrentPickaxe:PivotTo(Camera.CFrame + Vector3.new(0, -10, 0))
+		Display.CurrentPickaxe:Destroy()
 	end
 end
 
@@ -72,8 +73,38 @@ function Display.ShowPickaxe(PickaxeConfig: Configuration)
 
 	Model.Parent = Camera
 	Model:PivotTo(Workspace.Game.ForgePickaxePos.CFrame)
+	Model:ScaleTo(0.1)
+
+	local Thread = task.spawn(function()
+		local Motor = Flipper.SingleMotor.new(0)
+		local RotMotor = Flipper.SingleMotor.new(300)
+
+		Motor:onStep(function(Value)
+			if Model then
+				Model:ScaleTo(Value)
+			end
+		end)
+
+		RotMotor:onStep(function(Value)
+			if Model then
+				Model:PivotTo(Workspace.Game.ForgePickaxePos.CFrame * CFrame.Angles(0, math.rad(Value), 0))
+			end
+		end)
+
+		Motor:setGoal(Flipper.Spring.new(1, {
+			frequency = 4,
+			dampingRatio = 0.62,
+		}))
+
+		RotMotor:setGoal(Flipper.Spring.new(360, {
+			frequency = 4,
+			dampingRatio = 1,
+		}))
+	end)
+
 	Display.CurrentPickaxe = Model
 	Display.Trove:Add(Model)
+	Display.Trove:Add(Thread)
 end
 
 function Display.CleanUp()
