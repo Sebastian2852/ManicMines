@@ -9,9 +9,9 @@ local TycoonService
 
 local TycoonSelection = Roact.Component:extend("TycoonSelection")
 
-local CloseButton = require(script.Parent.Common.CloseButton)
-local CostFrame = require(script.CostFrame)
-local Theme = require(script.Parent.Theme)
+local CloseButton = require(ReplicatedStorage.Game.GUI.Common.CloseButton)
+local CostFrame = require(ReplicatedStorage.Game.GUI.Common.CostFrame)
+local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
 function TycoonSelection:init()
 	ClientDataController = Knit.GetController("ClientDataController")
@@ -184,7 +184,7 @@ function TycoonSelection:render()
 					}),
 
 					Right = NextLevelConfig and Roact.createElement("Frame", {
-						Size = UDim2.fromScale(0.3, 1),
+						Size = UDim2.fromScale(0.3, 0.8),
 						Position = UDim2.fromScale(1, 0.5),
 						AnchorPoint = Vector2.new(1, 0.5),
 						BackgroundTransparency = 1,
@@ -196,7 +196,7 @@ function TycoonSelection:render()
 						}, {}),
 
 						TitleContainer = Roact.createElement("Frame", {
-							Size = UDim2.fromScale(1, 0.125),
+							Size = UDim2.fromScale(1, 0.15),
 							BackgroundTransparency = 1,
 							BorderSizePixel = 0,
 							LayoutOrder = 1,

@@ -26,6 +26,8 @@ function CostFrame:GetFrames()
 
 	for _, Ore: Core.OreListItem in pairs(Orelist:LoopList()) do
 		local CanAfford = ClientDataController:HasEnoughOre(Ore)
+		local Amount = ClientDataController:GetOresAmount(Ore.Name)
+		local NeeedAmount = Ore.Amount
 
 		table.insert(
 			Promises,
@@ -39,7 +41,8 @@ function CostFrame:GetFrames()
 				}, {
 					App = Roact.createElement(IconLabel, {
 						Image = Ore.Emblem,
-						Text = Ore.DisplayName .. ": " .. Ore.Amount,
+						Text = CanAfford and Ore.DisplayName .. ": " .. Ore.Amount
+							or `{Ore.DisplayName}: {Ore.Amount} ({NeeedAmount - Amount} missing)`,
 					}, {}),
 				})
 				Resolve()
@@ -56,8 +59,8 @@ function CostFrame:render()
 	local Frames = self:GetFrames()
 
 	return Roact.createElement("ScrollingFrame", {
-		Size = UDim2.fromScale(1, 0.8),
-		Position = UDim2.fromScale(0, 0.2),
+		Size = UDim2.fromScale(1, 1),
+		Position = UDim2.fromScale(0, 0),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 

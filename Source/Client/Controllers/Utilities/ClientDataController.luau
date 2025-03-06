@@ -38,6 +38,21 @@ function ClientDataController:HasEnoughOre(Ore: Core.OreListItem): boolean
 	return Amount >= Ore.Amount
 end
 
+function ClientDataController:GetOresAmount(Name: string): number
+	local DataFolder = self:GetDataFolder()
+
+	if Name == "GoldCoins" then
+		local Amount = DataFolder.Gold.Value
+		return Amount
+	end
+
+	local InventoryDataValue = DataFolder.Inventory.Ores:FindFirstChild(Name) :: IntValue
+	local StorageDataValue = DataFolder.Storage.Ores:FindFirstChild(Name) :: IntValue
+	local Amount = InventoryDataValue.Value + StorageDataValue.Value
+
+	return Amount
+end
+
 --[=[
 	Check if the player has enough for an ore list
 ]=]

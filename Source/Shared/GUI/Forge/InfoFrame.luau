@@ -11,6 +11,7 @@ local PickaxeService
 
 local InfoFrame = Roact.Component:extend("InfoFrame")
 
+local CostFrame = require(ReplicatedStorage.Game.GUI.Common.CostFrame)
 local IconLabel = require(ReplicatedStorage.Game.GUI.Common.IconLabel)
 local Theme = require(script.Parent.Parent.Theme)
 
@@ -160,7 +161,7 @@ function InfoFrame:render()
 	local ShowButton = self.props.ShowButton or false
 	local Unlocked = self.props.Unlocked or false
 	local Equipped = self.props.Equipped or false
-	local Costs = self.props.Costs or Core.OreList.New()
+	local CostsOreList = self.props.Costs or Core.OreList.New()
 
 	local Button
 
@@ -284,32 +285,20 @@ function InfoFrame:render()
 					FontFace = Theme.Font,
 				}, {}),
 
-				Costs = Roact.createElement("ScrollingFrame", {
+				App = Roact.createElement("Frame", {
 					Size = UDim2.fromScale(1, 0.8),
 					Position = UDim2.fromScale(0, 0.2),
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
-
-					CanvasSize = UDim2.fromScale(1, 1),
-					AutomaticCanvasSize = Enum.AutomaticSize.Y,
-					ScrollBarThickness = 5,
-					ScrollBarImageColor3 = Color3.new(1, 1, 1),
-					VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right,
-					VerticalScrollBarInset = Enum.ScrollBarInset.Always,
-					ScrollingDirection = Enum.ScrollingDirection.Y,
 				}, {
-					Layout = Roact.createElement("UIListLayout", {
-						SortOrder = Enum.SortOrder.LayoutOrder,
-						FillDirection = Enum.FillDirection.Vertical,
-						VerticalAlignment = Enum.VerticalAlignment.Top,
-					}, {}),
-
-					self:CreateCostsFragment(Costs),
+					Costs = not Unlocked and Roact.createElement(CostFrame, {
+						OreList = CostsOreList,
+					}, {}) or self:CreateCostsFragment(CostsOreList),
 				}),
 			}),
 
 			Action = Roact.createElement("Frame", {
-				Size = UDim2.fromScale(1, 0.3),
+				Size = UDim2.fromScale(1, 0.25),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				LayoutOrder = 5,
