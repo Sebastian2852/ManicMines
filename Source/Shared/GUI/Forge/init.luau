@@ -320,7 +320,7 @@ function Forge:render()
 						BorderSizePixel = 0,
 
 						AutomaticCanvasSize = Enum.AutomaticSize.Y,
-						CanvasSize = UDim2.fromScale(1, 1),
+						CanvasSize = UDim2.fromScale(1, 2),
 						ScrollBarThickness = 0,
 						VerticalScrollBarInset = Enum.ScrollBarInset.None,
 						ScrollingDirection = Enum.ScrollingDirection.Y,

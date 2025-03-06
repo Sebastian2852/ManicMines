@@ -98,7 +98,7 @@ end
 -- [[ CLIENT ]] --
 
 function MysteryMerchantService.Client:GetTrades()
-	return self.Trades
+	return self.Server.Trades
 end
 
 -- [[ KNIT ]] --
