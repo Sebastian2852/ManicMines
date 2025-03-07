@@ -18,12 +18,13 @@ end
 
 Knit.AddServicesDeep(script.Parent.Services)
 
-local Timer = Profiler.Timer.new("[RUNTIME] Start knit")
+local KnitStartTimer = Profiler.Timer.new()
 
 Knit.Start()
 	:andThen(function()
-		Timer:Stop()
-		print("Knit started")
+		local StartTime = KnitStartTimer:GetTime()
+		KnitStartTimer:Destroy()
+		print(`Server loaded: {StartTime}ms elapsed`)
 	end)
 	:catch(warn)
 

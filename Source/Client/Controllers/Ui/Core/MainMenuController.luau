@@ -117,7 +117,6 @@ function MainMenuController:KnitStart()
 
 	while Camera.CameraType == Enum.CameraType.Scriptable do
 		for i = 0, #CameraNodes:GetChildren() - 1, 1 do
-			print(i)
 			local Node = CameraNodes:FindFirstChild(tostring(i))
 
 			local Tween = TweenService:Create(

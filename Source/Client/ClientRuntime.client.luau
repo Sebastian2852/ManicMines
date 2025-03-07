@@ -3,15 +3,20 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Packages
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 require(ReplicatedStorage.Packages.Iris).Init()
 local Cmdr = require(ReplicatedStorage:WaitForChild("CmdrClient"))
 
 -- [[ KNIT ]] --
 
+local KnitStartTimer = Profiler.Timer.new()
+
 Knit.AddControllersDeep(script.Parent.Controllers)
 Knit.Start()
 	:andThen(function()
-		print("Knit started")
+		local StartTime = KnitStartTimer:GetTime()
+		KnitStartTimer:Destroy()
+		print(`Client loaded: {StartTime}ms elapsed`)
 	end)
 	:catch(warn)
 
