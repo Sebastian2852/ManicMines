@@ -41,6 +41,7 @@ Theme.Images = {
 
 	-- Misc
 	Vignette = "rbxassetid://127366667073715",
+	UpArrow = "rbxassetid://120340466993952",
 }
 
 if RunService:IsServer() then

@@ -5,13 +5,68 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local Trove = require(ReplicatedStorage.Packages.trove)
 
 local MysteryMerchantService
+local ClientDataController
 
 local MysteryMerchant = Roact.Component:extend("MysteryMerchant")
 
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
+local TradeFrame = require(ReplicatedStorage.Game.GUI.MysteryMerchant.TradeFrame)
+
+local function BuyOreFrame(OreName: string, Price: number)
+	local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
+	local DisplayName = RealOre:GetAttribute("DisplayName")
+	local Gradient = RealOre:GetAttribute("InventoryBackgroundColor")
+	local Emblem = RealOre:GetAttribute("EmblemImageID")
+
+	return Roact.createElement("Frame", {
+		Size = UDim2.fromScale(1, 0.2),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+	}, {
+		App = Roact.createElement(TradeFrame, {
+			CostOreName = "Gold Coins",
+			CostOreEmblem = Theme.Images.Gold,
+			CostOreAmount = Price,
+
+			SellOreName = DisplayName,
+			SellOreEmblem = Emblem,
+			SellOreAmount = 1,
+
+			CanDoTrade = ClientDataController:GetOresAmount("GoldCoins") >= Price,
+			Gradient = Gradient,
+		}, {}),
+	})
+end
+
+local function SellOreFrame(OreName: string, Price: number)
+	local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
+	local DisplayName = RealOre:GetAttribute("DisplayName")
+	local Gradient = RealOre:GetAttribute("InventoryBackgroundColor")
+	local Emblem = RealOre:GetAttribute("EmblemImageID")
+
+	return Roact.createElement("Frame", {
+		Size = UDim2.fromScale(1, 0.2),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+	}, {
+		App = Roact.createElement(TradeFrame, {
+			SellOreName = "Gold Coins",
+			SellOreEmblem = Theme.Images.Gold,
+			SellOreAmount = Price,
+
+			CostOreName = DisplayName,
+			CostOreEmblem = Emblem,
+			CostOreAmount = 1,
+
+			CanDoTrade = ClientDataController:GetOresAmount(OreName) >= Price,
+			Gradient = Gradient,
+		}, {}),
+	})
+end
 
 function MysteryMerchant:init()
 	MysteryMerchantService = Knit.GetService("MysteryMerchantService")
+	ClientDataController = Knit.GetController("ClientDataController")
 	self.Trove = Trove.new()
 end
 
@@ -19,14 +74,10 @@ function MysteryMerchant:didMount()
 	local GetPromise = MysteryMerchantService:GetTrades():andThen(function(Trades: { ["Buy"]: {}, ["Sell"]: {} })
 		local Elements = {}
 		for OreName, Price in pairs(Trades["Sell"]) do
-			local Element = Roact.createElement("TextLabel", {
-				Size = UDim2.fromScale(1, 0.1),
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
-				Text = `{OreName} {Price}`,
-				TextScaled = true,
-			}, {})
-			Elements[OreName] = Element
+			Elements[OreName] = BuyOreFrame(OreName, Price)
+		end
+		for OreName, Price in pairs(Trades["Buy"]) do
+			Elements[OreName] = SellOreFrame(OreName, Price)
 		end
 
 		self:setState({
