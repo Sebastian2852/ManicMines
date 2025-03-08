@@ -24,7 +24,20 @@ function ChatController:KnitStart()
 
 			local DepthTag = ""
 			local PlayerTag = ""
+			local LevelTag = ""
 			local NameColor = Color3.fromRGB(255, 255, 255):ToHex()
+			local LevelColor = Color3.fromRGB(255, 255, 255):ToHex()
+
+			local DataFolder = ReplicatedStorage.PlayerData:FindFirstChild(Message.TextSource.UserId) :: Core.DataFolder
+
+			if DataFolder then
+				local Level = DataFolder.Level.Value
+				local Config = ReplicatedStorage.Assets.Levels:FindFirstChild(Level)
+				LevelColor = Config:GetAttribute("LevelColor"):ToHex()
+				NameColor = LevelColor
+				LevelTag = `<font color='#{LevelColor}'>[{Config:GetAttribute("LevelName")}]</font> `
+			end
+
 			if Depth >= 0 then
 				DepthTag = `[{Depth + 1}m] `
 			end
@@ -32,10 +45,15 @@ function ChatController:KnitStart()
 			if Core.GameConfig.Chat.Players[Message.TextSource.UserId] then
 				PlayerTag =
 					`<font color='#{Core.GameConfig.Chat.Players[Message.TextSource.UserId].TagColor:ToHex()}'>[{Core.GameConfig.Chat.Players[Message.TextSource.UserId].Tag}]</font> `
-				NameColor = Core.GameConfig.Chat.Players[Message.TextSource.UserId].NameColor:ToHex()
+
+				local PossibleNameColor = Core.GameConfig.Chat.Players[Message.TextSource.UserId].NameColor
+				if PossibleNameColor then
+					NameColor = PossibleNameColor
+				end
 			end
 
-			Properties.PrefixText = `<font color='#{NameColor}'>{PlayerTag .. DepthTag .. Message.PrefixText}</font>`
+			Properties.PrefixText =
+				`<font color='#{NameColor}'>{PlayerTag .. LevelTag .. DepthTag .. Message.PrefixText}</font>`
 		else
 			Properties.PrefixText = `<font color='#{Core.GameConfig.Chat.ServerTagColor:ToHex()}'>[SERVER]</font> `
 				.. Message.PrefixText
