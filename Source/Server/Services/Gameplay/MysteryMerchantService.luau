@@ -18,6 +18,8 @@ local MysteryMerchantService = Knit.CreateService({
 	},
 })
 
+local MessageService
+
 local NPC = ServerStorage.MysteryMerchant.NPC
 
 -- [[ PUBLIC ]] --
@@ -90,11 +92,23 @@ function MysteryMerchantService:Spawn()
 	end
 
 	NPC:PivotTo(SpawnCFrame)
+	MessageService:SendMessage({
+		Message = "Mystery Merchant has spawned somewhere on the map",
+		Prefix = "Mystery Merchant",
+		HasPrefix = false,
+		MessageColor = Color3.new(1, 1, 1),
+	})
 end
 
 function MysteryMerchantService:DeSpawn()
 	NPC:PivotTo(CFrame.new(0, 0, 0))
 	NPC.Parent = ServerStorage.MysteryMerchant
+	MessageService:SendMessage({
+		Message = "The Mystery Merchant is gone",
+		Prefix = "",
+		HasPrefix = false,
+		MessageColor = Color3.new(1, 1, 1),
+	})
 end
 
 -- [[ CLIENT ]] --
@@ -106,6 +120,8 @@ end
 -- [[ KNIT ]] --
 
 function MysteryMerchantService:KnitStart()
+	MessageService = Knit.GetService("MessageService")
+
 	task.spawn(function()
 		while true do
 			self:DeSpawn()
