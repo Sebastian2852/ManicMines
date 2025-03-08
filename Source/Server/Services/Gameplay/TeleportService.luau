@@ -34,6 +34,9 @@ local function FadeCharacterOut(Duration: number, Character: Model)
 		if table.find(NamesToAvoid, Thing.Name) then
 			continue
 		end
+		if Thing:FindFirstAncestorWhichIsA("Tool") then
+			continue
+		end
 		local Tween = TweenService:Create(Thing, TweeningInfo, { Transparency = 1 })
 		table.insert(Tweens, Tween)
 	end
@@ -55,6 +58,9 @@ local function FadeCharacterIn(Duration: number, Character: Model)
 			continue
 		end
 		if table.find(NamesToAvoid, Thing.Name) then
+			continue
+		end
+		if Thing:FindFirstAncestorWhichIsA("Tool") then
 			continue
 		end
 		local Tween = TweenService:Create(Thing, TweeningInfo, { Transparency = 0 })
