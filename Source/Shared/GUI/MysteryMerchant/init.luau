@@ -12,7 +12,7 @@ local MysteryMerchant = Roact.Component:extend("MysteryMerchant")
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 local TradeFrame = require(ReplicatedStorage.Game.GUI.MysteryMerchant.TradeFrame)
 
-local function BuyOreFrame(OreName: string, Price: number)
+local function BuyOreFrame(OreName: string, Price: number, Amount: number)
 	local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
 	local DisplayName = RealOre:GetAttribute("DisplayName")
 	local Gradient = RealOre:GetAttribute("InventoryBackgroundColor")
@@ -30,7 +30,7 @@ local function BuyOreFrame(OreName: string, Price: number)
 
 			SellOreName = DisplayName,
 			SellOreEmblem = Emblem,
-			SellOreAmount = 1,
+			SellOreAmount = Amount,
 
 			CanDoTrade = ClientDataController:GetOresAmount("GoldCoins") >= Price,
 			Gradient = Gradient,
@@ -38,7 +38,7 @@ local function BuyOreFrame(OreName: string, Price: number)
 	})
 end
 
-local function SellOreFrame(OreName: string, Price: number)
+local function SellOreFrame(OreName: string, Price: number, Amount: number)
 	local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
 	local DisplayName = RealOre:GetAttribute("DisplayName")
 	local Gradient = RealOre:GetAttribute("InventoryBackgroundColor")
@@ -56,7 +56,7 @@ local function SellOreFrame(OreName: string, Price: number)
 
 			CostOreName = DisplayName,
 			CostOreEmblem = Emblem,
-			CostOreAmount = 1,
+			CostOreAmount = Amount,
 
 			CanDoTrade = ClientDataController:GetOresAmount(OreName) >= Price,
 			Gradient = Gradient,
@@ -73,11 +73,11 @@ end
 function MysteryMerchant:didMount()
 	local GetPromise = MysteryMerchantService:GetTrades():andThen(function(Trades: { ["Buy"]: {}, ["Sell"]: {} })
 		local Elements = {}
-		for OreName, Price in pairs(Trades["Sell"]) do
-			Elements[OreName] = BuyOreFrame(OreName, Price)
+		for ID, Info: { ["Ore"]: string, ["Cost"]: number, ["Amount"]: number } in pairs(Trades["Sell"]) do
+			Elements[`BUY_{ID}`] = BuyOreFrame(Info.Ore, Info.Cost, Info.Amount)
 		end
-		for OreName, Price in pairs(Trades["Buy"]) do
-			Elements[OreName] = SellOreFrame(OreName, Price)
+		for ID, Info: { ["Ore"]: string, ["Cost"]: number, ["Amount"]: number } in pairs(Trades["Buy"]) do
+			Elements[`SELL_{ID}`] = SellOreFrame(Info.Ore, Info.Cost, Info.Amount)
 		end
 
 		self:setState({

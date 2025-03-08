@@ -306,6 +306,7 @@ Config.MysteryMerchant = {
 	MerchantIdleLength = NumberRange.new(1, 5),
 	MerchantBuyTrades = NumberRange.new(3, 10),
 	MerchantSellTrades = NumberRange.new(3, 10),
+	TradeCostAmountRange = NumberRange.new(1, 3),
 }
 
 Config.Chat = {

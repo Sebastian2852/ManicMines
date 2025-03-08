@@ -35,14 +35,15 @@ function MysteryMerchantService:GenerateTrades()
 		end
 	end
 
-	for _ = 1, BuyTradesToGenerate, 1 do
+	for i = 1, BuyTradesToGenerate, 1 do
 		local OreIndex = NumberGenerator:NextInteger(1, #PossibleBuyOres)
 		local Ore = PossibleBuyOres[OreIndex]
+		local Amount = math.random(Config.TradeCostAmountRange.Min, Config.TradeCostAmountRange.Max)
 		table.remove(PossibleBuyOres, OreIndex)
 
 		local CoinValue = Ore:GetAttribute("CoinValue")
-		local BuyPrice = math.round(CoinValue * 0.75)
-		BuyTrades[Ore.Name] = BuyPrice
+		local BuyPrice = math.round(CoinValue * 0.75) * Amount
+		BuyTrades[i] = { Ore = Ore.Name, Cost = BuyPrice, Amount = Amount }
 	end
 
 	local SellTrades = {}
@@ -58,14 +59,15 @@ function MysteryMerchantService:GenerateTrades()
 		end
 	end
 
-	for _ = 1, SellTradesToGenerate, 1 do
+	for i = 1, SellTradesToGenerate, 1 do
 		local OreIndex = NumberGenerator:NextInteger(1, #PossibleSellOres)
 		local Ore = PossibleSellOres[OreIndex]
+		local Amount = math.random(Config.TradeCostAmountRange.Min, Config.TradeCostAmountRange.Max)
 		table.remove(PossibleSellOres, OreIndex)
 
 		local CoinValue = Ore:GetAttribute("CoinValue")
-		local SellPrice = math.round(CoinValue * 1.5)
-		SellTrades[Ore.Name] = SellPrice
+		local SellPrice = math.round(CoinValue * 1.5) * Amount
+		SellTrades[i] = { Ore = Ore.Name, Cost = SellPrice, Amount = Amount }
 	end
 
 	self.Trades = {
