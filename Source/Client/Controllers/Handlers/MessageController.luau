@@ -16,12 +16,13 @@ local TextChannel
 
 local function SendChatMessage(MessageInfo: Core.ChatMessage)
 	local Message = MessageInfo.Message
+	local Color = MessageInfo.MessageColor or Color3.new(1, 1, 1)
 
 	if MessageInfo.HasPrefix then
 		Message = "[" .. MessageInfo.Prefix .. "] " .. Message
 	end
 
-	TextChannel:SendAsync(Message)
+	TextChannel:SendAsync(Message, `{Color.R};{Color.G};{Color.B}`)
 	LogService:Log("Sent chat message:", Message)
 end
 

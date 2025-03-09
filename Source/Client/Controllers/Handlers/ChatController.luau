@@ -57,6 +57,14 @@ function ChatController:KnitStart()
 		else
 			Properties.PrefixText = `<font color='#{Core.GameConfig.Chat.ServerTagColor:ToHex()}'>[SERVER]</font> `
 				.. Message.PrefixText
+
+			if Message.Metadata then
+				local ColorInfo = string.split(Message.Metadata, ";")
+				local Color =
+					Color3.new(tonumber(ColorInfo[1]) or 1, tonumber(ColorInfo[2]) or 1, tonumber(ColorInfo[3]) or 1)
+
+				Properties.Text = `<font color='#{Color:ToHex()}'>{Message.Text}</font>`
+			end
 		end
 
 		return Properties

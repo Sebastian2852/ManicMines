@@ -22,6 +22,7 @@ local NeededAttribs = {
 	GeodeGenerationChance = "number",
 	MysteryMerchantCanSell = "boolean",
 	MysteryMerchantCanBuy = "boolean",
+	AnnounceOnMined = "boolean",
 }
 
 return function()

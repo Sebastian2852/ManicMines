@@ -20,6 +20,7 @@ local MineService = Knit.CreateService({
 
 local TeleportService
 local PlayerStatsService
+local MessageService
 
 local Collapsing = false
 local BlockSize = Core.GameConfig.Mine.BlockSize
@@ -468,6 +469,19 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 
 		Resolve(ShouldDrop)
 	end):andThen(function(ShouldDrop)
+		local ShouldAnnounce = Block:GetAttribute("AnnounceOnMined")
+
+		if ShouldAnnounce then
+			MessageService:SendMessage({
+				Message = `{PlayerWhoMined.DisplayName} (@{PlayerWhoMined.Name}) mined {Block:GetAttribute(
+					"DisplayName"
+				)} which is 1 in {Block:GetAttribute("Rarity")}`,
+				Prefix = "Ore Announcer",
+				HasPrefix = false,
+				MessageColor = Block:GetAttribute("SelectionColor"),
+			})
+		end
+
 		self:GenerateAroundBlockAsync(Block):andThen(function()
 			if PlayerWhoMined and ShouldDrop then
 				PlayerStatsService:MinedOre(
@@ -503,6 +517,7 @@ end
 function MineService:KnitStart()
 	TeleportService = Knit.GetService("TeleportService")
 	PlayerStatsService = Knit.GetService("PlayerStatsService")
+	MessageService = Knit.GetService("MessageService")
 
 	OriginalMineSpawnPosition = MineService:SnapPositionToGrid(MineSpawn.CFrame.Position)
 	HiddenMineSpawnPosition = MineService:SnapPositionToGrid(OriginalMineSpawnPosition + Vector3.new(0, 50, 0))
