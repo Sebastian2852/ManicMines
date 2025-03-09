@@ -109,7 +109,7 @@ function PlayerStatsService:GiveOres(Player: Player, OreList)
 			continue
 		end
 
-		if OreName == "GoldGoins" then
+		if OreName == "GoldCoins" then
 			DataFolder.Gold.Value += Data.Amount
 			LogService:Log("Gave " .. Player.Name .. " " .. Data.Amount .. " gold")
 			continue

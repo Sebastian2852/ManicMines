@@ -1,6 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+
+local MysteryMerchantService
 
 local TradeFrame = Roact.Component:extend("TradeFrame")
 
@@ -83,6 +86,10 @@ local function OreSideFrame(
 	})
 end
 
+function TradeFrame:init()
+	MysteryMerchantService = Knit.GetService("MysteryMerchantService")
+end
+
 function TradeFrame:render()
 	local CostOreName = self.props.CostOreName or "[UNKNOWN]"
 	local CostOreEmblem = self.props.CostOreEmblem or Theme.Images.Missing
@@ -92,6 +99,9 @@ function TradeFrame:render()
 	local SellOreEmblem = self.props.SellOreEmblem or Theme.Images.Missing
 	local SellOreAmount = self.props.SellOreAmount
 	local CanDoTrade = self.props.CanDoTrade or false
+
+	local TradeID = self.props.TradeID
+	local TradeType = self.props.TradeType
 
 	local Gradient = self.props.Gradient or ColorSequence.new(Color3.new(1, 0, 1))
 
@@ -146,6 +156,15 @@ function TradeFrame:render()
 				TextScaled = true,
 				FontFace = Theme.Font,
 				TextColor3 = CanDoTrade and Theme.TextColor or Theme.TextDisabledColor,
+				Interactable = CanDoTrade,
+
+				[Roact.Event.MouseButton1Click] = function()
+					if TradeType == "Buy" then
+						MysteryMerchantService:BuyTrade(TradeID)
+					elseif TradeType == "Sell" then
+						MysteryMerchantService:SellTrade(TradeID)
+					end
+				end,
 			}, {
 				Corners = Roact.createElement("UICorner", {
 					CornerRadius = UDim.new(0, 10),

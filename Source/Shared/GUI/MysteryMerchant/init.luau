@@ -12,7 +12,7 @@ local MysteryMerchant = Roact.Component:extend("MysteryMerchant")
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 local TradeFrame = require(ReplicatedStorage.Game.GUI.MysteryMerchant.TradeFrame)
 
-local function BuyOreFrame(OreName: string, Price: number, Amount: number)
+local function BuyOreFrame(OreName: string, Price: number, Amount: number, TradeID: number)
 	local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
 	local DisplayName = RealOre:GetAttribute("DisplayName")
 	local Gradient = RealOre:GetAttribute("InventoryBackgroundColor")
@@ -34,11 +34,14 @@ local function BuyOreFrame(OreName: string, Price: number, Amount: number)
 
 			CanDoTrade = ClientDataController:GetOresAmount("GoldCoins") >= Price,
 			Gradient = Gradient,
+
+			TradeID = TradeID,
+			TradeType = "Buy",
 		}, {}),
 	})
 end
 
-local function SellOreFrame(OreName: string, Price: number, Amount: number)
+local function SellOreFrame(OreName: string, Price: number, Amount: number, TradeID: number)
 	local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
 	local DisplayName = RealOre:GetAttribute("DisplayName")
 	local Gradient = RealOre:GetAttribute("InventoryBackgroundColor")
@@ -60,6 +63,9 @@ local function SellOreFrame(OreName: string, Price: number, Amount: number)
 
 			CanDoTrade = ClientDataController:GetOresAmount(OreName) >= Price,
 			Gradient = Gradient,
+
+			TradeID = TradeID,
+			TradeType = "Sell",
 		}, {}),
 	})
 end
@@ -74,10 +80,10 @@ function MysteryMerchant:didMount()
 	local GetPromise = MysteryMerchantService:GetTrades():andThen(function(Trades: { ["Buy"]: {}, ["Sell"]: {} })
 		local Elements = {}
 		for ID, Info: { ["Ore"]: string, ["Cost"]: number, ["Amount"]: number } in pairs(Trades["Sell"]) do
-			Elements[`BUY_{ID}`] = BuyOreFrame(Info.Ore, Info.Cost, Info.Amount)
+			Elements[`BUY_{ID}`] = BuyOreFrame(Info.Ore, Info.Cost, Info.Amount, Info.ID)
 		end
 		for ID, Info: { ["Ore"]: string, ["Cost"]: number, ["Amount"]: number } in pairs(Trades["Buy"]) do
-			Elements[`SELL_{ID}`] = SellOreFrame(Info.Ore, Info.Cost, Info.Amount)
+			Elements[`SELL_{ID}`] = SellOreFrame(Info.Ore, Info.Cost, Info.Amount, Info.ID)
 		end
 
 		self:setState({

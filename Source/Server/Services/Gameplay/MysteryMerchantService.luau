@@ -19,10 +19,30 @@ local MysteryMerchantService = Knit.CreateService({
 })
 
 local MessageService
+local DataService
+local PlayerStatsService
 
 local NPC = ServerStorage.MysteryMerchant.NPC
 
+type TradeInfo = {
+	ID: number,
+	Ore: string,
+	Amount: number,
+	Cost: number,
+}
+
 -- [[ PUBLIC ]] --
+
+function MysteryMerchantService:GetTradeByTradeID(TradeID: number, Type: string)
+	local Trades = self.Trades[Type]
+
+	for i, Trade in pairs(Trades) do
+		local ID = Trade.ID
+		if ID == TradeID then
+			return i, Trade
+		end
+	end
+end
 
 function MysteryMerchantService:GenerateTrades()
 	local BuyTrades = {}
@@ -45,7 +65,7 @@ function MysteryMerchantService:GenerateTrades()
 
 		local CoinValue = Ore:GetAttribute("CoinValue")
 		local BuyPrice = math.round(CoinValue * 0.75) * Amount
-		BuyTrades[i] = { Ore = Ore.Name, Cost = BuyPrice, Amount = Amount }
+		BuyTrades[i] = { ID = i, Ore = Ore.Name, Cost = BuyPrice, Amount = Amount }
 	end
 
 	local SellTrades = {}
@@ -69,7 +89,7 @@ function MysteryMerchantService:GenerateTrades()
 
 		local CoinValue = Ore:GetAttribute("CoinValue")
 		local SellPrice = math.round(CoinValue * 1.5) * Amount
-		SellTrades[i] = { Ore = Ore.Name, Cost = SellPrice, Amount = Amount }
+		SellTrades[i] = { ID = i, Ore = Ore.Name, Cost = SellPrice, Amount = Amount }
 	end
 
 	self.Trades = {
@@ -117,10 +137,42 @@ function MysteryMerchantService.Client:GetTrades()
 	return self.Server.Trades
 end
 
+function MysteryMerchantService.Client:BuyTrade(Player: Player, TradeID: number)
+	local _, Trade: TradeInfo = self.Server:GetTradeByTradeID(TradeID, "Sell")
+
+	local CostOreList = Core.OreList.New()
+	CostOreList:AddGold(Trade.Cost)
+
+	local RewardList = Core.OreList.New()
+	RewardList:AddOre(Trade.Ore, Trade.Amount)
+
+	local Success = DataService:HandleCosts(Player, CostOreList)
+	if Success then
+		PlayerStatsService:GiveOres(Player, RewardList)
+	end
+end
+
+function MysteryMerchantService.Client:SellTrade(Player: Player, TradeID: number)
+	local _, Trade: TradeInfo = self.Server:GetTradeByTradeID(TradeID, "Buy")
+
+	local CostOreList = Core.OreList.New()
+	CostOreList:AddOre(Trade.Ore, Trade.Amount)
+
+	local RewardList = Core.OreList.New()
+	RewardList:AddGold(Trade.Cost)
+
+	local Success = DataService:HandleCosts(Player, CostOreList)
+	if Success then
+		PlayerStatsService:GiveOres(Player, RewardList)
+	end
+end
+
 -- [[ KNIT ]] --
 
 function MysteryMerchantService:KnitStart()
 	MessageService = Knit.GetService("MessageService")
+	DataService = Knit.GetService("DataService")
+	PlayerStatsService = Knit.GetService("PlayerStatsService")
 
 	task.spawn(function()
 		while true do

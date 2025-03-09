@@ -302,7 +302,7 @@ Config.Mine = {
 }
 
 Config.MysteryMerchant = {
-	MerchantLivingLength = NumberRange.new(5, 10),
+	MerchantLivingLength = NumberRange.new(1000, 1000),
 	MerchantIdleLength = NumberRange.new(1, 5),
 	MerchantBuyTrades = NumberRange.new(3, 10),
 	MerchantSellTrades = NumberRange.new(3, 10),
