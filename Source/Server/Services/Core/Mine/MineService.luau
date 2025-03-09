@@ -74,6 +74,7 @@ local MineSpawn = Workspace.Game.MineSpawn
 local OriginalMineSpawnPosition
 local HiddenMineSpawnPosition
 local TopLayerY
+local BottomLayerDepth
 
 local function ConvertYLevelToDepth(WorldY: number): number
 	local Top = TopLayerY
@@ -361,7 +362,7 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 
 	local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
 	local Block: BasePart = nil
-	local Stone = self:YLevelToLayer(Position.Y).Stone
+	local Stone = Layer.Stone
 
 	if RandomNumber == 1 then
 		local Ore = PickRandomOre(ConvertYLevelToDepth(Position.Y), InCave)
@@ -401,6 +402,12 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	self:UpdateMiningConditions()
 
 	if Position.Y == TopLayerY and not (TopLayerPositions[KeyVector(Position)] == true) then
+		Block.Color = Core.Util:TintColor(Block.Color, Color3.new(0, 0, 0))
+		return Block
+	end
+
+	local Depth = self:YLevelToDepth(Position.Y)
+	if Depth >= BottomLayerDepth then
 		Block.Color = Core.Util:TintColor(Block.Color, Color3.new(0, 0, 0))
 		return Block
 	end
@@ -533,7 +540,17 @@ function MineService:KnitStart()
 
 	OriginalMineSpawnPosition = MineService:SnapPositionToGrid(MineSpawn.CFrame.Position)
 	HiddenMineSpawnPosition = MineService:SnapPositionToGrid(OriginalMineSpawnPosition + Vector3.new(0, 50, 0))
+
 	TopLayerY = OriginalMineSpawnPosition.Y
+	BottomLayerDepth = 0
+
+	for _, Layer in pairs(ReplicatedStorage.Assets.Layers:GetChildren()) do
+		local Depth = Layer:GetAttribute("Depth").Max
+
+		if Depth > BottomLayerDepth then
+			BottomLayerDepth = Depth
+		end
+	end
 
 	local function SetMaxHealthAttrib(Ore: BasePart)
 		Ore:SetAttribute("MaxHealth", Ore:GetAttribute("Health"))
