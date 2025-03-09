@@ -7,7 +7,7 @@ different requires for all the module.
 Since most of the scripts require all of the modules anyway this is easier.
 ]]
 
-local Private = require(script.Private)
+local Private = require(ReplicatedStorage.Game.Modules.Core.Private)
 
 --[=[
 Settings used for when creating a new save slot
@@ -118,7 +118,7 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local UI = require(script.UI)
 local Util = require(script.Util)
 
-local OreList = require(script.Parent.Classes.OreList)
+local OreList = require(ReplicatedStorage.Game.Modules.Classes.OreList)
 local Queue = require(script.Parent.Classes.Queue)
 
 local Data = require(script.Parent.Classes.SaveData.Data)
