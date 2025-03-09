@@ -157,7 +157,7 @@ end
 -- Do not call directly, or it will throw an assertion!
 
 function FpsCamera:UpdateTransparency(...)
-	assert(self ~= FpsCamera)
+	assert(self ~= FpsCamera, "not fps camera?")
 	self:BaseUpdate(...)
 
 	if self.ForceRefresh then
@@ -174,7 +174,7 @@ end
 -- Do not call directly, or it will throw an assertion!
 
 function FpsCamera:SetupTransparency(character, ...)
-	assert(self ~= FpsCamera)
+	assert(self ~= FpsCamera, "not fps camera?")
 	self:BaseSetupTransparency(character, ...)
 
 	if self.AttachmentListener then
@@ -361,7 +361,7 @@ function FpsCamera:OnRotationTypeChanged()
 
 				if self:IsInFirstPerson() then
 					local cf = camera.CFrame
-					local headPos, headLook = self:GetSubjectPosition(subject)
+					local headPos, _ = self:GetSubjectPosition(subject)
 
 					if headPos then
 						local offset = (headPos - cf.Position)
