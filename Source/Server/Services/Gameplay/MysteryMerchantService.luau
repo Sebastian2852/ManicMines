@@ -18,6 +18,8 @@ local MysteryMerchantService = Knit.CreateService({
 	},
 
 	CompletedTrades = {},
+
+	Spawned = false,
 })
 
 local MessageService
@@ -122,6 +124,7 @@ function MysteryMerchantService:Spawn()
 		HasPrefix = false,
 		MessageColor = Color3.new(1, 1, 1),
 	})
+	self.Spawned = true
 end
 
 function MysteryMerchantService:DeSpawn()
@@ -133,6 +136,11 @@ function MysteryMerchantService:DeSpawn()
 		HasPrefix = false,
 		MessageColor = Color3.new(1, 1, 1),
 	})
+	self.Spawned = false
+end
+
+function MysteryMerchantService:IsMerchantSpawned()
+	return self.Spawned
 end
 
 -- [[ CLIENT ]] --
