@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.trove)
 
 local MysteryMerchantService
@@ -11,6 +12,8 @@ local MysteryMerchant = Roact.Component:extend("MysteryMerchant")
 
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 local TradeFrame = require(ReplicatedStorage.Game.GUI.MysteryMerchant.TradeFrame)
+
+local RefreshSignal = Signal.new()
 
 local function BuyOreFrame(OreName: string, Price: number, Amount: number, TradeID: number)
 	local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
@@ -37,6 +40,7 @@ local function BuyOreFrame(OreName: string, Price: number, Amount: number, Trade
 
 			TradeID = TradeID,
 			TradeType = "Buy",
+			RefreshSignal = RefreshSignal,
 		}, {}),
 	})
 end
@@ -66,6 +70,7 @@ local function SellOreFrame(OreName: string, Price: number, Amount: number, Trad
 
 			TradeID = TradeID,
 			TradeType = "Sell",
+			RefreshSignal = RefreshSignal,
 		}, {}),
 	})
 end
@@ -77,21 +82,25 @@ function MysteryMerchant:init()
 end
 
 function MysteryMerchant:didMount()
-	local GetPromise = MysteryMerchantService:GetTrades():andThen(function(Trades: { ["Buy"]: {}, ["Sell"]: {} })
-		local Elements = {}
-		for ID, Info: { ["Ore"]: string, ["Cost"]: number, ["Amount"]: number } in pairs(Trades["Sell"]) do
-			Elements[`BUY_{ID}`] = BuyOreFrame(Info.Ore, Info.Cost, Info.Amount, Info.ID)
-		end
-		for ID, Info: { ["Ore"]: string, ["Cost"]: number, ["Amount"]: number } in pairs(Trades["Buy"]) do
-			Elements[`SELL_{ID}`] = SellOreFrame(Info.Ore, Info.Cost, Info.Amount, Info.ID)
-		end
+	local SignalConnection = RefreshSignal:Connect(function()
+		local GetPromise = MysteryMerchantService:GetTrades():andThen(function(Trades: { ["Buy"]: {}, ["Sell"]: {} })
+			local Elements = {}
+			for ID, Info: { ["Ore"]: string, ["Cost"]: number, ["Amount"]: number } in pairs(Trades["Sell"]) do
+				Elements[`BUY_{ID}`] = BuyOreFrame(Info.Ore, Info.Cost, Info.Amount, Info.ID)
+			end
+			for ID, Info: { ["Ore"]: string, ["Cost"]: number, ["Amount"]: number } in pairs(Trades["Buy"]) do
+				Elements[`SELL_{ID}`] = SellOreFrame(Info.Ore, Info.Cost, Info.Amount, Info.ID)
+			end
 
-		self:setState({
-			TradeFrames = Elements,
-		})
+			self:setState({
+				TradeFrames = Elements,
+			})
+		end)
+		self.Trove:AddPromise(GetPromise)
 	end)
 
-	self.Trove:AddPromise(GetPromise)
+	RefreshSignal:Fire()
+	self.Trove:Add(SignalConnection)
 end
 
 function MysteryMerchant:willUnmount()

@@ -16,6 +16,8 @@ local MysteryMerchantService = Knit.CreateService({
 		Buy = {},
 		Sell = {},
 	},
+
+	CompletedTrades = {},
 })
 
 local MessageService
@@ -96,6 +98,8 @@ function MysteryMerchantService:GenerateTrades()
 		Buy = BuyTrades,
 		Sell = SellTrades,
 	}
+
+	self.CompletedTrades = {}
 end
 
 function MysteryMerchantService:PickRandomSpawn()
@@ -133,11 +137,38 @@ end
 
 -- [[ CLIENT ]] --
 
-function MysteryMerchantService.Client:GetTrades()
-	return self.Server.Trades
+function MysteryMerchantService.Client:GetTrades(Player: Player)
+	local PlayerID = Player.UserId
+	local CompletedTrades = self.Server.CompletedTrades[PlayerID] or { Buy = {}, Sell = {} }
+
+	local AvailableTrades = {
+		Buy = {},
+		Sell = {},
+	}
+
+	for _, Trade in pairs(self.Server.Trades.Buy) do
+		if not CompletedTrades.Buy[Trade.ID] then
+			table.insert(AvailableTrades.Buy, Trade)
+		end
+	end
+
+	for _, Trade in pairs(self.Server.Trades.Sell) do
+		if not CompletedTrades.Sell[Trade.ID] then
+			table.insert(AvailableTrades.Sell, Trade)
+		end
+	end
+
+	return AvailableTrades
 end
 
 function MysteryMerchantService.Client:BuyTrade(Player: Player, TradeID: number)
+	local PlayerID = Player.UserId
+	self.Server.CompletedTrades[PlayerID] = self.Server.CompletedTrades[PlayerID] or { Buy = {}, Sell = {} }
+
+	if self.Server.CompletedTrades[PlayerID].Sell[TradeID] then
+		return
+	end
+
 	local _, Trade: TradeInfo = self.Server:GetTradeByTradeID(TradeID, "Sell")
 
 	local CostOreList = Core.OreList.New()
@@ -149,10 +180,18 @@ function MysteryMerchantService.Client:BuyTrade(Player: Player, TradeID: number)
 	local Success = DataService:HandleCosts(Player, CostOreList)
 	if Success then
 		PlayerStatsService:GiveOres(Player, RewardList)
+		self.Server.CompletedTrades[PlayerID].Sell[TradeID] = true
 	end
 end
 
 function MysteryMerchantService.Client:SellTrade(Player: Player, TradeID: number)
+	local PlayerID = Player.UserId
+	self.Server.CompletedTrades[PlayerID] = self.Server.CompletedTrades[PlayerID] or { Buy = {}, Sell = {} }
+
+	if self.Server.CompletedTrades[PlayerID].Buy[TradeID] then
+		return
+	end
+
 	local _, Trade: TradeInfo = self.Server:GetTradeByTradeID(TradeID, "Buy")
 
 	local CostOreList = Core.OreList.New()
@@ -164,6 +203,7 @@ function MysteryMerchantService.Client:SellTrade(Player: Player, TradeID: number
 	local Success = DataService:HandleCosts(Player, CostOreList)
 	if Success then
 		PlayerStatsService:GiveOres(Player, RewardList)
+		self.Server.CompletedTrades[PlayerID].Buy[TradeID] = true
 	end
 end
 

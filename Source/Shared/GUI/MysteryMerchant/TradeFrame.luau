@@ -102,6 +102,7 @@ function TradeFrame:render()
 
 	local TradeID = self.props.TradeID
 	local TradeType = self.props.TradeType
+	local RefreshSignal = self.props.RefreshSignal
 
 	local Gradient = self.props.Gradient or ColorSequence.new(Color3.new(1, 0, 1))
 
@@ -164,6 +165,7 @@ function TradeFrame:render()
 					elseif TradeType == "Sell" then
 						MysteryMerchantService:SellTrade(TradeID)
 					end
+					RefreshSignal:Fire()
 				end,
 			}, {
 				Corners = Roact.createElement("UICorner", {
