@@ -10,6 +10,7 @@ local ClientDataController
 
 local MysteryMerchant = Roact.Component:extend("MysteryMerchant")
 
+local CloseButton = require(ReplicatedStorage.Game.GUI.Common.CloseButton)
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 local TradeFrame = require(ReplicatedStorage.Game.GUI.MysteryMerchant.TradeFrame)
 
@@ -112,6 +113,10 @@ function MysteryMerchant:willUnmount()
 end
 
 function MysteryMerchant:render()
+	local Close = self.props.Close or function()
+		warn("No close")
+	end
+
 	local TradeFrames = self.state.TradeFrames or {}
 	TradeFrames["Layout"] = Roact.createElement("UIListLayout", {
 		SortOrder = Enum.SortOrder.LayoutOrder,
@@ -148,6 +153,13 @@ function MysteryMerchant:render()
 				TextXAlignment = Enum.TextXAlignment.Left,
 				FontFace = Theme.Font,
 				TextColor3 = Theme.TextColor,
+			}, {}),
+
+			CloseButton = Roact.createElement(CloseButton, {
+				Size = UDim2.new(1, 0, 0.09, -5),
+				OnClick = function()
+					Close()
+				end,
 			}, {}),
 
 			Content = Roact.createElement("Frame", {

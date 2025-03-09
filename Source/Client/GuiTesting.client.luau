@@ -6,14 +6,26 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 
 Knit.OnStart():andThen(function()
 	local GUI = require(ReplicatedStorage.Game.GUI.MysteryMerchant)
+	local Tree = nil
 
-	local Connection
-	Connection = UserInputService.InputBegan:Connect(function(Input)
+	UserInputService.InputBegan:Connect(function(Input)
 		if Input.KeyCode ~= Enum.KeyCode.Z then
 			return
 		end
 
-		Roact.mount(Roact.createElement(GUI), Knit.Player.PlayerGui, "TEST_GUI")
-		Connection:Disconnect()
+		if Tree ~= nil then
+			return
+		end
+
+		Tree = Roact.mount(
+			Roact.createElement(GUI, {
+				Close = function()
+					Roact.unmount(Tree)
+					Tree = nil
+				end,
+			}),
+			Knit.Player.PlayerGui,
+			"TEST_GUI"
+		)
 	end)
 end)
