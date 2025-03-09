@@ -42,6 +42,8 @@ export type DataFolder = {
 	ServerMining: BoolValue,
 	DataLoaded: BoolValue,
 
+	MiningBlockDepth: IntValue,
+
 	FindFirstChild: (DataFolder, Name: string) -> any,
 }
 

@@ -144,6 +144,9 @@
         "Depth": {
           "$className": "NumberValue"
         },
+        "OptimalDepth": {
+          "$className": "IntValue"
+        },
         "BelowOptimalDepth": {
           "$className": "BoolValue"
         },
@@ -205,6 +208,9 @@
           },
           "TycoonName": {
             "$className": "StringValue"
+          },
+          "MiningBlockDepth":{
+            "$className":"IntValue"
           },
           "DataLoaded": {
             "$className": "BoolValue"

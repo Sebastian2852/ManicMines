@@ -238,7 +238,7 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 		return
 	end
 
-	local DataFolder = DataService:GetPlayerDataFolder(Player)
+	local DataFolder = DataService:GetPlayerDataFolder(Player) :: Core.DataFolder
 	if not DataFolder then
 		return
 	end
@@ -261,9 +261,10 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 		return
 	end
 
-	DataFolder.ServerMining.Value = true
 	self.Mining[Player.UserId].Mining = true
 	self.Mining[Player.UserId].Object = ObjectToMine
+	DataFolder.ServerMining.Value = true
+	DataFolder.MiningBlockDepth.Value = MineService:YLevelToDepth(ObjectToMine.CFrame.Position.Y)
 
 	ObjectToMine:SetAttribute("MinedBy", Player.UserId)
 	ObjectToMine:SetAttribute("BeingMined", true)
@@ -271,10 +272,10 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 	LogService:Log(Player.Name .. " started mining")
 
 	local OptimalDepth = self:GetOptimalDepth(Player)
-
 	local OreList = Core.OreList.New()
 	OreList:AddOre(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
 	MineService:GenerateAroundBlockAsync(ObjectToMine)
+
 	while self.Mining[Player.UserId].Mining and self:VerifyIfCanMine(Player, Character, ObjectToMine) do
 		local Health = ObjectToMine:GetAttribute("Health")
 		local Damage = Pickaxe:GetAttribute("Damage")
@@ -403,6 +404,11 @@ end
 
 --[[ CLIENT ]]
 --
+
+function PickaxeService.Client:UpdateSelectedDepth(Player: Player, Object: Part)
+	local DataFolder = ReplicatedStorage.PlayerData:FindFirstChild(Player.UserId) :: Core.DataFolder
+	DataFolder.MiningBlockDepth.Value = MineService:YLevelToDepth(Object.CFrame.Y)
+end
 
 --[=[
 Get the players pickaxe

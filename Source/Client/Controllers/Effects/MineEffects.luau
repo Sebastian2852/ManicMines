@@ -81,6 +81,7 @@ function MineEffects:KnitStart()
 			ReplicatedStorage.Player.Depth.Value = Depth
 
 			local _, OptimalDepth = PickaxeService:GetOptimalDepth():await()
+			ReplicatedStorage.Player.OptimalDepth.Value = OptimalDepth
 			local BelowOptimalDepth = Depth >= OptimalDepth
 
 			if BelowOptimalDepth ~= LastBelowOptimalDepth then

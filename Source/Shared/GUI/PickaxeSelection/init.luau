@@ -9,6 +9,8 @@ local PickaxeSelection = Roact.Component:extend("PickaxeSelection")
 
 local Bar = require(script.Bar)
 
+local DataFolder = ReplicatedStorage.PlayerData:WaitForChild(Players.LocalPlayer.UserId) :: Core.DataFolder
+
 function PickaxeSelection:init()
 	ReplicatedStorage.Player.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
 		local Block = ReplicatedStorage.Player.PickaxeSelection.Value
@@ -32,7 +34,13 @@ function PickaxeSelection:init()
 				return
 			end
 
-			local HitsNeeded = math.ceil(Health / Pickaxe:GetAttribute("Damage"))
+			local AdjustedDamage = (Pickaxe:GetAttribute("Damage") / 2) / DataFolder.MiningBlockDepth.Value
+
+			if DataFolder.MiningBlockDepth.Value < ReplicatedStorage.Player.OptimalDepth.Value then
+				AdjustedDamage = Pickaxe:GetAttribute("Damage")
+			end
+
+			local HitsNeeded = math.ceil(Health / AdjustedDamage)
 			local TimePerHit = Pickaxe:GetAttribute("Delay")
 			local TotalTime = HitsNeeded * TimePerHit
 
