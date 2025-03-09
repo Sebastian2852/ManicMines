@@ -460,22 +460,16 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 	Promise.new(function(Resolve)
 		local Module = Block:FindFirstChildWhichIsA("ModuleScript")
 		if not Module then
-			Resolve()
+			Resolve(true)
 			return
 		end
 
-		local Success, ErrorMessage = pcall(function()
-			require(Module)(self)
-		end)
+		local ShouldDrop = require(Module)(self, PlayerWhoMined)
 
-		if not Success then
-			warn("Block code FAILED: " .. ErrorMessage)
-		end
-
-		Resolve(Success)
-	end):andThen(function()
+		Resolve(ShouldDrop)
+	end):andThen(function(ShouldDrop)
 		self:GenerateAroundBlockAsync(Block):andThen(function()
-			if PlayerWhoMined then
+			if PlayerWhoMined and ShouldDrop then
 				PlayerStatsService:MinedOre(
 					PlayerWhoMined,
 					Core.OreList.CreateFromOre(Block.Name, Block:GetAttribute("AmountDroppedWhenMined"))
