@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Workspace = game:GetService("Workspace")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
@@ -6,6 +7,8 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
+
+local OreAnnouncer = require(ServerScriptService.Game.Modules.OreAnnouncer)
 
 local MineService = Knit.CreateService({
 	Name = "MineService",
@@ -472,14 +475,23 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 		local ShouldAnnounce = Block:GetAttribute("AnnounceOnMined")
 
 		if ShouldAnnounce then
-			MessageService:SendMessage({
-				Message = `{PlayerWhoMined.DisplayName} (@{PlayerWhoMined.Name}) mined {Block:GetAttribute(
-					"DisplayName"
-				)} which is 1 in {Block:GetAttribute("Rarity")}`,
-				Prefix = "Ore Announcer",
-				HasPrefix = false,
-				MessageColor = Block:GetAttribute("SelectionColor"),
-			})
+			task.spawn(function()
+				MessageService:SendMessage({
+					Message = `{PlayerWhoMined.DisplayName} (@{PlayerWhoMined.Name}) mined {Block:GetAttribute(
+						"DisplayName"
+					)} which is 1 in {Block:GetAttribute("Rarity")}`,
+					Prefix = "Ore Announcer",
+					HasPrefix = false,
+					MessageColor = Block:GetAttribute("SelectionColor"),
+				})
+
+				OreAnnouncer:AnnounceOreMined(
+					PlayerWhoMined,
+					Block:GetAttribute("DisplayName"),
+					Block:GetAttribute("SelectionColor"),
+					Block:GetAttribute("Rarity")
+				)
+			end)
 		end
 
 		self:GenerateAroundBlockAsync(Block):andThen(function()
