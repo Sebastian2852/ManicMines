@@ -20,11 +20,13 @@ local function BuyOreFrame(OreName: string, Price: number, Amount: number, Trade
 	local DisplayName = RealOre:GetAttribute("DisplayName")
 	local Gradient = RealOre:GetAttribute("InventoryBackgroundColor")
 	local Emblem = RealOre:GetAttribute("EmblemImageID")
+	local CanDoTrade = ClientDataController:GetOresAmount(OreName) >= Price
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 0.2),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
+		LayoutOrder = CanDoTrade and 1 or 2,
 	}, {
 		App = Roact.createElement(TradeFrame, {
 			CostOreName = "Gold Coins",
@@ -35,7 +37,7 @@ local function BuyOreFrame(OreName: string, Price: number, Amount: number, Trade
 			SellOreEmblem = Emblem,
 			SellOreAmount = Amount,
 
-			CanDoTrade = ClientDataController:GetOresAmount("GoldCoins") >= Price,
+			CanDoTrade = CanDoTrade,
 			Gradient = Gradient,
 
 			TradeID = TradeID,
@@ -50,11 +52,13 @@ local function SellOreFrame(OreName: string, Price: number, Amount: number, Trad
 	local DisplayName = RealOre:GetAttribute("DisplayName")
 	local Gradient = RealOre:GetAttribute("InventoryBackgroundColor")
 	local Emblem = RealOre:GetAttribute("EmblemImageID")
+	local CanDoTrade = ClientDataController:GetOresAmount(OreName) >= Price
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 0.2),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
+		LayoutOrder = CanDoTrade and 1 or 2,
 	}, {
 		App = Roact.createElement(TradeFrame, {
 			SellOreName = "Gold Coins",
@@ -65,7 +69,7 @@ local function SellOreFrame(OreName: string, Price: number, Amount: number, Trad
 			CostOreEmblem = Emblem,
 			CostOreAmount = Amount,
 
-			CanDoTrade = ClientDataController:GetOresAmount(OreName) >= Price,
+			CanDoTrade = CanDoTrade,
 			Gradient = Gradient,
 
 			TradeID = TradeID,
