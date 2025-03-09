@@ -93,7 +93,9 @@ function MineEffects:KnitStart()
 			end
 
 			CurrentlyTweening = true
-			local TargetFOV = BelowOptimalDepth and 60 or 70
+			local DepthDifference = Depth - OptimalDepth
+			ReplicatedStorage.Player.DepthDifference.Value = DepthDifference
+			local TargetFOV = BelowOptimalDepth and math.clamp(70 - DepthDifference, 60, 70) or 70
 			if workspace.CurrentCamera.FieldOfView == TargetFOV then
 				CurrentlyTweening = false
 				continue

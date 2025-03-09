@@ -147,6 +147,9 @@
         "BelowOptimalDepth": {
           "$className": "BoolValue"
         },
+        "DepthDifference": {
+          "$className":"IntValue"
+        },
         "Debug": {
           "$className": "Folder",
           "DebugMode": {

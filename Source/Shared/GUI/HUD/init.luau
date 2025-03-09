@@ -36,13 +36,21 @@ function HUD:init()
 			dampingRatio = 1,
 		}))
 	end)
+
+	ReplicatedStorage.Player.DepthDifference:GetPropertyChangedSignal("Value"):Connect(function()
+		local DepthDifference = ReplicatedStorage.Player.DepthDifference.Value
+		self:setState({
+			DepthDifference = DepthDifference,
+		})
+	end)
 end
 
 function HUD:render()
 	local BelowOptimalDepth = self.state.BelowOptimalDepth
+	local DepthDifference = self.state.DepthDifference
 
-	local ImageTransparency = self.Binding:map(function(Value)
-		return Lerp(0, 0.6, Value)
+	local ImageTransparency = self.Binding:map(function()
+		return 1 - Lerp(0, 0.6, math.clamp(DepthDifference / 10, 0, 1))
 	end)
 
 	return Roact.createFragment({
