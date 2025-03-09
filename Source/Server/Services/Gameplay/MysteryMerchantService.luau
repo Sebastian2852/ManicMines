@@ -110,6 +110,10 @@ function MysteryMerchantService:PickRandomSpawn()
 end
 
 function MysteryMerchantService:Spawn()
+	if self.Spawned then
+		return
+	end
+
 	local SpawnCFrame = self:PickRandomSpawn() :: CFrame
 	NPC.Parent = workspace
 
@@ -128,6 +132,10 @@ function MysteryMerchantService:Spawn()
 end
 
 function MysteryMerchantService:DeSpawn()
+	if not self.Spawned then
+		return
+	end
+
 	NPC:PivotTo(CFrame.new(0, 0, 0))
 	NPC.Parent = ServerStorage.MysteryMerchant
 	MessageService:SendMessage({
