@@ -18,6 +18,87 @@ local BlockSize = Core.GameConfig.Mine.BlockSize
 
 -- [[ PUBLIC ]] --
 
+function CaveService:GetModelByName(Name: string)
+	return ReplicatedStorage.Assets.Caves.CaveDecorModels:FindFirstChild(Name)
+end
+
+function CaveService:PlaceCaveDecor(OriginalModel: Model, InitialPosition: Vector3)
+	local Model = OriginalModel:Clone()
+	local Hitbox = Model:FindFirstChild("Hitbox") :: Part
+	if not Hitbox then
+		warn(Model:GetFullName(), "Has no hitbox")
+		return
+	end
+
+	Model.Parent = workspace
+	Model.PrimaryPart = Hitbox
+	Hitbox.Size = Hitbox.Size - Vector3.new(1, 1, 1)
+	Model:PivotTo(CFrame.new(InitialPosition))
+
+	local ModelCFrame = Hitbox.CFrame
+	local ModelSize = Hitbox.Size
+
+	local CornerOffsets = {
+		Vector3.new(-ModelSize.X / 2, -ModelSize.Y / 2, -ModelSize.Z / 2),
+		Vector3.new(ModelSize.X / 2, -ModelSize.Y / 2, -ModelSize.Z / 2),
+		Vector3.new(-ModelSize.X / 2, -ModelSize.Y / 2, ModelSize.Z / 2),
+		Vector3.new(ModelSize.X / 2, -ModelSize.Y / 2, ModelSize.Z / 2),
+	}
+
+	local CornerCFrames = {}
+
+	for _, Offset: Vector3 in pairs(CornerOffsets) do
+		table.insert(CornerCFrames, ModelCFrame * CFrame.new(Offset))
+	end
+
+	local Hits = 0
+	local HitPositions = {}
+
+	for _, CornerCFrame: CFrame in pairs(CornerCFrames) do
+		local RayOrigin = CornerCFrame.Position
+		local RayDirection = Vector3.new(0, -7, 0)
+		local RaycastParams = RaycastParams.new()
+		RaycastParams.FilterDescendantsInstances = { game.Workspace.Game.Mine }
+		RaycastParams.FilterType = Enum.RaycastFilterType.Include
+
+		local RaycastResult = workspace:Raycast(RayOrigin, RayDirection, RaycastParams)
+
+		if RaycastResult then
+			Hits += 1
+			table.insert(HitPositions, RaycastResult.Position)
+		end
+	end
+
+	if Hits ~= 4 then
+		Model:Destroy()
+		return
+	end
+
+	local HitY = HitPositions[1].Y
+
+	for _, Position: Vector3 in pairs(HitPositions) do
+		if Position.Y ~= HitY then
+			Model:Destroy()
+			return
+		end
+	end
+
+	local NewCFrame = ModelCFrame - Vector3.new(0, (ModelCFrame.Position.Y - HitY) - (ModelSize.Y / 2), 0)
+	Model:PivotTo(NewCFrame)
+
+	local Params = OverlapParams.new()
+	Params.FilterDescendantsInstances = { Model }
+	Params.FilterType = Enum.RaycastFilterType.Exclude
+	local Parts = workspace:GetPartsInPart(Hitbox, Params)
+
+	for _, Part: BasePart in pairs(Parts) do
+		if Part.CFrame.Position.Y < NewCFrame.Position.Y then
+			Model:Destroy()
+			return
+		end
+	end
+end
+
 --[=[
 Do not use this function, instead use "GenerateRandomCaveAsync"
 ]=]
@@ -27,6 +108,8 @@ function CaveService:GenerateCaveAsync(
 	NoiseResolution: Vector3,
 	NoiseResolutionOffset: Vector3,
 	NoiseThreshold: number,
+	HasDecor: boolean,
+	DecorFolder: Folder,
 	Tint: Color3?
 )
 	return Promise.new(function(Resolve)
@@ -38,6 +121,8 @@ function CaveService:GenerateCaveAsync(
 		local Gens = {}
 		local NoiseCache = {}
 		local CaveMap = {}
+
+		local DecorPositions = {}
 
 		local function GetNoise(X, Y, Z)
 			local Key = string.format("%d_%d_%d", X, Y, Z)
@@ -90,11 +175,13 @@ function CaveService:GenerateCaveAsync(
 		end
 
 		local function GenerateBlock(Position, ForceGenerate)
-			MineService:GenerateAtPositionAsync(Position, ForceGenerate):andThen(function(Block)
-				if Block and Tint ~= nil and Tint ~= Color3.new(1, 1, 1) then
-					Block.Color = Core.Util:TintColor(Block.Color, Tint)
-				end
-			end)
+			MineService:GenerateAtPositionAsync(Position, ForceGenerate)
+				:andThen(function(Block)
+					if Block and Tint ~= nil and Tint ~= Color3.new(1, 1, 1) then
+						Block.Color = Core.Util:TintColor(Block.Color, Tint)
+					end
+				end)
+				:await()
 		end
 
 		local function GenZ(X, Y)
@@ -126,7 +213,15 @@ function CaveService:GenerateCaveAsync(
 					if IsSurfaceBlock(X, Y, Z) then
 						GenerateBlock(Position, false)
 						MineService:AddAirPosition(Position)
+					else
+						if HasDecor then
+							local Chance = math.random(1, 4)
+							if Chance == 1 then
+								table.insert(DecorPositions, Position)
+							end
+						end
 					end
+					MineService:AddAirPosition(Position)
 				end
 				ResolveGen()
 			end)
@@ -139,6 +234,22 @@ function CaveService:GenerateCaveAsync(
 		end
 
 		Promise.all(Gens):await()
+
+		local DecorValues = DecorFolder:GetChildren() :: { IntValue }
+
+		for i, Position in pairs(DecorPositions) do
+			local RandomDecorIndex = math.random(1, #DecorValues)
+			local RandomValue = DecorValues[RandomDecorIndex]
+
+			if math.random(1, RandomValue.Value) == 1 then
+				self:PlaceCaveDecor(self:GetModelByName(RandomValue.Name), MineService:SnapPositionToGrid(Position))
+			end
+
+			if i % 30 == 0 then
+				RunService.Heartbeat:Wait()
+			end
+		end
+
 		Resolve()
 	end)
 end
@@ -211,7 +322,16 @@ function CaveService:GenerateCaveFromConfigAsync(CaveConfig: Configuration, Posi
 	local NoiseThreshold = CaveConfig:GetAttribute("NoiseThreshold")
 	local Tint = CaveConfig:GetAttribute("Tint")
 
-	return self:GenerateCaveAsync(Position, Size, NoiseResolution, NoiseResolutionOffset, NoiseThreshold, Tint)
+	return self:GenerateCaveAsync(
+		Position,
+		Size,
+		NoiseResolution,
+		NoiseResolutionOffset,
+		NoiseThreshold,
+		CaveConfig:GetAttribute("HasDecor"),
+		CaveConfig.Decor,
+		Tint
+	)
 end
 
 --[=[

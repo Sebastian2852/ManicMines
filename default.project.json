@@ -27,6 +27,9 @@
           "$className": "Folder",
           "Random": {
             "$className": "Folder"
+          },
+          "CaveDecorModels":{
+            "$className":"Folder"
           }
         },
         "Sounds": {
