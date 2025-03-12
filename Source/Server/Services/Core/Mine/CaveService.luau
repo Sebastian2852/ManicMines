@@ -16,6 +16,8 @@ local LogService
 
 local BlockSize = Core.GameConfig.Mine.BlockSize
 
+local NumberGenerator = Random.new()
+
 -- [[ PUBLIC ]] --
 
 function CaveService:GetModelByName(Name: string)
@@ -97,6 +99,8 @@ function CaveService:PlaceCaveDecor(OriginalModel: Model, InitialPosition: Vecto
 			return
 		end
 	end
+
+	return Model
 end
 
 --[=[
@@ -242,7 +246,25 @@ function CaveService:GenerateCaveAsync(
 			local RandomValue = DecorValues[RandomDecorIndex]
 
 			if math.random(1, RandomValue.Value) == 1 then
-				self:PlaceCaveDecor(self:GetModelByName(RandomValue.Name), MineService:SnapPositionToGrid(Position))
+				local PlacedModel = self:PlaceCaveDecor(
+					self:GetModelByName(RandomValue.Name),
+					MineService:SnapPositionToGrid(Position)
+				) :: Model?
+
+				if PlacedModel then
+					for _, Object: Part in pairs(PlacedModel:GetDescendants()) do
+						if Object:HasTag("Mine/LayerColor") then
+							local Y = Object.CFrame.Position.Y
+							local Layer = MineService:YLevelToLayer(Y)
+							Object.Color = Layer.Stone.Color
+							Object.Color = Object.Color:Lerp(
+								Layer:GetAttribute("BlockColorOffset"),
+								NumberGenerator:NextNumber(0, Layer:GetAttribute("BlockColorOffsetLerp"))
+							)
+							Object.Color = Core.Util:TintColor(Object.Color, Tint)
+						end
+					end
+				end
 			end
 
 			if i % 30 == 0 then
