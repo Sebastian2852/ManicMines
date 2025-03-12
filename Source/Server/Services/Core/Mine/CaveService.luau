@@ -114,6 +114,7 @@ function CaveService:GenerateCaveAsync(
 	NoiseThreshold: number,
 	HasDecor: boolean,
 	DecorFolder: Folder,
+	DecorSpawnChance: number,
 	Tint: Color3?
 )
 	return Promise.new(function(Resolve)
@@ -219,7 +220,7 @@ function CaveService:GenerateCaveAsync(
 						MineService:AddAirPosition(Position)
 					else
 						if HasDecor then
-							local Chance = math.random(1, 4)
+							local Chance = math.random(1, DecorSpawnChance)
 							if Chance == 1 then
 								table.insert(DecorPositions, Position)
 							end
@@ -332,7 +333,7 @@ Generates a cave from the given config at the given position
 ]=]
 function CaveService:GenerateCaveFromConfigAsync(CaveConfig: Configuration, Position: Vector3)
 	LogService:Log("Generating cave from config: " .. CaveConfig.Name)
-	local NumberGenerator: Random = MineService:GetRandomObject()
+	NumberGenerator = MineService:GetRandomObject()
 
 	local SizeRange = CaveConfig:GetAttribute("Size")
 	local MinSize = SizeRange.Min
@@ -352,6 +353,7 @@ function CaveService:GenerateCaveFromConfigAsync(CaveConfig: Configuration, Posi
 		NoiseThreshold,
 		CaveConfig:GetAttribute("HasDecor"),
 		CaveConfig.Decor,
+		CaveConfig:GetAttribute("DecorSpawnChance"),
 		Tint
 	)
 end
