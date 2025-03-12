@@ -299,7 +299,6 @@ end
 
 function CaveService:GetRandomConfig(Depth: number): Configuration
 	local PossibleCaves = self:GetSpawnableCaves(Depth)
-	local NumberGenerator = MineService:GetRandomObject()
 
 	local function GetRemainingCaves(CavesLeft: { BasePart })
 		for i, Cave: Configuration in pairs(CavesLeft) do
