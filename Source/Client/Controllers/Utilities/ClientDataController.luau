@@ -38,6 +38,11 @@ function ClientDataController:HasEnoughOre(Ore: Core.OreListItem): boolean
 	return Amount >= Ore.Amount
 end
 
+function ClientDataController:GetTycoonName()
+	local DataFolder = self:GetDataFolder()
+	return DataFolder.TycoonName.Value
+end
+
 function ClientDataController:GetOresAmount(Name: string): number
 	local DataFolder = self:GetDataFolder()
 

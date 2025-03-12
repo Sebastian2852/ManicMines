@@ -38,6 +38,7 @@ Theme.Images = {
 	Gold = "rbxassetid://92870304618730",
 	MiningPower = "rbxassetid://94366503795994",
 	OptimalDepth = "rbxassetid://95810331033800",
+	TycoonEditor = "rbxassetid://87413669840444",
 
 	-- Misc
 	Vignette = "rbxassetid://127366667073715",

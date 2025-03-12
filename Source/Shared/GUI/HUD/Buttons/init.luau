@@ -12,11 +12,13 @@ local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
 local TeleportService
 local OreIndexController
+local TycoonEditorController
 
 function Buttons:init()
 	local DataService = Knit.GetService("DataService")
 	TeleportService = Knit.GetService("TeleportService")
 	OreIndexController = Knit.GetController("OreIndexController")
+	TycoonEditorController = Knit.GetController("TycoonEditorController")
 
 	DataService:GetPlayerDataFolder():andThen(function(DataFolder: Core.DataFolder)
 		local InTycoon = DataFolder.InTycoon
@@ -49,7 +51,7 @@ function Buttons:render()
 		BorderSizePixel = 0,
 	}, {
 		Layout = Roact.createElement("UIListLayout", {
-			Padding = UDim.new(0, 15),
+			Padding = UDim.new(0, 10),
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			FillDirection = Enum.FillDirection.Horizontal,
 			HorizontalAlignment = Enum.HorizontalAlignment.Left,
@@ -96,6 +98,28 @@ function Buttons:render()
 				Icon = "",
 				OnClick = function()
 					TeleportService:TeleportToTycoon()
+				end,
+			}, {}),
+		}),
+
+		TycoonEditor = InTycoon and Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = 2,
+			Visible = not Hidden,
+		}, {
+			AspectRatio = Roact.createElement("UIAspectRatioConstraint", {
+				AspectRatio = 1,
+				AspectType = Enum.AspectType.FitWithinMaxSize,
+				DominantAxis = Enum.DominantAxis.Height,
+			}, {}),
+
+			Button = Roact.createElement(AnimatedButton, {
+				Background = Theme.Images.TycoonEditor,
+				Icon = "",
+				OnClick = function()
+					TycoonEditorController:OpenGUI()
 				end,
 			}, {}),
 		}),

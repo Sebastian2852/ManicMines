@@ -21,6 +21,7 @@ local AdminService
 local TycoonUpgradeService
 local TycoonGeneratorService
 local LoadingService
+local TextFilteringService
 
 local TycoonsSpawn = workspace.Game:FindFirstChild("TycoonsSpawn")
 
@@ -202,6 +203,13 @@ function TycoonService.Client:SetTycoonName(Setter: Player, Player: Player, Name
 	PlayerData.Tycoon.TycoonName.Value = Name
 end
 
+function TycoonService.Client:RenameTycoon(Player: Player, NewName: string)
+	local FilteredText = TextFilteringService:FilterTextFromUserToEveryone(Player, NewName) :: string
+	local DataFolder = DataService:GetPlayerDataFolder(Player) :: Core.DataFolder
+	DataFolder.TycoonName.Value = FilteredText
+	return FilteredText
+end
+
 --[[ KNIT ]]
 --
 
@@ -229,6 +237,8 @@ function TycoonService:KnitStart()
 	TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")
 	TycoonGeneratorService = Knit.GetService("TycoonGeneratorService")
 	LoadingService = Knit.GetService("LoadingService")
+
+	TextFilteringService = Knit.GetService("TextFilteringService")
 end
 
 return TycoonService
