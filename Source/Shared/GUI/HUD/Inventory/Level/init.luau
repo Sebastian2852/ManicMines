@@ -31,17 +31,17 @@ function LevelDisplay:init()
 		end)
 
 		self.ShortUnitsConnection = UseShortUnits:GetPropertyChangedSignal("Value"):Connect(function()
-			self:setState {
+			self:setState({
 				ShortUnits = UseShortUnits.Value,
-			}
+			})
 		end)
 
 		self:UpdateLevel(Level.Value)
 		self:UpdateXp(Xp.Value)
 
-		self:setState {
+		self:setState({
 			ShortUnits = UseShortUnits.Value,
-		}
+		})
 	end)
 
 	self.ColorConnection = ReplicatedStorage.Player.LastBlockColor:GetPropertyChangedSignal("Value"):Connect(function()
@@ -51,9 +51,9 @@ function LevelDisplay:init()
 			return
 		end
 
-		self:setState {
+		self:setState({
 			LastBlockColor = NewColor,
-		}
+		})
 	end)
 
 	self.Motor = Flipper.SingleMotor.new(0)
@@ -66,10 +66,10 @@ function LevelDisplay:init()
 	self.TextBinding = TextBinding
 	self.TextMotor:onStep(TextSetBinding)
 
-	self:setState {
+	self:setState({
 		XpChange = 0,
 		ShowChange = false,
-	}
+	})
 end
 
 function LevelDisplay:willUnmount()
@@ -96,11 +96,11 @@ function LevelDisplay:UpdateXp(Xp: number)
 	local XpChange = Xp - LastXp
 	local ShowChange = XpChange > 1
 
-	self:setState {
+	self:setState({
 		LastXp = Xp,
 		XpChange = XpChange,
 		ShowChange = ShowChange,
-	}
+	})
 
 	if ShowChange then
 		task.wait(0.61)
@@ -111,10 +111,10 @@ function LevelDisplay:UpdateXp(Xp: number)
 		}))
 	end
 
-	self:setState {
+	self:setState({
 		ShowChange = false,
 		Xp = Xp,
-	}
+	})
 
 	if ShowChange then
 		task.wait(0.15)
@@ -146,12 +146,12 @@ function LevelDisplay:UpdateLevel(Level: number)
 	local BarGradient = CurrentLevelConfig:GetAttribute("LevelXpBarColor") :: ColorSequence
 	local XpNeeded = NextLevelConfig and NextLevelConfig:GetAttribute("XpNeeded") or 0
 
-	self:setState {
+	self:setState({
 		LevelName = LevelName,
 		LevelColor = LevelColor,
 		BarGradient = BarGradient,
 		XpNeeded = XpNeeded,
-	}
+	})
 end
 
 function LevelDisplay:render()
@@ -168,12 +168,18 @@ function LevelDisplay:render()
 
 	if UseShortUnits then
 		Xp = Core.Util:ConvertNumberToString(Xp)
-		XpNeeded = Core.Util:ConvertNumberToString(XpNeeded)
 		XpChange = Core.Util:ConvertNumberToString(XpChange)
+		if XpNeeded ~= 0 then
+			XpNeeded = Core.Util:ConvertNumberToString(XpNeeded)
+		end
 	end
 
 	local BarSize = self.Binding:map(function(Value)
-		return UDim2.fromScale(0, 1):Lerp(UDim2.fromScale(1, 1), Value)
+		if XpNeeded == 0 then
+			return UDim2.fromScale(1, 1)
+		else
+			return UDim2.fromScale(0, 1):Lerp(UDim2.fromScale(1, 1), Value)
+		end
 	end)
 
 	local TextPosition = self.TextBinding:map(function(Value)
@@ -196,7 +202,7 @@ function LevelDisplay:render()
 		Layout = Roact.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-		}, {}),
+		}),
 
 		TextArea = Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 0.8),
@@ -206,7 +212,7 @@ function LevelDisplay:render()
 			Layout = Roact.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
 				SortOrder = Enum.SortOrder.LayoutOrder,
-			}, {}),
+			}),
 
 			TopText = Roact.createElement("TextLabel", {
 				Size = UDim2.fromScale(1, 0.5),
@@ -219,7 +225,7 @@ function LevelDisplay:render()
 				TextXAlignment = Enum.TextXAlignment.Right,
 				TextColor3 = LevelColor,
 				FontFace = Theme.Font,
-			}, {}),
+			}),
 
 			BottomText = Roact.createElement("Frame", {
 				Size = UDim2.fromScale(1, 0.5),
@@ -230,10 +236,10 @@ function LevelDisplay:render()
 				Layout = Roact.createElement("UIListLayout", {
 					FillDirection = Enum.FillDirection.Horizontal,
 					SortOrder = Enum.SortOrder.LayoutOrder,
-				}, {}),
+				}),
 
 				CurrentXpContainer = Roact.createElement("Frame", {
-					Size = UDim2.fromScale(0.45, 1),
+					Size = XpNeeded == 0 and UDim2.fromScale(1, 1) or UDim2.fromScale(0.45, 1),
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
 				}, {
@@ -248,18 +254,20 @@ function LevelDisplay:render()
 						Text = Xp,
 						TextStrokeTransparency = 0,
 						TextScaled = true,
-						TextXAlignment = Enum.TextXAlignment.Left,
+						TextXAlignment = XpNeeded == 0 and Enum.TextXAlignment.Right or Enum.TextXAlignment.Left,
 						TextColor3 = TextColor,
 						FontFace = Theme.Font,
 					}, {
 						ShowXpChange and Roact.createElement(XpDiff, {
 							Amount = XpChange,
 							Color = LastOreColor,
-						}, {}),
+							Position = UDim2.fromScale(XpNeeded == 0 and 1 or 0.5, 0.5),
+							AnchorPoint = Vector2.new(XpNeeded == 0 and 1 or 0.5, 0.5),
+						}),
 					}),
 				}),
 
-				Slash = Roact.createElement("TextLabel", {
+				Slash = XpNeeded ~= 0 and Roact.createElement("TextLabel", {
 					Size = UDim2.fromScale(0.1, 1),
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
@@ -271,9 +279,9 @@ function LevelDisplay:render()
 					TextXAlignment = Enum.TextXAlignment.Center,
 					TextColor3 = Theme.TextColor,
 					FontFace = Theme.Font,
-				}, {}),
+				}),
 
-				NeededXp = Roact.createElement("TextLabel", {
+				XpNeeded = XpNeeded ~= 0 and Roact.createElement("TextLabel", {
 					Size = UDim2.fromScale(0.45, 1),
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
@@ -285,7 +293,7 @@ function LevelDisplay:render()
 					TextXAlignment = Enum.TextXAlignment.Right,
 					TextColor3 = Theme.TextColor,
 					FontFace = Theme.Font,
-				}, {}),
+				}),
 			}),
 		}),
 
@@ -305,7 +313,7 @@ function LevelDisplay:render()
 				Outline = Roact.createElement("UIStroke", {
 					Thickness = 3,
 					Color = Color3.new(0, 0, 0),
-				}, {}),
+				}),
 
 				Overlay = Roact.createElement("Frame", {
 					Size = BarSize,
@@ -313,7 +321,7 @@ function LevelDisplay:render()
 					BackgroundColor3 = LastOreColor,
 					BorderSizePixel = 0,
 					ZIndex = 2,
-				}, {}),
+				}),
 
 				Bar = Roact.createElement("Frame", {
 					Size = BarSize,
@@ -322,7 +330,7 @@ function LevelDisplay:render()
 				}, {
 					Gradient = Roact.createElement("UIGradient", {
 						Color = BarGradient,
-					}, {}),
+					}),
 				}),
 			}),
 		}),
