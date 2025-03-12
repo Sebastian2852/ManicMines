@@ -397,7 +397,8 @@ function TycoonUpgradeService:Upgrade(Player: Player, Tycoon: Model, UpgradeName
 	self:AddUpgradeToTycoonAsync(Player, UpgradeName, Tycoon)
 
 	PlayerStatsService:CalculateInventoryMaxCapactiy(DataService:GetPlayerDataFolder(Player))
-	PickaxeService:CalculateMiningPower(Player)
+	PickaxeService:CalculateMiningPower(Player, true)
+	PickaxeService:GetOptimalDepth(Player, true)
 
 	return true
 end

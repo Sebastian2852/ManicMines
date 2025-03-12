@@ -17,6 +17,7 @@ local LogService
 local DataService
 local TycoonService
 local TycoonUpgradeService
+local PlayerStatsService
 
 --[=[
 Returns the data value of the given generator
@@ -72,6 +73,8 @@ function TycoonGeneratorService:AddFunctionality(
 
 		CurrencyDataValue.Value += GeneratorDataValue.Value
 		GeneratorDataValue.Value = 0
+
+		PlayerStatsService:AwardXP(Player, 0)
 	end)
 end
 
@@ -162,6 +165,7 @@ function TycoonGeneratorService:KnitStart()
 	TycoonService = Knit.GetService("TycoonService")
 	DataService = Knit.GetService("DataService")
 	TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")
+	PlayerStatsService = Knit.GetService("PlayerStatsService")
 end
 
 return TycoonGeneratorService
