@@ -90,7 +90,7 @@ function MainMenu:render()
 					}, {
 						Title = Roact.createElement(
 							Title,
-							{ GameName = "Manic Mines", UpdateName = Core.GameConfig.MainMenu.Version },
+							{ GameName = "Manic Mines", UpdateName = Core.GameConfig.MainMenu.TitleScreenVersion },
 							{}
 						),
 					}),
