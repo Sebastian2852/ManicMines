@@ -263,6 +263,8 @@ function CaveService:GenerateCaveAsync(
 								NumberGenerator:NextNumber(0, Layer:GetAttribute("BlockColorOffsetLerp"))
 							)
 							Object.Color = Core.Util:TintColor(Object.Color, Tint)
+							Object.Material = Layer.Stone.Material
+							Object.MaterialVariant = Layer.Stone.MaterialVariant
 						end
 					end
 				end
