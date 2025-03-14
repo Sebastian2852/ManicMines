@@ -54,7 +54,7 @@ function HUD:render()
 	end)
 
 	return Roact.createFragment({
-		Roact.createElement("ScreenGui", {
+		HUD = Roact.createElement("ScreenGui", {
 			ResetOnSpawn = false,
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		}, {
@@ -110,7 +110,7 @@ function HUD:render()
 				}),
 			}),
 		}),
-		Roact.createElement("ScreenGui", {
+		TurningPointEffects = Roact.createElement("ScreenGui", {
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 			DisplayOrder = 200,
 			IgnoreGuiInset = true,
