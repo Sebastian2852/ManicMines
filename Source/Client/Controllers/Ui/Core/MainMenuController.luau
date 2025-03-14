@@ -4,6 +4,7 @@ local TweenService = game:GetService("TweenService")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local MainMenuController = Knit.CreateController({ Name = "MainMenuController" })
@@ -94,8 +95,12 @@ function MainMenuController:KnitStart()
 	local LightingController = Knit.GetController("LightingController")
 
 	local MainMenu = require(ReplicatedStorage.Game.GUI.MainMenu)
+
+	local Timer = Profiler.Timer.new("Mount MainMenu")
 	local App = Roact.createElement(MainMenu)
 	MainMenuTree = Roact.mount(App, Knit.Player.PlayerGui, "MainMenu")
+	Timer:Stop()
+
 	LogService:Log("Mounted main menu")
 
 	Blur = Instance.new("BlurEffect")
