@@ -398,6 +398,7 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	Block:PivotTo(CFrame.new(Position))
 	Block.Parent = Workspace.Game.Mine
 	Block.Anchored = true
+	Block:SetAttribute("Depth", self:YLevelToDepth(Block.CFrame.Position.Y))
 	self.MineStats.BlocksGenerated += 1
 	self:UpdateMiningConditions()
 

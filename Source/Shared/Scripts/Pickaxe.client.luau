@@ -128,7 +128,6 @@ local function SetTarget(Object: BasePart)
 		return
 	end
 	PlayerFolder.LastBlockColor.Value = Object:GetAttribute("SelectionColor")
-	PickaxeService:UpdateSelectedDepth(Object)
 
 	AddOutline(Object)
 end

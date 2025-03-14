@@ -264,7 +264,6 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 	self.Mining[Player.UserId].Mining = true
 	self.Mining[Player.UserId].Object = ObjectToMine
 	DataFolder.ServerMining.Value = true
-	DataFolder.MiningBlockDepth.Value = MineService:YLevelToDepth(ObjectToMine.CFrame.Position.Y)
 
 	ObjectToMine:SetAttribute("MinedBy", Player.UserId)
 	ObjectToMine:SetAttribute("BeingMined", true)
@@ -404,11 +403,6 @@ end
 
 --[[ CLIENT ]]
 --
-
-function PickaxeService.Client:UpdateSelectedDepth(Player: Player, Object: Part)
-	local DataFolder = ReplicatedStorage.PlayerData:FindFirstChild(Player.UserId) :: Core.DataFolder
-	DataFolder.MiningBlockDepth.Value = MineService:YLevelToDepth(Object.CFrame.Y)
-end
 
 --[=[
 Get the players pickaxe

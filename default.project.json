@@ -212,9 +212,6 @@
           "TycoonName": {
             "$className": "StringValue"
           },
-          "MiningBlockDepth":{
-            "$className":"IntValue"
-          },
           "DataLoaded": {
             "$className": "BoolValue"
           },
