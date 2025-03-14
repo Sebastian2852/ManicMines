@@ -22,7 +22,7 @@
           "$path": "Submodules/DialogueKit.rbxm"
         },
         "React-Lua": {
-          "$path": "Submodules/React17.rbxm"
+          "$path": "Submodules/React17/React-Lua"
         },
         "Roact": {
           "$path": "Submodules/Roact.luau"
