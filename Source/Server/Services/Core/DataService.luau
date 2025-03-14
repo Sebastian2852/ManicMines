@@ -120,6 +120,7 @@ local function SetupTemplateDataFolder()
 		NewValue.Parent = TemplateDataFolder.Settings
 	end
 
+	TemplateDataFolder.LastVersionPlayed.Value = Core.GameConfig.MainMenu.Version
 	LogService:Log("Setup template data folder")
 end
 
@@ -181,6 +182,8 @@ function DataService:SavePlayerData(Player: Player)
 
 	LogService:Assert(DataFolder, "Tried saving data with No data folder")
 	LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
+
+	DataFolder.LastVersionPlayed.Value = Core.GameConfig.MainMenu.Version
 
 	local SaveData = Core.Data.SaveData.New(Player.UserId)
 
