@@ -29,11 +29,18 @@ function Gameplay:render()
 			LayoutOrder = 1,
 		}, {}),
 
+		HideOverheadGUI = Roact.createElement(BooleanSetting, {
+			SettingName = "HideOverheadGUI",
+			DisplayName = "Hide Overhead GUI",
+			Description = "Hide your overhead GUI from yourself",
+			LayoutOrder = 2,
+		}, {}),
+
 		MusicVolume = Roact.createElement(NumberSetting, {
 			SettingName = "MusicVolume",
 			DisplayName = "Music volume",
 			Description = "The volume of all music in the game. This excludes any sound effects",
-			LayoutOrder = 2,
+			LayoutOrder = 3,
 			MinValue = 0,
 			MaxValue = 1,
 		}, {}),

@@ -267,6 +267,7 @@ Config.DefaultSettings = {
 	MusicVolume = 0.5,
 	InventoryShortUnits = false,
 	HideMapProps = false,
+	HideOverheadGUI = false,
 }
 
 Config.MainMenu = {

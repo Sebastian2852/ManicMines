@@ -74,6 +74,7 @@ export type Settings = {
 	MusicVolume: number,
 	InventoryShortUnits: boolean,
 	HideMapProps: boolean,
+	HideOverheadGUI: boolean,
 }
 
 --[=[

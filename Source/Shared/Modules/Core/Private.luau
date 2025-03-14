@@ -31,6 +31,7 @@ export type DataFolder_SettingsFolder = {
 	RainbowEffect: BoolValue,
 	MusicVolume: NumberValue,
 	InventoryShortUnits: BoolValue,
+	HideOverheadGUI: BoolValue,
 }
 
 export type DataFolder_StatsFolder = {
