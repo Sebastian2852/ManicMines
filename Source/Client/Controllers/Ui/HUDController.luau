@@ -7,7 +7,6 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local TopbarPlus = require(ReplicatedStorage.Packages.TopbarPlus)
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
-local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Signals = require(ReplicatedStorage.Game.GUI.Signals)
 
 local HUDController = Knit.CreateController({ Name = "HUDController" })
@@ -126,10 +125,8 @@ function HUDController:KnitStart()
 	local HUD = require(ReplicatedStorage.Game.GUI.HUD)
 
 	DataService.DataLoaded:Connect(function()
-		local Timer = Profiler.Timer.new("Mount HUD")
 		local App = Roact.createElement(HUD)
 		Roact.mount(App, Knit.Player.PlayerGui, "HUD")
-		Timer:Stop()
 		LogService:Log("Mounted HUD component")
 
 		NeoHotbar:Start()
