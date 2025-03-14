@@ -215,6 +215,9 @@
           "LastVersionPlayed": {
             "$className":"StringValue"
           },
+          "VersionCreated":{
+            "$className":"StringValue"
+          },
           "DataLoaded": {
             "$className": "BoolValue"
           },

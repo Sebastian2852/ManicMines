@@ -121,6 +121,7 @@ local function SetupTemplateDataFolder()
 	end
 
 	TemplateDataFolder.LastVersionPlayed.Value = Core.GameConfig.MainMenu.Version
+	TemplateDataFolder.VersionCreated.Value = Core.GameConfig.MainMenu.Version
 	LogService:Log("Setup template data folder")
 end
 
