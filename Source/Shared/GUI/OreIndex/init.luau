@@ -46,13 +46,12 @@ function OreIndex:CreateOreButtons()
 
 	for _, Ore in pairs(ReplicatedStorage.Assets.Ores:GetChildren()) do
 		local DisplayName = Ore:GetAttribute("DisplayName")
+		local Locked = OreIndexController:ShouldOreBeLocked(Ore.Name)
+		if not Locked then
+			UnlockedOres += 1
+		end
+
 		if Search == "" or string.find(string.lower(DisplayName), string.lower(Search)) then
-			local Locked = OreIndexController:ShouldOreBeLocked(Ore.Name)
-
-			if not Locked then
-				UnlockedOres += 1
-			end
-
 			if Search ~= "" and Locked then
 				continue
 			end
