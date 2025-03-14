@@ -5,7 +5,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 require(ReplicatedStorage.Packages.Iris).Init()
-local Cmdr = require(ReplicatedStorage:WaitForChild("CmdrClient"))
 
 -- [[ KNIT ]] --
 
@@ -31,7 +30,10 @@ end
 
 -- [[ CMDR ]] --
 
+local Cmdr = require(ReplicatedStorage:WaitForChild("CmdrClient"))
 Cmdr:SetActivationKeys({ Enum.KeyCode.F2 })
+Cmdr:SetPlaceName("ManicMines")
+Cmdr:SetActivationUnlocksMouse(true)
 
 -- [[ DEBUG ]] --
 
