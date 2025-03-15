@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local CaveDecorClass = require(ServerScriptService.Game.Modules.Classes.CaveDecor)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local PerlinNoise = require(ServerScriptService.Game.Modules.PerlinNoise)
@@ -26,83 +27,13 @@ function CaveService:GetModelByName(Name: string)
 	return ReplicatedStorage.Assets.Caves.CaveDecorModels:FindFirstChild(Name)
 end
 
-function CaveService:PlaceCaveDecor(OriginalModel: Model, InitialPosition: Vector3)
-	local Model = OriginalModel:Clone()
-	local Hitbox = Model:FindFirstChild("Hitbox") :: Part
-	if not Hitbox then
-		warn(Model:GetFullName(), "Has no hitbox")
-		return
+function CaveService:PlaceCaveDecor(OriginalModel: Model, InitialPosition: Vector3, Tint: Color3)
+	local CaveDecor = CaveDecorClass.New(OriginalModel, InitialPosition)
+	CaveDecor:SnapToGround()
+	if CaveDecor then
+		CaveDecor:RandomizeModelRotation()
+		CaveDecor:ApplyStoneColors(Tint)
 	end
-
-	Model.Parent = workspace
-	Model.PrimaryPart = Hitbox
-	Hitbox.Size = Hitbox.Size - Vector3.new(1, 0, 1)
-	Model:PivotTo(CFrame.new(InitialPosition))
-
-	local ModelCFrame = Hitbox.CFrame
-	local ModelSize = Hitbox.Size
-
-	local CornerOffsets = {
-		Vector3.new(-ModelSize.X / 2, -ModelSize.Y / 2, -ModelSize.Z / 2),
-		Vector3.new(ModelSize.X / 2, -ModelSize.Y / 2, -ModelSize.Z / 2),
-		Vector3.new(-ModelSize.X / 2, -ModelSize.Y / 2, ModelSize.Z / 2),
-		Vector3.new(ModelSize.X / 2, -ModelSize.Y / 2, ModelSize.Z / 2),
-	}
-
-	local CornerCFrames = {}
-
-	for _, Offset: Vector3 in pairs(CornerOffsets) do
-		table.insert(CornerCFrames, ModelCFrame * CFrame.new(Offset))
-	end
-
-	local Hits = 0
-	local HitPositions = {}
-
-	for _, CornerCFrame: CFrame in pairs(CornerCFrames) do
-		local RayOrigin = CornerCFrame.Position
-		local RayDirection = Vector3.new(0, -7, 0)
-		local RaycastParams = RaycastParams.new()
-		RaycastParams.FilterDescendantsInstances = { game.Workspace.Game.Mine }
-		RaycastParams.FilterType = Enum.RaycastFilterType.Include
-
-		local RaycastResult = workspace:Raycast(RayOrigin, RayDirection, RaycastParams)
-
-		if RaycastResult then
-			Hits += 1
-			table.insert(HitPositions, RaycastResult.Position)
-		end
-	end
-
-	if Hits ~= 4 then
-		Model:Destroy()
-		return
-	end
-
-	local HitY = HitPositions[1].Y
-
-	for _, Position: Vector3 in pairs(HitPositions) do
-		if Position.Y ~= HitY then
-			Model:Destroy()
-			return
-		end
-	end
-
-	local NewCFrame = ModelCFrame - Vector3.new(0, (ModelCFrame.Position.Y - HitY) - (ModelSize.Y / 2), 0)
-	Model:PivotTo(NewCFrame)
-
-	local Params = OverlapParams.new()
-	Params.FilterDescendantsInstances = { Model }
-	Params.FilterType = Enum.RaycastFilterType.Exclude
-	local Parts = workspace:GetPartsInPart(Hitbox, Params)
-
-	for _, Part: BasePart in pairs(Parts) do
-		if Part.CFrame.Position.Y < NewCFrame.Position.Y then
-			Model:Destroy()
-			return
-		end
-	end
-
-	return Model
 end
 
 --[=[
@@ -236,35 +167,11 @@ function CaveService:GenerateCaveAsync(
 									local RandomValue = DecorValues[RandomDecorIndex]
 
 									if math.random(1, RandomValue.Value) == 1 then
-										local PlacedModel = self:PlaceCaveDecor(
+										self:PlaceCaveDecor(
 											self:GetModelByName(RandomValue.Name),
-											MineService:SnapPositionToGrid(Position)
-										) :: Model?
-
-										if PlacedModel then
-											for _, Object: Part in pairs(PlacedModel:GetDescendants()) do
-												if Object:HasTag("Mine/LayerColor") then
-													local DecorY = Object.CFrame.Position.Y
-													local Layer = MineService:YLevelToLayer(DecorY)
-													Object.Color = Layer.Stone.Color
-													Object.Color = Object.Color:Lerp(
-														Layer:GetAttribute("BlockColorOffset"),
-														NumberGenerator:NextNumber(
-															0,
-															Layer:GetAttribute("BlockColorOffsetLerp")
-														)
-													)
-													Object.Color = Core.Util:TintColor(Object.Color, Tint)
-													Object.Material = Layer.Stone.Material
-													Object.MaterialVariant = Layer.Stone.MaterialVariant
-												end
-											end
-
-											PlacedModel:PivotTo(
-												PlacedModel.PrimaryPart.CFrame
-													* CFrame.Angles(0, math.rad(NumberGenerator:NextInteger(0, 360)), 0)
-											)
-										end
+											MineService:SnapPositionToGrid(Position),
+											Tint
+										)
 									end
 								end)
 							end
