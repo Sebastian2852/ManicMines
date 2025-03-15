@@ -34,7 +34,7 @@ function CaveService:PlaceCaveDecor(OriginalModel: Model, InitialPosition: Vecto
 
 	Model.Parent = workspace
 	Model.PrimaryPart = Hitbox
-	Hitbox.Size = Hitbox.Size - Vector3.new(1, 1, 1)
+	Hitbox.Size = Hitbox.Size - Vector3.new(1, 0, 1)
 	Model:PivotTo(CFrame.new(InitialPosition))
 
 	local ModelCFrame = Hitbox.CFrame
@@ -172,11 +172,11 @@ function CaveService:GenerateCaveAsync(
 			for _, Offset in Offsets do
 				local NeighborKey = (X + Offset.X) .. "," .. (Y + Offset.Y) .. "," .. (Z + Offset.Z)
 				if not CaveMap[NeighborKey] then
-					return true -- This block is exposed to air
+					return true
 				end
 			end
 
-			return false -- Fully enclosed, skip it
+			return true
 		end
 
 		local function GenerateBlock(Position, ForceGenerate)
@@ -267,6 +267,11 @@ function CaveService:GenerateCaveAsync(
 							Object.MaterialVariant = Layer.Stone.MaterialVariant
 						end
 					end
+
+					PlacedModel:PivotTo(
+						PlacedModel.PrimaryPart.CFrame
+							* CFrame.Angles(0, math.rad(NumberGenerator:NextInteger(0, 360)), 0)
+					)
 				end
 			end
 
@@ -383,17 +388,17 @@ function CaveService:KnitStart()
 	MineService = Knit.GetService("MineService")
 	LogService = Knit.GetService("LogService")
 
-	-- MineService.OnBlockMined:Connect(function(_, Position: Vector3)
-	-- 	local NumberGenerator = MineService:GetRandomObject() :: Random
-	-- 	local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateCave)
+	MineService.OnBlockMined:Connect(function(_, Position: Vector3)
+		NumberGenerator = MineService:GetRandomObject() :: Random
+		local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateCave)
 
-	-- 	if RandomNumber ~= 1 then
-	-- 		return
-	-- 	end
+		if RandomNumber ~= 1 then
+			return
+		end
 
-	-- 	local NewPosition = Position - Vector3.new(0, 60, 0)
-	-- 	self:GenerateRandomCave(NewPosition)
-	-- end)
+		local NewPosition = Position - Vector3.new(0, 60, 0)
+		self:GenerateRandomCave(NewPosition)
+	end)
 
 	if _G.DEBUG then
 		task.wait(5)
