@@ -3,11 +3,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Roact = require(ReplicatedStorage.Packages.Roact)
-local Theme = require(script.Parent.Theme)
 
 local PickaxeSelection = Roact.Component:extend("PickaxeSelection")
 
 local Bar = require(script.Bar)
+local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
 function PickaxeSelection:init()
 	ReplicatedStorage.Player.PickaxeSelection:GetPropertyChangedSignal("Value"):Connect(function()
@@ -69,12 +69,12 @@ end
 
 function PickaxeSelection:render()
 	local Block = self.state.Block :: BasePart
-	local DisplayName = self.state.DisplayName
-	local EmblemID = self.state.EmblemID
-	local Selecting = self.state.Selecting
+	local DisplayName = self.state.DisplayName or "[UNKNOWN]"
+	local EmblemID = self.state.EmblemID or Theme.Images.Missing
+	local Selecting = self.state.Selecting or false
 
-	local MiningPercentage = self.state.MiningPercentage
-	local TimeToMine = self.state.TimeToMine
+	local MiningPercentage = self.state.MiningPercentage or -1
+	local TimeToMine = self.state.TimeToMine or -1
 
 	return Selecting
 			and Roact.createElement("ScreenGui", {
