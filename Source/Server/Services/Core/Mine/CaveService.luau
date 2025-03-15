@@ -1,8 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local PerlinNoise = require(ServerScriptService.Game.Modules.PerlinNoise)
 local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
@@ -127,7 +129,7 @@ function CaveService:GenerateCaveAsync(
 		local NoiseCache = {}
 		local CaveMap = {}
 
-		local DecorPositions = {}
+		local DecorValues = DecorFolder:GetChildren() :: { IntValue }
 
 		local function GetNoise(X, Y, Z)
 			local Key = string.format("%d_%d_%d", X, Y, Z)
@@ -135,11 +137,17 @@ function CaveService:GenerateCaveAsync(
 				return NoiseCache[Key]
 			end
 
-			local Noise = math.noise(
+			-- local Noise = math.noise(
+			-- 	X / NoiseResolution.X + NoiseResolutionOffset.X,
+			-- 	Y / NoiseResolution.Y + NoiseResolutionOffset.Y,
+			-- 	Z / NoiseResolution.Z + NoiseResolutionOffset.Z
+			-- )
+
+			local Noise = PerlinNoise.new({
 				X / NoiseResolution.X + NoiseResolutionOffset.X,
 				Y / NoiseResolution.Y + NoiseResolutionOffset.Y,
-				Z / NoiseResolution.Z + NoiseResolutionOffset.Z
-			)
+				Z / NoiseResolution.Z + NoiseResolutionOffset.Z,
+			}, 1, 1, 1)
 
 			NoiseCache[Key] = Noise
 			return Noise
@@ -222,7 +230,43 @@ function CaveService:GenerateCaveAsync(
 						if HasDecor then
 							local Chance = math.random(1, DecorSpawnChance)
 							if Chance == 1 then
-								table.insert(DecorPositions, Position)
+								task.spawn(function()
+									task.wait(1)
+									local RandomDecorIndex = math.random(1, #DecorValues)
+									local RandomValue = DecorValues[RandomDecorIndex]
+
+									if math.random(1, RandomValue.Value) == 1 then
+										local PlacedModel = self:PlaceCaveDecor(
+											self:GetModelByName(RandomValue.Name),
+											MineService:SnapPositionToGrid(Position)
+										) :: Model?
+
+										if PlacedModel then
+											for _, Object: Part in pairs(PlacedModel:GetDescendants()) do
+												if Object:HasTag("Mine/LayerColor") then
+													local DecorY = Object.CFrame.Position.Y
+													local Layer = MineService:YLevelToLayer(DecorY)
+													Object.Color = Layer.Stone.Color
+													Object.Color = Object.Color:Lerp(
+														Layer:GetAttribute("BlockColorOffset"),
+														NumberGenerator:NextNumber(
+															0,
+															Layer:GetAttribute("BlockColorOffsetLerp")
+														)
+													)
+													Object.Color = Core.Util:TintColor(Object.Color, Tint)
+													Object.Material = Layer.Stone.Material
+													Object.MaterialVariant = Layer.Stone.MaterialVariant
+												end
+											end
+
+											PlacedModel:PivotTo(
+												PlacedModel.PrimaryPart.CFrame
+													* CFrame.Angles(0, math.rad(NumberGenerator:NextInteger(0, 360)), 0)
+											)
+										end
+									end
+								end)
 							end
 						end
 					end
@@ -239,47 +283,6 @@ function CaveService:GenerateCaveAsync(
 		end
 
 		Promise.all(Gens):await()
-
-		local DecorValues = DecorFolder:GetChildren() :: { IntValue }
-
-		for i, Position in pairs(DecorPositions) do
-			local RandomDecorIndex = math.random(1, #DecorValues)
-			local RandomValue = DecorValues[RandomDecorIndex]
-
-			if math.random(1, RandomValue.Value) == 1 then
-				local PlacedModel = self:PlaceCaveDecor(
-					self:GetModelByName(RandomValue.Name),
-					MineService:SnapPositionToGrid(Position)
-				) :: Model?
-
-				if PlacedModel then
-					for _, Object: Part in pairs(PlacedModel:GetDescendants()) do
-						if Object:HasTag("Mine/LayerColor") then
-							local Y = Object.CFrame.Position.Y
-							local Layer = MineService:YLevelToLayer(Y)
-							Object.Color = Layer.Stone.Color
-							Object.Color = Object.Color:Lerp(
-								Layer:GetAttribute("BlockColorOffset"),
-								NumberGenerator:NextNumber(0, Layer:GetAttribute("BlockColorOffsetLerp"))
-							)
-							Object.Color = Core.Util:TintColor(Object.Color, Tint)
-							Object.Material = Layer.Stone.Material
-							Object.MaterialVariant = Layer.Stone.MaterialVariant
-						end
-					end
-
-					PlacedModel:PivotTo(
-						PlacedModel.PrimaryPart.CFrame
-							* CFrame.Angles(0, math.rad(NumberGenerator:NextInteger(0, 360)), 0)
-					)
-				end
-			end
-
-			if i % 30 == 0 then
-				RunService.Heartbeat:Wait()
-			end
-		end
-
 		Resolve()
 	end)
 end
