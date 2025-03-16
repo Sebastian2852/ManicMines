@@ -4,10 +4,10 @@ local TweenService = game:GetService("TweenService")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local NeoHotbar = require(ReplicatedStorage.Packages.NeoHotbar)
 local Roact = require(ReplicatedStorage.Packages.Roact)
-local Signals = require(ReplicatedStorage.Game.GUI.Signals)
 local TopbarPlus = require(ReplicatedStorage.Packages.TopbarPlus)
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Signals = require(ReplicatedStorage.Game.GUI.Signals)
 
 local HUDController = Knit.CreateController({ Name = "HUDController" })
 
