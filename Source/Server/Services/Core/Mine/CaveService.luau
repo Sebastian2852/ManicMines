@@ -113,8 +113,8 @@ function CaveService:GenerateCaveAsync(
 			return true
 		end
 
-		local function GenerateBlock(Position, ForceGenerate)
-			MineService:GenerateAtPositionAsync(Position, ForceGenerate)
+		local function GenerateBlock(Position)
+			MineService:GenerateAtPositionAsync(Position, true)
 				:andThen(function(Block)
 					if Block and Tint ~= nil and Tint ~= Color3.new(1, 1, 1) then
 						Block.Color = Core.Util:TintColor(Block.Color, Tint)
@@ -144,20 +144,20 @@ function CaveService:GenerateCaveAsync(
 						or Z == -Size
 						or Z + BlockSize.Z > Size
 					then
-						GenerateBlock(Position, true)
+						GenerateBlock(Position)
 						continue
 					end
 
 					-- Generate only surface blocks inside the cave
 					if IsSurfaceBlock(X, Y, Z) then
-						GenerateBlock(Position, false)
+						GenerateBlock(Position)
 						MineService:AddAirPosition(Position)
 					else
 						if HasDecor then
 							local Chance = math.random(1, DecorSpawnChance)
 							if Chance == 1 then
 								task.spawn(function()
-									task.wait(1)
+									task.wait(3)
 									local RandomDecorIndex = math.random(1, #DecorValues)
 									local RandomValue = DecorValues[RandomDecorIndex]
 
