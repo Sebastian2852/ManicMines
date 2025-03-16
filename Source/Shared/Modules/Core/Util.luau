@@ -223,11 +223,11 @@ end
 --[=[
 Create a box with a given size at the given position with a certain color (if no color provided, red is used)
 ]=]
-function Util:CreateDebugBoundingBox(Size: Vector3, CenterPosition: Vector3, Color: Color3?)
+function Util:CreateDebugBoundingBox(Size: Vector3, CenterPosition: Vector3 | CFrame, Color: Color3?)
 	return Promise.new(function(Resolve)
 		local DebugPart = Instance.new("Part")
 		DebugPart.Size = Size
-		DebugPart.CFrame = CFrame.new(CenterPosition)
+		DebugPart.CFrame = type(CenterPosition) == "vector" and CFrame.new(CenterPosition) or CenterPosition
 		DebugPart.Transparency = 1
 		DebugPart.CanCollide = false
 		DebugPart.Anchored = true

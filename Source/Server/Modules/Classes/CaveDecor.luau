@@ -8,7 +8,7 @@ local TroveClass = require(ReplicatedStorage.Packages.trove)
 
 local MineService
 
-function CaveDecorClass.New(DecorModel: Model, InitialPosition: Vector3)
+function CaveDecorClass.New(DecorModel: Model, InitialPosition: Vector3, Tint: Color3)
 	if MineService == nil then
 		MineService = Knit.GetService("MineService")
 	end
@@ -32,10 +32,44 @@ function CaveDecorClass.New(DecorModel: Model, InitialPosition: Vector3)
 	self.Model.Parent = workspace
 	self.Model:PivotTo(CFrame.new(InitialPosition))
 
+	self:SnapToGround(Tint)
+
 	return self
 end
 
-function CaveDecorClass:SnapToGround()
+function CaveDecorClass:_FindAttachedStone()
+	if self.Model then
+		local Model = self.Model :: Model
+		local HitBox = Model.PrimaryPart
+		local BoundsSize = HitBox.Size
+		local BoundsCFrame = HitBox.CFrame
+
+		local PositionCFrame = BoundsCFrame - Vector3.new(0, BoundsSize.Y / 2, 0)
+
+		local Params = OverlapParams.new()
+		Params.FilterDescendantsInstances = { workspace.Game.Mine }
+		Params.FilterType = Enum.RaycastFilterType.Include
+
+		local Parts = workspace:GetPartBoundsInBox(PositionCFrame, Vector3.new(BoundsSize.X, 7, BoundsSize.Z), Params)
+
+		for i, Block: Part in pairs(Parts) do
+			if Block.CFrame.Position.Y > PositionCFrame.Position.Y then
+				table.remove(Parts, i)
+				continue
+			end
+
+			local Destroy = Block.Destroying:Connect(function()
+				self:Destroy()
+			end)
+
+			self._Trove:Add(Destroy)
+		end
+	else
+		warn("No model")
+	end
+end
+
+function CaveDecorClass:SnapToGround(Tint: Color3)
 	local Model = self.Model
 	local Hitbox = Model:FindFirstChild("Hitbox") :: Part
 
@@ -102,10 +136,14 @@ function CaveDecorClass:SnapToGround()
 		end
 	end
 
+	self:_RandomizeModelRotation()
+	self:_FindAttachedStone()
+	self:_ApplyStoneColors(Tint)
+
 	return Model
 end
 
-function CaveDecorClass:RandomizeModelRotation()
+function CaveDecorClass:_RandomizeModelRotation()
 	if self.Model and self.Model.PrimaryPart then
 		local NumberGenerator = MineService:GetRandomObject()
 		local Model = self.Model :: Model
@@ -114,7 +152,7 @@ function CaveDecorClass:RandomizeModelRotation()
 	end
 end
 
-function CaveDecorClass:ApplyStoneColors(Tint: Color3)
+function CaveDecorClass:_ApplyStoneColors(Tint: Color3)
 	if self.Model and self.Model.PrimaryPart then
 		local NumberGenerator = MineService:GetRandomObject()
 

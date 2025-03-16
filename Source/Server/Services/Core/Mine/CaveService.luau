@@ -28,12 +28,7 @@ function CaveService:GetModelByName(Name: string)
 end
 
 function CaveService:PlaceCaveDecor(OriginalModel: Model, InitialPosition: Vector3, Tint: Color3)
-	local CaveDecor = CaveDecorClass.New(OriginalModel, InitialPosition)
-	CaveDecor:SnapToGround()
-	if CaveDecor then
-		CaveDecor:RandomizeModelRotation()
-		CaveDecor:ApplyStoneColors(Tint)
-	end
+	CaveDecorClass.New(OriginalModel, InitialPosition, Tint)
 end
 
 --[=[
