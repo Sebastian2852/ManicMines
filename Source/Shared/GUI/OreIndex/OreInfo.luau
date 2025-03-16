@@ -1,10 +1,70 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
+local GraphModule = require(ReplicatedStorage.Packages.GraphModule)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local OreInfo = Roact.PureComponent:extend("OreInfo")
 
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
+
+function OreInfo:init()
+	self.GraphFrameRef = Roact.createRef()
+end
+
+-- Function to calculate rarity using the same logic as MineService
+local function CalculateRarity(OreSpawningRange, NormalRarity, Depth, Curve)
+	local NormalDepth = (Depth - OreSpawningRange.Min) / (OreSpawningRange.Max - OreSpawningRange.Min)
+	local Rarity = Core.Util:EvaluateNumberSequence(Curve, NormalDepth)
+
+	local AdjustedRarity = 0
+
+	if Rarity <= 0 then
+		AdjustedRarity = math.huge
+	elseif Rarity >= 1 then
+		AdjustedRarity = 1
+	else
+		local x = 1 - (Rarity * 2)
+		AdjustedRarity = NormalRarity ^ x
+	end
+
+	return AdjustedRarity
+end
+
+function OreInfo:componentDidUpdate()
+	local Frame = self.GraphFrameRef.current :: Frame?
+	if not Frame then
+		return
+	end
+
+	local Block = self.props.Block
+	if not Block then
+		return
+	end
+
+	Frame:ClearAllChildren()
+
+	-- Extract ore attributes
+	local SpawningRange: NumberRange = Block:GetAttribute("SpawningRange")
+	local NormalRarity = Block:GetAttribute("Rarity")
+	local SpawningCurve = Block:GetAttribute("SpawningCurve")
+
+	-- Generate data points for the graph
+	local DepthRange = {}
+	local Step = (SpawningRange.Max - SpawningRange.Min) / 50 -- 50 data points
+	for Depth = SpawningRange.Min, SpawningRange.Max, Step do
+		local RarityValue = CalculateRarity(SpawningRange, NormalRarity, Depth, SpawningCurve)
+		table.insert(DepthRange, RarityValue)
+	end
+
+	-- Create and configure the graph
+	local GraphHandler = GraphModule.new(Frame)
+	GraphHandler.Resolution = 50
+	GraphHandler.BaselineZero = true
+	GraphHandler.Data = {
+		Rarity = DepthRange,
+	}
+end
 
 function OreInfo:render()
 	local Block = self.props.Block
@@ -35,7 +95,7 @@ function OreInfo:render()
 		}, {}),
 
 		OreHeader = Roact.createElement("TextLabel", {
-			Size = UDim2.fromScale(1, 0.15),
+			Size = UDim2.fromScale(1, 0.125),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 1,
@@ -99,7 +159,7 @@ function OreInfo:render()
 		}),
 
 		RarityHeader = Roact.createElement("TextLabel", {
-			Size = UDim2.fromScale(1, 0.125),
+			Size = UDim2.fromScale(1, 0.1),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 3,
@@ -112,25 +172,13 @@ function OreInfo:render()
 		}, {}),
 
 		RarityGraph = Roact.createElement("Frame", {
-			Size = UDim2.fromScale(1, 0.4),
+			Size = UDim2.fromScale(1, 0.5),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 4,
-		}, {
-			WipLabel = Roact.createElement("TextLabel", {
-				Size = UDim2.fromScale(1, 0.5),
-				Position = UDim2.fromScale(0, 0.5),
-				AnchorPoint = Vector2.new(0, 0.5),
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
 
-				Text = "[RARITY GRAPH]<br />Work in progress",
-				TextScaled = true,
-				RichText = true,
-				TextColor3 = Theme.TextDisabledColor,
-				FontFace = Theme.Font,
-			}, {}),
-		}),
+			[Roact.Ref] = self.GraphFrameRef,
+		}, {}),
 	})
 end
 

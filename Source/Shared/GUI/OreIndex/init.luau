@@ -231,7 +231,7 @@ function OreIndex:render()
 			BorderSizePixel = 0,
 		}, {
 			OreInfo = Roact.createElement("Frame", {
-				Size = UDim2.fromScale(0.2, 0.3),
+				Size = UDim2.fromScale(0.2, 0.4),
 				Position = UDim2.new(1, -10, 0.5, 0),
 				AnchorPoint = Vector2.new(1, 0.5),
 				BackgroundColor3 = Theme.BackgroundColor,
