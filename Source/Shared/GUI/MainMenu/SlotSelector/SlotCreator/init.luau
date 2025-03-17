@@ -5,9 +5,10 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local SlotCreator = Roact.Component:extend("SlotCreator")
 
+local BooleanSetting = require(ReplicatedStorage.Game.GUI.MainMenu.SlotSelector.SlotCreator.BooleanSlotSetting)
 local NameTextBox = require(script.NameTextBox)
 local RandomButton = require(script.RandomButton)
-local Theme = require(script.Parent.Parent.Parent.Theme)
+local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
 local MainMenuController
 
@@ -15,9 +16,17 @@ function SlotCreator:init()
 	MainMenuController = Knit.GetController("MainMenuController")
 end
 
+function SlotCreator:didMount()
+	self:setState({
+		Tutorial = true,
+		SlotName = "",
+	})
+end
+
 function SlotCreator:render()
 	local SlotID = self.props.SlotID
 	local SlotName = self.state.SlotName
+	local Tutorial = self.state.Tutorial
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
@@ -131,9 +140,9 @@ function SlotCreator:render()
 				}, {
 					Input = Roact.createElement(NameTextBox, {
 						TextChanged = function(NewText)
-							self:setState {
+							self:setState({
 								SlotName = NewText,
-							}
+							})
 						end,
 
 						Text = self.state.SlotName,
@@ -144,20 +153,63 @@ function SlotCreator:render()
 					LayoutOrder = 2,
 					OnClick = function()
 						local RandomName = MainMenuController:PickRandomName()
-						self:setState {
+						self:setState({
 							SlotName = RandomName,
-						}
+						})
 					end,
 				}, {}),
 			}),
 		}),
 
-		Padding = Roact.createElement("Frame", {
+		SlotSettings = Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 0.5),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 3,
-		}, {}),
+		}, {
+			Title = Roact.createElement("TextLabel", {
+				Size = UDim2.fromScale(1, 0.12),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = 1,
+
+				Text = "Slot Settings",
+				TextScaled = true,
+				TextColor3 = Theme.TextColor,
+				FontFace = Theme.Font,
+			}, {}),
+
+			Settings = Roact.createElement("Frame", {
+				Size = UDim2.fromScale(1, 0.88),
+				Position = UDim2.fromScale(0, 0.12),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+			}, {
+				Layout = Roact.createElement("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+				}, {}),
+
+				Padding = Roact.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 10),
+					PaddingBottom = UDim.new(0, 10),
+					PaddingLeft = UDim.new(0, 10),
+					PaddingRight = UDim.new(0, 10),
+				}, {}),
+
+				Tutorial = Roact.createElement(BooleanSetting, {
+					InitialValue = true,
+					DisplayName = "Tutorial",
+					Description = "Enable the tutorial for this slot",
+					LayoutOrder = 1,
+					OnToggle = function(New: boolean)
+						print("On toggle", New)
+						self:setState({
+							Tutorial = New,
+						})
+					end,
+				}, {}),
+			}),
+		}),
 
 		BottomBar = Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 0.1),
@@ -189,7 +241,7 @@ function SlotCreator:render()
 
 				[Roact.Event.MouseButton1Click] = function()
 					Theme.PlaySound(Theme.RawAudio.ButtonClick)
-					local SlotSettings = MainMenuController:CreateSlotSettings(SlotName)
+					local SlotSettings = MainMenuController:CreateSlotSettings(SlotName, Tutorial)
 					MainMenuController:CreateSlot(SlotID, SlotSettings)
 				end,
 			}, {

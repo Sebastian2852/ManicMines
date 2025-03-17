@@ -36,6 +36,7 @@ export type DataFolder = {
 	Level: IntValue,
 	Gold: IntValue,
 	TycoonName: StringValue,
+	TutorialStage: NumberValue,
 
 	InMine: BoolValue,
 	InTycoon: BoolValue,

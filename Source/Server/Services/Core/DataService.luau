@@ -282,6 +282,8 @@ function DataService:LoadPlayerData(Player: Player, Slot: DataStore)
 		end
 	end
 
+	LogService:Log("Tutorial Stage:", DataFolder.TutorialStage.Value)
+
 	PlayerStatsService:CalculateInventoryCapacity(DataFolder)
 	task.spawn(function()
 		task.wait(1)
@@ -450,6 +452,7 @@ function DataService:NewSlot(Player: Player, SlotNumber: number, SlotSettings: C
 
 	local PlayerData = RootDataFolder:WaitForChild(tostring(Player.UserId))
 	PlayerData.TycoonName.Value = SlotSettings.Name or "[INVALID SLOT DATA]"
+	PlayerData.TutorialStage.Value = SlotSettings.Tutorial == true and 0 or -2
 
 	self.Players[Player.UserId] = AsDataStore
 	LoadingService:StartLoading(Player)

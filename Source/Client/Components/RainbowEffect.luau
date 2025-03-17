@@ -64,11 +64,11 @@ local DataService
 local DataFolder: Core.DataFolder
 
 -- Main component stuff
-local RainbowEffectComponent = Component.new {
+local RainbowEffectComponent = Component.new({
 	Tag = "Component/Effect/Rainbow",
 	Ancestors = { workspace },
 	Extensions = Extensions,
-}
+})
 
 function RainbowEffectComponent:Construct()
 	DataService = Knit.GetService("DataService")

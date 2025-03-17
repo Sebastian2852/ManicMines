@@ -55,11 +55,11 @@ function MainMenuController:LoadSlot(SlotNumber: number)
 	self:Close()
 end
 
-function MainMenuController:CreateSlotSettings(Name: string): Core.SaveSlotSettings
+function MainMenuController:CreateSlotSettings(Name: string, Tutorial: boolean): Core.SaveSlotSettings
 	local Settings: Core.SaveSlotSettings = {}
 
 	Settings.Name = Name or self:PickRandomName()
-	Settings.Tutorial = false
+	Settings.Tutorial = Tutorial
 
 	return Settings
 end

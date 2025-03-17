@@ -219,6 +219,9 @@
           "TycoonName": {
             "$className": "StringValue"
           },
+          "TutorialStage":{
+            "$className":"NumberValue"
+          },
           "LastVersionPlayed": {
             "$className":"StringValue"
           },
