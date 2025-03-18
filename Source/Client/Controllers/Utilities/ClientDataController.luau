@@ -7,6 +7,7 @@ local ClientDataController = Knit.CreateController({
 	Name = "ClientDataController",
 })
 
+local DataService
 ClientDataController.DataFolder = nil
 
 function ClientDataController:GetDataFolder(): Core.DataFolder
@@ -83,6 +84,21 @@ function ClientDataController:GetTimesMinedForOre(OreName: string): number
 	end
 
 	return DataValue.Value
+end
+
+function ClientDataController:AdvanceTutorialStage()
+	local DataFolder = self:GetDataFolder()
+	DataFolder.TutorialStage.Value += 1
+	DataService:AdvanceTutorialStage()
+end
+
+function ClientDataController:GetTutorialStage()
+	local DataFolder = self:GetDataFolder()
+	return DataFolder.TutorialStage.Value
+end
+
+function ClientDataController:KnitStart()
+	DataService = Knit.GetService("DataService")
 end
 
 return ClientDataController
