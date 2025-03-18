@@ -40,7 +40,7 @@ function Tutorial:render()
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 		}, {
-			App = Roact.createElement(StageGUIContent),
+			App = StageGUIContent and Roact.createElement(StageGUIContent),
 		}),
 	})
 end
