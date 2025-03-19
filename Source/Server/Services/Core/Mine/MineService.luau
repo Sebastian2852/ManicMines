@@ -508,6 +508,11 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 					PlayerWhoMined,
 					Core.OreList.CreateFromOre(Block.Name, Block:GetAttribute("AmountDroppedWhenMined"))
 				)
+
+				local DataFolder = ReplicatedStorage.PlayerData:FindFirstChild(PlayerWhoMined.UserId) :: Core.DataFolder
+				if DataFolder.TutorialStage.Value == 2 then
+					DataFolder.TutorialStage.Value = 3
+				end
 			end
 			Block:Destroy()
 		end)

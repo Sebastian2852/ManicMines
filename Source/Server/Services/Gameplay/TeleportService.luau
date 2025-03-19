@@ -164,6 +164,13 @@ function TeleportService.Client:TeleportToSurface(Player: Player)
 end
 
 function TeleportService.Client:TeleportToTycoon(Player: Player)
+	task.spawn(function()
+		task.wait(1)
+		local DataFolder = DataService:GetPlayerDataFolder(Player) :: Core.DataFolder
+		if DataFolder.TutorialStage.Value == 3 then
+			DataFolder.TutorialStage.Value = 4
+		end
+	end)
 	self.Server:TeleportPlayerToTycoon(Player, nil, true)
 end
 
