@@ -581,9 +581,9 @@ function DataService.Client:GetOtherPlayerStats(_, Player: Player)
 	return self:GetPlayerDataFolder(Player)
 end
 
-function DataService.Client:AdvanceTutorialStage(Player: Player)
+function DataService.Client:SetTutorialStage(Player: Player, New: number)
 	local DataFolder = self:GetPlayerDataFolder(Player)
-	DataFolder.TutorialStage.Value += 1
+	DataFolder.TutorialStage.Value = New
 end
 
 --[[ KNIT ]]

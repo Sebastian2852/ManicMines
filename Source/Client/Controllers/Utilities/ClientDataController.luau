@@ -88,8 +88,12 @@ end
 
 function ClientDataController:AdvanceTutorialStage()
 	local DataFolder = self:GetDataFolder()
-	DataFolder.TutorialStage.Value += 1
-	DataService:AdvanceTutorialStage()
+	local NewValue = DataFolder.TutorialStage.Value + 1
+	self:SetTutorialStage(NewValue)
+end
+
+function ClientDataController:SetTutorialStage(New: number)
+	DataService:SetTutorialStage(New)
 end
 
 function ClientDataController:GetTutorialStage()
