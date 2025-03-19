@@ -24,7 +24,11 @@ local NumberGenerator = Random.new()
 -- [[ PUBLIC ]] --
 
 function CaveService:GetModelByName(Name: string)
-	return ReplicatedStorage.Assets.Caves.CaveDecorModels:FindFirstChild(Name)
+	local Model = ReplicatedStorage.Assets.Caves.CaveDecorModels:FindFirstChild(Name)
+	if Model == nil then
+		warn(`{Name} is not a valid cave decor name`)
+	end
+	return Model
 end
 
 function CaveService:PlaceCaveDecor(OriginalModel: Model, InitialPosition: Vector3, Tint: Color3)
@@ -160,6 +164,10 @@ function CaveService:GenerateCaveAsync(
 									task.wait(3)
 									local RandomDecorIndex = math.random(1, #DecorValues)
 									local RandomValue = DecorValues[RandomDecorIndex]
+
+									if self:GetModelByName(RandomValue.Name) == nil then
+										return
+									end
 
 									if math.random(1, RandomValue.Value) == 1 then
 										self:PlaceCaveDecor(

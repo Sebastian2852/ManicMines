@@ -4,6 +4,7 @@ CaveDecorClass.__index = CaveDecorClass
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Promise = require(ReplicatedStorage.Packages.Promise)
 local TroveClass = require(ReplicatedStorage.Packages.trove)
 
 local MineService
@@ -174,9 +175,16 @@ function CaveDecorClass:_ApplyStoneColors(Tint: Color3)
 end
 
 function CaveDecorClass:_Destroy()
-	self._Trove:Destroy()
-	table.clear(self)
-	self = nil
+	return Promise.new(function()
+		local Module = self.Model:FindFirstChildWhichIsA("ModuleScript")
+		if Module then
+			require(Module)(MineService)
+		end
+
+		self._Trove:Destroy()
+		table.clear(self)
+		self = nil
+	end)
 end
 
 function CaveDecorClass:Destroy()
