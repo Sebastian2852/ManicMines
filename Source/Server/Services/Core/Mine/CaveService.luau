@@ -313,7 +313,7 @@ function CaveService:KnitStart()
 		self:GenerateRandomCave(NewPosition)
 	end)
 
-	if _G.DEBUG then
+	if RunService:IsStudio() then
 		task.wait(5)
 		local Generated = 0
 
