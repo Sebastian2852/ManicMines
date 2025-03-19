@@ -34,6 +34,7 @@ function Tutorial:render()
 		ResetOnSpawn = false,
 		DisplayOrder = 10,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+		IgnoreGuiInset = true,
 	}, {
 		Container = Roact.createElement("Frame", {
 			Size = UDim2.fromScale(1, 1),

@@ -1,6 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Signals = require(ReplicatedStorage.Game.GUI.Signals)
 
 local TutoriaController = Knit.CreateController({
 	Name = "TutorialController",
@@ -23,6 +26,10 @@ function TutoriaController:ApplyCurrentStage()
 			Roact.unmount(GUITree)
 			GUITree = nil
 		end
+		Signals.ToggleHUDButtons:Fire(true)
+		Signals.ToggleHotbar:Fire(true)
+		Signals.ToggleHUDGold:Fire(true)
+		Signals.ToggleInventory:Fire(true)
 		return
 	end
 end
@@ -34,11 +41,11 @@ function TutoriaController:KnitStart()
 	DataService.DataLoaded:Connect(function()
 		local CurrentStage = ClientDataController:GetTutorialStage()
 		if CurrentStage == -2 or CurrentStage == -1 then
-			print("Tutorial finished or skipped")
 			return
 		end
 
 		local GUI = require(ReplicatedStorage.Game.GUI.Tutorial)
+		task.wait(1)
 		GUITree = Roact.mount(
 			Roact.createElement(GUI, {
 				DataFolder = ClientDataController:GetDataFolder(),
@@ -47,7 +54,10 @@ function TutoriaController:KnitStart()
 			"Tutorial"
 		)
 
-		print("Tutorial time!")
+		local DataFolder = ClientDataController:GetDataFolder() :: Core.DataFolder
+		DataFolder.TutorialStage:GetPropertyChangedSignal("Value"):Connect(function()
+			self:ApplyCurrentStage()
+		end)
 	end)
 end
 
