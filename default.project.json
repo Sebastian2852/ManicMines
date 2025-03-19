@@ -124,6 +124,9 @@
             }
           }
         },
+        "Tutorial": {
+          "$className":"Folder"
+        },
         "Stone": {
           "$className": "Part"
         }

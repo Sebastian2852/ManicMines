@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local TeleportService = Knit.CreateService({
@@ -152,6 +153,13 @@ end
 Teleport the current player to the surface
 ]=]
 function TeleportService.Client:TeleportToSurface(Player: Player)
+	task.spawn(function()
+		task.wait(1)
+		local DataFolder = DataService:GetPlayerDataFolder(Player) :: Core.DataFolder
+		if DataFolder.TutorialStage.Value == 1 then
+			DataFolder.TutorialStage.Value = 2
+		end
+	end)
 	self.Server:TeleportPlayerToSurface(Player)
 end
 

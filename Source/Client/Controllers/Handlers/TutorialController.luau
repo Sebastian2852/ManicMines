@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -12,6 +13,7 @@ local TutoriaController = Knit.CreateController({
 local ClientDataController
 local DataService
 
+local ActiveTutorialFolder = nil
 local GUITree = nil
 
 function TutoriaController:AdvanceStage()
@@ -20,6 +22,10 @@ end
 
 function TutoriaController:ApplyCurrentStage()
 	local CurrentStage = ClientDataController:GetTutorialStage()
+
+	if ActiveTutorialFolder ~= nil then
+		ActiveTutorialFolder:Destroy()
+	end
 
 	if CurrentStage < 0 then
 		if GUITree then
@@ -31,6 +37,12 @@ function TutoriaController:ApplyCurrentStage()
 		Signals.ToggleHUDGold:Fire(true)
 		Signals.ToggleInventory:Fire(true)
 		return
+	end
+
+	local StageFolder = ReplicatedStorage.Assets.Tutorial:FindFirstChild(CurrentStage)
+	if StageFolder then
+		ActiveTutorialFolder = StageFolder:Clone()
+		ActiveTutorialFolder.Parent = Workspace
 	end
 end
 
