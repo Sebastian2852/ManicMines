@@ -1,12 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local StorageController = Knit.CreateController({ Name = "StorageController" })
 
 local StorageService
-local LogService
 
 local ActiveGUI = nil
 
@@ -21,7 +21,7 @@ function StorageController:OpenGUI()
 		end,
 	})
 	ActiveGUI = Roact.mount(App, Knit.Player.PlayerGui, "Storage")
-	LogService:Log("Mounted storage component")
+	Logger:Log("Mounted storage component")
 end
 
 function StorageController:CloseGUI()
@@ -34,7 +34,6 @@ end
 -- [[ KNIT ]] --
 
 function StorageController:KnitStart()
-	LogService = Knit.GetService("LogService")
 	StorageService = Knit.GetService("StorageService")
 
 	StorageService.OpenStorage:Connect(function()

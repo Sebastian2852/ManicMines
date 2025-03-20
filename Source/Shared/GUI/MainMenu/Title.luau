@@ -1,17 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local Theme = require(script.Parent.Parent.Theme)
-
 local Title = Roact.Component:extend("Title")
+
+local Theme = require(script.Parent.Parent.Theme)
 
 function Title:render()
 	local GameName = self.props.GameName or "[GAME NAME]"
 	local UpdateName = self.props.UpdateName or "[UPDATE NAME]"
-
-	if _G.DEBUG then
-		UpdateName = UpdateName .. " <font color='rgb(255, 0, 0)'>- DEBUG VERSION</font>"
-	end
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),

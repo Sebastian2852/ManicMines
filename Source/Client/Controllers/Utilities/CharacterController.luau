@@ -2,10 +2,9 @@ local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
-local CharacterController = Knit.CreateController { Name = "CharacterController" }
-
-local LogService
+local CharacterController = Knit.CreateController({ Name = "CharacterController" })
 
 local FREEZE_ACTION = "FreezeAction"
 
@@ -15,7 +14,7 @@ local FREEZE_ACTION = "FreezeAction"
 Disables the player's movement
 ]=]
 function CharacterController:DisableMovement()
-	LogService:Log("Disabling movement")
+	Logger:Log("Disabling movement")
 	ContextActionService:BindAction(FREEZE_ACTION, function()
 		return Enum.ContextActionResult.Sink
 	end, false, unpack(Enum.PlayerActions:GetEnumItems()))
@@ -25,14 +24,8 @@ end
 Enables the player's movement
 ]=]
 function CharacterController:EnableMovement()
-	LogService:Log("Enabling movement")
+	Logger:Log("Enabling movement")
 	ContextActionService:UnbindAction(FREEZE_ACTION)
-end
-
--- [[ KNIT ]] --
-
-function CharacterController:KnitStart()
-	LogService = Knit.GetService("LogService")
 end
 
 return CharacterController

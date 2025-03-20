@@ -1,10 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local TycoonService
-local LogService
 local DataService
 
 local DataFolder
@@ -24,7 +24,7 @@ function SelectionUIController:Deselect()
 	if not CurrentlySelectingTycoon then
 		return
 	end
-	LogService:Log("Deselecting upgrade hitbox")
+	Logger:Log("Deselecting upgrade hitbox")
 	if CurrentTycoonOutline then
 		CurrentTycoonOutline:Destroy()
 	end
@@ -43,7 +43,7 @@ Selectes a given hitbox by giving it an outline, if anything is already selected
 automatically deslect it
 ]=]
 function SelectionUIController:SelectTycoonHitbox(Hitbox: BasePart)
-	LogService:Log("Selecting upgrade hitbox")
+	Logger:Log("Selecting upgrade hitbox")
 	if CurrentlySelectingTycoon then
 		self:Deselect()
 	end
@@ -80,14 +80,13 @@ function SelectionUIController:SelectTycoonHitbox(Hitbox: BasePart)
 	CurrentTycoonOutline = New
 	TycoonSelection = Hitbox
 	CurrentlySelectingTycoon = true
-	LogService:Log("Selected upgrade hitbox: " .. Hitbox.Name)
+	Logger:Log("Selected upgrade hitbox: " .. Hitbox.Name)
 end
 
 --[[ KNIT ]]
 
 function SelectionUIController:KnitStart()
 	TycoonService = Knit.GetService("TycoonService")
-	LogService = Knit.GetService("LogService")
 	DataService = Knit.GetService("DataService")
 
 	DataService.DataLoaded:Connect(function(Data)

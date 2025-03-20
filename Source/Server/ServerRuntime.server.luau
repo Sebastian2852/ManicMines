@@ -7,12 +7,6 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 
 -- Game
 local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
-local Tests = require(ReplicatedStorage.Game.Tests)
-
--- [[ TESTING / STUDIO ONLY ]] --
-if _G.DEBUG then
-	Tests:RunTests()
-end
 
 -- [[ KNIT ]] --
 

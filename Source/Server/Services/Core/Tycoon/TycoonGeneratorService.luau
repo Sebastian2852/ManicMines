@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
@@ -13,7 +14,6 @@ local TycoonGeneratorService = Knit.CreateService({
 	Client = {},
 })
 
-local LogService
 local DataService
 local TycoonService
 local TycoonUpgradeService
@@ -90,14 +90,14 @@ function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon: Model, Owner:
 		end
 
 		for _, GeneratorPart: BasePart in pairs(GeneratorsFolder:GetChildren()) do
-			LogService:Log("Setting up generator: " .. GeneratorPart:GetFullName())
+			Logger:Log("Setting up generator: " .. GeneratorPart:GetFullName())
 
 			GeneratorPart.Anchored = true
 			GeneratorPart.CanCollide = false
 
 			local GeneratorConfig: Configuration = Core.Assets.Tycoon.Generators:FindFirstChild(GeneratorPart.Name)
 			if not GeneratorConfig then
-				LogService:Warn("No config found for generator: " .. GeneratorPart:GetFullName())
+				Logger:Warn("No config found for generator: " .. GeneratorPart:GetFullName())
 				continue
 			end
 
@@ -105,14 +105,12 @@ function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon: Model, Owner:
 			local Currency = GeneratorConfig:GetAttribute("Currency") :: string
 
 			if not TycoonUpgradeService:ValidUpgradeName(UpgradeName) then
-				LogService:Warn(
-					"Invalid upgrade name: " .. UpgradeName .. " for config: " .. GeneratorConfig:GetFullName()
-				)
+				Logger:Warn("Invalid upgrade name: " .. UpgradeName .. " for config: " .. GeneratorConfig:GetFullName())
 				continue
 			end
 
 			if not DataFolder:FindFirstChild(Currency) then
-				LogService:Warn(
+				Logger:Warn(
 					"Invalid currency name: "
 						.. Currency
 						.. " for config: "
@@ -126,7 +124,7 @@ function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon: Model, Owner:
 			self:AddFunctionality(GeneratorPart, GeneratorConfig, DataFolder)
 
 			task.spawn(function()
-				LogService:Log("[" .. Owner.Name .. "]", "Starting generator loop")
+				Logger:Log("[" .. Owner.Name .. "]", "Starting generator loop")
 				while true do
 					if not TycoonService:GetTycoonOwner(Tycoon) then
 						break
@@ -147,12 +145,12 @@ function TycoonGeneratorService:AddGeneratorsToTycoonAsync(Tycoon: Model, Owner:
 					task.wait(TickRate)
 
 					DataValue.Value += Amount
-					LogService:Log(
+					Logger:Log(
 						"[" .. Owner.Name .. "]",
 						"Added " .. tostring(Amount) .. " value to generator: " .. DataValue.Name
 					)
 				end
-				LogService:Log("[" .. Owner.Name .. "]", "Finished generator loop")
+				Logger:Log("[" .. Owner.Name .. "]", "Finished generator loop")
 			end)
 		end
 	end)
@@ -161,7 +159,6 @@ end
 -- [[ KNIT ]] --
 
 function TycoonGeneratorService:KnitStart()
-	LogService = Knit.GetService("LogService")
 	TycoonService = Knit.GetService("TycoonService")
 	DataService = Knit.GetService("DataService")
 	TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")

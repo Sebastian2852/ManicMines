@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
 local TycoonAssets = ReplicatedStorage.Assets.Tycoon
 local Tycoons = workspace.Game.Tycoons
@@ -14,7 +15,6 @@ local TycoonService = Knit.CreateService({
 	},
 })
 
-local LogService
 local DataService
 local TeleportService
 local AdminService
@@ -71,7 +71,7 @@ function TycoonService:GetPlayerTycoon(Player: Player): Model?
 		return FoundTycoon
 	end
 
-	LogService:Warn("Couldnt find " .. Player.Name .. "'s tycoon")
+	Logger:Warn("Couldnt find " .. Player.Name .. "'s tycoon")
 	return nil
 end
 
@@ -86,7 +86,7 @@ Create a tycoon for the player and put it in workspace. Then setup an event so w
 spawns they get teleported to their tycoon spawn instead of the SpawnLocation.
 ]=]
 function TycoonService:CreateTycoonForPlayer(Player: Player): Model
-	LogService:Assert(not self:DoesPlayerHaveTycoon(Player), "Player already has tycoon?")
+	Logger:Assert(not self:DoesPlayerHaveTycoon(Player), "Player already has tycoon?")
 
 	TycoonsAmount += 1
 	local NewTycoon = TycoonAssets.TycoonModel:Clone()
@@ -124,7 +124,7 @@ function TycoonService:CreateTycoonForPlayer(Player: Player): Model
 		end)
 	end
 
-	LogService:Log("Created " .. Player.Name .. "'s tycoon")
+	Logger:Log("Created " .. Player.Name .. "'s tycoon")
 	return NewTycoon
 end
 
@@ -137,7 +137,7 @@ function TycoonService:DeletePlayerTycoon(Player: Player)
 		return
 	end
 	Tycoon:Destroy()
-	LogService:Log("Delted " .. Player.Name .. "'s tycoon")
+	Logger:Log("Delted " .. Player.Name .. "'s tycoon")
 end
 
 --[[ CLIENT ]]
@@ -170,7 +170,7 @@ end
 
 function TycoonService.Client:SetUpgradeValue(Setter: Player, Player: Player, UpgradeName: string, Value: number)
 	if not AdminService:IsPlayerAdmin(Setter) then
-		LogService:Warn("User is not an admin!")
+		Logger:Warn("User is not an admin!")
 		return
 	end
 	if not AdminService:GetAdminPermissions(Setter).EditTycoonUpgrades then
@@ -182,7 +182,7 @@ function TycoonService.Client:SetUpgradeValue(Setter: Player, Player: Player, Up
 
 	local UpgradeValue = PlayerData.Tycoon.Upgrades:FindFirstChild(UpgradeName)
 	if not UpgradeValue then
-		LogService:Warn("Invalid upgrade name passed")
+		Logger:Warn("Invalid upgrade name passed")
 		return
 	end
 	UpgradeValue.Value = Value
@@ -192,7 +192,7 @@ end
 
 function TycoonService.Client:SetTycoonName(Setter: Player, Player: Player, Name: string)
 	if not AdminService:IsPlayerAdmin(Setter) then
-		LogService:Warn("User is not an admin!")
+		Logger:Warn("User is not an admin!")
 		return
 	end
 	if not AdminService:GetAdminPermissions(Setter).EditTycoonName then
@@ -217,10 +217,8 @@ end
 Some checks to make sure the game is ready for tycoons
 ]=]
 function TycoonService:KnitInit()
-	LogService = Knit.GetService("LogService")
-
 	if not TycoonsSpawn then
-		LogService:Warn("No tycoon spawn found, defaulting to 0,0,0")
+		Logger:Warn("No tycoon spawn found, defaulting to 0,0,0")
 		local New = Instance.new("Part")
 		New.Name = "TycoonsSpawn"
 		New.Position = Vector3.new(0, 0, 0)

@@ -3,14 +3,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 
-local HideService = Knit.CreateService {
+local HideService = Knit.CreateService({
 	Name = "HideService",
 	Client = {},
-}
+})
 
-local LogService
 local HideTag = "_Hide"
 
 --[[ PUBLIC ]]
@@ -36,12 +36,12 @@ function HideService:Hide(Object: BasePart | Decal | Light)
 		elseif Thing:IsA("Light") then
 			Thing.Enabled = false
 		else
-			LogService:Warn("Cannot hide " .. Core.Util:LogObjectString(Thing) .. " unsupported type")
+			Logger:Warn("Cannot hide " .. Core.Util:LogObjectString(Thing) .. " unsupported type")
 			continue
 		end
 
 		table.insert(self.HiddenObjects, Thing)
-		LogService:Log("Hidden " .. Core.Util:LogObjectString(Thing))
+		Logger:Log("Hidden " .. Core.Util:LogObjectString(Thing))
 	end
 end
 
@@ -49,8 +49,6 @@ end
 --
 
 function HideService:KnitStart()
-	LogService = Knit.GetService("LogService")
-
 	local Timer = Profiler.Timer.new("[HIDE SERVICE] Hide objects")
 	local Tagged = CollectionService:GetTagged(HideTag)
 

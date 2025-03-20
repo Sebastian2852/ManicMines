@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local LoadingController = Knit.CreateController({
@@ -9,7 +10,6 @@ local LoadingController = Knit.CreateController({
 })
 
 local LoadingService
-local LogService
 local HudController
 
 local LoadingScreen
@@ -26,7 +26,7 @@ function LoadingController:ShowGui(BigText: string?, SmallText: string?)
 		SmallText = SmallText,
 	}, {})
 	Tree = Roact.mount(App, Player.PlayerGui, "LoadingScreen")
-	LogService:Log("Mounted loading screen")
+	Logger:Log("Mounted loading screen")
 end
 
 function LoadingController:HideGui()
@@ -34,7 +34,7 @@ function LoadingController:HideGui()
 	HudController:EnableHotbar()
 	if Tree then
 		Roact.unmount(Tree)
-		LogService:Log("Unmounted loading screen")
+		Logger:Log("Unmounted loading screen")
 	end
 end
 
@@ -43,7 +43,6 @@ end
 
 function LoadingController:KnitStart()
 	LoadingService = Knit.GetService("LoadingService")
-	LogService = Knit.GetService("LogService")
 	HudController = Knit.GetController("HUDController")
 	LoadingScreen = require(ReplicatedStorage.Game.GUI.LoadingScreen)
 

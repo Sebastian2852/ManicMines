@@ -2,17 +2,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
-local SettingsService = Knit.CreateService {
+local SettingsService = Knit.CreateService({
 	Name = "SettingsService",
 	Client = {
 		UpdateSettings = Knit.CreateSignal(),
 		SettingsChanged = Knit.CreateSignal(),
 	},
-}
+})
 
 local DataService
-local LogService
 
 --[[ PRIVATE ]]
 --
@@ -21,7 +21,7 @@ local LogService
 Updates the given player's settings in their data folder with the given settings
 ]=]
 local function UpdateSettings(Player: Player, Settings: Core.Settings)
-	LogService:Log("Updating", Player.Name .. "'s", "settings")
+	Logger:Log("Updating", Player.Name .. "'s", "settings")
 	local PlayerData = DataService:GetPlayerDataFolder(Player)
 
 	for SettingName, SettingValue in pairs(Settings) do
@@ -33,7 +33,7 @@ end
 --
 
 function SettingsService:ResetPlayerSettings(Player: Player)
-	LogService:Log("Resetting player's settings to default")
+	Logger:Log("Resetting player's settings to default")
 	UpdateSettings(Player, Core.GameConfig.DefaultSettings)
 	self.Client.SettingsChanged:Fire(Player)
 end
@@ -50,7 +50,6 @@ end
 
 function SettingsService:KnitStart()
 	DataService = Knit.GetService("DataService")
-	LogService = Knit.GetService("LogService")
 end
 
 return SettingsService

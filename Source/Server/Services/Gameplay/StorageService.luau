@@ -2,16 +2,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
-local StorageService = Knit.CreateService {
+local StorageService = Knit.CreateService({
 	Name = "StorageService",
 	Client = {
 		OpenStorage = Knit.CreateSignal(),
 		Update = Knit.CreateSignal(),
 	},
-}
+})
 
-local LogService
 local DataService
 local PlayerStatsService
 
@@ -29,22 +29,22 @@ function StorageService:MoveOreToStorage(Player: Player, OreName: string, Amount
 
 	local InventoryDataValue = DataFolder.Inventory.Ores:FindFirstChild(OreName)
 	if not InventoryDataValue then
-		LogService:Warn("Couldnt find inventory data value for: " .. tostring(OreName))
+		Logger:Warn("Couldnt find inventory data value for: " .. tostring(OreName))
 		return false
 	end
 
 	local StorageDataValue = DataFolder.Storage.Ores:FindFirstChild(OreName)
 	if not StorageDataValue then
-		LogService:Warn("Couldnt find storage data value for: " .. tostring(OreName))
+		Logger:Warn("Couldnt find storage data value for: " .. tostring(OreName))
 		return false
 	end
 
 	if InventoryDataValue.Value < Amount then
-		LogService:Warn(Player.Name .. " tried to move " .. Amount .. " " .. OreName .. " but not enough in inventory")
+		Logger:Warn(Player.Name .. " tried to move " .. Amount .. " " .. OreName .. " but not enough in inventory")
 		return false
 	end
 
-	LogService:Log("Moved " .. Amount .. " " .. OreName .. " for player: " .. Player.Name)
+	Logger:Log("Moved " .. Amount .. " " .. OreName .. " for player: " .. Player.Name)
 	InventoryDataValue.Value -= Amount
 	StorageDataValue.Value += Amount
 	PlayerStatsService:CalculateInventoryCapacity(DataFolder)
@@ -64,22 +64,22 @@ function StorageService:MoveOreToInventory(Player: Player, OreName: string, Amou
 
 	local InventoryDataValue = DataFolder.Inventory.Ores:FindFirstChild(OreName)
 	if not InventoryDataValue then
-		LogService:Warn("Couldnt find inventory data value for: " .. tostring(OreName))
+		Logger:Warn("Couldnt find inventory data value for: " .. tostring(OreName))
 		return false
 	end
 
 	local StorageDataValue = DataFolder.Storage.Ores:FindFirstChild(OreName)
 	if not StorageDataValue then
-		LogService:Warn("Couldnt find storage data value for: " .. tostring(OreName))
+		Logger:Warn("Couldnt find storage data value for: " .. tostring(OreName))
 		return false
 	end
 
 	if StorageDataValue.Value < Amount then
-		LogService:Warn(Player.Name .. " tried to move " .. Amount .. " " .. OreName .. " but not enough in inventory")
+		Logger:Warn(Player.Name .. " tried to move " .. Amount .. " " .. OreName .. " but not enough in inventory")
 		return false
 	end
 
-	LogService:Log("Moved " .. Amount .. " " .. OreName .. " for player: " .. Player.Name)
+	Logger:Log("Moved " .. Amount .. " " .. OreName .. " for player: " .. Player.Name)
 	StorageDataValue.Value -= Amount
 	InventoryDataValue.Value += Amount
 	PlayerStatsService:CalculateInventoryCapacity(DataFolder)
@@ -126,7 +126,6 @@ end
 -- [[ KNIT ]] --
 
 function StorageService:KnitStart()
-	LogService = Knit.GetService("LogService")
 	DataService = Knit.GetService("DataService")
 	PlayerStatsService = Knit.GetService("PlayerStatsService")
 end

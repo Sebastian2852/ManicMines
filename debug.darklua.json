@@ -1,9 +1,0 @@
-{
-	"rules": [
-		{
-			"rule": "inject_global_value",
-			"identifier": "DEBUG",
-			"value": true
-		}
-	]
-}

@@ -8,7 +8,7 @@
     "$className": "DataModel",
     "ReplicatedStorage": {
       "Game": {
-        "$path": "Build/Shared",
+        "$path": "Source/Shared",
         "Tests": {
           "$path": "Tests"
         }
@@ -367,13 +367,13 @@
     },
     "ServerScriptService": {
       "Game": {
-        "$path": "Build/Server"
+        "$path": "Source/Server"
       }
     },
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "Game": {
-          "$path": "Build/Client"
+          "$path": "Source/Client"
         }
       }
     },

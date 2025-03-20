@@ -5,6 +5,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local CaveDecorClass = require(ServerScriptService.Game.Modules.Classes.CaveDecor)
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 local PerlinNoise = require(ServerScriptService.Game.Modules.PerlinNoise)
 local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -15,7 +16,6 @@ local CaveService = Knit.CreateService({
 })
 
 local MineService
-local LogService
 
 local BlockSize = Core.GameConfig.Mine.BlockSize
 
@@ -251,7 +251,7 @@ end
 Generates a cave from the given config at the given position
 ]=]
 function CaveService:GenerateCaveFromConfigAsync(CaveConfig: Configuration, Position: Vector3)
-	LogService:Log("Generating cave from config: " .. CaveConfig.Name)
+	Logger:Log("Generating cave from config: " .. CaveConfig.Name)
 	NumberGenerator = MineService:GetRandomObject()
 
 	local SizeRange = CaveConfig:GetAttribute("Size")
@@ -281,7 +281,7 @@ end
 Generates a random cave from a random config at the given position
 ]=]
 function CaveService:GenerateRandomCave(Position: Vector3)
-	LogService:Log("Generating new cave")
+	Logger:Log("Generating new cave")
 
 	Position = MineService:SnapPositionToGrid(Position)
 	local Depth = MineService:YLevelToDepth(Position.Y)
@@ -299,7 +299,6 @@ end
 
 function CaveService:KnitStart()
 	MineService = Knit.GetService("MineService")
-	LogService = Knit.GetService("LogService")
 
 	MineService.OnBlockMined:Connect(function(_, Position: Vector3)
 		NumberGenerator = MineService:GetRandomObject() :: Random
@@ -313,7 +312,7 @@ function CaveService:KnitStart()
 		self:GenerateRandomCave(NewPosition)
 	end)
 
-	if _G.DEBUG then
+	if RunService:IsStudio() then
 		task.wait(5)
 		local Generated = 0
 
@@ -322,7 +321,7 @@ function CaveService:KnitStart()
 				continue
 			end
 			Generated += 1
-			LogService:Log("Generateing test cave: " .. CaveConfig.Name)
+			Logger:Log("Generateing test cave: " .. CaveConfig.Name)
 			local Timer = Profiler.Timer.new("CaveGen")
 			self:GenerateCaveFromConfigAsync(CaveConfig, Vector3.new(500 * Generated, -500, 0)):await()
 			Timer:Stop()

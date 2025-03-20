@@ -2,10 +2,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
 local MusicController = Knit.CreateController({ Name = "MusicController" })
 
-local LogService
 local DataService
 local AudioEngine
 local SettingsService
@@ -24,7 +24,7 @@ Stops any active song playing
 ]=]
 function MusicController:StopActiveMusic()
 	if ActiveSong ~= nil then
-		LogService:Log("Stopping active song")
+		Logger:Log("Stopping active song")
 		AudioEngine:StopSound(ActiveSong)
 	end
 end
@@ -33,7 +33,7 @@ end
 Clears the songs in the queue that are meant to be played
 ]=]
 function MusicController:ClearQueue()
-	LogService:Log("Clearing song queue")
+	Logger:Log("Clearing song queue")
 	SongQueue:Clear()
 end
 
@@ -78,10 +78,10 @@ end
 Plays the next song; if no songs are in the queue and the config had songs then new queue is made
 ]=]
 function MusicController:PlayNextSong()
-	LogService:Log("Playing next song")
+	Logger:Log("Playing next song")
 	if SongQueue:IsEmpty() then
 		if HadSongs and CurrentFolder ~= nil then
-			LogService:Log("Refreshing song queue; end of queue")
+			Logger:Log("Refreshing song queue; end of queue")
 			self:PlayMusicFromFolder(CurrentFolder, UseSettingVolume)
 		else
 			return
@@ -96,7 +96,7 @@ function MusicController:PlayNextSong()
 	end
 
 	Song.OnFinish = function()
-		LogService:Log("Song finished")
+		Logger:Log("Song finished")
 		self:PlayNextSong(UseSettingVolume)
 	end
 
@@ -107,7 +107,6 @@ end
 
 function MusicController:KnitStart()
 	AudioEngine = Knit.GetController("AudioEngine")
-	LogService = Knit.GetService("LogService")
 	DataService = Knit.GetService("DataService")
 	SettingsService = Knit.GetService("SettingsService")
 
@@ -123,22 +122,22 @@ function MusicController:KnitStart()
 	end)
 
 	SettingsService.SettingsChanged:Connect(function()
-		LogService:Log("Settings updated, updating sound volume")
+		Logger:Log("Settings updated, updating sound volume")
 		UseSettingVolume = true
 
 		if not ActiveSong then
-			LogService:Warn("No active song")
+			Logger:Warn("No active song")
 			return
 		end
 
 		local CurrentSound = AudioEngine:GetSoundObject(ActiveSong) :: Sound
 		if not CurrentSound then
-			LogService:Warn("No current sound")
+			Logger:Warn("No current sound")
 			return
 		end
 
 		CurrentSound.Volume = DataFolder.Settings.MusicVolume.Value
-		LogService:Log("Updated volume of current song")
+		Logger:Log("Updated volume of current song")
 	end)
 end
 

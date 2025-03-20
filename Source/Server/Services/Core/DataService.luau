@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
 local DataService = Knit.CreateService({
 	Name = "DataService",
@@ -12,7 +13,6 @@ local DataService = Knit.CreateService({
 })
 
 local PickaxeService
-local LogService
 local TycoonService
 local PlayerDisplayService
 local PlayerStatsService
@@ -122,7 +122,7 @@ local function SetupTemplateDataFolder()
 
 	TemplateDataFolder.LastVersionPlayed.Value = Core.GameConfig.MainMenu.Version
 	TemplateDataFolder.VersionCreated.Value = Core.GameConfig.MainMenu.Version
-	LogService:Log("Setup template data folder")
+	Logger:Log("Setup template data folder")
 end
 
 --[=[
@@ -181,8 +181,8 @@ function DataService:SavePlayerData(Player: Player)
 
 	local DataFolder = self:GetPlayerDataFolder(Player)
 
-	LogService:Assert(DataFolder, "Tried saving data with No data folder")
-	LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
+	Logger:Assert(DataFolder, "Tried saving data with No data folder")
+	Logger:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
 	DataFolder.LastVersionPlayed.Value = Core.GameConfig.MainMenu.Version
 
@@ -190,13 +190,13 @@ function DataService:SavePlayerData(Player: Player)
 
 	local GeneralData = {}
 	GeneralData["LastPlayed"] = os.time()
-	LogService:Log("Saved general data: LastPlayed ~ " .. tostring(os.time()))
+	Logger:Log("Saved general data: LastPlayed ~ " .. tostring(os.time()))
 	for _, Value: ValueBase in pairs(DataFolder:GetChildren()) do
 		if not Value:IsA("ValueBase") then
 			continue
 		end
 		GeneralData[Value.Name] = Value.Value
-		LogService:Log("Saved general data: " .. Value.Name .. " - " .. tostring(Value.Value))
+		Logger:Log("Saved general data: " .. Value.Name .. " - " .. tostring(Value.Value))
 	end
 	local General = Core.Data.Data.New("General", GeneralData)
 	SaveData:AddData(General)
@@ -213,7 +213,7 @@ function DataService:SavePlayerData(Player: Player)
 			end
 			local Key = GetPathFromRoot(Folder, Value)
 			Data[Key] = Value.Value
-			LogService:Log("Saved data: " .. Key .. " - " .. tostring(Value.Value))
+			Logger:Log("Saved data: " .. Key .. " - " .. tostring(Value.Value))
 		end
 
 		local DataToAdd = Core.Data.Data.New(Folder.Name, Data)
@@ -231,8 +231,8 @@ function DataService:LoadPlayerData(Player: Player, Slot: DataStore)
 	self.Players[Player.UserId] = Slot
 	local DataFolder = self:GetPlayerDataFolder(Player)
 
-	LogService:Assert(DataFolder, "Tried loading data with No data folder")
-	LogService:Assert(IsSlotValid(Slot), "Invalid data slot passed")
+	Logger:Assert(DataFolder, "Tried loading data with No data folder")
+	Logger:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
 	LoadingService:StartLoading(Player)
 	LoadingService:UpdateActionText(Player, "Loading data")
@@ -256,13 +256,13 @@ function DataService:LoadPlayerData(Player: Player, Slot: DataStore)
 			local Value = DataFolder:FindFirstChild(ValueName)
 			if Value then
 				Value.Value = Data
-				LogService:Log("Loaded general data: " .. ValueName .. " - " .. tostring(Data))
+				Logger:Log("Loaded general data: " .. ValueName .. " - " .. tostring(Data))
 			else
-				LogService:Warn("Couldnt find value for: " .. ValueName .. "; discarding data")
+				Logger:Warn("Couldnt find value for: " .. ValueName .. "; discarding data")
 			end
 		end
 	else
-		LogService:Warn("No general data")
+		Logger:Warn("No general data")
 	end
 
 	for _, Folder: Folder in pairs(DataFolder:GetChildren()) do
@@ -275,14 +275,14 @@ function DataService:LoadPlayerData(Player: Player, Slot: DataStore)
 			local Instance = GetInstanceFromPath(DataFolder, Path)
 			if Instance then
 				Instance.Value = Value
-				LogService:Log("Loaded data: " .. Path .. " - " .. tostring(Value))
+				Logger:Log("Loaded data: " .. Path .. " - " .. tostring(Value))
 			else
-				LogService:Warn("Couldnt find value for: " .. Path .. "; discarding data")
+				Logger:Warn("Couldnt find value for: " .. Path .. "; discarding data")
 			end
 		end
 	end
 
-	LogService:Log("Tutorial Stage:", DataFolder.TutorialStage.Value)
+	Logger:Log("Tutorial Stage:", DataFolder.TutorialStage.Value)
 
 	PlayerStatsService:CalculateInventoryCapacity(DataFolder)
 	task.spawn(function()
@@ -328,7 +328,7 @@ function DataService:CreateDataFolderForPlayer(Player: Player): Core.DataFolder
 	DataFolder.Name = Player.UserId
 	DataFolder.Parent = RootDataFolder
 
-	LogService:Log("Created " .. Player.Name .. "'s data folder")
+	Logger:Log("Created " .. Player.Name .. "'s data folder")
 	return DataFolder
 end
 
@@ -342,7 +342,7 @@ function DataService:DeleteDataFolder(Player: Player): Core.DataFolder
 	local DataFolder = self:GetPlayerDataFolder(Player)
 	DataFolder:Destroy()
 
-	LogService:Log("Deleted " .. Player.Name .. "'s data folder")
+	Logger:Log("Deleted " .. Player.Name .. "'s data folder")
 	return DataFolder
 end
 
@@ -401,7 +401,7 @@ Turns a number into a data store from the save slots table, returns slot 1 data
 store if an invalid number is given
 ]=]
 function DataService:SlotNumberToDataStore(SlotNumber: number): DataStore
-	LogService:Assert(
+	Logger:Assert(
 		type(SlotNumber) == "number",
 		"'" .. type(SlotNumber) .. "' passed for 'SlotNumber', expected 'number'"
 	)
@@ -413,7 +413,7 @@ function DataService:SlotNumberToDataStore(SlotNumber: number): DataStore
 		return DataService.SaveSlots.Slot3
 	end
 
-	LogService:Warn("Invalid slot number", SlotNumber)
+	Logger:Warn("Invalid slot number", SlotNumber)
 	return DataService.SaveSlots.Slot1
 end
 
@@ -429,7 +429,7 @@ function DataService:SlotDataStoreToNumber(Slot: DataStore): number
 		return 3
 	end
 
-	LogService:Warn("Invalid slot data store", Slot)
+	Logger:Warn("Invalid slot data store", Slot)
 	return 1
 end
 
@@ -470,14 +470,14 @@ function DataService:DeleteSlot(Player: Player, SlotNumber: number)
 		return
 	end
 
-	LogService:Log("Deleting slot " .. tostring(SlotNumber) .. " for " .. Player.Name)
+	Logger:Log("Deleting slot " .. tostring(SlotNumber) .. " for " .. Player.Name)
 
 	local SaveData = Core.Data.SaveData.New(Player.UserId)
 	local Data = Core.Data.Data.New("General", {})
 	SaveData:AddData(Data)
 	SaveData:Save(AsDataStore)
 
-	LogService:Log("Deleted slot " .. tostring(SlotNumber) .. " for " .. Player.Name)
+	Logger:Log("Deleted slot " .. tostring(SlotNumber) .. " for " .. Player.Name)
 end
 
 --[=[
@@ -590,7 +590,6 @@ end
 --
 
 function DataService:KnitInit()
-	LogService = Knit.GetService("LogService")
 	SetupTemplateDataFolder()
 end
 
@@ -617,12 +616,12 @@ function DataService:KnitStart()
 	end)
 
 	game:BindToClose(function(CloseReason: Enum.CloseReason)
-		LogService:Warn("Closing server, Reason: " .. CloseReason.Name)
-		LogService:Log("Waiting for data to be saved")
+		Logger:Warn("Closing server, Reason: " .. CloseReason.Name)
+		Logger:Log("Waiting for data to be saved")
 		while PlayersLeft > 0 do
 			task.wait(10)
 		end
-		LogService:Log("Data saved; closing server")
+		Logger:Log("Data saved; closing server")
 	end)
 end
 

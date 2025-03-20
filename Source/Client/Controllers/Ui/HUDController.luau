@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 local NeoHotbar = require(ReplicatedStorage.Packages.NeoHotbar)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local TopbarPlus = require(ReplicatedStorage.Packages.TopbarPlus)
@@ -116,7 +117,6 @@ end
 -- [[ KNIT ]] --
 
 function HUDController:KnitStart()
-	local LogService = Knit.GetService("LogService")
 	local DataService = Knit.GetService("DataService")
 
 	self:SetupSettingsGUI()
@@ -127,7 +127,7 @@ function HUDController:KnitStart()
 	DataService.DataLoaded:Connect(function()
 		local App = Roact.createElement(HUD)
 		Roact.mount(App, Knit.Player.PlayerGui, "HUD")
-		LogService:Log("Mounted HUD component")
+		Logger:Log("Mounted HUD component")
 
 		NeoHotbar:Start()
 		self.GUI = Knit.Player.PlayerGui:FindFirstChild("NeoHotbar") :: ScreenGui

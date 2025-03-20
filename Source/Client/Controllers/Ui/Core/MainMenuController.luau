@@ -4,6 +4,7 @@ local TweenService = game:GetService("TweenService")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local MainMenuController = Knit.CreateController({ Name = "MainMenuController" })
@@ -11,7 +12,6 @@ local MainMenuController = Knit.CreateController({ Name = "MainMenuController" }
 local Camera = workspace.CurrentCamera
 
 local DataService
-local LogService
 local TextFilteringService
 
 local Blur
@@ -81,7 +81,7 @@ function MainMenuController:Close()
 
 	Camera.CameraType = Enum.CameraType.Custom
 
-	LogService:Log("Closed main menu")
+	Logger:Log("Closed main menu")
 end
 
 -- [[ KNIT ]] --
@@ -89,7 +89,6 @@ end
 function MainMenuController:KnitStart()
 	DataService = Knit.GetService("DataService")
 	TextFilteringService = Knit.GetService("TextFilteringService")
-	LogService = Knit.GetService("LogService")
 
 	local LightingController = Knit.GetController("LightingController")
 
@@ -97,7 +96,7 @@ function MainMenuController:KnitStart()
 
 	local App = Roact.createElement(MainMenu)
 	MainMenuTree = Roact.mount(App, Knit.Player.PlayerGui, "MainMenu")
-	LogService:Log("Mounted main menu")
+	Logger:Log("Mounted main menu")
 
 	Blur = Instance.new("BlurEffect")
 	Blur.Name = "MainMenuBlur"
