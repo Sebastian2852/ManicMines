@@ -7,6 +7,7 @@ local Promise = require(ReplicatedStorage.Packages.Promise)
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Enums = require(ReplicatedStorage.Game.Modules.Enums)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
 local TycoonUpgradeService = Knit.CreateService({
 	Name = "TycoonUpgradeService",
@@ -19,7 +20,6 @@ local TycoonService
 local PlayerStatsService
 local PickaxeService
 local DataService
-local LogService
 
 type UpgradeSetupInformation = {
 	ActionText: string,
@@ -186,7 +186,7 @@ function TycoonUpgradeService:AddFunctionality(
 
 	local TycoonOwner = TycoonService:GetTycoonOwner(Tycoon)
 	if not TycoonOwner then
-		LogService:Error("No owner for tycoon")
+		Logger:Error("No owner for tycoon")
 		return
 	end
 	local OwnerData: Core.DataFolder = DataService:GetPlayerDataFolder(TycoonOwner)
@@ -208,7 +208,7 @@ function TycoonUpgradeService:AddFunctionality(
 		SetupModule.Triggered(Player, IsOwner)
 	end)
 
-	LogService:Log("Created proximity prompt")
+	Logger:Log("Created proximity prompt")
 end
 
 --[=[
@@ -223,7 +223,7 @@ end
 This function add the model to the tycoon, sets up the hitbox (if needed) and adds the GUI to the hitbox
 ]=]
 function TycoonUpgradeService:AddUpgradeToTycoonAsync(Player: Player, UpgradeName: string, Tycoon: Model)
-	LogService:Log("Adding upgrade", UpgradeName, "to", tostring(Player.UserId) .. "'s", "tycoon")
+	Logger:Log("Adding upgrade", UpgradeName, "to", tostring(Player.UserId) .. "'s", "tycoon")
 	return Promise.new(function(Resolve)
 		assert(Player:IsDescendantOf(Players), "Player is not a valid player")
 		assert(Tycoon:IsDescendantOf(workspace.Game.Tycoons), "Tycoon must be a tycoon in workspace")
@@ -237,19 +237,19 @@ function TycoonUpgradeService:AddUpgradeToTycoonAsync(Player: Player, UpgradeNam
 		local LevelConfig = UpgradeConfig:FindFirstChild(tostring(DataValue.Value))
 
 		if not UpgradeConfig then
-			LogService:Error("Unkown upgrade:", UpgradeName)
+			Logger:Error("Unkown upgrade:", UpgradeName)
 		end
 
 		if not DataValue then
-			LogService:Error("Cannot find data value for upgrade:", UpgradeName)
+			Logger:Error("Cannot find data value for upgrade:", UpgradeName)
 		end
 
 		if not TycoonHitbox then
-			LogService:Error("Cannot find tycoon hitbox for upgrade:", UpgradeName)
+			Logger:Error("Cannot find tycoon hitbox for upgrade:", UpgradeName)
 		end
 
 		if not SetupModule then
-			LogService:Error("Cannot find upgrade setup module for upgrade:", UpgradeName)
+			Logger:Error("Cannot find upgrade setup module for upgrade:", UpgradeName)
 		end
 		SetupModule = require(SetupModule)
 
@@ -307,13 +307,13 @@ function TycoonUpgradeService:CanBeUpgraded(Player: Player, UpgradeName: string)
 
 	local DataValue = DataFolder.Tycoon.Upgrades:FindFirstChild(UpgradeName)
 	if not DataValue then
-		LogService:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName)
+		Logger:Warn("Invalid upgrade name passed; Can't find data for upgrade:", UpgradeName)
 		return
 	end
 
 	local UpgradeConfig = Core.Assets.Tycoon.Upgrades:FindFirstChild(UpgradeName)
 	if not UpgradeConfig then
-		LogService:Warn("Invalid upgrade name:", UpgradeName)
+		Logger:Warn("Invalid upgrade name:", UpgradeName)
 		return
 	end
 
@@ -375,20 +375,20 @@ Upgrade the given upgrade for the given player. This also updates the tycoon mod
 Returns true/false based on if the upgrade was actually upgraded
 ]=]
 function TycoonUpgradeService:Upgrade(Player: Player, Tycoon: Model, UpgradeName: string): boolean
-	LogService:Log("Attempting to upgrade " .. Player.Name .. "'s tycoon upgrade: " .. UpgradeName)
+	Logger:Log("Attempting to upgrade " .. Player.Name .. "'s tycoon upgrade: " .. UpgradeName)
 	if not self:CanBeUpgraded(Player, UpgradeName) then
-		LogService:Warn("Failed: cannot be upgraded")
+		Logger:Warn("Failed: cannot be upgraded")
 		return false
 	end
 
 	local DataValue = self:GetUpgradeDataValue(Player, UpgradeName)
 	if not DataValue then
-		LogService:Warn("Failed: Invalid upgrade name: " .. UpgradeName)
+		Logger:Warn("Failed: Invalid upgrade name: " .. UpgradeName)
 		return false
 	end
 
 	if not self:CanAffordUpgrade(Player, UpgradeName, DataValue.Value + 1) then
-		LogService:Warn("Failed: can't afford")
+		Logger:Warn("Failed: can't afford")
 		return false
 	end
 
@@ -407,7 +407,6 @@ end
 
 function TycoonUpgradeService:KnitStart()
 	DataService = Knit.GetService("DataService")
-	LogService = Knit.GetService("LogService")
 	TycoonService = Knit.GetService("TycoonService")
 	PlayerStatsService = Knit.GetService("PlayerStatsService")
 	PickaxeService = Knit.GetService("PickaxeService")

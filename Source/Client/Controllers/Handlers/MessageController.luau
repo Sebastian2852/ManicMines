@@ -3,10 +3,10 @@ local TextChatService = game:GetService("TextChatService")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
 local MessageController = Knit.CreateController({ Name = "MessageController" })
 
-local LogService
 local MessageService
 
 local TextChannel
@@ -23,29 +23,27 @@ local function SendChatMessage(MessageInfo: Core.ChatMessage)
 	end
 
 	TextChannel:SendAsync(Message, `{Color.R};{Color.G};{Color.B}`)
-	LogService:Log("Sent chat message:", Message)
+	Logger:Log("Sent chat message:", Message)
 end
 
 --[[ KNIT ]]
 --
 
 function MessageController:KnitInit()
-	LogService = Knit.GetService("LogService")
-
 	TextChannel = Instance.new("TextChannel")
 	TextChannel.Name = "SystemMessages"
 	TextChannel.Parent = TextChatService
-	LogService:Log("Created text channel")
+	Logger:Log("Created text channel")
 end
 
 function MessageController:KnitStart()
 	MessageService = Knit.GetService("MessageService")
 
 	MessageService.SendMessage:Connect(function(MessageInfo: Core.ChatMessage)
-		LogService:Log("New chat message from server")
-		LogService:Log("    - Message:", MessageInfo.Message)
-		LogService:Log("    - HasPrefix:", tostring(MessageInfo.HasPrefix))
-		LogService:Log("    - Prefix:", MessageInfo.Prefix)
+		Logger:Log("New chat message from server")
+		Logger:Log("    - Message:", MessageInfo.Message)
+		Logger:Log("    - HasPrefix:", tostring(MessageInfo.HasPrefix))
+		Logger:Log("    - Prefix:", MessageInfo.Prefix)
 
 		SendChatMessage(MessageInfo)
 	end)

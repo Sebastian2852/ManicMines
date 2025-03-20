@@ -3,10 +3,10 @@ local ReplicatedStorage = game.ReplicatedStorage
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
 local SettingsController = Knit.CreateController({ Name = "PlayerSettingsController" })
 
-local LogService
 local SettingsService
 local DataService
 
@@ -23,7 +23,7 @@ local Settings: Core.Settings = {}
 Pushes the current settings to the server
 ]=]
 local function PushToServer()
-	LogService:Log("Pushing settings to server")
+	Logger:Log("Pushing settings to server")
 	SettingsService:PushSettings(Settings)
 end
 
@@ -32,7 +32,7 @@ Updates the settings by actually doing the settings (e.g. Disabling shadows)
 Only does things that can be done by the client. The rest will be handled by the server
 ]=]
 local function Update()
-	LogService:Log("Updating settings")
+	Logger:Log("Updating settings")
 	game.Lighting.GlobalShadows = Settings.GlobalShadows
 
 	if Settings.HideMapProps then
@@ -57,7 +57,6 @@ end
 --
 
 function SettingsController:KnitStart()
-	LogService = Knit.GetService("LogService")
 	SettingsService = Knit.GetService("SettingsService")
 	DataService = Knit.GetService("DataService")
 

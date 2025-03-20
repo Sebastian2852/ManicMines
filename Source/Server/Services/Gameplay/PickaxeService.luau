@@ -2,11 +2,11 @@ local ReplicatedStorage = game.ReplicatedStorage
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
 local DataService
 local MineService
-local LogService
 
 local PickaxeAssetFolder = game.ReplicatedStorage.Assets.Pickaxe
 local Pickaxes = PickaxeAssetFolder.Pickaxes
@@ -160,7 +160,7 @@ function PickaxeService:RemovePickaxeFromPlayer(Player: Player)
 		return
 	end
 
-	LogService:Log("Removing " .. Player.Name .. "'s pickaxe")
+	Logger:Log("Removing " .. Player.Name .. "'s pickaxe")
 
 	for _, Tool: Tool in pairs(Player.Backpack:GetChildren()) do
 		if not Tool:IsA("Tool") then
@@ -191,7 +191,7 @@ end
 Give the player thier currently equipped pickaxe
 ]=]
 function PickaxeService:GivePickaxeToPlayer(Player: Player)
-	LogService:Log("Giving " .. Player.Name .. " a pickaxe")
+	Logger:Log("Giving " .. Player.Name .. " a pickaxe")
 	repeat
 		task.wait(1)
 	until Player.Character
@@ -201,11 +201,11 @@ function PickaxeService:GivePickaxeToPlayer(Player: Player)
 	end
 
 	local DataFolder = DataService:GetPlayerDataFolder(Player)
-	LogService:Assert(DataFolder, "No data folder")
+	Logger:Assert(DataFolder, "No data folder")
 
 	local CurrentPickaxeID: number = DataFolder.Pickaxes.Equipped.Value
 	local CurrentPickaxeConfig: Configuration = Pickaxes:FindFirstChild(CurrentPickaxeID)
-	LogService:Assert(CurrentPickaxeConfig, "No pickaxe config")
+	Logger:Assert(CurrentPickaxeConfig, "No pickaxe config")
 
 	local Pickaxe: Tool = CurrentPickaxeConfig:FindFirstChildWhichIsA("Tool")
 	local NewPickaxe: Tool = Pickaxe:Clone()
@@ -227,7 +227,7 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 	end
 
 	if not self.Mining[Player.UserId] then
-		LogService:Warn("Player should have an entry in mining table?")
+		Logger:Warn("Player should have an entry in mining table?")
 		self.Mining[Player.UserId] = { Mining = false, Object = nil, Cooldown = false }
 	end
 
@@ -268,7 +268,7 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 	ObjectToMine:SetAttribute("MinedBy", Player.UserId)
 	ObjectToMine:SetAttribute("BeingMined", true)
 
-	LogService:Log(Player.Name .. " started mining")
+	Logger:Log(Player.Name .. " started mining")
 
 	local OptimalDepth = self:GetOptimalDepth(Player)
 	local OreList = Core.OreList.New()
@@ -352,7 +352,7 @@ function PickaxeService:StopMining(Player: Player)
 		end
 
 		local Pickaxe = self:GetPlayerPickaxe(Player)
-		LogService:Log(Player.Name .. " stopped mining")
+		Logger:Log(Player.Name .. " stopped mining")
 
 		self.Mining[Player.UserId].Cooldown = true
 		DataFolder.ServerMining.Value = false
@@ -470,35 +470,33 @@ end
 --
 
 function PickaxeService:KnitInit()
-	LogService = Knit.GetService("LogService")
-
-	LogService:Log("Setting up pickaxes")
+	Logger:Log("Setting up pickaxes")
 	for _, PickaxeConfig: Configuration in pairs(Core.Assets.Pickaxe.Pickaxes:GetChildren()) do
-		LogService:Log("Setting up pickaxe: " .. PickaxeConfig:GetFullName())
+		Logger:Log("Setting up pickaxe: " .. PickaxeConfig:GetFullName())
 		local PickaxeTool = PickaxeConfig:FindFirstChildWhichIsA("Tool")
 		if not PickaxeTool then
-			LogService:Warn("Pickaxe config has no pickaxe tool: " .. PickaxeConfig:GetFullName())
+			Logger:Warn("Pickaxe config has no pickaxe tool: " .. PickaxeConfig:GetFullName())
 			continue
 		end
 
 		PickaxeTool.CanBeDropped = false
 		PickaxeTool:SetAttribute("Range", PickaxeTool:GetAttribute("Range") * Core.GameConfig.Mine.BlockSize.X)
 
-		LogService:Log("    - Setting up pickaxe: " .. PickaxeTool:GetFullName())
+		Logger:Log("    - Setting up pickaxe: " .. PickaxeTool:GetFullName())
 		local Handle = PickaxeTool:FindFirstChild("Handle")
 		if not Handle then
-			LogService:Warn("Pickaxe tool has no handle?: " .. PickaxeTool:GetFullName())
+			Logger:Warn("Pickaxe tool has no handle?: " .. PickaxeTool:GetFullName())
 			continue
 		end
 
 		for _, Weld: Weld in pairs(PickaxeTool:GetDescendants()) do
 			if Weld:IsA("Weld") then
-				LogService:Log("    - Destroyed weld: " .. Weld:GetFullName())
+				Logger:Log("    - Destroyed weld: " .. Weld:GetFullName())
 				Weld:Destroy()
 			end
 
 			if Weld:IsA("WeldConstraint") then
-				LogService:Log("    - Destroyed weld: " .. Weld:GetFullName())
+				Logger:Log("    - Destroyed weld: " .. Weld:GetFullName())
 				Weld:Destroy()
 			end
 		end
@@ -516,7 +514,7 @@ function PickaxeService:KnitInit()
 			Weld.Part0 = Part
 			Weld.Part1 = Handle
 			Weld.Parent = Handle
-			LogService:Log("    - Welded pickaxe parts:", Part.Name .. " -> " .. Handle.Name)
+			Logger:Log("    - Welded pickaxe parts:", Part.Name .. " -> " .. Handle.Name)
 		end
 
 		for _, Part: BasePart in pairs(PickaxeTool:GetDescendants()) do
@@ -526,7 +524,7 @@ function PickaxeService:KnitInit()
 
 			Part.Anchored = false
 			Part.CanCollide = false
-			LogService:Log("    - Setup pickaxe part: " .. Part.Name)
+			Logger:Log("    - Setup pickaxe part: " .. Part.Name)
 		end
 	end
 end

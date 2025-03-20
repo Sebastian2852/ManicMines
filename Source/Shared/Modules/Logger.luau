@@ -1,13 +1,6 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
-
-local LogService = Knit.CreateService({
-	Name = "LogService",
-	Client = {},
-})
-
+local LogService = {}
 local LOG_SPACING = 40
 
 --[[ PUBLIC ]]
@@ -91,49 +84,6 @@ function LogService:Assert(Value: any, ErrorMessage: string)
 	end
 	if Value == nil or Value == false then
 		error("ASSERTION FAILED: " .. ErrorMessage)
-	end
-end
-
--- [[ CLIENT ]]--
-
-function LogService.Client:Log(Player: Player, Message: string, ...: string)
-	if not RunService:IsStudio() then
-		return
-	end
-	local Extras = { ... }
-
-	local PlayerName = Player.Name
-	local SpacingToUse = LOG_SPACING - (#PlayerName + 9)
-	print("[CLIENT]", "[" .. PlayerName .. "]", string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
-end
-
-function LogService.Client:Warn(Player: Player, Message: string, ...: string)
-	if not RunService:IsStudio() then
-		return
-	end
-	local Extras = { ... }
-
-	local PlayerName = Player.Name
-	local SpacingToUse = LOG_SPACING - (#PlayerName + 19)
-	warn("[CLIENT] [WARNING]", "[" .. PlayerName .. "]", string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
-end
-
-function LogService.Client:Error(_, Message: string, ...: string)
-	local AssembledMessage = Message
-	if ... ~= nil then
-		for _, Item: string in pairs({ ... }) do
-			AssembledMessage = AssembledMessage .. " " .. Item
-		end
-	end
-	error("[CLIENT] " .. AssembledMessage)
-end
-
-function LogService.Client:Assert(Player: Player, Value: string, ErrorMessage: string)
-	if not RunService:IsStudio() then
-		return
-	end
-	if Value == nil or Value == false then
-		error("[CLIENT]" .. " [" .. Player.Name .. "] " .. "ASSERTION FAILED: " .. ErrorMessage)
 	end
 end
 

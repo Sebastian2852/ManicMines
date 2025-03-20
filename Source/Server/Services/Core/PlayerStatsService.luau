@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
 local PlayerStatsService = Knit.CreateService({
 	Name = "PlayerStatsService",
@@ -8,7 +9,6 @@ local PlayerStatsService = Knit.CreateService({
 })
 
 local DataService
-local LogService
 local TycoonUpgradeService
 
 -- [[ PRIVATE ]] --
@@ -111,13 +111,13 @@ function PlayerStatsService:GiveOres(Player: Player, OreList)
 
 		if OreName == "GoldCoins" then
 			DataFolder.Gold.Value += Data.Amount
-			LogService:Log("Gave " .. Player.Name .. " " .. Data.Amount .. " gold")
+			Logger:Log("Gave " .. Player.Name .. " " .. Data.Amount .. " gold")
 			continue
 		end
 
 		local DataValue = FindInventoryValueByName(OreName, DataFolder)
 		DataValue.Value += Data.Amount
-		LogService:Log("Gave " .. Player.Name .. " " .. Data.Amount .. " " .. Data.DisplayName)
+		Logger:Log("Gave " .. Player.Name .. " " .. Data.Amount .. " " .. Data.DisplayName)
 	end
 	self:CalculateInventoryCapacity(DataFolder)
 end
@@ -139,7 +139,7 @@ function PlayerStatsService:TakeOres(Player: Player, OreList)
 				NewAmount = 0
 			end
 			DataFolder.Gold.Value = NewAmount
-			LogService:Log("removed " .. Player.Name .. " " .. Data.Amount .. " gold")
+			Logger:Log("removed " .. Player.Name .. " " .. Data.Amount .. " gold")
 			continue
 		end
 
@@ -153,7 +153,7 @@ function PlayerStatsService:TakeOres(Player: Player, OreList)
 			InventoryValue.Value -= Data.Amount
 		end
 
-		LogService:Log("removed " .. Player.Name .. " " .. Data.Amount .. " " .. Data.DisplayName)
+		Logger:Log("removed " .. Player.Name .. " " .. Data.Amount .. " " .. Data.DisplayName)
 	end
 	self:CalculateInventoryCapacity(DataFolder)
 end
@@ -174,11 +174,11 @@ function PlayerStatsService:MinedOre(Player: Player, OreList: Core.OreList)
 
 		local DataValue = FindTimesMinedValueByName(OreName, DataFolder)
 		DataValue.Value += 1
-		LogService:Log("Increased " .. Player.Name .. "'s " .. OreName .. " times mined value")
+		Logger:Log("Increased " .. Player.Name .. "'s " .. OreName .. " times mined value")
 
 		local Xp = OreData.RealOre:GetAttribute("XP")
 		if Xp == nil then
-			LogService:Warn("No xp value?")
+			Logger:Warn("No xp value?")
 		end
 		self:AwardXP(Player, Xp)
 	end
@@ -190,7 +190,6 @@ end
 
 function PlayerStatsService:KnitStart()
 	DataService = Knit.GetService("DataService")
-	LogService = Knit.GetService("LogService")
 	TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")
 end
 

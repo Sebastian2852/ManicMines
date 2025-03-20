@@ -3,13 +3,13 @@ local TweenService = game:GetService("TweenService")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
 local TeleportService = Knit.CreateService({
 	Name = "TeleportService",
 	Client = {},
 })
 
-local LogService
 local TycoonService
 local DataService
 local LoadingService
@@ -81,10 +81,10 @@ Teleports a player's character to the given position. If the player doesnt have 
 the function waits until a character is present
 ]=]
 function TeleportService:TeleportPlayerToPosition(Player: Player, Position: Vector3, WithLoadingScreen: boolean?)
-	LogService:Log("Teleporting", Player.Name, "to", tostring(Position))
+	Logger:Log("Teleporting", Player.Name, "to", tostring(Position))
 	local Character = Player.Character
 	if not Character then
-		LogService:Log("Waiting for player's character")
+		Logger:Log("Waiting for player's character")
 		repeat
 			Character = Player.Character
 			task.wait(0.1)
@@ -120,7 +120,7 @@ Teleports a player to a given tycoon's spawn. If no tycoon is passed the player 
 tycoon.
 ]=]
 function TeleportService:TeleportPlayerToTycoon(Player: Player, TycoonPlayer: Player?, WithLoadingScreen: boolean?)
-	LogService:Log("Teleporting", Player.Name, "to their player")
+	Logger:Log("Teleporting", Player.Name, "to their player")
 	local DataFolder = DataService:GetPlayerDataFolder(Player)
 	local TeleportLocation
 
@@ -178,7 +178,6 @@ end
 --
 
 function TeleportService:KnitStart()
-	LogService = Knit.GetService("LogService")
 	TycoonService = Knit.GetService("TycoonService")
 	DataService = Knit.GetService("DataService")
 	LoadingService = Knit.GetService("LoadingService")

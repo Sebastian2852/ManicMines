@@ -3,6 +3,7 @@ local TweenService = game:GetService("TweenService")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 
 local MineEffects = Knit.CreateController({ Name = "MineEffects" })
 
@@ -11,7 +12,6 @@ local MusicController
 local PickaxeService
 local AudioEngine
 local MineService
-local LogService
 
 local PreviousLayer = ""
 local Animation
@@ -23,9 +23,9 @@ local CurrentlyTweening = false
 MineEffects.CurrentLayer = nil
 
 function MineEffects:Layer(LayerName: string)
-	LogService:Log("Appling layer effects for: " .. LayerName)
+	Logger:Log("Appling layer effects for: " .. LayerName)
 	if not Core.Assets.Layers:FindFirstChild(LayerName) then
-		LogService:Warn("Invalid layer name: " .. LayerName)
+		Logger:Warn("Invalid layer name: " .. LayerName)
 		return
 	end
 
@@ -34,7 +34,7 @@ function MineEffects:Layer(LayerName: string)
 
 	local LightingConfig = LayerConfig:FindFirstChild("Lighting")
 	if LightingConfig then
-		LogService:Log("Appling lighting effects")
+		Logger:Log("Appling lighting effects")
 		LightingController:CreateFromConfig(LightingConfig)
 	end
 
@@ -54,7 +54,6 @@ function MineEffects:KnitStart()
 	AudioEngine = Knit.GetController("AudioEngine")
 	LightingController = Knit.GetController("LightingController")
 	MusicController = Knit.GetController("MusicController")
-	LogService = Knit.GetService("LogService")
 	MineService = Knit.GetService("MineService")
 	PickaxeService = Knit.GetService("PickaxeService")
 
