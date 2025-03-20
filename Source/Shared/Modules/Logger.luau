@@ -46,7 +46,6 @@ function LogService:Warn(Message: string, ...: string)
 	end
 	local Extras = { ... }
 	local ScriptName = "[" .. self:GetNameOfFunctionCaller(3) .. "]"
-
 	warn("[WARNING]", ScriptName, Message, table.unpack(Extras))
 end
 
@@ -62,7 +61,6 @@ function LogService:Error(Message: string, ...: string)
 			AssembledMessage = AssembledMessage .. " " .. Item
 		end
 	end
-
 	error(ScriptName .. " " .. AssembledMessage)
 end
 

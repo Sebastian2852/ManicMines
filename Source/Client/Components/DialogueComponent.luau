@@ -4,6 +4,7 @@ local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 
 local Component = require(ReplicatedStorage.Packages.Component)
+local Logger = require(ReplicatedStorage.Game.Modules.Logger)
 local Signals = require(ReplicatedStorage.Game.GUI.Signals)
 local Trove = require(ReplicatedStorage.Packages.trove)
 
@@ -203,6 +204,7 @@ function DialogueComponent:Start()
 	ProximityPrompt.RequiresLineOfSight = false
 	ProximityPrompt.Parent = self.NPC
 	table.insert(Prompts, ProximityPrompt)
+	Logger:Log("Started dialogue component on: " .. self.Instance:GetFullName())
 
 	self.CameraDialoguePart:Clone().Parent = ProximityPrompt
 	self.ProximityPrompt = ProximityPrompt
@@ -219,6 +221,7 @@ function DialogueComponent:Start()
 end
 
 function DialogueComponent:Stop()
+	Logger:Log("Stopped dialogue component on: " .. self.Instance:GetFullName())
 	self.Trove:Clean()
 end
 
