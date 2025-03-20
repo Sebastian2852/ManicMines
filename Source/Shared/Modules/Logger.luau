@@ -1,7 +1,6 @@
 local RunService = game:GetService("RunService")
 
 local LogService = {}
-local LOG_SPACING = 40
 
 --[[ PUBLIC ]]
 --
@@ -18,16 +17,11 @@ function LogService:GetNameOfFunctionCaller(UpLevel: number): string
 	local LineText = tostring(debug.info(3, "l"))
 	local Function = debug.info(UpLevel, "n")
 
-	local FunctionLenth = #Function
-	local MaxLength = 10
-
-	if FunctionLenth >= MaxLength then
-		Function = string.sub(Function, 1, MaxLength - 3)
-		Function = Function .. "..."
+	if Function == "" or Function == " " or Function == nil then
+		Function = "<anonymous>"
 	end
 
 	FinalString = Function .. " - " .. Name .. ":" .. LineText
-
 	return FinalString
 end
 
@@ -40,9 +34,7 @@ function LogService:Log(Message: string, ...: string)
 	end
 	local Extras = { ... }
 	local ScriptName = "[" .. self:GetNameOfFunctionCaller(3) .. "]"
-
-	local SpacingToUse = LOG_SPACING - (#ScriptName + 5)
-	print("[LOG]", ScriptName, string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
+	print("[LOG]", ScriptName, Message, table.unpack(Extras))
 end
 
 --[=[
@@ -55,8 +47,7 @@ function LogService:Warn(Message: string, ...: string)
 	local Extras = { ... }
 	local ScriptName = "[" .. self:GetNameOfFunctionCaller(3) .. "]"
 
-	local SpacingToUse = LOG_SPACING - (#ScriptName + 9)
-	warn("[WARNING]", ScriptName, string.rep(" ", SpacingToUse), Message, table.unpack(Extras))
+	warn("[WARNING]", ScriptName, Message, table.unpack(Extras))
 end
 
 --[=[
