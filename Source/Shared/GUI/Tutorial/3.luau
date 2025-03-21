@@ -109,7 +109,7 @@ function Stage3:render()
 					BackgroundTransparency = 1,
 					BorderSizePixel = 0,
 
-					Text = "Great job mining your first block! Now, let's get familiar with your inventory and how to upgrading your tycoon.<br /><br /><u>Your Inventory</u><br />- View Your Items: Check out what you've collected in your inventory.<br />- Capacity: You can carry up to seven items at a time.<br /><br /><u>Level & XP</u><br />- Track Progress: Your current level and XP are displayed above the inventory. Keep mining to level up!<br /><br /><u>Upgrading Your Tycoon</u><br />Your tycoon has many upgradable elements to help you while mining. Press the green button to get started!",
+					Text = "Great job mining your first block! Now, let's get familiar with your inventory.<br /><br /><u>Your Inventory</u><br />- View Your Items: Check out what you've collected in your inventory.<br />- Capacity: You can carry up to seven items at a time.<br /><br /><u>Level & XP</u><br />- Track Progress: Your current level and XP are displayed above the inventory. Keep mining to level up!<br /><br /><u>Upgrading Your Tycoon</u><br />Your tycoon has many upgradable elements to help you while mining. <br /><br /><b>Press the green button to get started with upgrading your tycoon!</b>",
 					TextScaled = true,
 					RichText = true,
 					TextXAlignment = Enum.TextXAlignment.Left,
