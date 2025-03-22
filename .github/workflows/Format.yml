@@ -21,7 +21,7 @@ jobs:
 
       - name: Set up Stylua
         run: |
-          curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux.zip -o stylua.zip
+          curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.zip
           unzip stylua.zip -d stylua
           chmod +x stylua/stylua
           sudo mv stylua/stylua /usr/local/bin/stylua
