@@ -32,6 +32,10 @@ jobs:
       - name: Run Stylua
         run: stylua .
 
+      - name: Clean up Stylua
+        run: rm -rf stylua stylua.zip
+
+
       - name: Commit formatted code
         run: |
           git config user.name "github-actions"
