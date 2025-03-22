@@ -127,7 +127,7 @@ function TycoonUpgradeService:AddClickDetectorToHitbox(HitBox: BasePart)
 		local NewClickDetector = Instance.new("ClickDetector")
 		NewClickDetector.Name = "_SelectionClickDetector"
 		NewClickDetector.Parent = HitBox
-		NewClickDetector.MaxActivationDistance = Core.GameConfig.Tycoon.UpgradeSelectionDistance
+		NewClickDetector.MaxActivationDistance = 20
 
 		NewClickDetector.MouseClick:Connect(function(Player)
 			TycoonService.Client.SelectUpgrade:Fire(Player, HitBox.Name) -- Event should probably be moved to this service
