@@ -1,0 +1,36 @@
+name: Format Code with Stylua
+
+on:
+  push:
+    paths:
+      - '**.luau'
+      - '**.lua'
+  pull_request:
+    paths:
+      - '**.luau'
+      - '**.lua'
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Stylua
+        run: |
+          curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux.zip -o stylua.zip
+          unzip stylua.zip -d stylua
+          chmod +x stylua/stylua
+          sudo mv stylua/stylua /usr/local/bin/stylua
+
+      - name: Run Stylua
+        run: stylua .
+
+      - name: Check for unformatted files
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "Code not formatted. Please run Stylua locally."
+            exit 1
+          fi
