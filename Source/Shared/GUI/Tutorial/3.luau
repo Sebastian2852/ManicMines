@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Enums = require(ReplicatedStorage.Game.Modules.Enums)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
-local Stage3 = Roact.Component:extend("Stage0")
+local Stage3 = Roact.Component:extend("Stage3")
 
 local FloatingInfo = require(ReplicatedStorage.Game.GUI.Common.FloatingInfo)
 local Signals = require(ReplicatedStorage.Game.GUI.Signals)
