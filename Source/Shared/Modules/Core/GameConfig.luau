@@ -273,7 +273,7 @@ Config.DefaultSettings = {
 Config.MainMenu = {
 	Version = "v1.1.0",
 	TitleScreenVersion = "v1.1.0 - Caves & Caverns",
-
+  
 	--[=[
     All the credits for the game; main menu will automatically fill out the credits gui with these names. DO NOT EDIT YET!!
     ]=]
@@ -330,6 +330,11 @@ Config.Chat = {
 		[890072408] = {
 			Tag = "[John Manic Mines]",
 			TagColor = Color3.fromRGB(250, 127, 255),
+		},
+		[4367923334] = {
+			Tag = "Quasar",
+			TagColor = Color3.fromRGB(0, 255, 0),
+			NameColor = Color3.fromRGB(255, 255, 255),
 		},
 	},
 }

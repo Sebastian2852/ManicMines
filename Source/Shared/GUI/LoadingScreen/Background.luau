@@ -20,9 +20,9 @@ function Background:UpdateImagePosition()
 	local XOffset = (MousePosition.X - ScreenSize.X / 2) / ScreenSize.X * MaxOffset
 	local YOffset = (MousePosition.Y - ScreenSize.Y / 2) / ScreenSize.Y * MaxOffset
 
-	self:setState {
+	self:setState({
 		Offset = Vector2.new(-XOffset, -YOffset),
-	}
+	})
 end
 
 function Background:init()

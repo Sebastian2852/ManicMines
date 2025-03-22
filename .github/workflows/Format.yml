@@ -1,0 +1,49 @@
+name: Format Code with Stylua
+
+permissions:
+  contents: write
+  
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '**.luau'
+      - '**.lua'
+  pull_request:
+    paths:
+      - '**.luau'
+      - '**.lua'
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Stylua
+        run: |
+          curl -L https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip -o stylua.zip
+          unzip stylua.zip -d stylua
+          chmod +x stylua/stylua
+          sudo mv stylua/stylua /usr/local/bin/stylua
+
+      - name: Run Stylua
+        run: stylua .
+
+      - name: Clean up Stylua
+        run: rm -rf stylua stylua.zip
+
+
+      - name: Commit formatted code
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          if [[ -n $(git status --porcelain) ]]; then
+            git add .
+            git commit -m "Auto code formatting"
+            git push
+          else
+            echo "No formatting changes."
+          fi

@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local LightingController = Knit.CreateController { Name = "LightingController" }
+local LightingController = Knit.CreateController({ Name = "LightingController" })
 
 -- [[ PUBLUC ]] --
 

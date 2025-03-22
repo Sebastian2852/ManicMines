@@ -10,10 +10,10 @@ function SlotButton:init()
 	local Text = self.props.Text :: string or "unknown"
 	local BackgroundColor = self.props.Color or Color3.new(1, 0, 0)
 
-	self:setState {
+	self:setState({
 		Text = Text,
 		Color = BackgroundColor,
-	}
+	})
 
 	self.Motor = Flipper.SingleMotor.new(0)
 	local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())

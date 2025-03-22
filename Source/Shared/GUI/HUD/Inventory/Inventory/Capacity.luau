@@ -18,28 +18,28 @@ function Capacity:init()
 		local UseShortUnits = DataFolder.Settings.InventoryShortUnits
 
 		self.ItemCountConnection = InventoryItemCount:GetPropertyChangedSignal("Value"):Connect(function()
-			self:setState {
+			self:setState({
 				ItemCount = InventoryItemCount.Value,
-			}
+			})
 		end)
 
 		self.CapacityConnection = InventoryCap:GetPropertyChangedSignal("Value"):Connect(function()
-			self:setState {
+			self:setState({
 				Cap = InventoryCap.Value,
-			}
+			})
 		end)
 
 		self.ShortUnitsConnection = UseShortUnits:GetPropertyChangedSignal("Value"):Connect(function()
-			self:setState {
+			self:setState({
 				ShortUnits = UseShortUnits.Value,
-			}
+			})
 		end)
 
-		self:setState {
+		self:setState({
 			ItemCount = InventoryItemCount.Value,
 			Cap = InventoryCap.Value,
 			ShortUnits = UseShortUnits.Value,
-		}
+		})
 	end)
 
 	self.Motor = Flipper.SingleMotor.new(0)

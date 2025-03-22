@@ -3,10 +3,10 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 
-local AdminService = Knit.CreateService {
+local AdminService = Knit.CreateService({
 	Name = "AdminService",
 	Client = {},
-}
+})
 
 local PlayerStatsService
 

@@ -8,7 +8,7 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 Despite the name this is just a controller to get device type and stuff
 ]=]
 
-local DeviceController = Knit.CreateController { Name = "DeviceController" }
+local DeviceController = Knit.CreateController({ Name = "DeviceController" })
 
 local LastDeviceType = Enums.DeviceType.Unkown
 

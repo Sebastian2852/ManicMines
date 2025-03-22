@@ -35,21 +35,21 @@ function Inventory:init()
 		local ShortUnits = DataFolder.Settings.InventoryShortUnits
 
 		local ShortUnitsConnection = ShortUnits:GetPropertyChangedSignal("Value"):Connect(function()
-			self:setState {
+			self:setState({
 				ShortUnits = ShortUnits.Value,
-			}
+			})
 		end)
 
 		self.Trove:Add(ShortUnitsConnection)
 
-		self:setState {
+		self:setState({
 			ShortUnits = ShortUnits.Value,
-		}
+		})
 	end)
 
-	self:setState {
+	self:setState({
 		Ores = {},
-	}
+	})
 end
 
 function Inventory:willUnmount()

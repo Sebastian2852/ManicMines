@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local DialogueKit = ReplicatedStorage.Packages.DialogueKit
 
-local DialogueController = Knit.CreateController { Name = "DialogueController" }
+local DialogueController = Knit.CreateController({ Name = "DialogueController" })
 
 -- [[ PUBLIC ]] --
 
