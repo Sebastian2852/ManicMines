@@ -29,9 +29,14 @@ jobs:
       - name: Run Stylua
         run: stylua .
 
-      - name: Check for unformatted files
+      - name: Commit formatted code
         run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           if [[ -n $(git status --porcelain) ]]; then
-            echo "Code not formatted. Please run Stylua locally."
-            exit 1
+            git add .
+            git commit -m "Auto code formatting"
+            git push
+          else
+            echo "No formatting changes."
           fi
