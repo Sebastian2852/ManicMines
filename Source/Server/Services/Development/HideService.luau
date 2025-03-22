@@ -5,10 +5,10 @@ local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 
-local HideService = Knit.CreateService {
+local HideService = Knit.CreateService({
 	Name = "HideService",
 	Client = {},
-}
+})
 
 local LogService
 local HideTag = "_Hide"

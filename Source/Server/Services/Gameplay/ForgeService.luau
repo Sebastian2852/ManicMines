@@ -3,12 +3,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local ForgeService = Knit.CreateService {
+local ForgeService = Knit.CreateService({
 	Name = "ForgeService",
 	Client = {
 		OpenForge = Knit.CreateSignal(),
 	},
-}
+})
 
 local PickaxeService
 

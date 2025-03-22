@@ -4,13 +4,13 @@ local TextChatService = game:GetService("TextChatService")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local MessageService = Knit.CreateService {
+local MessageService = Knit.CreateService({
 	Name = "MessageService",
 	Client = {
 		SendMessage = Knit.CreateSignal(),
 		EnableChannels = Knit.CreateSignal(),
 	},
-}
+})
 
 local LogService
 local AdminService

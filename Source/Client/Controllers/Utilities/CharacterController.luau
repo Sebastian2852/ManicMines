@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local CharacterController = Knit.CreateController { Name = "CharacterController" }
+local CharacterController = Knit.CreateController({ Name = "CharacterController" })
 
 local LogService
 

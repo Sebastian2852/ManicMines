@@ -17,21 +17,21 @@ function Currency:init()
 		local Value = DataFolder:FindFirstChild(CurrencyName)
 
 		if not Value then
-			self:setState {
+			self:setState({
 				Amount = -1,
-			}
+			})
 			return
 		end
 
 		Value:GetPropertyChangedSignal("Value"):Connect(function()
-			self:setState {
+			self:setState({
 				Amount = Value.Value,
-			}
+			})
 		end)
 
-		self:setState {
+		self:setState({
 			Amount = Value.Value,
-		}
+		})
 	end)
 end
 

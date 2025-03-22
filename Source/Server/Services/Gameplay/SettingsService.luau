@@ -3,13 +3,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local SettingsService = Knit.CreateService {
+local SettingsService = Knit.CreateService({
 	Name = "SettingsService",
 	Client = {
 		UpdateSettings = Knit.CreateSignal(),
 		SettingsChanged = Knit.CreateSignal(),
 	},
-}
+})
 
 local DataService
 local LogService

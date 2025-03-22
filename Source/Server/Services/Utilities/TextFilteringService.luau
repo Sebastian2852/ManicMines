@@ -3,10 +3,10 @@ local TextService = game:GetService("TextService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local TextFilteringService = Knit.CreateService {
+local TextFilteringService = Knit.CreateService({
 	Name = "TextFilteringService",
 	Client = {},
-}
+})
 
 -- [[ PUBLIC ]] --
 

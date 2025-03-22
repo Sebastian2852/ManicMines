@@ -7,12 +7,12 @@ local Spinner = Roact.Component:extend("Spinner")
 
 local Theme = require(script.Parent.Parent.Theme)
 
-local LOADING_WHEEL_TRANSPARENCY_SEQUENCE = NumberSequence.new {
+local LOADING_WHEEL_TRANSPARENCY_SEQUENCE = NumberSequence.new({
 	NumberSequenceKeypoint.new(0, 1, 0),
 	NumberSequenceKeypoint.new(0.5, 1, 0),
 	NumberSequenceKeypoint.new(0.501, 0, 0),
 	NumberSequenceKeypoint.new(1, 0, 0),
-}
+})
 
 local function Lerp(Start: number, End: number, Time: number)
 	return Start * (1 - Time) + End * Time

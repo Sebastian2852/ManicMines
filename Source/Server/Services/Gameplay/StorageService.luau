@@ -3,13 +3,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local StorageService = Knit.CreateService {
+local StorageService = Knit.CreateService({
 	Name = "StorageService",
 	Client = {
 		OpenStorage = Knit.CreateSignal(),
 		Update = Knit.CreateSignal(),
 	},
-}
+})
 
 local LogService
 local DataService

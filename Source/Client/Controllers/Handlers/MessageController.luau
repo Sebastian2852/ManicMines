@@ -5,7 +5,7 @@ local TextChatService = game:GetService("TextChatService")
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local MessageController = Knit.CreateController { Name = "MessageController" }
+local MessageController = Knit.CreateController({ Name = "MessageController" })
 
 local LogService
 local MessageService

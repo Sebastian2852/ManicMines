@@ -7,7 +7,7 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local DebugFolder = ReplicatedStorage.Player.Debug
 
-local AudioEngine = Knit.CreateController { Name = "AudioEngine" }
+local AudioEngine = Knit.CreateController({ Name = "AudioEngine" })
 
 local GLOBALSTORAGEFOLDER -- Used to hold sounds that are played globally
 local POSITIONALSTORAGEFOLDER -- Used for sounds that play at a vector without a part

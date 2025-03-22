@@ -31,17 +31,17 @@ function LevelDisplay:init()
 		end)
 
 		self.ShortUnitsConnection = UseShortUnits:GetPropertyChangedSignal("Value"):Connect(function()
-			self:setState {
+			self:setState({
 				ShortUnits = UseShortUnits.Value,
-			}
+			})
 		end)
 
 		self:UpdateLevel(Level.Value)
 		self:UpdateXp(Xp.Value)
 
-		self:setState {
+		self:setState({
 			ShortUnits = UseShortUnits.Value,
-		}
+		})
 	end)
 
 	self.ColorConnection = ReplicatedStorage.Player.LastBlockColor:GetPropertyChangedSignal("Value"):Connect(function()
@@ -51,9 +51,9 @@ function LevelDisplay:init()
 			return
 		end
 
-		self:setState {
+		self:setState({
 			LastBlockColor = NewColor,
-		}
+		})
 	end)
 
 	self.Motor = Flipper.SingleMotor.new(0)
@@ -66,10 +66,10 @@ function LevelDisplay:init()
 	self.TextBinding = TextBinding
 	self.TextMotor:onStep(TextSetBinding)
 
-	self:setState {
+	self:setState({
 		XpChange = 0,
 		ShowChange = false,
-	}
+	})
 end
 
 function LevelDisplay:willUnmount()
@@ -96,11 +96,11 @@ function LevelDisplay:UpdateXp(Xp: number)
 	local XpChange = Xp - LastXp
 	local ShowChange = XpChange > 1
 
-	self:setState {
+	self:setState({
 		LastXp = Xp,
 		XpChange = XpChange,
 		ShowChange = ShowChange,
-	}
+	})
 
 	if ShowChange then
 		task.wait(0.61)
@@ -111,10 +111,10 @@ function LevelDisplay:UpdateXp(Xp: number)
 		}))
 	end
 
-	self:setState {
+	self:setState({
 		ShowChange = false,
 		Xp = Xp,
-	}
+	})
 
 	if ShowChange then
 		task.wait(0.15)
@@ -146,12 +146,12 @@ function LevelDisplay:UpdateLevel(Level: number)
 	local BarGradient = CurrentLevelConfig:GetAttribute("LevelXpBarColor") :: ColorSequence
 	local XpNeeded = NextLevelConfig and NextLevelConfig:GetAttribute("XpNeeded") or 0
 
-	self:setState {
+	self:setState({
 		LevelName = LevelName,
 		LevelColor = LevelColor,
 		BarGradient = BarGradient,
 		XpNeeded = XpNeeded,
-	}
+	})
 end
 
 function LevelDisplay:render()

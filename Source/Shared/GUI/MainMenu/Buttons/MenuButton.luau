@@ -9,11 +9,11 @@ local MenuButton = Roact.Component:extend("MenuButton")
 function MenuButton:init()
 	local Text = "> " .. self.props.Text :: string or "NO TEXT GIVEN"
 
-	self:setState {
+	self:setState({
 		Text = Text,
 		HoveredText = "<b><u>" .. Text .. "</u></b>",
 		Hovered = false,
-	}
+	})
 
 	self.Motor = Flipper.SingleMotor.new(0)
 	local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
@@ -47,9 +47,9 @@ function MenuButton:render()
 			[Roact.Event.MouseEnter] = function()
 				Theme.PlaySound(Theme.RawAudio.ButtonHover, true)
 
-				self:setState {
+				self:setState({
 					Hovered = true,
-				}
+				})
 
 				self.Motor:setGoal(Flipper.Spring.new(1, {
 					frequency = 5,
@@ -58,9 +58,9 @@ function MenuButton:render()
 			end,
 
 			[Roact.Event.MouseLeave] = function()
-				self:setState {
+				self:setState({
 					Hovered = false,
-				}
+				})
 
 				self.Motor:setGoal(Flipper.Spring.new(0, {
 					frequency = 4,

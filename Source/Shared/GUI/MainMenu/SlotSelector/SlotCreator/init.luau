@@ -131,9 +131,9 @@ function SlotCreator:render()
 				}, {
 					Input = Roact.createElement(NameTextBox, {
 						TextChanged = function(NewText)
-							self:setState {
+							self:setState({
 								SlotName = NewText,
-							}
+							})
 						end,
 
 						Text = self.state.SlotName,
@@ -144,9 +144,9 @@ function SlotCreator:render()
 					LayoutOrder = 2,
 					OnClick = function()
 						local RandomName = MainMenuController:PickRandomName()
-						self:setState {
+						self:setState({
 							SlotName = RandomName,
-						}
+						})
 					end,
 				}, {}),
 			}),

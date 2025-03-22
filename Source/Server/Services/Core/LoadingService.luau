@@ -1,14 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(ReplicatedStorage.Packages.Knit)
 
-local LoadingService = Knit.CreateService {
+local LoadingService = Knit.CreateService({
 	Name = "LoadingService",
 	Client = {
 		LoadingStarted = Knit.CreateSignal(),
 		LoadingEnded = Knit.CreateSignal(),
 		UpdateActionText = Knit.CreateSignal(),
 	},
-}
+})
 
 local LogService
 LoadingService.Players = {}

@@ -24,11 +24,11 @@ function SlotSelector:init()
 	self.Binding = Binding
 	self.Motor:onStep(SetBinding)
 
-	self:setState {
+	self:setState({
 		ShowCreator = false,
 		CreatorSlotID = 0,
 		SlotFrames = { Roact.createElement(LoadingSlots) },
-	}
+	})
 end
 
 function SlotSelector:CreateSlotFrames(SlotInfo)
@@ -42,9 +42,9 @@ function SlotSelector:CreateSlotFrames(SlotInfo)
 			SlotFrames[ID] = Roact.createElement(UsedSlotFrame, {
 				SlotInfo = Slot,
 				OnSlotDelete = function()
-					self:setState {
+					self:setState({
 						SlotFrames = { Roact.createElement(LoadingSlots) },
-					}
+					})
 					DataService:DeleteSlot(ID):andThen(function()
 						DataService:GetSlotsInfo():andThen(function(SlotsInfo)
 							self:CreateSlotFrames(SlotsInfo)
@@ -56,18 +56,18 @@ function SlotSelector:CreateSlotFrames(SlotInfo)
 			SlotFrames[ID] = Roact.createElement(UnUsedSlotFrame, {
 				SlotInfo = Slot,
 				OnCreate = function()
-					self:setState {
+					self:setState({
 						ShowCreator = true,
 						CreatorSlotID = ID,
-					}
+					})
 				end,
 			})
 		end
 	end
 
-	self:setState {
+	self:setState({
 		SlotFrames = SlotFrames,
-	}
+	})
 end
 
 function SlotSelector:didMount()
@@ -123,9 +123,9 @@ function SlotSelector:render()
 			Creator = ShowCreator and Roact.createElement(Creator, {
 				SlotID = CreatorSlotID,
 				OnClose = function()
-					self:setState {
+					self:setState({
 						ShowCreator = false,
-					}
+					})
 				end,
 			}, {}),
 		}),

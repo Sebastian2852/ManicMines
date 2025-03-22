@@ -16,9 +16,9 @@ local MainMenuController
 function UsedSlotFrame:init()
 	MainMenuController = Knit.GetController("MainMenuController")
 
-	self:setState {
+	self:setState({
 		ShowDelete = false,
-	}
+	})
 end
 
 function UsedSlotFrame:render()
@@ -43,9 +43,9 @@ function UsedSlotFrame:render()
 			DeleteSlot = Roact.createElement(DeleteSlot, {
 				SlotID = SlotInfo.SlotID,
 				OnClose = function()
-					self:setState {
+					self:setState({
 						ShowDelete = false,
-					}
+					})
 				end,
 
 				OnDelete = function()
@@ -130,9 +130,9 @@ function UsedSlotFrame:render()
 						LayoutOrder = 2,
 
 						OnClick = function()
-							self:setState {
+							self:setState({
 								ShowDelete = true,
-							}
+							})
 						end,
 					}, {}),
 				}),
