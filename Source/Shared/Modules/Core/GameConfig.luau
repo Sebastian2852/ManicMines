@@ -331,11 +331,6 @@ Config.Chat = {
 			Tag = "[John Manic Mines]",
 			TagColor = Color3.fromRGB(250, 127, 255),
 		},
-		[4367923334] = {
-			Tag = "Quasar",
-			TagColor = Color3.fromRGB(0, 255, 0),
-			NameColor = Color3.fromRGB(255, 255, 255),
-		},
 	},
 }
 
