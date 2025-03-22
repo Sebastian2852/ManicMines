@@ -273,7 +273,7 @@ Config.DefaultSettings = {
 Config.MainMenu = {
 	Version = "v1.1.0",
 	TitleScreenVersion = "v1.1.0 - Caves & Caverns",
-  
+
 	--[=[
     All the credits for the game; main menu will automatically fill out the credits gui with these names. DO NOT EDIT YET!!
     ]=]
