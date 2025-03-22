@@ -1,6 +1,7 @@
 name: Format Code with Stylua
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - '**.luau'
