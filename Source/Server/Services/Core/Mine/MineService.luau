@@ -209,6 +209,7 @@ local function PickRandomOre(Depth: number, InCave: boolean)
 			v:GetAttribute("SpawningCurve")
 		)
 		if RandomWeight <= CurrentWeight then
+			-- Calculate a final random number to decide whether to actually generate the ore
 			local Number = NumberGenerator:NextInteger(1, v:GetAttribute("Rarity"))
 			if Number == 1 then
 				Ore = v
@@ -217,6 +218,7 @@ local function PickRandomOre(Depth: number, InCave: boolean)
 		end
 	end
 
+	-- Return the ore or stone if no ore was picked
 	return Ore and Ore or Core.Assets.Stone
 end
 
