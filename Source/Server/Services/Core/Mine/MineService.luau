@@ -8,6 +8,7 @@ local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
+-- Seperated into a different module since its nothing to do with the mine really
 local OreAnnouncer = require(ServerScriptService.Game.Modules.OreAnnouncer)
 
 local MineService = Knit.CreateService({
@@ -32,6 +33,7 @@ local TopLayerPositions = {}
 
 local NumberGenerator = Random.new()
 
+-- Offsets used to generate blocks
 local BlockGenerationOffsets = {
 	-- Direct neighbors
 	Vector3.new(BlockSize.X, 0, 0),
@@ -76,12 +78,14 @@ local HiddenMineSpawnPosition
 local TopLayerY
 local BottomLayerDepth
 
+-- Convert a world Y position into a depth
 local function ConvertYLevelToDepth(WorldY: number): number
 	local Top = TopLayerY
 	local CellSize = Core.GameConfig.Mine.BlockSize.Y
 	return math.floor((Top - WorldY) / CellSize)
 end
 
+-- Turn a vector into a string key for `UsedPositions` table
 local function KeyVector(Vector: Vector3)
 	return `{Vector.X};{Vector.Y};{Vector.Z}`
 end
@@ -98,6 +102,8 @@ local function ShowMineSpawn()
 	MineSpawn.CanCollide = true
 end
 
+-- FIXME: Possible applies attribs twice? (need to look into)
+-- Takes a stone block and applies it's attributes to the normal stone block
 local function SetupStoneBlock(StoneBlock: BasePart)
 	local NormalStone = Core.Assets.Stone
 	local Attribs = StoneBlock:GetAttributes()
@@ -115,6 +121,7 @@ local function SetupStoneBlock(StoneBlock: BasePart)
 	end
 end
 
+-- Returns the spawnable ores based on the given settings
 local function GetSpawnableOres(Depth: number, InCave: boolean)
 	local Ores = Core.Assets.Ores:GetChildren()
 	local SpawnableOres = {}
@@ -147,6 +154,8 @@ local function GetSpawnableOres(Depth: number, InCave: boolean)
 	return SpawnableOres
 end
 
+-- (tbh this probs doesnt even calculate it right but whatever it works)
+-- Returns the rarity of an ore based off a spawning curve
 local function GetRarityFromCurve(
 	OreSpawningRange: NumberRange,
 	NormalRarity: number,
@@ -519,20 +528,35 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 	end)
 end
 
+--[[
+Expose the `ConvertYLevelToDepth` local function
+]]
 function MineService:YLevelToDepth(YLevel: number)
 	return ConvertYLevelToDepth(YLevel)
 end
 
 -- [[ CLIENT ]] --
 
+--[[
+Returns the amount of blocks needed to collapse
+(this should not be used and will be removed)
+]]
 function MineService.Client:GetBlocksToCollapse()
 	return Core.GameConfig.Mine.BlocksToCollapse
 end
 
+--[[
+Converts a WorldY to a depth
+(this should not be used and will be removed)
+]]
 function MineService.Client:ConvertToDepth(_, YLevel: number)
 	return ConvertYLevelToDepth(YLevel)
 end
 
+--[[
+Returns the layer config for the given world Y
+(shouldnt really be used but needs to be here for now)
+]]
 function MineService.Client:GetLayerConfig(_, YLevel: number): Configuration
 	return self.Server:YLevelToLayer(YLevel)
 end
@@ -550,6 +574,7 @@ function MineService:KnitStart()
 	TopLayerY = OriginalMineSpawnPosition.Y
 	BottomLayerDepth = 0
 
+	-- Calculate the bottom depth of the mine
 	for _, Layer in pairs(ReplicatedStorage.Assets.Layers:GetChildren()) do
 		local Depth = Layer:GetAttribute("Depth").Max
 
@@ -562,6 +587,7 @@ function MineService:KnitStart()
 		Ore:SetAttribute("MaxHealth", Ore:GetAttribute("Health"))
 	end
 
+	-- Set a needed `MaxHealth` for every ore type + stone automatically
 	SetMaxHealthAttrib(Core.Assets.Stone)
 	for _, v in pairs(Core.Assets.Ores:GetChildren()) do
 		SetMaxHealthAttrib(v)
