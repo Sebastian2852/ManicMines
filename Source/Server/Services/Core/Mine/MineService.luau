@@ -373,10 +373,12 @@ Generate a random block at the given position
 ]=]
 function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	Position = self:SnapPositionToGrid(Position)
+	-- Check if something has already been generated at the position
 	if self:IsPositionAir(Position) then
 		return
 	end
 
+	-- Dont bother generating the block if its above the top of the mine since it wont even be seen
 	if Position.Y > TopLayerY then
 		return
 	end
