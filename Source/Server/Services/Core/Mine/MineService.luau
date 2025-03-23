@@ -492,6 +492,7 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 		local ShouldAnnounce = Block:GetAttribute("AnnounceOnMined")
 
 		if ShouldAnnounce then
+			-- This sends a message to a discord webhook which yields so done in a task.spawn()
 			task.spawn(function()
 				MessageService:SendMessage({
 					Message = `{PlayerWhoMined.DisplayName} (@{PlayerWhoMined.Name}) mined {Block:GetAttribute(
