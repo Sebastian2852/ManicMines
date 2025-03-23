@@ -8,7 +8,7 @@ local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
--- Seperated into a different module since its nothing to do with the mine really
+-- Seperated into a different module as to not clutter this service
 local OreAnnouncer = require(ServerScriptService.Game.Modules.OreAnnouncer)
 
 local MineService = Knit.CreateService({
@@ -179,6 +179,11 @@ local function GetRarityFromCurve(
 	return AdjustedRarity
 end
 
+--[[
+Picks a random ore from the ores that can spawn with the given settings
+Since rarities are converted to weigths this is split into a different function to
+stop the generate block function being too long and unreadable.
+]]
 local function PickRandomOre(Depth: number, InCave: boolean)
 	local Ores = GetSpawnableOres(Depth, InCave)
 	local TotalWeight = 0
@@ -265,6 +270,9 @@ Generates the top layer of the mine
 function MineService:GenerateTopLayer()
 	ShowMineSpawn()
 
+	-- Calculate the blocks to generate on each axis by taking sizes and dividing by block sizes
+	-- This in theory would allow blocks to be any shape but right now other parts of the game
+	-- expect blocks to be perfect squares.
 	local BlocksToGenerateX = math.round(MineSpawn.Size.X / BlockSize.X)
 	local BlocksToGenerateY = math.round(MineSpawn.Size.Z / BlockSize.Z)
 
@@ -277,6 +285,7 @@ function MineService:GenerateTopLayer()
 	UsedPositions = {}
 	TopLayerPositions = {}
 
+	-- Seperated into a different function for more readable multithreading
 	local function Generate(Y)
 		return Promise.new(function(Resolve)
 			for X = 1, BlocksToGenerateX, 1 do
@@ -296,11 +305,15 @@ function MineService:GenerateTopLayer()
 	local Promises = {}
 
 	local Timer = Profiler.Timer.new("TopLayerGen")
+	-- Start a promise for each "strip" of blocks that need to generate
+	-- This is the fastest way to generate after testing
 	for Y = 1, BlocksToGenerateY, 1 do
 		table.insert(Promises, Generate(Y))
 	end
 	Timer:Stop()
 
+	-- Await for all the threads to finish generating blocks and then hiding the mine spawn to allow players to mine
+	-- A wait is added to purposly delay to hiding the mine spawn as per request of project lead
 	Promise.all(Promises):andThen(function()
 		task.wait(1)
 		HideMineSpawn()
@@ -319,6 +332,7 @@ function MineService:Collapse()
 	Collapsing = true
 	ShowMineSpawn()
 
+	-- Teleport players to the surface if they are not in their tycoon (they are most likley in the mine)
 	for _, DataFolder: Core.DataFolder in pairs(ReplicatedStorage.PlayerData:GetChildren()) do
 		if DataFolder.Name == "Template" then
 			continue
@@ -333,7 +347,7 @@ function MineService:Collapse()
 
 	Workspace.Game.Mine:ClearAllChildren()
 	self.MineStats.BlocksGenerated = 0
-	NumberGenerator = Random.new()
+	NumberGenerator = Random.new() -- Create a new seed for different generation of blocks
 
 	task.wait(1)
 
@@ -369,6 +383,7 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 
 	local Layer = self:YLevelToLayer(Position.Y)
 
+	-- Random number to see if the block should attempt to generate an ore or stone
 	local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
 	local Block: BasePart = nil
 	local Stone = Layer.Stone
@@ -376,10 +391,13 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	if RandomNumber == 1 then
 		local Ore = PickRandomOre(ConvertYLevelToDepth(Position.Y), InCave)
 
+		-- We turn stone into the ore instead of cloning the ore
+		-- Since each layer has different stone color and/or material
 		local NewOre = Stone:Clone() :: BasePart
 		NewOre.Name = Ore.Name
 		NewOre:ClearAllChildren()
 
+		-- Apply the attributes from the ore to the stone block
 		local AttribsToSet = Ore:GetAttributes()
 
 		for Key, Value in pairs(AttribsToSet) do
@@ -394,12 +412,16 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	end
 
 	if Block == nil then
+		-- Take the same steps but instead with stone, so the normal stone gets turned into layer stone
+		-- Instead of stone getting turned into ore
 		Stone = Stone:Clone()
 		SetupStoneBlock(Stone)
 		Block = Stone
 	end
 
-	Block.Size = Vector3.new(6, 6, 6)
+	Block.Size = BlockSize
+	-- Lerp the stone's color based on the layer's settings to give stone some color variation
+	-- Instead of all of it looking the same
 	Block.Color = Block.Color:Lerp(
 		Layer:GetAttribute("BlockColorOffset"),
 		NumberGenerator:NextNumber(0, Layer:GetAttribute("BlockColorOffsetLerp"))
@@ -407,21 +429,27 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	Block:PivotTo(CFrame.new(Position))
 	Block.Parent = Workspace.Game.Mine
 	Block.Anchored = true
+	-- Set the depth attribute so that the client can easily calculate depth-based things like turning point without doing any maths or events
 	Block:SetAttribute("Depth", self:YLevelToDepth(Block.CFrame.Position.Y))
 	self.MineStats.BlocksGenerated += 1
 	self:UpdateMiningConditions()
 
+	-- If the block is on the very top of the mine and it is not a top layer block then its made unminble to stop players
+	-- Mining outside of the map or too high
 	if Position.Y == TopLayerY and not (TopLayerPositions[KeyVector(Position)] == true) then
 		Block.Color = Core.Util:TintColor(Block.Color, Color3.new(0, 0, 0))
 		return Block
 	end
 
+	-- If the block is at the very bottom of the mine then its made unminable to stop players mining below the
+	-- Created layers causing for some visual bugs as well as ore gen breaking
 	local Depth = self:YLevelToDepth(Position.Y)
 	if Depth >= BottomLayerDepth then
 		Block.Color = Core.Util:TintColor(Block.Color, Color3.new(0, 0, 0))
 		return Block
 	end
 
+	-- Block is ready to be mined
 	Block:SetAttribute("CanMine", true)
 	return Block
 end
@@ -478,6 +506,8 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 
 	self.OnBlockMined:Fire(Block, Block.CFrame.Position)
 
+	-- A promise is started since the block has a module which can take time to execute
+	-- and so to not block the thread it is ran in a promise
 	Promise.new(function(Resolve)
 		local Module = Block:FindFirstChildWhichIsA("ModuleScript")
 		if not Module then
@@ -485,14 +515,18 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 			return
 		end
 
+		-- The module expected to return if the player who mined it should actually get it in their inventory
+		-- In the future this return should probably be checked and should be ran in a pcall
 		local ShouldDrop = require(Module)(self, PlayerWhoMined)
 
 		Resolve(ShouldDrop)
 	end):andThen(function(ShouldDrop)
 		local ShouldAnnounce = Block:GetAttribute("AnnounceOnMined")
 
+		-- Some rare ores are sent in chat once mined
+		-- TODO: Make this send to every server
 		if ShouldAnnounce then
-			-- This sends a message to a discord webhook which yields so done in a task.spawn()
+			-- Done in task.spawn since this sends to a discord webhook which takes time
 			task.spawn(function()
 				MessageService:SendMessage({
 					Message = `{PlayerWhoMined.DisplayName} (@{PlayerWhoMined.Name}) mined {Block:GetAttribute(
@@ -512,6 +546,7 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 			end)
 		end
 
+		-- Generate blocks around the block that is being mined in case it hasnt already
 		self:GenerateAroundBlockAsync(Block):andThen(function()
 			if PlayerWhoMined and ShouldDrop then
 				PlayerStatsService:MinedOre(
@@ -519,6 +554,7 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 					Core.OreList.CreateFromOre(Block.Name, Block:GetAttribute("AmountDroppedWhenMined"))
 				)
 
+				-- Advance the tutroial if the player is on a certain part of the tutorial
 				local DataFolder = ReplicatedStorage.PlayerData:FindFirstChild(PlayerWhoMined.UserId) :: Core.DataFolder
 				if DataFolder.TutorialStage.Value == 2 then
 					DataFolder.TutorialStage.Value = 3
@@ -588,7 +624,8 @@ function MineService:KnitStart()
 		Ore:SetAttribute("MaxHealth", Ore:GetAttribute("Health"))
 	end
 
-	-- Set a needed `MaxHealth` for every ore type + stone automatically
+	-- Set a needed `MaxHealth` attribute for every ore type + stone automatically instead of having to
+	-- manually set it
 	SetMaxHealthAttrib(Core.Assets.Stone)
 	for _, v in pairs(Core.Assets.Ores:GetChildren()) do
 		SetMaxHealthAttrib(v)
