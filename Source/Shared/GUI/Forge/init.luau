@@ -73,6 +73,7 @@ function Forge:CreateOwnedButton(Name: string, Config: Configuration)
 			PickaxeConfig = Config,
 			Name = Name,
 			Image = GetPickaxeImage(Config),
+			Animated = true,
 		}, {}),
 	})
 end
@@ -90,6 +91,7 @@ function Forge:CreateUnOwnedButton(Name: string, Config: Configuration)
 			Image = GetPickaxeImage(Config),
 			NameColor = Color3.fromHex("3f3f3f"),
 			ImageColor = Color3.fromHex("3f3f3f"),
+			Animated = true,
 		}, {}),
 	})
 end
@@ -107,6 +109,7 @@ function Forge:CreateLockedButton(Config: Configuration)
 			Image = GetPickaxeImage(Config),
 			NameColor = Color3.fromHex("3f3f3f"),
 			ImageColor = Color3.new(0, 0, 0),
+			Animated = false,
 		}, {}),
 	})
 end
@@ -306,13 +309,6 @@ function Forge:render()
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 			}, {
-				Padding = Roact.createElement("UIPadding", {
-					PaddingTop = UDim.new(0, 10),
-					PaddingLeft = UDim.new(0, 10),
-					PaddingRight = UDim.new(0, 10),
-					PaddingBottom = UDim.new(0, 10),
-				}, {}),
-
 				Pickaxes = Roact.createElement("Frame", {
 					Size = UDim2.fromScale(0.7, 0.8),
 					Position = UDim2.new(0, 10, 0.5, 0),
@@ -321,6 +317,13 @@ function Forge:render()
 					BackgroundTransparency = 0.5,
 					BorderSizePixel = 0,
 				}, {
+					Padding = Roact.createElement("UIPadding", {
+						PaddingTop = UDim.new(0, 10),
+						PaddingLeft = UDim.new(0, 10),
+						PaddingRight = UDim.new(0, 10),
+						PaddingBottom = UDim.new(0, 10),
+					}, {}),
+
 					Scroller = Roact.createElement("ScrollingFrame", {
 						Size = UDim2.fromScale(1, 1),
 						BackgroundTransparency = 1,
@@ -335,7 +338,6 @@ function Forge:render()
 						Layout = Roact.createElement("UIListLayout", {
 							SortOrder = Enum.SortOrder.LayoutOrder,
 							FillDirection = Enum.FillDirection.Vertical,
-							HorizontalAlignment = Enum.HorizontalAlignment.Center,
 							Padding = UDim.new(0, 10),
 						}, {}),
 

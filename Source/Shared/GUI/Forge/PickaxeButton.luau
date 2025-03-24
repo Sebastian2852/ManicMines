@@ -21,9 +21,16 @@ function PickaxeButton:render()
 	local Image = self.props.Image or Theme.Images.Missing
 	local ImageColor = self.props.ImageColor or Color3.new(1, 1, 1)
 	local PickaxeConfig = self.props.PickaxeConfig or ReplicatedStorage.Assets.Pickaxe.Pickaxes["0"]
+	local Animated = self.props.Animated or false
+
+	local Size = self.Binding:map(function(Value)
+		return UDim2.fromScale(1, 1):Lerp(UDim2.fromScale(1, 1.2), Value)
+	end)
 
 	return Roact.createElement("Frame", {
-		Size = UDim2.fromScale(1, 1),
+		Size = Size,
+		Position = UDim2.fromScale(0.5, 0.5),
+		AnchorPoint = Vector2.new(0.5, 0.5),
 		BackgroundColor3 = Color3.new(0, 0, 0),
 		BackgroundTransparency = 0.5,
 		BorderSizePixel = 0,
@@ -48,6 +55,24 @@ function PickaxeButton:render()
 
 			[Roact.Event.MouseButton1Click] = function()
 				Display.ShowPickaxe(PickaxeConfig)
+			end,
+
+			[Roact.Event.MouseEnter] = function()
+				if Animated then
+					self.Motor:setGoal(Flipper.Spring.new(1, {
+						frequency = 4,
+						dampingRatio = 1,
+					}))
+				end
+			end,
+
+			[Roact.Event.MouseLeave] = function()
+				if Animated then
+					self.Motor:setGoal(Flipper.Spring.new(0, {
+						frequency = 4,
+						dampingRatio = 1,
+					}))
+				end
 			end,
 		}, {}),
 
