@@ -20,7 +20,7 @@ local Buying = false
 
 function InfoFrame:CreateIconLabel(Text: string, IconImage: string, LayoutOrder: number)
 	return Roact.createElement("Frame", {
-		Size = UDim2.fromScale(1, 0.3),
+		Size = UDim2.fromScale(1, 0.25),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 	}, {
@@ -34,6 +34,10 @@ end
 
 function InfoFrame:CreateCostsFragment(Costs: Core.OreList)
 	local Elements = {}
+	Elements["Layout"] = Roact.createElement("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		FillDirection = Enum.FillDirection.Vertical,
+	}, {})
 
 	for _, v: Core.OreListItem in pairs(Costs:LoopList()) do
 		Elements[v.Name] = self:CreateIconLabel(v.DisplayName .. ": " .. v.Amount, v.Emblem, v.Amount)
@@ -293,7 +297,22 @@ function InfoFrame:render()
 				}, {
 					Costs = not Unlocked and Roact.createElement(CostFrame, {
 						OreList = CostsOreList,
-					}, {}) or self:CreateCostsFragment(CostsOreList),
+					}, {}) or Roact.createElement("ScrollingFrame", {
+						Size = UDim2.fromScale(1, 1),
+						Position = UDim2.fromScale(0, 0),
+						BackgroundTransparency = 1,
+						BorderSizePixel = 0,
+
+						CanvasSize = UDim2.fromScale(1, 1),
+						AutomaticCanvasSize = Enum.AutomaticSize.Y,
+						ScrollBarThickness = 5,
+						ScrollBarImageColor3 = Color3.new(1, 1, 1),
+						VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right,
+						VerticalScrollBarInset = Enum.ScrollBarInset.Always,
+						ScrollingDirection = Enum.ScrollingDirection.Y,
+					}, {
+						self:CreateCostsFragment(CostsOreList),
+					}),
 				}),
 			}),
 
