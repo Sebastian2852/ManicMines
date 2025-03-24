@@ -64,7 +64,7 @@ end
 
 function Forge:CreateOwnedButton(Name: string, Config: Configuration)
 	return Roact.createElement("Frame", {
-		Size = UDim2.fromScale(1, 0.08),
+		Size = UDim2.fromScale(0.95, 0.08),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		LayoutOrder = tonumber(Config.Name),
@@ -79,7 +79,7 @@ end
 
 function Forge:CreateUnOwnedButton(Name: string, Config: Configuration)
 	return Roact.createElement("Frame", {
-		Size = UDim2.fromScale(1, 0.08),
+		Size = UDim2.fromScale(0.95, 0.08),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		LayoutOrder = tonumber(Config.Name),
@@ -96,7 +96,7 @@ end
 
 function Forge:CreateLockedButton(Config: Configuration)
 	return Roact.createElement("Frame", {
-		Size = UDim2.fromScale(1, 0.08),
+		Size = UDim2.fromScale(0.95, 0.08),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		LayoutOrder = tonumber(Config.Name),
@@ -306,6 +306,13 @@ function Forge:render()
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 			}, {
+				Padding = Roact.createElement("UIPadding", {
+					PaddingTop = UDim.new(0, 10),
+					PaddingLeft = UDim.new(0, 10),
+					PaddingRight = UDim.new(0, 10),
+					PaddingBottom = UDim.new(0, 10),
+				}, {}),
+
 				Pickaxes = Roact.createElement("Frame", {
 					Size = UDim2.fromScale(0.7, 0.8),
 					Position = UDim2.new(0, 10, 0.5, 0),
@@ -330,13 +337,6 @@ function Forge:render()
 							FillDirection = Enum.FillDirection.Vertical,
 							HorizontalAlignment = Enum.HorizontalAlignment.Center,
 							Padding = UDim.new(0, 10),
-						}, {}),
-
-						Padding = Roact.createElement("UIPadding", {
-							PaddingTop = UDim.new(0, 10),
-							PaddingLeft = UDim.new(0, 10),
-							PaddingRight = UDim.new(0, 10),
-							PaddingBottom = UDim.new(0, 10),
 						}, {}),
 
 						table.unpack(PickaxeButtons),
