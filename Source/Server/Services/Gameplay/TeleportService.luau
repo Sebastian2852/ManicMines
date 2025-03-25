@@ -156,8 +156,13 @@ function TeleportService.Client:TeleportToSurface(Player: Player)
 	task.spawn(function()
 		task.wait(1)
 		local DataFolder = DataService:GetPlayerDataFolder(Player) :: Core.DataFolder
+
 		if DataFolder.TutorialStage.Value == 1 then
 			DataFolder.TutorialStage.Value = 2
+		end
+
+		if DataFolder.TutorialStage.Value == 6 then
+			DataFolder.TutorialStage.Value = 7
 		end
 	end)
 	self.Server:TeleportPlayerToSurface(Player)
