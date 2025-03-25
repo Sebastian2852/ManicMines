@@ -400,6 +400,13 @@ function TycoonUpgradeService:Upgrade(Player: Player, Tycoon: Model, UpgradeName
 	PickaxeService:CalculateMiningPower(Player, true)
 	PickaxeService:GetOptimalDepth(Player, true)
 
+	if UpgradeName == "Storage" then
+		local DataFolder = DataService:GetPlayerDataFolder(Player) :: Core.DataFolder
+		if DataFolder.TutorialStage.Value == 4 then
+			DataFolder.TutorialStage.Value = 5
+		end
+	end
+
 	return true
 end
 
