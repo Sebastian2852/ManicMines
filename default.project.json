@@ -26,6 +26,9 @@
         },
         "Roact": {
           "$path": "Submodules/Roact.luau"
+        },
+        "Zeno":{
+          "$path":"Submodules/Zeno"
         }
       },
       "Assets": {
