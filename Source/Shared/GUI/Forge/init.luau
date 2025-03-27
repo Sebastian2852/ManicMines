@@ -19,6 +19,7 @@ local Camera = Workspace.CurrentCamera
 local CameraPos = Workspace.Game:FindFirstChild("ForgeCameraPos")
 
 local DataService
+local ClientDataController
 
 local FloatingInfo = require(ReplicatedStorage.Game.GUI.Common.FloatingInfo)
 local InfoFrame = require(script.InfoFrame)
@@ -116,6 +117,7 @@ end
 
 function Forge:init()
 	DataService = Knit.GetService("DataService")
+	ClientDataController = Knit.GetController("ClientDataController")
 
 	Display.SetCurrentPickaxe:Connect(function(Pickaxe: Configuration)
 		self:setState({
@@ -129,6 +131,10 @@ function Forge:init()
 end
 
 function Forge:didMount()
+	if ClientDataController:GetTutorialStage() == 7 then
+		ClientDataController:AdvanceTutorialStage()
+	end
+
 	self:CreateButtons()
 	CameraPos = Workspace.Game:FindFirstChild("ForgeCameraPos")
 
@@ -155,6 +161,10 @@ function Forge:willUnmount()
 
 	Camera.CameraType = Enum.CameraType.Custom
 	Display:CleanUp()
+
+	if ClientDataController:GetTutorialStage() == 8 then
+		ClientDataController:AdvanceTutorialStage()
+	end
 end
 
 function Forge:CreateButtons()
