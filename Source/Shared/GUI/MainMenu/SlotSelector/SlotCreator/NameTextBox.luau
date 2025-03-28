@@ -51,10 +51,14 @@ function NameTextBox:render()
 			end,
 
 			[Roact.Event.FocusLost] = function(Object: TextBox)
+				if self.props.PreFilter then
+					self.props.PreFilter()
+				end
+
 				Object.Text = MainMenuController:FilterName(Object.Text)
 
-				if self.props.TextChanged then
-					self.props.TextChanged(Object.Text)
+				if self.props.AfterFilter then
+					self.props.AfterFilter(Object.Text)
 				end
 
 				self.Motor:setGoal(Flipper.Spring.new(0, {

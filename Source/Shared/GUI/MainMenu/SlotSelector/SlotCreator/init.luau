@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local Zeno = require(ReplicatedStorage.Packages.Zeno)
 
 local SlotCreator = Roact.Component:extend("SlotCreator")
 
@@ -20,6 +21,15 @@ function SlotCreator:didMount()
 	self:setState({
 		Tutorial = true,
 		SlotName = "",
+		CanCreate = false,
+	})
+end
+
+function SlotCreator:Verify()
+	local Name = self.state.SlotName
+	local Valid = Zeno.String():LongerThan(1):ShorterThan(15):Check(Name)
+	self:setState({
+		CanCreate = Valid,
 	})
 end
 
@@ -27,6 +37,7 @@ function SlotCreator:render()
 	local SlotID = self.props.SlotID
 	local SlotName = self.state.SlotName
 	local Tutorial = self.state.Tutorial
+	local CanCreate = self.state.CanCreate
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
@@ -139,10 +150,18 @@ function SlotCreator:render()
 					LayoutOrder = 1,
 				}, {
 					Input = Roact.createElement(NameTextBox, {
-						TextChanged = function(NewText)
+						PreFilter = function()
+							self:setState({
+								CanCreate = false,
+							})
+						end,
+
+						AfterFilter = function(NewText)
 							self:setState({
 								SlotName = NewText,
-							})
+							}, function()
+								self:Verify()
+							end)
 						end,
 
 						Text = self.state.SlotName,
@@ -202,7 +221,6 @@ function SlotCreator:render()
 					Description = "Enable the tutorial for this slot",
 					LayoutOrder = 1,
 					OnToggle = function(New: boolean)
-						print("On toggle", New)
 						self:setState({
 							Tutorial = New,
 						})
@@ -226,24 +244,25 @@ function SlotCreator:render()
 
 			CreateButton = Roact.createElement("TextButton", {
 				Size = UDim2.fromScale(0.3, 0.7),
-				BackgroundColor3 = Theme.BackgroundColorGreen,
+				BackgroundColor3 = Theme.BackgroundColorGreen:Lerp(Color3.new(0, 0, 0), CanCreate and 0 or 0.5),
 				BorderSizePixel = 0,
 				LayoutOrder = 1,
 
 				Text = "Create",
 				TextScaled = true,
-				TextColor3 = Theme.TextColor,
+				TextColor3 = CanCreate and Theme.TextColor or Theme.TextDisabledColor,
 				FontFace = Theme.Font,
+				AutoButtonColor = CanCreate,
 
-				[Roact.Event.MouseEnter] = function()
+				[Roact.Event.MouseEnter] = CanCreate and function()
 					Theme.PlaySound(Theme.RawAudio.ButtonHover, true)
-				end,
+				end or function() end,
 
-				[Roact.Event.MouseButton1Click] = function()
+				[Roact.Event.MouseButton1Click] = CanCreate and function()
 					Theme.PlaySound(Theme.RawAudio.ButtonClick)
 					local SlotSettings = MainMenuController:CreateSlotSettings(SlotName, Tutorial)
 					MainMenuController:CreateSlot(SlotID, SlotSettings)
-				end,
+				end or function() end,
 			}, {
 				Corners = Roact.createElement("UICorner", {
 					CornerRadius = UDim.new(0, 4),
