@@ -1,4 +1,8 @@
+local BadgeService = game:GetService("BadgeService")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RobloxMessagingService = game:GetService("MessagingService")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -35,6 +39,12 @@ function MessageService:SendMessage(Message: Core.ChatMessage)
 	Logger:Log("Sent message to all players")
 end
 
+function MessageService:SendMessageToAllServers(Message: Core.ChatMessage)
+	local Color = Message.MessageColor
+	Message.MessageColor = { Color.R, Color.G, Color.B }
+	RobloxMessagingService:PublishAsync("GlobalChatMessage", HttpService:JSONEncode(Message))
+end
+
 --[[ KNIT ]]
 --
 
@@ -51,6 +61,25 @@ function MessageService:KnitStart()
 			end
 			MessageService:SendMessageToPlayer(Message, v)
 		end
+
+		task.wait(10)
+
+		for _, v in pairs(Players:GetPlayers()) do
+			local ID = Core.GameConfig.Badges[v.UserId]
+			if ID == nil then
+				break
+			end
+
+			for _, ToAward in pairs(Players:GetPlayers()) do
+				BadgeService:AwardBadge(ToAward.UserId, ID.ID)
+				MessageService:SendMessageToAllServers({
+					Message = `{ToAward.DisplayName} (@{ToAward.Name}) has been awarded the "{ID.Name}" badge`,
+					Prefix = "",
+					HasPrefix = false,
+					MessageColor = Color3.fromRGB(255, 210, 24),
+				})
+			end
+		end
 	end)
 
 	game.Players.PlayerRemoving:Connect(function(Player)
@@ -60,6 +89,16 @@ function MessageService:KnitStart()
 		}
 
 		MessageService:SendMessage(Message)
+	end)
+
+	RobloxMessagingService:SubscribeAsync("GlobalChatMessage", function(Received)
+		local Message = Received.Data
+
+		local Decoded = HttpService:JSONDecode(Message) :: Core.ChatMessage
+		local Color = Decoded.MessageColor :: {}
+		Decoded.MessageColor = Color3.new(Color[1], Color[2], Color[3])
+
+		self:SendMessage(Decoded)
 	end)
 end
 

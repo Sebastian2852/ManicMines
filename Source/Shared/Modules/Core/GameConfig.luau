@@ -334,4 +334,9 @@ Config.Chat = {
 	},
 }
 
+Config.Badges = {
+	[3220168401] = { Name = "Meet BillyBob", ID = 397917972609905 },
+	[3092257097] = { Name = "Meet ImAnoob", ID = 1161079932804851 },
+}
+
 return Config
