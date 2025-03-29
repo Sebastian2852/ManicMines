@@ -1,7 +1,8 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
+local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local AdminService = Knit.CreateService({
 	Name = "AdminService",
@@ -9,6 +10,9 @@ local AdminService = Knit.CreateService({
 })
 
 local PlayerStatsService
+
+local TotalPlayersWhoJoined = 0
+local ServerStartTime = DateTime.now()
 
 -- [[ PUBLIC ]] --
 
@@ -26,6 +30,14 @@ function AdminService:IsPlayerAdmin(Player: Player): boolean
 	end
 
 	return false
+end
+
+function AdminService:GetServerStartTime(): DateTime
+	return ServerStartTime
+end
+
+function AdminService:GetTotalPlayerJoinCount(): number
+	return TotalPlayersWhoJoined
 end
 
 --[=[
@@ -91,6 +103,10 @@ end
 
 function AdminService:KnitStart()
 	PlayerStatsService = Knit.GetService("PlayerStatsService")
+
+	Players.PlayerAdded:Connect(function()
+		TotalPlayersWhoJoined += 1
+	end)
 end
 
 return AdminService
