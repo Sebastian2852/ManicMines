@@ -85,6 +85,12 @@ local function ConvertYLevelToDepth(WorldY: number): number
 	return math.floor((Top - WorldY) / CellSize)
 end
 
+local function ConvertDepthToYLevel(Depth: number): number
+	local Top = TopLayerY
+	local CellSize = Core.GameConfig.Mine.BlockSize.Y
+	return Top - (Depth * CellSize)
+end
+
 -- Turn a vector into a string key for `UsedPositions` table
 local function KeyVector(Vector: Vector3)
 	return `{Vector.X};{Vector.Y};{Vector.Z}`
@@ -567,6 +573,101 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 			Block:Destroy()
 		end)
 	end)
+end
+
+function MineService:GenerateRoomAtDepth(Depth: number): Vector3
+	local YLevel = ConvertDepthToYLevel(Depth)
+	local RandomXZ = NumberGenerator:NextInteger(-100, 100)
+	local CenterPos = Vector3.new(RandomXZ, YLevel, RandomXZ)
+
+	local YSize = Core.GameConfig.Mine.BlockSize.Y
+	local CenterOffset = YSize * 2
+
+	local Offsets = {
+		--Floor
+		Vector3.new(0, -CenterOffset, 0),
+		Vector3.new(YSize, -CenterOffset, 0),
+		Vector3.new(-YSize, -CenterOffset, 0),
+		Vector3.new(0, -CenterOffset, YSize),
+		Vector3.new(0, -CenterOffset, -YSize),
+		Vector3.new(YSize, -CenterOffset, YSize),
+		Vector3.new(-YSize, -CenterOffset, YSize),
+		Vector3.new(YSize, -CenterOffset, -YSize),
+		Vector3.new(-YSize, -CenterOffset, -YSize),
+
+		--Roof
+		Vector3.new(0, CenterOffset, 0),
+		Vector3.new(YSize, CenterOffset, 0),
+		Vector3.new(-YSize, CenterOffset, 0),
+		Vector3.new(0, CenterOffset, YSize),
+		Vector3.new(0, CenterOffset, -YSize),
+		Vector3.new(YSize, CenterOffset, YSize),
+		Vector3.new(-YSize, CenterOffset, YSize),
+		Vector3.new(YSize, CenterOffset, -YSize),
+		Vector3.new(-YSize, CenterOffset, -YSize),
+
+		--Wall
+		Vector3.new(CenterOffset, 0, 0),
+		Vector3.new(CenterOffset, YSize, 0),
+		Vector3.new(CenterOffset, -YSize, 0),
+		Vector3.new(CenterOffset, 0, YSize),
+		Vector3.new(CenterOffset, 0, -YSize),
+		Vector3.new(CenterOffset, YSize, YSize),
+		Vector3.new(CenterOffset, -YSize, YSize),
+		Vector3.new(CenterOffset, YSize, -YSize),
+		Vector3.new(CenterOffset, -YSize, -YSize),
+
+		--Wall
+		Vector3.new(-CenterOffset, 0, 0),
+		Vector3.new(-CenterOffset, YSize, 0),
+		Vector3.new(-CenterOffset, -YSize, 0),
+		Vector3.new(-CenterOffset, 0, YSize),
+		Vector3.new(-CenterOffset, 0, -YSize),
+		Vector3.new(-CenterOffset, YSize, YSize),
+		Vector3.new(-CenterOffset, -YSize, YSize),
+		Vector3.new(-CenterOffset, YSize, -YSize),
+		Vector3.new(-CenterOffset, -YSize, -YSize),
+
+		--Wall
+		Vector3.new(0, 0, CenterOffset),
+		Vector3.new(0, YSize, CenterOffset),
+		Vector3.new(0, -YSize, CenterOffset),
+		Vector3.new(YSize, 0, CenterOffset),
+		Vector3.new(-YSize, 0, CenterOffset),
+		Vector3.new(YSize, YSize, CenterOffset),
+		Vector3.new(-YSize, YSize, CenterOffset),
+		Vector3.new(YSize, -YSize, CenterOffset),
+		Vector3.new(-YSize, -YSize, CenterOffset),
+
+		--Wall
+		Vector3.new(0, 0, -CenterOffset),
+		Vector3.new(0, YSize, -CenterOffset),
+		Vector3.new(0, -YSize, -CenterOffset),
+		Vector3.new(YSize, 0, -CenterOffset),
+		Vector3.new(-YSize, 0, -CenterOffset),
+		Vector3.new(YSize, YSize, -CenterOffset),
+		Vector3.new(-YSize, YSize, -CenterOffset),
+		Vector3.new(YSize, -YSize, -CenterOffset),
+		Vector3.new(-YSize, -YSize, -CenterOffset),
+	}
+
+	-- Generate the walls, floor, and roof
+	for _, Offset in pairs(Offsets) do
+		local NewPos = CenterPos + Offset
+		self:GenerateAtPosition(NewPos)
+	end
+
+	-- Mark the air inside the cube as used
+	for x = -YSize, YSize, YSize do
+		for y = -CenterOffset, CenterOffset, YSize do
+			for z = -YSize, YSize, YSize do
+				local AirPos = CenterPos + Vector3.new(x, y, z)
+				self:AddAirPosition(AirPos)
+			end
+		end
+	end
+
+	return CenterPos
 end
 
 --[[

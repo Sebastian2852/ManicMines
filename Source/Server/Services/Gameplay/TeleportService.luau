@@ -13,6 +13,7 @@ local TeleportService = Knit.CreateService({
 local TycoonService
 local DataService
 local LoadingService
+local MineService
 
 local NamesToAvoid = {
 	"HumanoidRootPart",
@@ -147,6 +148,11 @@ function TeleportService:TeleportPlayerToSurface(Player: Player)
 	DataFolder.InTycoon.Value = false
 end
 
+function TeleportService:TeleportToDepth(Player: Player, Depth: number)
+	local Pos = MineService:GenerateRoomAtDepth(Depth)
+	self:TeleportPlayerToPosition(Player, Pos, true)
+end
+
 -- [[ CLIENT ]] --
 
 --[=[
@@ -186,6 +192,7 @@ function TeleportService:KnitStart()
 	TycoonService = Knit.GetService("TycoonService")
 	DataService = Knit.GetService("DataService")
 	LoadingService = Knit.GetService("LoadingService")
+	MineService = Knit.GetService("MineService")
 end
 
 return TeleportService
