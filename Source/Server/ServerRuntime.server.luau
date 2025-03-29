@@ -34,4 +34,18 @@ Knit.Start()
 Cmdr:RegisterHooksIn(script.Parent.Cmdr.Hooks)
 Cmdr:RegisterCommandsIn(script.Parent.Cmdr.Commands)
 Cmdr:RegisterTypesIn(script.Parent.Cmdr.Types)
-Cmdr:RegisterDefaultCommands({ "Help", "DefaultUtil" })
+Cmdr:RegisterDefaultCommands(function(Command)
+	if Command.Group == "Help" then
+		return true
+	end
+
+	if Command.Group == "DefaultUtil" then
+		return true
+	end
+
+	if Command.Name == "teleport" then
+		return true
+	end
+
+	return false
+end)
