@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
-local Zeno = require(ReplicatedStorage.Packages.Zeno)
 
 local SlotCreator = Roact.Component:extend("SlotCreator")
 
@@ -27,8 +27,7 @@ end
 
 function SlotCreator:Verify()
 	local Name = self.state.SlotName
-	local Valid = Zeno.String():LongerThan(1):ShorterThan(15):Check(Name)
-	self:setState({
+	local Valid = self:setState({
 		CanCreate = Valid,
 	})
 end

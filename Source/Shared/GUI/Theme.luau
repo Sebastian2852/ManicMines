@@ -33,12 +33,12 @@ Theme.Images = {
 	SurfaceButton = "rbxassetid://119967532396729",
 	OreIndexButton = "rbxassetid://123713792355132",
 	TycoonTeleportButton = "rbxassetid://83761770070710",
+	TycoonEditor = "rbxassetid://80787861937370",
 
 	-- HUD
 	Gold = "rbxassetid://92870304618730",
 	MiningPower = "rbxassetid://94366503795994",
 	OptimalDepth = "rbxassetid://95810331033800",
-	TycoonEditor = "rbxassetid://87413669840444",
 
 	-- Misc
 	Vignette = "rbxassetid://127366667073715",

@@ -1,3 +1,6 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Zeno = require(ReplicatedStorage.Packages.Zeno)
+
 local Config = {}
 
 --[=[
@@ -273,6 +276,8 @@ Config.DefaultSettings = {
 Config.MainMenu = {
 	Version = "v1.1.0",
 	TitleScreenVersion = "v1.1.0 - Caves & Caverns",
+
+	NameTypeCheck = Zeno.String():LongerThan(1):ShorterThan(50),
 
 	--[=[
     All the credits for the game; main menu will automatically fill out the credits gui with these names. DO NOT EDIT YET!!

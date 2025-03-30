@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 
@@ -15,10 +16,13 @@ function Main:init()
 
 	self:setState({
 		TycoonNameInput = "",
+		CanUpdateName = false,
 	})
 end
 
 function Main:render()
+	local CanUpdateName = self.state.CanUpdateName
+
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 0.5,
@@ -68,6 +72,7 @@ function Main:render()
 
 				[Roact.Event.FocusLost] = function(Box)
 					self:setState({
+						CanUpdateName = Core.GameConfig.MainMenu.NameTypeCheck:Check(Box.Text),
 						TycoonNameInput = Box.Text,
 					})
 				end,
@@ -81,24 +86,24 @@ function Main:render()
 				Size = UDim2.fromScale(0.3, 0.25),
 				Position = UDim2.fromScale(1, 1),
 				AnchorPoint = Vector2.new(1, 1),
-				BackgroundColor3 = Theme.BackgroundColorGreen,
+				BackgroundColor3 = CanUpdateName and Theme.BackgroundColorGreen
+					or Theme.BackgroundColorGreen:Lerp(Color3.new(0, 0, 0), 0.5),
 				BorderSizePixel = 0,
 
 				Text = "Update",
 				TextScaled = true,
-				TextColor3 = Theme.TextColor,
+				TextColor3 = CanUpdateName and Theme.TextColor or Theme.TextDisabledColor,
 				FontFace = Theme.Font,
 
 				[Roact.Event.MouseButton1Click] = function(Button: TextButton)
+					if not CanUpdateName then
+						return
+					end
+
 					local NameInput = self.NameInputRef:getValue() :: TextBox?
 					Button.Interactable = false
 
 					local NewName = self.state.TycoonNameInput
-
-					if NewName == "" or NewName == " " then
-						Button.Interactable = true
-						return
-					end
 
 					TycoonService:RenameTycoon(NewName):andThen(function(UpdatedName)
 						NameInput.Text = UpdatedName
