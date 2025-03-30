@@ -62,8 +62,6 @@ function MessageService:KnitStart()
 			MessageService:SendMessageToPlayer(Message, v)
 		end
 
-		task.wait(10)
-
 		for _, v in pairs(Players:GetPlayers()) do
 			local ID = Core.GameConfig.Badges[v.UserId]
 			if ID == nil then
@@ -71,13 +69,24 @@ function MessageService:KnitStart()
 			end
 
 			for _, ToAward in pairs(Players:GetPlayers()) do
-				BadgeService:AwardBadge(ToAward.UserId, ID.ID)
-				MessageService:SendMessageToAllServers({
-					Message = `{ToAward.DisplayName} (@{ToAward.Name}) has been awarded the "{ID.Name}" badge`,
-					Prefix = "",
-					HasPrefix = false,
-					MessageColor = Color3.fromRGB(255, 210, 24),
-				})
+				local Success, HasBadge, Error = pcall(function()
+					return BadgeService:UserHasBadgeAsync(ToAward.UserId, ID.ID)
+				end)
+
+				if Success == false then
+					warn("Failed to see if the player has badge:", HasBadge, Error)
+					continue
+				end
+
+				if HasBadge == false then
+					BadgeService:AwardBadge(ToAward.UserId, ID.ID)
+					MessageService:SendMessageToAllServers({
+						Message = `{ToAward.DisplayName} (@{ToAward.Name}) has been awarded the "{ID.Name}" badge`,
+						Prefix = "",
+						HasPrefix = false,
+						MessageColor = Color3.fromRGB(255, 210, 24),
+					})
+				end
 			end
 		end
 	end)
