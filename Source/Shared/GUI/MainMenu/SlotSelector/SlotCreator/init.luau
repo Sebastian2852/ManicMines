@@ -27,7 +27,8 @@ end
 
 function SlotCreator:Verify()
 	local Name = self.state.SlotName
-	local Valid = self:setState({
+	local Valid = Core.GameConfig.MainMenu.NameTypeCheck:Check(Name)
+	self:setState({
 		CanCreate = Valid,
 	})
 end
@@ -173,7 +174,9 @@ function SlotCreator:render()
 						local RandomName = MainMenuController:PickRandomName()
 						self:setState({
 							SlotName = RandomName,
-						})
+						}, function()
+							self:Verify()
+						end)
 					end,
 				}, {}),
 			}),

@@ -33,4 +33,3 @@ end
 local Cmdr = require(ReplicatedStorage:WaitForChild("CmdrClient"))
 Cmdr:SetActivationKeys({ Enum.KeyCode.F2 })
 Cmdr:SetPlaceName("ManicMines")
-Cmdr:SetActivationUnlocksMouse(true)
