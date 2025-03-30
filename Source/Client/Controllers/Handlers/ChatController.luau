@@ -16,11 +16,15 @@ function ChatController:KnitStart()
 		if Message.TextSource then
 			local Player = Players:GetPlayerByUserId(Message.TextSource.UserId)
 			local Character = Player.Character
-			local _, Depth =
-				MineService:ConvertToDepth(
+			local Depth = -100
+
+			if Character then
+				local _, aDepth = MineService:ConvertToDepth(
 					Character:FindFirstChild("HumanoidRootPart") and Character.HumanoidRootPart.CFrame.Position.Y
 						or 100000
 				):await()
+				Depth = aDepth
+			end
 
 			local DepthTag = ""
 			local PlayerTag = ""
@@ -53,7 +57,7 @@ function ChatController:KnitStart()
 			end
 
 			Properties.PrefixText =
-				`<font color='#{NameColor}'>{PlayerTag .. LevelTag .. DepthTag .. Message.PrefixText}</font>`
+				`<font color='#{NameColor}'>{PlayerTag .. DepthTag .. LevelTag .. Message.PrefixText}</font>`
 		else
 			Properties.PrefixText = `<font color='#{Core.GameConfig.Chat.ServerTagColor:ToHex()}'>[SERVER]</font> `
 				.. Message.PrefixText
