@@ -115,8 +115,12 @@ function MainMenuController:KnitStart()
 	Camera.CameraType = Enum.CameraType.Scriptable
 	local CameraNodes = workspace.Game:WaitForChild("MainMenuCameraPositions")
 
-	while Camera.CameraType == Enum.CameraType.Scriptable do
+	while MainMenuTree ~= nil do
 		for i = 0, #CameraNodes:GetChildren() - 1, 1 do
+			if MainMenuTree == nil then
+				break
+			end
+
 			local Node = CameraNodes:FindFirstChild(tostring(i))
 
 			local Tween = TweenService:Create(
