@@ -54,12 +54,12 @@ function OreInfo:componentDidUpdate()
 	local Step = (SpawningRange.Max - SpawningRange.Min) / 50 -- 50 data points
 	for Depth = SpawningRange.Min, SpawningRange.Max, Step do
 		local RarityValue = CalculateRarity(SpawningRange, NormalRarity, Depth, SpawningCurve)
-		table.insert(DepthRange, RarityValue)
+		table.insert(DepthRange, math.floor((1 / RarityValue) * NormalRarity))
 	end
 
 	-- Create and configure the graph
 	local GraphHandler = GraphModule.new(Frame)
-	GraphHandler.Resolution = math.floor((SpawningRange.Max - SpawningRange.Min) / 2)
+	GraphHandler.Resolution = 20
 	GraphHandler.BaselineZero = true
 	GraphHandler.Data = {
 		Rarity = DepthRange,
@@ -76,6 +76,9 @@ function OreInfo:render()
 	local DepthRange: NumberRange = Block:GetAttribute("SpawningRange")
 	local XpWhenMined = Block:GetAttribute("XP")
 	local AmountDroppedWhenMined = Block:GetAttribute("AmountDroppedWhenMined")
+	local BlockColor = Block:GetAttribute("InventoryBackgroundColor")
+	local Description = Block:GetAttribute("OreIndexDescription") or ""
+	local Rarity = Block:GetAttribute("Rarity")
 
 	return Roact.createElement("Frame", {
 		Size = UDim2.fromScale(1, 1),
@@ -95,7 +98,7 @@ function OreInfo:render()
 		}, {}),
 
 		OreHeader = Roact.createElement("TextLabel", {
-			Size = UDim2.fromScale(1, 0.125),
+			Size = UDim2.fromScale(1, 0.075),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 1,
@@ -105,24 +108,54 @@ function OreInfo:render()
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextColor3 = Theme.TextColor,
 			FontFace = Theme.Font,
-		}, {}),
+		}, {
+			Gradient = Roact.createElement("UIGradient", {
+				Color = BlockColor,
+			}, {}),
+		}),
 
-		OreInfo = Roact.createElement("Frame", {
-			Size = UDim2.fromScale(1, 0.25),
+		Description = Roact.createElement("TextLabel", {
+			Size = UDim2.fromScale(1, 0.04),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			LayoutOrder = 2,
+
+			Text = Description,
+			TextScaled = true,
+			RichText = true,
+			TextXAlignment = Enum.TextXAlignment.Center,
+			TextColor3 = Theme.TextColor,
+			FontFace = Theme.Font,
+		}, {}),
+
+		InfoHeader = Roact.createElement("TextLabel", {
+			Size = UDim2.fromScale(1, 0.06),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = 3,
+
+			Text = "Basic Info",
+			TextScaled = true,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextColor3 = Theme.TextColor,
+			FontFace = Theme.Font,
+		}, {}),
+
+		OreInfo = Roact.createElement("Frame", {
+			Size = UDim2.fromScale(1, 0.15),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = 4,
 		}, {
 			Layout = Roact.createElement("UIListLayout", {
 				FillDirection = Enum.FillDirection.Vertical,
-				SortOrder = Enum.SortOrder.LayoutOrder,
+				SortOrder = Enum.SortOrder.Name,
 			}, {}),
 
 			Depth = Roact.createElement("TextLabel", {
-				Size = UDim2.fromScale(1, 0.3),
+				Size = UDim2.fromScale(1, 0.25),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				LayoutOrder = 1,
 
 				Text = `Depth: {DepthRange.Min}m - {DepthRange.Max}m`,
 				TextScaled = true,
@@ -131,11 +164,22 @@ function OreInfo:render()
 				FontFace = Theme.Font,
 			}, {}),
 
-			XP = Roact.createElement("TextLabel", {
-				Size = UDim2.fromScale(1, 0.3),
+			BaseRarity = Roact.createElement("TextLabel", {
+				Size = UDim2.fromScale(1, 0.25),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				LayoutOrder = 1,
+
+				Text = `Base rarity (1/x): {Rarity}`,
+				TextScaled = true,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextColor3 = Theme.TextColor,
+				FontFace = Theme.Font,
+			}, {}),
+
+			XP = Roact.createElement("TextLabel", {
+				Size = UDim2.fromScale(1, 0.25),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
 
 				Text = `XP when mined: {XpWhenMined} XP`,
 				TextScaled = true,
@@ -145,10 +189,9 @@ function OreInfo:render()
 			}, {}),
 
 			Amount = Roact.createElement("TextLabel", {
-				Size = UDim2.fromScale(1, 0.3),
+				Size = UDim2.fromScale(1, 0.25),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
-				LayoutOrder = 1,
 
 				Text = `Amount dropped when mined: {AmountDroppedWhenMined}`,
 				TextScaled = true,
@@ -159,10 +202,10 @@ function OreInfo:render()
 		}),
 
 		RarityHeader = Roact.createElement("TextLabel", {
-			Size = UDim2.fromScale(1, 0.1),
+			Size = UDim2.fromScale(1, 0.06),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			LayoutOrder = 3,
+			LayoutOrder = 5,
 
 			Text = "Rarity",
 			TextScaled = true,
@@ -175,7 +218,7 @@ function OreInfo:render()
 			Size = UDim2.fromScale(1, 0.5),
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
-			LayoutOrder = 4,
+			LayoutOrder = 6,
 
 			[Roact.Ref] = self.GraphFrameRef,
 		}, {}),
