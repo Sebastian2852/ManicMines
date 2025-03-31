@@ -10,7 +10,7 @@ return {
 			Description = "The player that is affected",
 		},
 		{
-			Type = "string",
+			Type = "ore",
 			Name = "New block",
 			Description = "The block to replace",
 		},

@@ -10,7 +10,7 @@ return {
 			Description = "Who to give the ore to",
 		},
 		{
-			Type = "string",
+			Type = "ore",
 			Name = "Ore",
 			Description = "The ore to give",
 		},
