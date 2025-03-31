@@ -555,11 +555,10 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 		local ShouldAnnounce = Block:GetAttribute("AnnounceOnMined")
 
 		-- Some rare ores are sent in chat once mined
-		-- TODO: Make this send to every server
 		if ShouldAnnounce then
 			-- Done in task.spawn since this sends to a discord webhook which takes time
 			task.spawn(function()
-				MessageService:SendMessage({
+				MessageService:SendMessageToAllServers({
 					Message = `{PlayerWhoMined.DisplayName} (@{PlayerWhoMined.Name}) mined {Block:GetAttribute(
 						"DisplayName"
 					)} which is 1 in {Block:GetAttribute("Rarity")}`,
