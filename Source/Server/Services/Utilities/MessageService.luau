@@ -65,7 +65,7 @@ function MessageService:KnitStart()
 		for _, v in pairs(Players:GetPlayers()) do
 			local ID = Core.GameConfig.Badges[v.UserId]
 			if ID == nil then
-				break
+				continue
 			end
 
 			for _, ToAward in pairs(Players:GetPlayers()) do
