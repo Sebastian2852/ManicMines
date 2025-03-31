@@ -4,6 +4,7 @@ local Workspace = game:GetService("Workspace")
 
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local OctoTree = require(ReplicatedStorage.Packages["octo-tree"])
 local Profiler = require(ReplicatedStorage.Game.Modules.Profiler)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -32,6 +33,7 @@ local UsedPositions = {}
 local TopLayerPositions = {}
 
 local NumberGenerator = Random.new()
+local MineOctoTree = OctoTree.new()
 
 -- Offsets used to generate blocks
 local BlockGenerationOffsets = {
@@ -365,7 +367,9 @@ function MineService:Collapse()
 	end
 
 	Workspace.Game.Mine:ClearAllChildren()
+	MineOctoTree:ClearAllNodes()
 	self.MineStats.BlocksGenerated = 0
+
 	NumberGenerator = Random.new() -- Create a new seed for different generation of blocks
 
 	task.wait(1)
@@ -455,6 +459,8 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	self.MineStats.BlocksGenerated += 1
 	self:UpdateMiningConditions()
 
+	MineOctoTree:CreateNode(Position, Block)
+
 	-- If the block is on the very top of the mine and it is not a top layer block then its made unminble to stop players
 	-- Mining outside of the map or too high
 	if Position.Y == TopLayerY and not (TopLayerPositions[KeyVector(Position)] == true) then
@@ -507,6 +513,10 @@ function MineService:YLevelToLayer(YLevel: number): Configuration
 	end
 
 	return game.ReplicatedStorage.Assets.Layers.Surface
+end
+
+function MineService:GetBlockClosestToPosition(Position: Vector3): Part | nil
+	return MineOctoTree:GetNearest(Position, 12, 1)[1].Object
 end
 
 --[=[
@@ -582,6 +592,10 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 				end
 			end
 			Block:Destroy()
+			local Node = MineOctoTree:FindFirstNode(Block)
+			if Node then
+				MineOctoTree:RemoveNode(Node)
+			end
 		end)
 	end)
 end
