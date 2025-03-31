@@ -59,7 +59,7 @@ function OreInfo:componentDidUpdate()
 
 	-- Create and configure the graph
 	local GraphHandler = GraphModule.new(Frame)
-	GraphHandler.Resolution = 50
+	GraphHandler.Resolution = math.floor((SpawningRange.Max - SpawningRange.Min) / 2)
 	GraphHandler.BaselineZero = true
 	GraphHandler.Data = {
 		Rarity = DepthRange,
