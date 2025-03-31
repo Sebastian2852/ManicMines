@@ -45,6 +45,11 @@ function OreIndex:CreateOreButtons()
 	local Search = self.state.SearchQuery or ""
 
 	for _, Ore in pairs(ReplicatedStorage.Assets.Ores:GetChildren()) do
+		local ShouldShow = OreIndexController:ShouldShowOre(Ore.Name)
+		if not ShouldShow then
+			continue
+		end
+
 		local DisplayName = Ore:GetAttribute("DisplayName")
 		local Locked = OreIndexController:ShouldOreBeLocked(Ore.Name)
 		if not Locked then

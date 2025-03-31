@@ -28,6 +28,26 @@ function OreIndexController:ShouldOreBeLocked(OreName: string)
 	return TimesMined <= 0
 end
 
+function OreIndexController:ShouldShowOre(OreName: string)
+	local RealOre = ReplicatedStorage.Assets.Ores:FindFirstChild(OreName)
+	if RealOre == nil then
+		return false
+	end
+
+	local CanGenerate = RealOre:GetAttribute("CanGenerate")
+	local Locked = self:ShouldOreBeLocked(OreName)
+
+	if CanGenerate == true then
+		return true
+	else
+		if Locked == true then
+			return true
+		else
+			return true
+		end
+	end
+end
+
 function OreIndexController:OnMouseMove(MousePosition: Vector2)
 	local ViewportSize = Camera.ViewportSize
 

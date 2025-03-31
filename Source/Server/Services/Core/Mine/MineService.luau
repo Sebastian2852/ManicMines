@@ -133,6 +133,10 @@ local function GetSpawnableOres(Depth: number, InCave: boolean)
 	local SpawnableOres = {}
 
 	for _, Ore: Part in ipairs(Ores) do
+		if Ore:GetAttribute("CanGenerate") == false then
+			continue
+		end
+
 		local SpawningRange = Ore:GetAttribute("SpawningRange")
 
 		local MinY = SpawningRange.Min
@@ -193,6 +197,13 @@ stop the generate block function being too long and unreadable.
 local function PickRandomOre(Depth: number, InCave: boolean)
 	local Ores = GetSpawnableOres(Depth, InCave)
 	local TotalWeight = 0
+
+	if #Ores == 1 then
+		local Ore = Ores[1]
+		if Ore == Core.Assets.Stone then
+			return Core.Assets.Stone
+		end
+	end
 
 	for _, v in pairs(Ores) do
 		TotalWeight += GetRarityFromCurve(
