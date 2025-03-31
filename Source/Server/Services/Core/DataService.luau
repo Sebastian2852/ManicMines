@@ -623,6 +623,14 @@ function DataService:KnitStart()
 		end
 		Logger:Log("Data saved; closing server")
 	end)
+
+	while true do
+		task.wait(300)
+		for _, Player in pairs(game.Players:GetPlayers()) do
+			self:SavePlayerData(Player)
+			task.wait(1)
+		end
+	end
 end
 
 return DataService
