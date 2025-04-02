@@ -5,7 +5,7 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local AudioEngine = RunService:IsClient() and Knit.GetController("AudioEngine") or nil
 
 local Theme = {
-	BackgroundColor = Color3.fromRGB(31, 31, 31),
+	BackgroundColor = Color3.fromRGB(0, 0, 0),
 	BackgroundColorRed = Color3.fromRGB(231, 96, 93),
 	BackgroundColorGreen = Color3.fromRGB(93, 231, 137),
 	BackgroundColorBlue = Color3.fromRGB(43, 142, 235),
