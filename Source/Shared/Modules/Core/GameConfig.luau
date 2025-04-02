@@ -274,8 +274,8 @@ Config.DefaultSettings = {
 }
 
 Config.MainMenu = {
-	Version = "v1.1.1",
-	TitleScreenVersion = "v1.1.1 - April Fools 2025",
+	Version = "v1.1.2",
+	TitleScreenVersion = "v1.1.2 - Poopium Aftermath",
 
 	NameTypeCheck = Zeno.String():LongerThan(1):ShorterThan(50),
 
