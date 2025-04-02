@@ -54,7 +54,7 @@ function MainMenu:render()
 			BorderSizePixel = 0,
 		}, {
 			Background = Roact.createElement("Frame", {
-				Size = UDim2.fromScale(1, 1),
+				Size = UDim2.fromScale(0.5, 1),
 				Position = Position,
 				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 				BorderSizePixel = 0,
@@ -62,7 +62,7 @@ function MainMenu:render()
 				Gradient = Roact.createElement("UIGradient", {
 					Color = ColorSequence.new(Theme.BackgroundColor),
 					Transparency = NumberSequence.new({
-						NumberSequenceKeypoint.new(0, 0, 0),
+						NumberSequenceKeypoint.new(0, 0.25, 0),
 						NumberSequenceKeypoint.new(0.5, 1, 0),
 						NumberSequenceKeypoint.new(1, 1, 0),
 					}),

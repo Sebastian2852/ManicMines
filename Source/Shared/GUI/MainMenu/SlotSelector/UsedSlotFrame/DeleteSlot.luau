@@ -17,7 +17,7 @@ end
 function DeleteSlot:didMount()
 	self.Motor:setGoal(Flipper.Spring.new(1, {
 		frequency = 5,
-		dampingRatio = 1,
+		dampingRatio = 0.7,
 	}))
 end
 
@@ -43,6 +43,10 @@ function DeleteSlot:render()
 		return UDim2.fromScale(0, 0):Lerp(UDim2.fromScale(1, 1), Value)
 	end)
 
+	local Padding = self.Binding:map(function(Value)
+		return Value * 10
+	end)
+
 	return Roact.createElement("Frame", {
 		Size = Size,
 		Position = UDim2.fromScale(0.5, 0.5),
@@ -51,6 +55,17 @@ function DeleteSlot:render()
 		BackgroundTransparency = 0.5,
 		BorderSizePixel = 0,
 	}, {
+		Corners = Roact.createElement("UICorner", {
+			CornerRadius = UDim.new(0, 7),
+		}, {}),
+
+		Padding = Roact.createElement("UIPadding", {
+			PaddingTop = UDim.new(0, Padding),
+			PaddingBottom = UDim.new(0, Padding),
+			PaddingLeft = UDim.new(0, Padding),
+			PaddingRight = UDim.new(0, Padding),
+		}, {}),
+
 		Layout = Roact.createElement("UIListLayout", {
 			FillDirection = Enum.FillDirection.Vertical,
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,

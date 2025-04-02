@@ -34,7 +34,7 @@ function UsedSlotFrame:render()
 		BorderSizePixel = 0,
 	}, {
 		DeleteSlotContainer = ShowDelete and Roact.createElement("Frame", {
-			Size = UDim2.fromScale(0.3, 0.7),
+			Size = UDim2.fromScale(0.3, 0.8),
 			Position = UDim2.fromScale(-0.2, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundTransparency = 1,

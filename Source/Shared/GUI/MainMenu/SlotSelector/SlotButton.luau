@@ -49,14 +49,14 @@ function SlotButton:render()
 
 				self.Motor:setGoal(Flipper.Spring.new(1, {
 					frequency = 5,
-					dampingRatio = 1,
+					dampingRatio = 0.5,
 				}))
 			end,
 
 			[Roact.Event.MouseLeave] = function()
 				self.Motor:setGoal(Flipper.Spring.new(0, {
 					frequency = 4,
-					dampingRatio = 0.75,
+					dampingRatio = 0.5,
 				}))
 			end,
 

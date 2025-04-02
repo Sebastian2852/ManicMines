@@ -77,7 +77,7 @@ function SlotSelector:didMount()
 
 	self.Motor:setGoal(Flipper.Spring.new(1, {
 		frequency = 5,
-		dampingRatio = 1,
+		dampingRatio = 0.7,
 	}))
 end
 
@@ -95,6 +95,10 @@ function SlotSelector:render()
 		BackgroundTransparency = 0.5,
 		BorderSizePixel = 0,
 	}, {
+		Corners = Roact.createElement("UICorner", {
+			CornerRadius = UDim.new(0, 7),
+		}, {}),
+
 		CloseButton = not ShowCreator and Roact.createElement(CloseButton, {
 			OnClick = function()
 				self.Motor:setGoal(Flipper.Spring.new(0, {
