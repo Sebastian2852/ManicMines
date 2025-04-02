@@ -321,7 +321,9 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 			break
 		end
 
-		task.wait(Delay)
+		if Delay > 0 then
+			task.wait(Pickaxe:GetAttribute("Delay") * 2)
+		end
 	end
 
 	OreList:Destroy()
@@ -359,7 +361,9 @@ function PickaxeService:StopMining(Player: Player)
 		self.Mining[Player.UserId].Mining = false
 		self.Mining[Player.UserId].Object = nil
 
-		task.wait(Pickaxe:GetAttribute("Delay") * 2)
+		if Pickaxe:GetAttribute("Delay") > 0 then
+			task.wait(Pickaxe:GetAttribute("Delay") * 2)
+		end
 		self.Mining[Player.UserId].Cooldown = false
 
 		Resolve()
