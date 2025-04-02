@@ -34,9 +34,8 @@ function Spinner:Animate()
 		self.CurrentAnimGoal = 1
 	end
 
-	self.Motor:setGoal(Flipper.Spring.new(self.CurrentAnimGoal, {
-		dampingRatio = 0.7,
-		frequency = 2,
+	self.Motor:setGoal(Flipper.Linear.new(self.CurrentAnimGoal, {
+		velocity = 1,
 	}))
 end
 
