@@ -39,6 +39,7 @@ end
 Do not use this function, instead use "GenerateRandomCaveAsync"
 ]=]
 function CaveService:GenerateCaveAsync(
+	CaveName: string,
 	Center: Vector3,
 	Size: number,
 	NoiseResolution: Vector3,
@@ -122,6 +123,10 @@ function CaveService:GenerateCaveAsync(
 				:andThen(function(Block)
 					if Block and Tint ~= nil and Tint ~= Color3.new(1, 1, 1) then
 						Block.Color = Core.Util:TintColor(Block.Color, Tint)
+					end
+
+					if Block then
+						Block:SetAttribute("INFO_CaveGenName", CaveName)
 					end
 				end)
 				:await()
@@ -265,6 +270,7 @@ function CaveService:GenerateCaveFromConfigAsync(CaveConfig: Configuration, Posi
 	local Tint = CaveConfig:GetAttribute("Tint")
 
 	return self:GenerateCaveAsync(
+		CaveConfig.Name,
 		Position,
 		Size,
 		NoiseResolution,

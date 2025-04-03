@@ -567,11 +567,13 @@ function MineService:BlockMined(Block: BasePart, PlayerWhoMined: Player?)
 					MessageColor = Block:GetAttribute("SelectionColor"),
 				})
 
+				local Cave = Block:GetAttribute("INFO_CaveGenName")
 				OreAnnouncer:AnnounceOreMined(
 					PlayerWhoMined,
-					Block:GetAttribute("DisplayName"),
-					Block:GetAttribute("SelectionColor"),
-					Block:GetAttribute("Rarity")
+					Block.Name,
+					Block:GetAttribute("Depth"),
+					Cave ~= nil,
+					Cave
 				)
 			end)
 		end
