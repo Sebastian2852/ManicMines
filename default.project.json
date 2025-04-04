@@ -228,6 +228,9 @@
           "TutorialStage":{
             "$className":"NumberValue"
           },
+          "PlayTime":{
+            "$className":"NumberValue"
+          },
           "LastVersionPlayed": {
             "$className":"StringValue"
           },

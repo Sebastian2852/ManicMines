@@ -38,6 +38,7 @@ DataService.SaveSlots = {
 }
 
 DataService.Players = {}
+DataService.PlayerJoinTimes = {}
 
 --[=[
 Create all values in the template data folder so that it can be cloned for each player
@@ -179,12 +180,21 @@ function DataService:SavePlayerData(Player: Player)
 		return
 	end
 
+	local JoinTime = self.PlayerJoinTimes[Player.UserId]
+	if not JoinTime then
+		warn("No join time found; setting to now")
+		JoinTime = os.time()
+	end
+
 	local DataFolder = self:GetPlayerDataFolder(Player)
 
 	Logger:Assert(DataFolder, "Tried saving data with No data folder")
 	Logger:Assert(IsSlotValid(Slot), "Invalid data slot passed")
 
+	local TimePlayed = os.time() - JoinTime
 	DataFolder.LastVersionPlayed.Value = Core.GameConfig.MainMenu.Version
+	DataFolder.PlayTime.Value = DataFolder.PlayTime.Value + TimePlayed
+	self.PlayerJoinTimes[Player.UserId] = os.time()
 
 	local SaveData = Core.Data.SaveData.New(Player.UserId)
 
@@ -236,6 +246,8 @@ function DataService:LoadPlayerData(Player: Player, Slot: DataStore)
 
 	LoadingService:StartLoading(Player)
 	LoadingService:UpdateActionText(Player, "Loading data")
+
+	self.PlayerJoinTimes[Player.UserId] = os.time()
 
 	local SaveData = Core.Data.SaveData.New(Player.UserId)
 	SaveData:AddData(Core.Data.Data.New("General", {}))
