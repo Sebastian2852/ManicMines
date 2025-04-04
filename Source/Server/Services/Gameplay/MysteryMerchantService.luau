@@ -230,22 +230,21 @@ function MysteryMerchantService:KnitStart()
 	DataService = Knit.GetService("DataService")
 	PlayerStatsService = Knit.GetService("PlayerStatsService")
 
-	self:DeSpawn()
-	--task.spawn(function()
-	--	while true do
-	--		self:DeSpawn()
+	task.spawn(function()
+		while true do
+			self:DeSpawn()
 
-	--		local IdleTime = NumberGenerator:NextInteger(Config.MerchantIdleLength.Min, Config.MerchantIdleLength.Max)
-	--		task.wait(IdleTime)
+			local IdleTime = NumberGenerator:NextInteger(Config.MerchantIdleLength.Min, Config.MerchantIdleLength.Max)
+			task.wait(IdleTime)
 
-	--		self:GenerateTrades()
-	--		self:Spawn()
+			self:GenerateTrades()
+			self:Spawn()
 
-	--		local LivingTime =
-	--			NumberGenerator:NextInteger(Config.MerchantLivingLength.Min, Config.MerchantLivingLength.Max)
-	--		task.wait(LivingTime)
-	--	end
-	--end)
+			local LivingTime =
+				NumberGenerator:NextInteger(Config.MerchantLivingLength.Min, Config.MerchantLivingLength.Max)
+			task.wait(LivingTime)
+		end
+	end)
 end
 
 return MysteryMerchantService
