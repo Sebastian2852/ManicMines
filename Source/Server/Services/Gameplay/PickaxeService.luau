@@ -7,6 +7,7 @@ local Promise = require(ReplicatedStorage.Packages.Promise)
 
 local DataService
 local MineService
+local TycoonUpgradeService
 
 local PickaxeAssetFolder = game.ReplicatedStorage.Assets.Pickaxe
 local Pickaxes = PickaxeAssetFolder.Pickaxes
@@ -448,7 +449,25 @@ Attempts to buy the given pickaxe config
 ]=]
 function PickaxeService.Client:BuyPickaxe(Player: Player, PickaxeConfig: Configuration): boolean
 	local Costs = PickaxeConfig:FindFirstChild("Ores")
+	local Upgrades = PickaxeConfig:FindFirstChild("Upgrades")
 	local DataFolder: Core.DataFolder = DataService:GetPlayerDataFolder(Player)
+
+	for _, v in pairs(Upgrades:GetChildren()) do
+		local Value = TycoonUpgradeService:GetUpgradeDataValue(Player, v.Name)
+		if Value == nil then
+			warn("ERROR: Invalid upgrade name: " .. v.Name)
+			return false
+		end
+
+		local UpgradeLevel = Value.Value
+		local UpgradeLevelNeeded = v.Value
+
+		if UpgradeLevel >= UpgradeLevelNeeded then
+			continue
+		else
+			return false
+		end
+	end
 
 	local Success = Costs and false or true
 	if Costs then
@@ -536,6 +555,7 @@ end
 function PickaxeService:KnitStart()
 	DataService = Knit.GetService("DataService")
 	MineService = Knit.GetService("MineService")
+	TycoonUpgradeService = Knit.GetService("TycoonUpgradeService")
 
 	game.Players.PlayerAdded:Connect(function(Player)
 		self.Mining[Player.UserId] = { Mining = false, Object = nil, Cooldown = false }
