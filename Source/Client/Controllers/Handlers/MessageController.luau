@@ -53,12 +53,15 @@ function MessageController:KnitStart()
 	end)
 
 	task.wait(1)
+	local Player = Knit.Player
+	local ChatTagInfo = Core.GameConfig.Chat.Players[Player.UserId]
 
-	local JoinMessage: Core.ChatMessage = {
-		Message = Knit.Player.DisplayName .. " (@" .. Knit.Player.Name .. ") joined the game!",
+	local Message: Core.ChatMessage = {
+		Message = `{ChatTagInfo ~= nil and `[{ChatTagInfo.Tag}] ` or " "} {Player.DisplayName} (@{Player.Name}) joined the game!`,
 		HasPrefix = false,
+		MessageColor = ChatTagInfo ~= nil and ChatTagInfo.TagColor or Color3.new(1, 1, 1),
 	}
-	SendChatMessage(JoinMessage)
+	SendChatMessage(Message)
 end
 
 return MessageController

@@ -50,9 +50,12 @@ end
 
 function MessageService:KnitStart()
 	game.Players.PlayerAdded:Connect(function(Player)
+		local ChatTagInfo = Core.GameConfig.Chat.Players[Player.UserId]
+
 		local Message: Core.ChatMessage = {
-			Message = Player.DisplayName .. " (@" .. Player.Name .. ") joined the game!",
+			Message = `{ChatTagInfo ~= nil and `[{ChatTagInfo.Tag}] ` or " "} {Player.DisplayName} (@{Player.Name}) joined the game!`,
 			HasPrefix = false,
+			MessageColor = ChatTagInfo ~= nil and ChatTagInfo.TagColor or Color3.new(1, 1, 1),
 		}
 
 		for _, v in pairs(game.Players:GetPlayers()) do
