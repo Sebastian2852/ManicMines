@@ -17,6 +17,21 @@ end
 function LevelDisplay:init()
 	local DataService = Knit.GetService("DataService")
 
+	self.Motor = Flipper.SingleMotor.new(0)
+	local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
+	self.Binding = Binding
+	self.Motor:onStep(SetBinding)
+
+	self.TextMotor = Flipper.SingleMotor.new(0)
+	local TextBinding, TextSetBinding = Roact.createBinding(self.Motor:getValue())
+	self.TextBinding = TextBinding
+	self.TextMotor:onStep(TextSetBinding)
+
+	self:setState({
+		XpChange = 0,
+		ShowChange = false,
+	})
+
 	DataService:GetPlayerDataFolder():andThen(function(DataFolder: Core.DataFolder)
 		local Xp = DataFolder.XP
 		local Level = DataFolder.Level
@@ -36,12 +51,13 @@ function LevelDisplay:init()
 			})
 		end)
 
-		self:UpdateLevel(Level.Value)
-		self:UpdateXp(Xp.Value)
-
 		self:setState({
 			ShortUnits = UseShortUnits.Value,
 		})
+
+		self:UpdateLevel(Level.Value)
+		self:UpdateXp(Xp.Value)
+		self.Motor:setGoal(Flipper.Instant.new(Xp.Value / (self.state.XpNeeded or 100)))
 	end)
 
 	self.ColorConnection = ReplicatedStorage.Player.LastBlockColor:GetPropertyChangedSignal("Value"):Connect(function()
@@ -55,21 +71,6 @@ function LevelDisplay:init()
 			LastBlockColor = NewColor,
 		})
 	end)
-
-	self.Motor = Flipper.SingleMotor.new(0)
-	local Binding, SetBinding = Roact.createBinding(self.Motor:getValue())
-	self.Binding = Binding
-	self.Motor:onStep(SetBinding)
-
-	self.TextMotor = Flipper.SingleMotor.new(0)
-	local TextBinding, TextSetBinding = Roact.createBinding(self.Motor:getValue())
-	self.TextBinding = TextBinding
-	self.TextMotor:onStep(TextSetBinding)
-
-	self:setState({
-		XpChange = 0,
-		ShowChange = false,
-	})
 end
 
 function LevelDisplay:willUnmount()
