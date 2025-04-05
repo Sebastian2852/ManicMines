@@ -274,8 +274,8 @@ Config.DefaultSettings = {
 }
 
 Config.MainMenu = {
-	Version = "v1.1.2",
-	TitleScreenVersion = "v1.1.2 - Poopium Aftermath",
+	Version = "v1.1.3",
+	TitleScreenVersion = "v1.1.3 - Bits and Bobs!",
 
 	NameTypeCheck = Zeno.String():LongerThan(1):ShorterThan(50),
 
