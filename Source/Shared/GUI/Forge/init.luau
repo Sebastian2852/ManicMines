@@ -370,7 +370,7 @@ function Forge:render()
 				}, {
 					App = Roact.createElement(InfoFrame, {
 						Power = IsLocked and "???" or Power,
-						Range = IsLocked and "???" or Range,
+						Range = IsLocked and "???" or math.round(Range),
 						Delay = IsLocked and "???" or Delay,
 						Name = IsLocked and "???" or SelectedConfig:GetAttribute("Name"),
 						ShowButton = not IsLocked,
@@ -392,7 +392,7 @@ function Forge:render()
 
 				Range = self:CreateRightInfo(
 					"Range",
-					IsLocked and "???" or tostring(Range),
+					IsLocked and "???" or tostring(math.round(Range)),
 					UDim2.fromScale(0.59, 0.5),
 					Vector2.new(0.5, 0.5)
 				),
