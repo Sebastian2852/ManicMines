@@ -55,8 +55,8 @@ end
 function Bar:render()
 	local BarGradient = self.state.BarGradient
 
-	local BarSize = self.Binding:map(function(Value)
-		return UDim2.fromScale(0, 1):Lerp(UDim2.fromScale(1, 1), math.clamp(Value, 0, 1))
+	local CoverSize = self.Binding:map(function(Value)
+		return UDim2.fromScale(1 - math.clamp(Value, 0, 1), 1)
 	end)
 
 	return Roact.createElement("Frame", {
@@ -81,7 +81,7 @@ function Bar:render()
 		}),
 
 		Bar = Roact.createElement("Frame", {
-			Size = BarSize,
+			Size = UDim2.fromScale(1, 1),
 			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 			BorderSizePixel = 0,
 			ZIndex = 2,
@@ -89,6 +89,15 @@ function Bar:render()
 			Gardient = Roact.createElement("UIGradient", {
 				Color = BarGradient,
 			}, {}),
+		}),
+
+		Cover = Roact.createElement("Frame", {
+			Size = CoverSize,
+			Position = UDim2.fromScale(1, 1),
+			AnchorPoint = Vector2.new(1, 1),
+			BackgroundColor3 = Theme.BackgroundColor,
+			BorderSizePixel = 0,
+			ZIndex = 3,
 		}),
 	})
 end

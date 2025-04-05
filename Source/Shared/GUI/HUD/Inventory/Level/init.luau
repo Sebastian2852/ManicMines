@@ -325,13 +325,25 @@ function LevelDisplay:render()
 				}),
 
 				Bar = Roact.createElement("Frame", {
-					Size = BarSize,
+					Size = UDim2.fromScale(1, 1),
 					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 					BorderSizePixel = 0,
+					ZIndex = 1,
 				}, {
 					Gradient = Roact.createElement("UIGradient", {
 						Color = BarGradient,
 					}),
+				}),
+
+				Cover = Roact.createElement("Frame", {
+					Size = BarSize:map(function(Value)
+						return UDim2.fromScale(1 - Value.X.Scale, 1)
+					end),
+					Position = UDim2.fromScale(1, 1),
+					AnchorPoint = Vector2.new(1, 1),
+					BackgroundColor3 = Theme.BackgroundColor,
+					BorderSizePixel = 0,
+					ZIndex = 3,
 				}),
 			}),
 		}),
