@@ -119,12 +119,12 @@ end
 function HUDController:KnitStart()
 	local DataService = Knit.GetService("DataService")
 
-	self:SetupSettingsGUI()
-	self:AddTopBarLabel(Core.GameConfig.MainMenu.Version)
-
 	local HUD = require(ReplicatedStorage.Game.GUI.HUD)
 
 	DataService.DataLoaded:Connect(function()
+		self:SetupSettingsGUI()
+		self:AddTopBarLabel(Core.GameConfig.MainMenu.Version)
+
 		local App = Roact.createElement(HUD)
 		Roact.mount(App, Knit.Player.PlayerGui, "HUD")
 		Logger:Log("Mounted HUD component")
