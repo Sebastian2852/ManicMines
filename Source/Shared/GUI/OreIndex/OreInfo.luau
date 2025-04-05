@@ -66,6 +66,43 @@ function OreInfo:componentDidUpdate()
 	}
 end
 
+function OreInfo:componentDidMount()
+	local Frame = self.GraphFrameRef.current :: Frame?
+	if not Frame then
+		repeat
+			Frame = self.GraphFrameRef.current
+		until Frame ~= nil
+	end
+
+	local Block = self.props.Block
+	if not Block then
+		return
+	end
+
+	Frame:ClearAllChildren()
+
+	-- Extract ore attributes
+	local SpawningRange: NumberRange = Block:GetAttribute("SpawningRange")
+	local NormalRarity = Block:GetAttribute("Rarity")
+	local SpawningCurve = Block:GetAttribute("SpawningCurve")
+
+	-- Generate data points for the graph
+	local DepthRange = {}
+	local Step = (SpawningRange.Max - SpawningRange.Min) / 50 -- 50 data points
+	for Depth = SpawningRange.Min, SpawningRange.Max, Step do
+		local RarityValue = CalculateRarity(SpawningRange, NormalRarity, Depth, SpawningCurve)
+		table.insert(DepthRange, math.floor((1 / RarityValue) * NormalRarity))
+	end
+
+	-- Create and configure the graph
+	local GraphHandler = GraphModule.new(Frame)
+	GraphHandler.Resolution = 20
+	GraphHandler.BaselineZero = true
+	GraphHandler.Data = {
+		Rarity = DepthRange,
+	}
+end
+
 function OreInfo:render()
 	local Block = self.props.Block
 	if Block == nil then
