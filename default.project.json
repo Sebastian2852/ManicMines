@@ -8,10 +8,7 @@
     "$className": "DataModel",
     "ReplicatedStorage": {
       "Game": {
-        "$path": "Source/Shared",
-        "Tests": {
-          "$path": "Tests"
-        }
+        "$path": "Source/Shared"
       },
       "Packages": {
         "$path": "Packages",
