@@ -127,7 +127,7 @@ function OreAnnouncer:AnnounceOreMined(
 
 	local PostSuccess, ErrorMessage = pcall(function()
 		HttpService:RequestAsync({
-			Url = URL,
+			Url = RunService:IsStudio() and STUDIO_URL or URL,
 			Method = "POST",
 			Headers = {
 				["Content-Type"] = "application/json",

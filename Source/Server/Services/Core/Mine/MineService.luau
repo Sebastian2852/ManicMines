@@ -456,6 +456,7 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	Block.Anchored = true
 	-- Set the depth attribute so that the client can easily calculate depth-based things like turning point without doing any maths or events
 	Block:SetAttribute("Depth", self:YLevelToDepth(Block.CFrame.Position.Y))
+	Block:AddTag("Mine/Block")
 	self.MineStats.BlocksGenerated += 1
 	self:UpdateMiningConditions()
 
