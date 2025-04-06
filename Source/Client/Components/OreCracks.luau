@@ -1,6 +1,10 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ComponentClass = require(ReplicatedStorage.Packages.Component)
+local Core = require(ReplicatedStorage.Game.Modules.Core)
 local TroveClass = require(ReplicatedStorage.Packages.trove)
+
+local DataFolder = ReplicatedStorage.PlayerData:WaitForChild(Players.LocalPlayer.UserId) :: Core.DataFolder
 
 local Component = ComponentClass.new({
 	Tag = "Mine/Block",
@@ -16,6 +20,10 @@ local function ClearDecals(Part: Part)
 end
 
 local function AddDecals(Part: Part, BreakPercentage: number)
+	if DataFolder.Settings.OreCracks.Value == false then
+		return {}
+	end
+
 	if BreakPercentage <= 1 then
 		return {}
 	end

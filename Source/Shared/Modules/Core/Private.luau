@@ -32,6 +32,7 @@ export type DataFolder_SettingsFolder = {
 	MusicVolume: NumberValue,
 	InventoryShortUnits: BoolValue,
 	HideOverheadGUI: BoolValue,
+	OreCracks: BoolValue,
 }
 
 export type DataFolder_StatsFolder = {

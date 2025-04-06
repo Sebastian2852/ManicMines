@@ -34,6 +34,13 @@ function Graphics:render()
 			Description = "Toggle the RGB effects that is present in some ores (This makes them neon white)",
 			LayoutOrder = 2,
 		}, {}),
+
+		OreCracks = Roact.createElement(BooleanSetting, {
+			SettingName = "OreCracks",
+			DisplayName = "Ore cracks",
+			Description = "Enable/Disable the ore cracks on blocks that are being mined",
+			LayoutOrder = 3,
+		}, {}),
 	})
 end
 
