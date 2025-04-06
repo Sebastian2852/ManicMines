@@ -3,9 +3,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local URL =
-	"https://discord.com/api/webhooks/1348327491739324426/rz87d8gY2BNltY7Uk9IJi2vxOVPfWA3jnB3thdc5ysuuOm6i07tmgbLD_QgdoCXZ3bjd"
+	"https://discord.com/api/webhooks/1358070084060577973/ztj8mEovyUdPQ-rCvvadtk1c2NO203Nl8hZNRWIbZN9YsyujfVNCK46CLOFTmijQsR9K"
 local STUDIO_URL =
-	"https://discord.com/api/webhooks/1356944078075592704/w9iRA6KvY2oU61t7PjRjcNFfteV-FRryjStNgxCbO6P7dzI0IoJTUfZf0e6PiM40U1rM"
+	"https://discord.com/api/webhooks/1358070178281422990/ZXhEq4rXoOdGMGBig4vzM5l1lSaqavhhz1HB__XoL6f6Sp0uEi4F6iJKhySgm98Mh8C3"
 
 local OreAnnouncer = {}
 
@@ -116,7 +116,7 @@ function OreAnnouncer:AnnounceOreMined(
 					["url"] = `https://www.roblox.com/users/{Player.UserId}/profile`,
 					["icon_url"] = AvatarURL,
 				},
-				["thumbnail"] = Success and {
+				["thumbnail"] = {
 					["url"] = ImageURL,
 				},
 				["description"] = `{Player.DisplayName} mined {OreDisplayName} at a depth of {Depth}m which means it had a rarity of 1 in {Rarity}{InCave and ` it was found inside of a {CaveName} cave.` or "."}`,
@@ -125,11 +125,18 @@ function OreAnnouncer:AnnounceOreMined(
 		},
 	}
 
-	HttpService:PostAsync(
-		RunService:IsStudio() and STUDIO_URL or URL,
-		HttpService:JSONEncode(Message),
-		Enum.HttpContentType.ApplicationJson
-	)
+	local PostSuccess, ErrorMessage = pcall(function()
+		HttpService:RequestAsync({
+			Url = URL,
+			Method = "POST",
+			Headers = {
+				["Content-Type"] = "application/json",
+			},
+			Body = HttpService:JSONEncode(Message),
+		})
+	end)
+
+	print(PostSuccess, ErrorMessage)
 end
 
 return OreAnnouncer
