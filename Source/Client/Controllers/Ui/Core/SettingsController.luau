@@ -4,6 +4,7 @@ local ReplicatedStorage = game.ReplicatedStorage
 local Core = require(ReplicatedStorage.Game.Modules.Core)
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Logger = require(ReplicatedStorage.Game.Modules.Logger)
+local WindShake = require(ReplicatedStorage.Packages.WindShake)
 
 local SettingsController = Knit.CreateController({ Name = "PlayerSettingsController" })
 
@@ -39,6 +40,12 @@ local function Update()
 		MapProps.Parent = ReplicatedStorage
 	else
 		MapProps.Parent = workspace
+	end
+
+	if Settings.Wind then
+		WindShake:Resume()
+	else
+		WindShake:Pause()
 	end
 end
 

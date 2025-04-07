@@ -33,6 +33,7 @@ export type DataFolder_SettingsFolder = {
 	InventoryShortUnits: BoolValue,
 	HideOverheadGUI: BoolValue,
 	OreCracks: BoolValue,
+	Wind: BoolValue,
 }
 
 export type DataFolder_StatsFolder = {

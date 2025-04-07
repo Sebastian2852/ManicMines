@@ -66,6 +66,8 @@ export type ChatMessage = {
 	Prefix: string,
 	HasPrefix: boolean,
 	MessageColor: Color3,
+	OreCracks: boolean,
+	Wind: boolean,
 }
 
 --[=[

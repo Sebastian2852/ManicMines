@@ -41,6 +41,13 @@ function Graphics:render()
 			Description = "Enable/Disable the ore cracks on blocks that are being mined",
 			LayoutOrder = 3,
 		}, {}),
+
+		Wind = Roact.createElement(BooleanSetting, {
+			SettingName = "Wind",
+			DisplayName = "Wind Effects",
+			Description = "Enable/Disable the slight movment on trees",
+			LayoutOrder = 4,
+		}, {}),
 	})
 end
 

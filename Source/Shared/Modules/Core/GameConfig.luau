@@ -272,6 +272,7 @@ Config.DefaultSettings = {
 	HideMapProps = false,
 	HideOverheadGUI = false,
 	OreCracks = true,
+	Wind = true,
 }
 
 Config.MainMenu = {
