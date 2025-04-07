@@ -88,6 +88,10 @@ function MineEffects:KnitStart()
 				ReplicatedStorage.Player.BelowOptimalDepth.Value = BelowOptimalDepth
 			end
 
+			if workspace.CurrentCamera:HasTag("FORCE_FOV") then
+				continue
+			end
+
 			if CurrentlyTweening then
 				continue
 			end

@@ -4,7 +4,20 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 
 local Settings = Roact.Component:extend("Settings")
 
+local Global = require(ReplicatedStorage.Game.GUI.Global)
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
+
+function Settings:init()
+	Global.init(self)
+end
+
+function Settings:didMount()
+	Global.didMount(self)
+end
+
+function Settings:willUnmount()
+	Global.willUnmount(self)
+end
 
 function Settings:PageButton(LayoutOrder: number, Name: string, Page: ModuleScript)
 	return Roact.createElement("TextButton", {

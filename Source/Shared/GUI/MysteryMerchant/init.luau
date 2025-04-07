@@ -11,6 +11,7 @@ local ClientDataController
 local MysteryMerchant = Roact.Component:extend("MysteryMerchant")
 
 local CloseButton = require(ReplicatedStorage.Game.GUI.Common.CloseButton)
+local Global = require(ReplicatedStorage.Game.GUI.Global)
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 local TradeFrame = require(ReplicatedStorage.Game.GUI.MysteryMerchant.TradeFrame)
 
@@ -86,9 +87,12 @@ function MysteryMerchant:init()
 	MysteryMerchantService = Knit.GetService("MysteryMerchantService")
 	ClientDataController = Knit.GetController("ClientDataController")
 	self.Trove = Trove.new()
+	Global.init(self)
 end
 
 function MysteryMerchant:didMount()
+	Global.didMount(self)
+
 	local SignalConnection = RefreshSignal:Connect(function()
 		local GetPromise = MysteryMerchantService:GetTrades():andThen(function(Trades: { ["Buy"]: {}, ["Sell"]: {} })
 			local Elements = {}
@@ -112,6 +116,7 @@ end
 
 function MysteryMerchant:willUnmount()
 	self.Trove:Clean()
+	Global.willUnmount(self)
 end
 
 function MysteryMerchant:render()

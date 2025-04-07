@@ -8,12 +8,22 @@ local StorageService
 local Storage = Roact.Component:extend("Storage")
 
 local CloseButton = require(ReplicatedStorage.Game.GUI.Common.CloseButton)
+local Global = require(ReplicatedStorage.Game.GUI.Global)
 local InventorySide = require(ReplicatedStorage.Game.GUI.Storage.Inventory)
 local StorageSide = require(ReplicatedStorage.Game.GUI.Storage.Storage)
 local Theme = require(ReplicatedStorage.Game.GUI.Theme)
 
 function Storage:init()
 	StorageService = Knit.GetService("StorageService")
+	Global.init(self)
+end
+
+function Storage:didMount()
+	Global.didMount(self)
+end
+
+function Storage:willUnmount()
+	Global.willUnmount(self)
 end
 
 function Storage:render()
