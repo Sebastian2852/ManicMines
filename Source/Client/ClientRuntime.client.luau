@@ -33,3 +33,10 @@ end
 local Cmdr = require(ReplicatedStorage:WaitForChild("CmdrClient"))
 Cmdr:SetActivationKeys({ Enum.KeyCode.F2 })
 Cmdr:SetPlaceName("ManicMines")
+
+-- [[ WIND ]] --
+
+local WindShake = require(ReplicatedStorage.Packages.WindShake)
+WindShake:Init({
+	MatchWorkspaceWind = true,
+})
