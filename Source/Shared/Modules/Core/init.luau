@@ -80,6 +80,8 @@ export type Settings = {
 	InventoryShortUnits: boolean,
 	HideMapProps: boolean,
 	HideOverheadGUI: boolean,
+	OreCracks: boolean,
+	Wind: boolean,
 }
 
 --[=[
