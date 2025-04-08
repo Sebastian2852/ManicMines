@@ -407,9 +407,22 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	self:AddAirPosition(Position)
 
 	local Layer = self:YLevelToLayer(Position.Y)
+	local ShouldGenerateOre = true
+
+	if Position.Y == TopLayerY and not (TopLayerPositions[KeyVector(Position)] == true) then
+		ShouldGenerateOre = false
+	end
+
+	-- If the block is at the very bottom of the mine then its made unminable to stop players mining below the
+	-- Created layers causing for some visual bugs as well as ore gen breaking
+	local Depth = self:YLevelToDepth(Position.Y)
+	if Depth >= BottomLayerDepth then
+		ShouldGenerateOre = false
+	end
 
 	-- Random number to see if the block should attempt to generate an ore or stone
-	local RandomNumber = NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
+	local RandomNumber = ShouldGenerateOre and NumberGenerator:NextInteger(1, Core.GameConfig.Mine.ChanceToGenerateOre)
+		or 2
 	local Block: BasePart = nil
 	local Stone = Layer.Stone
 
@@ -471,7 +484,6 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 
 	-- If the block is at the very bottom of the mine then its made unminable to stop players mining below the
 	-- Created layers causing for some visual bugs as well as ore gen breaking
-	local Depth = self:YLevelToDepth(Position.Y)
 	if Depth >= BottomLayerDepth then
 		Block.Color = Core.Util:TintColor(Block.Color, Color3.new(0, 0, 0))
 		return Block
