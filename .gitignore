@@ -1,6 +1,7 @@
 #Folders
 Packages/
 Build/
+.DS_Store
 
 #Files
 /Manic Mines.rbxlx
