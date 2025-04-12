@@ -28,7 +28,7 @@ local TycoonUpgradesFolder: Folder = ReplicatedStorage.Assets.Tycoon.Upgrades
 --[[ PRIVATE ]]
 --
 
-local SessionLockStore = DataStoreService:GetDataStore("SessopmLocksV2")
+local SessionLockStore = DataStoreService:GetDataStore("SessionLocksV2")
 
 --[=[
 A list of all the data stores but as save slots so its easier to refrence in the code
