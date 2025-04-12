@@ -28,6 +28,8 @@ local TycoonUpgradesFolder: Folder = ReplicatedStorage.Assets.Tycoon.Upgrades
 --[[ PRIVATE ]]
 --
 
+local SessionLockStore = DataStoreService:GetDataStore("SessopmLocksV2")
+
 --[=[
 A list of all the data stores but as save slots so its easier to refrence in the code
 ]=]
@@ -617,6 +619,30 @@ function DataService:KnitStart()
 	game.Players.PlayerAdded:Connect(function(Player)
 		PlayersLeft += 1
 		self:CreateDataFolderForPlayer(Player)
+
+		local SessionLocked = false
+		local Success, ErrorMessage = pcall(function()
+			SessionLocked = SessionLockStore:GetAsync(Player.UserId)
+		end)
+
+		if not Success then
+			Logger:Warn(ErrorMessage)
+			SessionLocked = true
+		end
+
+		if SessionLocked then
+			Player:Kick("Data saving not finished, please rejoin")
+		end
+
+		local SetSuccess, SetErrorMessage = pcall(function()
+			SessionLockStore:SetAsync(Player.UserId, true)
+		end)
+
+		if not SetSuccess then
+			Player:Kick("Failed to lock session, please rejoin. Error: " .. SetErrorMessage)
+		end
+
+		Logger:Log("Session locked")
 	end)
 
 	game.Players.PlayerRemoving:Connect(function(Player)
@@ -625,6 +651,16 @@ function DataService:KnitStart()
 		self:DeleteDataFolder(Player)
 		self.Players[Player.UserId] = nil
 		TycoonService:DeletePlayerTycoon(Player)
+
+		local SetSuccess, SetErrorMessage = pcall(function()
+			SessionLockStore:SetAsync(Player.UserId, false)
+		end)
+
+		if not SetSuccess then
+			warn("Failed to unlock session: ", SetErrorMessage)
+		end
+
+		Logger:Log("Session unlocked")
 	end)
 
 	game:BindToClose(function(CloseReason: Enum.CloseReason)
