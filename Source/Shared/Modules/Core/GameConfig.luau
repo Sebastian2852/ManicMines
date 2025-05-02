@@ -276,8 +276,8 @@ Config.DefaultSettings = {
 }
 
 Config.MainMenu = {
-	Version = "v1.1.4",
-	TitleScreenVersion = "v1.1.4 - Bringing the heat!",
+	Version = "v1.2.0",
+	TitleScreenVersion = "v1.2 - Bringing the heat!",
 
 	NameTypeCheck = Zeno.String():LongerThan(1):ShorterThan(50),
 
