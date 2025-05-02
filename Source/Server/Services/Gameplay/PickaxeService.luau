@@ -276,10 +276,11 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 	OreList:AddOre(ObjectToMine.Name, ObjectToMine:GetAttribute("AmountDroppedWhenMined"))
 	MineService:GenerateAroundBlockAsync(ObjectToMine)
 
+	local Damage = Pickaxe:GetAttribute("Damage")
+	local Delay = 0.05
+
 	while self.Mining[Player.UserId].Mining and self:VerifyIfCanMine(Player, Character, ObjectToMine) do
 		local Health = ObjectToMine:GetAttribute("Health")
-		local Damage = Pickaxe:GetAttribute("Damage")
-		local Delay = Pickaxe:GetAttribute("Delay")
 
 		if Health <= 0 then
 			local Mined = ObjectToMine:GetAttribute("_MINED")
@@ -299,9 +300,13 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 		local Depth = MineService:YLevelToDepth(ObjectToMine.CFrame.Position.Y)
 
 		if Depth >= OptimalDepth then
-			Health -= (Damage / 2) / Depth
+			local metersBelowOptimalDepth = Depth - OptimalDepth
+			local damage = Damage * 1.1 - (metersBelowOptimalDepth / 10)
+
+			Health = Health - damage
 		else
-			Health -= Damage
+			local damage = Damage * 1.1
+			Health = Health - damage
 		end
 
 		ObjectToMine:SetAttribute("Health", Health)
@@ -318,13 +323,10 @@ function PickaxeService:StartMining(Player: Player, ObjectToMine: BasePart)
 			self:StopMining(Player)
 			task.wait(Delay)
 			MineService:BlockMined(ObjectToMine, Player)
-			task.wait(Delay / 2)
 			break
 		end
 
-		if Delay > 0 then
-			task.wait(Pickaxe:GetAttribute("Delay") * 2)
-		end
+		task.wait(Delay)
 	end
 
 	OreList:Destroy()
@@ -363,7 +365,7 @@ function PickaxeService:StopMining(Player: Player)
 		self.Mining[Player.UserId].Object = nil
 
 		if Pickaxe:GetAttribute("Delay") > 0 then
-			task.wait(Pickaxe:GetAttribute("Delay") * 2)
+			task.wait(Pickaxe:GetAttribute("Delay"))
 		end
 		self.Mining[Player.UserId].Cooldown = false
 

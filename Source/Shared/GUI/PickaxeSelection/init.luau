@@ -32,14 +32,17 @@ function PickaxeSelection:init()
 				return
 			end
 
-			local AdjustedDamage = (Pickaxe:GetAttribute("Damage") / 2) / Block:GetAttribute("Depth") or -1
+			local damage = Pickaxe:GetAttribute("Damage")
 
-			if (Block:GetAttribute("Depth") or -1) < ReplicatedStorage.Player.OptimalDepth.Value then
-				AdjustedDamage = Pickaxe:GetAttribute("Damage")
+			local AdjustedDamage = damage * 1.1
+
+			if (Block:GetAttribute("Depth") or -1) >= ReplicatedStorage.Player.OptimalDepth.Value then
+				local metersBelowOptimalDepth = ReplicatedStorage.Player.DepthDifference.Value
+				AdjustedDamage = damage * 1.1 - (metersBelowOptimalDepth / 10)
 			end
 
 			local HitsNeeded = math.ceil(Health / AdjustedDamage)
-			local TimePerHit = Pickaxe:GetAttribute("Delay")
+			local TimePerHit = 0.05
 			local TotalTime = HitsNeeded * TimePerHit
 
 			self:setState({

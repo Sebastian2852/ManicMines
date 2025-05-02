@@ -467,8 +467,16 @@ function MineService:GenerateAtPosition(Position: Vector3, InCave: boolean)
 	Block:PivotTo(CFrame.new(Position))
 	Block.Parent = Workspace.Game.Mine
 	Block.Anchored = true
+
 	-- Set the depth attribute so that the client can easily calculate depth-based things like turning point without doing any maths or events
-	Block:SetAttribute("Depth", self:YLevelToDepth(Block.CFrame.Position.Y))
+	local depth = self:YLevelToDepth(Block.CFrame.Position.Y)
+	Block:SetAttribute("Depth", depth)
+
+	local normalHealth: number = Block:GetAttribute("Health")
+	local newHealth = math.floor(normalHealth + (depth / 50))
+	Block:SetAttribute("Health", newHealth)
+	Block:SetAttribute("MaxHealth", newHealth)
+
 	Block:AddTag("Mine/Block")
 	self.MineStats.BlocksGenerated += 1
 	self:UpdateMiningConditions()
