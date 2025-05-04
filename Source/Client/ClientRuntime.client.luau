@@ -37,6 +37,7 @@ Cmdr:SetPlaceName("ManicMines")
 -- [[ WIND ]] --
 
 local WindShake = require(ReplicatedStorage.Packages.WindShake)
+WindShake.RenderDistance = 10
 WindShake:Init({
 	MatchWorkspaceWind = true,
 })

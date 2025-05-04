@@ -273,6 +273,7 @@ Config.DefaultSettings = {
 	HideOverheadGUI = false,
 	OreCracks = true,
 	Wind = true,
+	WindDistance = 50,
 }
 
 Config.MainMenu = {

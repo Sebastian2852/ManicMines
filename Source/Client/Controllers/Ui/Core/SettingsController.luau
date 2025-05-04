@@ -43,6 +43,7 @@ local function Update()
 	end
 
 	if Settings.Wind then
+		WindShake.RenderDistance = Settings.WindDistance
 		WindShake:Resume()
 	else
 		WindShake:Pause()

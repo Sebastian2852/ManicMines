@@ -82,6 +82,7 @@ export type Settings = {
 	HideOverheadGUI: boolean,
 	OreCracks: boolean,
 	Wind: boolean,
+	WindDistance: number,
 }
 
 --[=[

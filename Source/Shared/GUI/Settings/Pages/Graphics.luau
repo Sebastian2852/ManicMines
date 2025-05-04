@@ -5,6 +5,7 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local Graphics = Roact.Component:extend("Graphics")
 
 local BooleanSetting = require(ReplicatedStorage.Game.GUI.Settings.Components.BooleanSetting)
+local NumberSetting = require(ReplicatedStorage.Game.GUI.Settings.Components.NumberSetting)
 local Title = require(ReplicatedStorage.Game.GUI.Settings.Components.Title)
 
 function Graphics:render()
@@ -47,6 +48,16 @@ function Graphics:render()
 			DisplayName = "Wind Effects",
 			Description = "Enable/Disable the slight movment on trees",
 			LayoutOrder = 4,
+		}, {}),
+
+		WindDistance = Roact.createElement(NumberSetting, {
+			SettingName = "WindDistance",
+			DisplayName = "Wind Distance",
+			Description = "Maximum distance wind can affect parts. ",
+			LayoutOrder = 5,
+
+			MinValue = 1,
+			MaxValue = 300,
 		}, {}),
 	})
 end
